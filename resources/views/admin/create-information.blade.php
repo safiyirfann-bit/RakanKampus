@@ -1,0 +1,1 @@
+<h1>Add Information</h1> <a href="{{ url('/admin/dashboard') }}">Back</a>
