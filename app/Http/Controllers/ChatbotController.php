@@ -45,6 +45,20 @@ class ChatbotController extends Controller
 
         $entries = $this->searchKnowledgeBase($message);
 
+
+        if ($entries->isEmpty()) {
+    $existing = \App\Models\UnansweredQuestion::where('question', $message)->first();
+
+    if ($existing) {
+        $existing->increment('asked_count');
+    } else {
+        \App\Models\UnansweredQuestion::create([
+            'user_id' => $user->id,
+            'question' => $message,
+        ]);
+    }
+}
+
 $context = $entries->isEmpty() ? null : $entries->map(function ($entry) {
     return "Soalan: {$entry->question}\nJawapan: {$entry->answer}";
 })->implode("\n\n");

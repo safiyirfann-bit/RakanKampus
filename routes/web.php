@@ -6,6 +6,7 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\KnowledgeBaseController;
+use App\Http\Controllers\Admin\UnansweredQuestionController;
 use App\Http\Controllers\FeedbackController;
 
 /*
@@ -168,6 +169,16 @@ Route::middleware(['auth', 'admin'])
         // Inbox
         Route::get('/inbox', [FeedbackController::class, 'inbox'])
             ->name('inbox');
+
+        // Unanswered questions
+Route::get('/unanswered', [UnansweredQuestionController::class, 'index'])
+    ->name('unanswered.index');
+
+Route::post('/unanswered/{unansweredQuestion}/answer', [UnansweredQuestionController::class, 'storeAndResolve'])
+    ->name('unanswered.answer');
+
+Route::put('/unanswered/{unansweredQuestion}/resolve', [UnansweredQuestionController::class, 'resolve'])
+    ->name('unanswered.resolve');
 
         // Category pages
         Route::view('/category/mpp', 'admin.category-detail')
