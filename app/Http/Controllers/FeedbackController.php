@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
 {
-    // Student submit feedback
     public function store(Request $request)
     {
         Feedback::create([
@@ -19,10 +18,11 @@ class FeedbackController extends Controller
         return back()->with('success', 'Feedback sent successfully!');
     }
 
-    // Admin view inbox
     public function inbox()
     {
         $feedbacks = Feedback::latest()->get();
+
+        Feedback::where('is_read', false)->update(['is_read' => true]);
 
         return view('admin.inbox', compact('feedbacks'));
     }

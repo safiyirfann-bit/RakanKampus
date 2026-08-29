@@ -12,5 +12,6 @@ class Feedback extends Model
         'user_name',
         'feedback',
         'feature_request',
+        'is_read',
     ];
 }

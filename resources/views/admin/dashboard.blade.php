@@ -471,13 +471,26 @@ body{
     <!-- Right Actions -->
     <div class="header-actions">
 
+        <!-- Unanswered Questions -->
+        <a href="{{ route('admin.unanswered.index') }}" class="inbox-btn" aria-label="Unanswered questions">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            @if($unansweredCount > 0)
+                <span class="badge-count">{{ $unansweredCount }}</span>
+            @endif
+        </a>
+
         <!-- Feedback Inbox -->
         <a href="{{ route('admin.inbox') }}" class="inbox-btn" aria-label="Feedback inbox">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8m-2 10H5a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2z"/>
             </svg>
-            <span class="badge-count" id="feedbackBadge">3</span>
+            @if($unreadFeedbackCount > 0)
+                <span class="badge-count">{{ $unreadFeedbackCount }}</span>
+            @endif
         </a>
 
         <!-- Logout -->
@@ -672,30 +685,6 @@ body{
 </script>
 
 <script>
-  // Same data as feedback-inbox.html, kept here only to compute the unread badge.
-  const feedbackItems = [
-    { unread: true },
-    { unread: true },
-    { unread: true },
-    { unread: false },
-    { unread: false },
-    { unread: true },
-    { unread: false },
-  ];
-
-  function updateBadgeCount() {
-    const unreadCount = feedbackItems.filter(item => item.unread).length;
-    const badge = document.getElementById("feedbackBadge");
-    if (unreadCount > 0) {
-      badge.textContent = unreadCount;
-      badge.style.display = "flex";
-    } else {
-      badge.style.display = "none";
-    }
-  }
-
-  updateBadgeCount();
-
   function openModal() {
       document.getElementById('addModal').style.display = 'flex';
   }

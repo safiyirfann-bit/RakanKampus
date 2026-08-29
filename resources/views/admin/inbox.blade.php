@@ -331,7 +331,7 @@
             @forelse($feedbacks as $item)
 
                 @if($item->feedback)
-                    <div class="item {{ $loop->first ? 'unread' : '' }}" data-type="feedback">
+                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="feedback">
 
                         <div class="type-icon feedback">
                             <i class="ti ti-message-2" aria-hidden="true"></i>
@@ -354,7 +354,7 @@
                 @endif
 
                 @if($item->feature_request)
-                    <div class="item" data-type="feature">
+                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="feature">
 
                         <div class="type-icon feature">
                             <i class="ti ti-bulb" aria-hidden="true"></i>

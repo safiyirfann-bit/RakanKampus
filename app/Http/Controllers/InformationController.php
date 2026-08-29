@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Information;
+use App\Models\UnansweredQuestion;
 use Illuminate\Http\Request;
 
 class InformationController extends Controller
@@ -10,8 +11,10 @@ class InformationController extends Controller
     public function index()
     {
         $informations = Information::latest()->get();
+        $unansweredCount = UnansweredQuestion::where('status', 'pending')->count();
+        $unreadFeedbackCount = \App\Models\Feedback::where('is_read', false)->count();
 
-        return view('admin.dashboard', compact('informations'));
+        return view('admin.dashboard', compact('informations', 'unansweredCount', 'unreadFeedbackCount'));
     }
 
     public function store(Request $request)
