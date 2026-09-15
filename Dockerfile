@@ -8,7 +8,9 @@ RUN npm run build
 
 # Stage 2: bina app PHP sebenar
 FROM richarvey/nginx-php-fpm:3.1.6
+ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY . .
+RUN composer install --no-dev --working-dir=/var/www/html --optimize-autoloader --no-interaction
 COPY --from=assets /app/public/build ./public/build
 
 ENV SKIP_COMPOSER=1
@@ -19,7 +21,6 @@ ENV REAL_IP_HEADER=1
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
-ENV COMPOSER_ALLOW_SUPERUSER=1
 
 EXPOSE 80
 
