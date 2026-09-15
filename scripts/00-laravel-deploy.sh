@@ -12,6 +12,9 @@ php artisan migrate --force
 echo "Seeding FAQ knowledge base (skips if already seeded)..."
 php artisan db:seed --class='Database\Seeders\FaqDatabaseSeeder' --force
 
+echo "Importing users from secret file (if present)..."
+php artisan app:seed-users-secret
+
 if [ -n "$ADMIN_EMAIL" ]; then
     echo "Promoting $ADMIN_EMAIL to admin..."
     php artisan app:make-admin "$ADMIN_EMAIL"
