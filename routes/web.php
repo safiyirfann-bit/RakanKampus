@@ -7,6 +7,7 @@ use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\KnowledgeBaseController;
 use App\Http\Controllers\Admin\UnansweredQuestionController;
+use App\Http\Controllers\Admin\DatabaseViewerController;
 use App\Http\Controllers\FeedbackController;
 
 /*
@@ -179,6 +180,10 @@ Route::post('/unanswered/{unansweredQuestion}/answer', [UnansweredQuestionContro
 
 Route::put('/unanswered/{unansweredQuestion}/resolve', [UnansweredQuestionController::class, 'resolve'])
     ->name('unanswered.resolve');
+
+        // Database viewer (read-only)
+        Route::get('/database', [DatabaseViewerController::class, 'index'])
+            ->name('database');
 
         // Category pages
         Route::view('/category/mpp', 'admin.category-detail')
