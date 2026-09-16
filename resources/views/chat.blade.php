@@ -6,7 +6,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>RakanKampus - New Conversation</title>
 <style>
-  
+
   :root {
     --blue-primary: #60a5fa;
     --blue-dark: #3355a6;
@@ -226,6 +226,12 @@
     display: flex;
   }
 
+  .hidden { display: none !important; }
+
+.stop-btn {
+  background: #ef4444;
+}
+
   .menu-btn svg { width: 22px; height: 22px; stroke: var(--blue-primary); }
 
   .topbar-title { font-size: 16px; font-weight: 800; color: var(--blue-dark); margin: 0; }
@@ -426,8 +432,8 @@
     color: #dc2626 !important;
 }
 
-#recentSearchInput::placeholder { 
-  color: rgba(255,255,255,0.7); 
+#recentSearchInput::placeholder {
+  color: rgba(255,255,255,0.7);
   }
 
   @keyframes gradientShift {
@@ -521,6 +527,11 @@
               <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
             </svg>
           </button>
+          <button class="send-btn stop-btn hidden" id="stopBtn" aria-label="Stop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+              <rect x="7" y="7" width="10" height="10" rx="2"></rect>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -536,6 +547,8 @@ const newChatBtn = document.getElementById('newChatBtn');
 const recentList = document.getElementById('recentList');
 let emptyState = document.getElementById('emptyState');
 let currentConversationId = null;
+const stopBtn = document.getElementById('stopBtn');
+let currentController = null;
 
 menuBtn.addEventListener('click', () => {
   app.classList.toggle('sidebar-collapsed');
@@ -578,6 +591,10 @@ function sendMessage(){
   const typingMsg = addMessage('Menaip...', 'bot');
   typingMsg.id = 'typingIndicator';
 
+  currentController = new AbortController();
+  sendBtn.classList.add('hidden');
+  stopBtn.classList.remove('hidden');
+
   fetch('/chatbot', {
     method: 'POST',
     headers: {
@@ -585,6 +602,7 @@ function sendMessage(){
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
     },
     body: JSON.stringify({ message: text, conversation_id: currentConversationId }),
+    signal: currentController.signal,
   })
     .then(res => res.json())
     .then(data => {
@@ -598,9 +616,18 @@ function sendMessage(){
         addMessage('Maaf, ada masalah semasa mendapatkan jawapan. Sila cuba lagi.', 'bot');
       }
     })
-    .catch(() => {
+    .catch((error) => {
       document.getElementById('typingIndicator')?.remove();
-      addMessage('Maaf, tidak dapat sambung ke server. Sila cuba lagi.', 'bot');
+      if (error.name === 'AbortError') {
+        addMessage('(Dihentikan)', 'bot');
+      } else {
+        addMessage('Maaf, tidak dapat sambung ke server. Sila cuba lagi.', 'bot');
+      }
+    })
+    .finally(() => {
+      sendBtn.classList.remove('hidden');
+      stopBtn.classList.add('hidden');
+      currentController = null;
     });
 }
 
@@ -734,6 +761,9 @@ newChatBtn.addEventListener('click', () => {
 });
 
 sendBtn.addEventListener('click', sendMessage);
+stopBtn.addEventListener('click', () => {
+  if (currentController) currentController.abort();
+});
 
 messageInput.addEventListener('keypress', function(e){
   if(e.key === 'Enter'){
