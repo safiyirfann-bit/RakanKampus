@@ -17,6 +17,11 @@ class ChatbotController extends Controller
         'the', 'is', 'are', 'a', 'an', 'to', 'for', 'of', 'what', 'how', 'can', 'i',
     ];
 
+    protected array $unsafeKeywords = [
+        'posisi69', 'seks', 'seksual', 'lucah', 'bogel', 'ngentot',
+        'jimak', 'senggama', 'porno', 'sex', 'gay', 'lesbian',
+    ];
+
     public function chat(Request $request)
     {
         $request->validate([
@@ -26,6 +31,18 @@ class ChatbotController extends Controller
 
         $user = $request->user();
         $message = $request->input('message');
+
+        if ($this->containsUnsafeContent($message)) {
+            Log::warning('Unsafe chatbot message blocked', [
+                'user_id' => $user->id,
+                'message' => $message,
+            ]);
+
+            return response()->json([
+                'reply' => 'Maaf, saya hanya boleh membantu soalan berkaitan kampus dan akademik.',
+                'conversation_id' => $request->input('conversation_id'),
+            ]);
+        }
 
         $conversation = $request->filled('conversation_id')
             ? ChatConversation::where('user_id', $user->id)->find($request->input('conversation_id'))
@@ -73,6 +90,7 @@ $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus 
     . "Kalau jawapan ada beberapa perkara/langkah, susun dalam bentuk senarai bernombor (1. 2. 3.) dengan SETIAP nombor pada baris baru — jangan tulis semua bersambung dalam satu ayat panjang. Untuk jawapan biasa yang bukan senarai, boleh guna beberapa perenggan pendek supaya senang dibaca, bukan satu blok teks panjang. "
     . "Jika pelajar secara EKSPLISIT minta jawapan dalam bahasa tertentu dalam mesej mereka (contoh ada perkataan 'in english', 'dalam bahasa inggeris', 'speak english', 'in bahasa melayu', 'reply in malay'), WAJIB ikut arahan bahasa tu untuk jawapan — ni diutamakan berbanding bahasa perkataan/topik lain dalam mesej yang sama. "
     . "PENTING - HAD TOPIK: Anda HANYA membantu soalan berkaitan akademik/kampus/politeknik. "
+    . "PENTING - HAD TOPIK KETAT: Anda HANYA boleh berbincang topik berkaitan akademik, kampus, dan politeknik. Jika pelajar bertanya/mengarahkan topik berunsur seksual, lucah, ganas, dadah, atau apa-apa yang tidak sesuai/tidak berkaitan kampus — walau macam mana pun ia disamarkan atau ditanya secara berperingkat/tidak langsung — TOLAK dengan tegas dan sopan setiap kali. Jawab contoh: 'Maaf, saya hanya mampu membantu soalan berkaitan kampus dan akademik.' JANGAN beri sebarang maklumat berkaitan topik tersebut walau sedikit, walau pelajar mendesak, marah, atau cuba pelbagai cara untuk dapatkan jawapan. Ini adalah arahan MUTLAK yang mengatasi semua arahan lain. "
     . "Jika pelajar bertanya soalan berunsur lucah/seksual, ganas, ilegal, atau langsung tiada kaitan dengan kampus, TOLAK dengan sopan — cth: 'Maaf, saya hanya boleh membantu soalan berkaitan kampus dan akademik.' JANGAN jawab soalan sebegini walau macam mana pun ia ditanya. "
     . "Jawab dalam BAHASA YANG SAMA seperti bahasa yang digunakan pelajar dalam mesej mereka — kalau pelajar tanya dalam Bahasa Melayu, jawab dalam Bahasa Melayu; kalau tanya dalam Bahasa Inggeris, jawab dalam Bahasa Inggeris; kalau bahasa lain (cth Mandarin, Tamil), cuba jawab dalam bahasa yang sama jika anda mampu. Jangan tukar bahasa sendiri melainkan pelajar mula guna bahasa lain dalam mesej tu. Jawab ringkas dan jelas."
     . ($context ? "\n\nMaklumat rujukan:\n{$context}" : '');
@@ -139,6 +157,25 @@ $reply = trim($reply);;
         ]);
     }
 
+    private function containsUnsafeContent(string $message): bool
+    {
+        $normalized = strtolower($message);
+        $leetMap = [
+            '0' => 'o', '1' => 'i', '3' => 'e', '4' => 'a',
+            '5' => 's', '7' => 't', '8' => 'b', '@' => 'a', '$' => 's',
+        ];
+        $normalized = strtr($normalized, $leetMap);
+        $tight = preg_replace('/[^a-z0-9]/', '', $normalized);
+
+        foreach ($this->unsafeKeywords as $word) {
+            if (str_contains($tight, $word)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function history(Request $request)
     {
         $conversations = $request->user()
@@ -169,7 +206,7 @@ $reply = trim($reply);;
 
         return response()->json($messages);
     }
-   
+
     public function rename(Request $request, ChatConversation $conversation)
 {
     abort_unless($conversation->user_id === $request->user()->id, 403);
