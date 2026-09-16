@@ -102,7 +102,7 @@ $response = Http::withToken(config('services.groq.key'))
     ]);
 
 if ($response->failed()) {
-    \Log::error('Groq API error', [
+    Log::error('Groq API error', [
         'status' => $response->status(),
         'body' => $response->body(),
     ]);
