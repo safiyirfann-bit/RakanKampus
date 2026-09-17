@@ -50,6 +50,7 @@
   .app {
     display: flex;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
 
@@ -57,6 +58,7 @@
     width: 300px;
     min-width: 300px;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: linear-gradient(160deg, #24476b, #60a5fa, #24476b);
     color: #fff;
@@ -386,6 +388,7 @@
       position: fixed;
       z-index: 20;
       height: 100vh;
+      height: 100dvh;
     }
     .app.sidebar-collapsed .sidebar {
       margin-left: -300px;
