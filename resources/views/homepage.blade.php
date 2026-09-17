@@ -607,7 +607,7 @@
     @empty
 
         <p style="text-align:center; color: var(--text-muted); padding: 24px 0; grid-column: 1/-1;">
-            Belum ada perbualan lagi. Mula chat pertama anda! 💬
+            No conversations yet. Start your first chat! 💬
         </p>
 
     @endforelse

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Soalan Belum Terjawab</title>
+    <title>Unanswered Questions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css">
 
@@ -321,8 +321,8 @@
         </a>
 
         <div>
-            <h1>Soalan Belum Terjawab</h1>
-            <p>Soalan yang bot tak jumpa jawapan dalam knowledge base</p>
+            <h1>Unanswered Questions</h1>
+            <p>Questions the bot couldn't find an answer for in the knowledge base</p>
         </div>
 
     </div>
@@ -340,7 +340,7 @@
             </div>
 
             <div class="stat-card">
-                <p class="label">Jumlah Kali Ditanya</p>
+                <p class="label">Total Times Asked</p>
                 <p class="value">{{ $questions->sum('asked_count') }}</p>
             </div>
 
@@ -353,7 +353,7 @@
         <div class="tabs">
             <button class="tab active" onclick="setTab('pending', this)">
                 <i class="ti ti-help-circle" aria-hidden="true"></i>
-                Belum Terjawab
+                Unanswered
             </button>
             <button class="tab" onclick="setTab('history', this)">
                 <i class="ti ti-history" aria-hidden="true"></i>
@@ -374,10 +374,10 @@
 
                     <div class="body">
                         <div class="row-top">
-                            <div class="title">{{ $q->question }} <span>· ditanya {{ $q->asked_count }}x</span></div>
+                            <div class="title">{{ $q->question }} <span>· asked {{ $q->asked_count }}x</span></div>
                             <div class="time">{{ $q->created_at->diffForHumans() }}</div>
                         </div>
-                        <p class="preview">Belum ada jawapan dalam knowledge base untuk soalan ni.</p>
+                        <p class="preview">No answer in the knowledge base for this question yet.</p>
 
                         <div style="display:flex; gap:8px; margin-top:10px;">
                             <button type="button" class="resolve-btn" style="background:#8b5cf6; border-color:#8b5cf6; color:white;"
@@ -399,8 +399,8 @@
 
                 <div class="item">
                     <div class="body">
-                        <div class="title">Takde soalan belum terjawab 🎉</div>
-                        <p class="preview">Semua soalan pelajar dah ada dalam knowledge base.</p>
+                        <div class="title">No unanswered questions 🎉</div>
+                        <p class="preview">All student questions are already in the knowledge base.</p>
                     </div>
                 </div>
 
@@ -422,7 +422,7 @@
                     <div class="body">
                         <div class="row-top">
                             <div class="title">
-                                {{ $h->question }} <span>· ditanya {{ $h->asked_count }}x</span>
+                                {{ $h->question }} <span>· asked {{ $h->asked_count }}x</span>
                                 <span class="resolution-tag {{ $h->resolution }}">
                                     {{ $h->resolution === 'answered' ? 'Dijawab' : 'Diabaikan' }}
                                 </span>
@@ -437,8 +437,8 @@
 
                 <div class="item">
                     <div class="body">
-                        <div class="title">Takde history lagi</div>
-                        <p class="preview">Soalan yang dah diselesaikan akan muncul di sini.</p>
+                        <div class="title">No history yet</div>
+                        <p class="preview">Resolved questions will appear here.</p>
                     </div>
                 </div>
 
@@ -462,7 +462,7 @@
                 <div class="form-group">
                     <label>Main Topic</label>
                     <select name="information_id" id="answer_topic" required>
-                        <option value="">-- Pilih Topic --</option>
+                        <option value="">-- Select Topic --</option>
                         @foreach($topics as $topic)
                             <option value="{{ $topic->id }}">{{ $topic->main_topic }}</option>
                         @endforeach
@@ -481,12 +481,12 @@
 
                 <div class="form-group">
                     <label>Answer</label>
-                    <textarea name="answer" id="answer_answer" rows="4" placeholder="Tulis jawapan di sini..." required></textarea>
+                    <textarea name="answer" id="answer_answer" rows="4" placeholder="Write the answer here..." required></textarea>
                 </div>
 
                 <div class="form-group">
                     <label>Key Words</label>
-                    <input type="text" name="keywords" id="answer_keywords" placeholder="e.g. yuran, bayaran, tarikh akhir">
+                    <input type="text" name="keywords" id="answer_keywords" placeholder="e.g. fees, payment, deadline">
                 </div>
 
                 <div class="modal-actions">

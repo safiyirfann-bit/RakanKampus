@@ -266,7 +266,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
             </svg>
         </div>
-        <h2 id="alertTitle" class="text-lg font-bold text-indigo-900 mb-1">Perhatian</h2>
+        <h2 id="alertTitle" class="text-lg font-bold text-indigo-900 mb-1">Notice</h2>
         <p id="alertMessage" class="text-sm text-indigo-400 mb-6">&nbsp;</p>
         <button type="button" onclick="closeAlertModal()"
             class="w-full rounded-2xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 transition">
@@ -353,7 +353,7 @@ document.getElementById('alertModal').addEventListener('click', function(e) {
 
 function uploadPhoto() {
     if (!selectedFile) {
-        showAlert('warning', 'Perhatian', 'Sila pilih gambar dahulu.');
+        showAlert('warning', 'Notice', 'Please choose an image first.');
         return;
     }
 
@@ -374,12 +374,12 @@ function uploadPhoto() {
                 `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="Profile photo">`;
             closePhotoModal();
         } else {
-            showAlert('error', 'Gagal', 'Gagal upload gambar.');
+            showAlert('error', 'Failed', 'Failed to upload image.');
         }
     })
     .catch(err => {
         console.error(err);
-        showAlert('error', 'Ralat', 'Ada ralat semasa upload.');
+        showAlert('error', 'Error', 'An error occurred during upload.');
     });
 }
 </script>

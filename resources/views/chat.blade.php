@@ -588,7 +588,7 @@ function sendMessage(){
   addMessage(text, 'user');
   messageInput.value = '';
 
-  const typingMsg = addMessage('Menaip...', 'bot');
+  const typingMsg = addMessage('Typing...', 'bot');
   typingMsg.id = 'typingIndicator';
 
   currentController = new AbortController();
@@ -613,15 +613,15 @@ function sendMessage(){
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
-        addMessage('Maaf, ada masalah semasa mendapatkan jawapan. Sila cuba lagi.', 'bot');
+        addMessage('Sorry, there was a problem getting a response. Please try again.', 'bot');
       }
     })
     .catch((error) => {
       document.getElementById('typingIndicator')?.remove();
       if (error.name === 'AbortError') {
-        addMessage('(Dihentikan)', 'bot');
+        addMessage('(Stopped)', 'bot');
       } else {
-        addMessage('Maaf, tidak dapat sambung ke server. Sila cuba lagi.', 'bot');
+        addMessage('Sorry, unable to connect to the server. Please try again.', 'bot');
       }
     })
     .finally(() => {
