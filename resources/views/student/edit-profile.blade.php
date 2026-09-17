@@ -383,10 +383,10 @@ function snapPhoto() {
     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
     canvas.toBlob(function (blob) {
-        const file = new File([blob], 'selfie.png', { type: 'image/png' });
+        const file = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
         stopCamera();
         handlePhotoFile(file);
-    }, 'image/png');
+    }, 'image/jpeg', 0.9);
 }
 
 function handlePhotoFile(file) {
