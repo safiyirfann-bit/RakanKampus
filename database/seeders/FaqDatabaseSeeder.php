@@ -19,6 +19,12 @@ class FaqDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Information::exists()) {
+            $this->command?->info('FAQ data already seeded, skipping.');
+
+            return;
+        }
+
         $topics = require database_path('seeders/data/faq_data.php');
 
         foreach ($topics as $topic) {
