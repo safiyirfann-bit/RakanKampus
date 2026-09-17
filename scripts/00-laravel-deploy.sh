@@ -2,6 +2,9 @@
 echo "Running composer install..."
 composer install --no-dev --working-dir=/var/www/html --optimize-autoloader
 
+echo "Linking storage..."
+php artisan storage:link
+
 echo "Caching config..."
 php artisan config:cache
 
