@@ -326,6 +326,7 @@ function handlePhotoFile(file) {
             document.getElementById('noPhotoText').classList.add('hidden');
         };
         reader.readAsDataURL(selectedFile);
+        uploadPhoto();
     }
 }
 
