@@ -77,6 +77,26 @@
     padding: 20px 20px 16px;
   }
 
+  .sidebar-close-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-close-btn:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .sidebar-close-btn svg { width: 20px; height: 20px; }
+
   .sidebar-logo {
     width: 42px;
     height: 42px;
@@ -454,6 +474,12 @@
           <x-brand-logo size="42" />
         </div>
         <span class="sidebar-brand">RakanKampus</span>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
 
       <a href="{{ route('student.profile') }}" class="sidebar-user" style="text-decoration:none; color:inherit; cursor:pointer;">
@@ -552,6 +578,11 @@ let currentController = null;
 
 menuBtn.addEventListener('click', () => {
   app.classList.toggle('sidebar-collapsed');
+});
+
+const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+sidebarCloseBtn.addEventListener('click', () => {
+  app.classList.add('sidebar-collapsed');
 });
 
 function showEmptyState(){
