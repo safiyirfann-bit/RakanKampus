@@ -33,7 +33,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         body > div:not(.bg-blob) { animation: fadeInUp 0.45s ease both; }
-    
+
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -219,7 +219,7 @@
         <!-- Actions -->
         <div class="px-6 grid grid-cols-2 gap-4 mb-5">
 
-            <button type="button"
+            <button type="button" onclick="document.getElementById('selfieInput').click()"
                 class="rounded-2xl border border-indigo-100 bg-indigo-50/50 py-4 flex flex-col items-center gap-2 hover:bg-indigo-100 transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -227,6 +227,8 @@
                 </svg>
 
                 <span class="font-medium text-indigo-700">Take selfie</span>
+
+                <input type="file" accept="image/*" capture="user" class="hidden" id="selfieInput">
 
             </button>
 
@@ -313,8 +315,8 @@ document.getElementById('photoModal').addEventListener('click', function(e) {
 
 let selectedFile = null;
 
-document.getElementById('photoInput').addEventListener('change', function(e) {
-    selectedFile = e.target.files[0];
+function handlePhotoFile(file) {
+    selectedFile = file;
     if (selectedFile) {
         const reader = new FileReader();
         reader.onload = function(ev) {
@@ -325,6 +327,14 @@ document.getElementById('photoInput').addEventListener('change', function(e) {
         };
         reader.readAsDataURL(selectedFile);
     }
+}
+
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    handlePhotoFile(e.target.files[0]);
+});
+
+document.getElementById('selfieInput').addEventListener('change', function(e) {
+    handlePhotoFile(e.target.files[0]);
 });
 
 function showAlert(type, title, message) {
