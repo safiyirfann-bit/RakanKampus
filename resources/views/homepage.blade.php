@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>RakanKampus - Home</title>
 <style>
   :root {
@@ -276,6 +277,46 @@
     z-index: 1;
   }
 
+  .reminders-banner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: linear-gradient(120deg, #14213d, #1b3a5c 55%, #2ec4c6);
+    border-radius: 18px;
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 24px rgba(20, 33, 61, 0.25);
+    text-decoration: none;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    animation: fadeInUp 0.5s ease 0.05s both;
+  }
+
+  .reminders-banner:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(20, 33, 61, 0.35);
+  }
+
+  .reminders-banner-icon {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .reminders-banner-icon svg { width: 20px; height: 20px; stroke: #fff; }
+
+  .reminders-banner-body { flex: 1; min-width: 0; }
+
+  .reminders-banner-title { font-size: 15px; font-weight: 700; color: #fff; margin: 0; }
+
+  .reminders-banner-sub { font-size: 12.5px; color: #bfe9ea; margin: 4px 0 0; }
+
+  .reminders-banner > svg { width: 16px; height: 16px; stroke: #fff; flex-shrink: 0; }
+
   .quick-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -448,6 +489,32 @@
     stroke: #b8c3e0;
   }
 
+  .conv-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .conv-action-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .conv-action-btn:hover {
+    color: #6d28d9;
+    background: #f5f2ff;
+  }
+
+  .conv-action-btn svg { width: 15px; height: 15px; }
+
   /* Help FAB */
   .help-fab {
     position: fixed;
@@ -564,6 +631,17 @@
       <p class="greeting-question">How can I help you today?</p>
     </div>
 
+    <a href="{{ route('student.reminders') }}" class="reminders-banner">
+      <div class="reminders-banner-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+      </div>
+      <div class="reminders-banner-body">
+        <p class="reminders-banner-title">Reminders</p>
+        <p class="reminders-banner-sub">For exams, assignments &amp; deadlines</p>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+    </a>
+
     <div class="quick-grid">
   <a href="{{ route('student.chat') }}?q={{ urlencode('How do I register for courses?') }}" class="quick-chip">How do I register for courses?</a>
   <a href="{{ route('student.chat') }}?q={{ urlencode('When is the fee payment deadline?') }}" class="quick-chip">When is the fee payment deadline?</a>
@@ -588,7 +666,7 @@
 
     @forelse($conversations as $conv)
 
-        <a href="{{ route('student.chat') }}?conversation={{ $conv['id'] }}" class="conv-card">
+        <div class="conv-card" data-conv-id="{{ $conv['id'] }}" data-conv-title="{{ $conv['title'] }}" onclick="window.location='{{ route('student.chat') }}?conversation={{ $conv['id'] }}'">
             <div class="conv-icon">
                 <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -600,9 +678,16 @@
             </div>
             <div class="conv-meta">
                 <span class="conv-time">{{ $conv['time'] }}</span>
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </div>
-        </a>
+            <div class="conv-actions">
+                <button type="button" class="conv-action-btn" aria-label="Edit" onclick="event.stopPropagation(); renameHomeConversation({{ $conv['id'] }}, {{ Js::from($conv['title']) }})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+                </button>
+                <button type="button" class="conv-action-btn" aria-label="Delete" onclick="event.stopPropagation(); deleteHomeConversation({{ $conv['id'] }})">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
 
     @empty
 
@@ -617,6 +702,45 @@
   </div>
 
   <button class="help-fab" aria-label="Help">?</button>
+
+<script>
+function renameHomeConversation(id, currentTitle) {
+    const newTitle = prompt('Rename conversation:', currentTitle);
+    if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
+
+    fetch(`/chatbot/${id}/rename`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify({ title: newTitle.trim() }),
+    })
+    .then(res => res.json())
+    .then(() => {
+        const card = document.querySelector(`.conv-card[data-conv-id="${id}"]`);
+        if (card) card.querySelector('.conv-title').textContent = newTitle.trim();
+    })
+    .catch(err => console.error('Rename failed', err));
+}
+
+function deleteHomeConversation(id) {
+    if (!confirm('Delete this conversation?')) return;
+
+    fetch(`/chatbot/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    })
+    .then(res => res.json())
+    .then(() => {
+        const card = document.querySelector(`.conv-card[data-conv-id="${id}"]`);
+        if (card) card.remove();
+    })
+    .catch(err => console.error('Delete failed', err));
+}
+</script>
 
 </body>
 </html>

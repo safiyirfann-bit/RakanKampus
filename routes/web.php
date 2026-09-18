@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\Admin\KnowledgeBaseController;
 use App\Http\Controllers\Admin\UnansweredQuestionController;
 use App\Http\Controllers\FeedbackController;
@@ -81,6 +82,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/chatbot/{conversation}', [ChatbotController::class, 'show'])->name('chatbot.show');
     Route::put('/chatbot/{conversation}/rename', [ChatbotController::class, 'rename'])->name('chatbot.rename');
 Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])->name('chatbot.destroy');
+
+    // Reminders
+    Route::get('/student/reminders', [ReminderController::class, 'index'])->name('student.reminders');
+    Route::post('/reminders', [ReminderController::class, 'store'])->name('reminders.store');
+    Route::put('/reminders/{reminder}', [ReminderController::class, 'update'])->name('reminders.update');
+    Route::delete('/reminders/{reminder}', [ReminderController::class, 'destroy'])->name('reminders.destroy');
 
     // Profile
     Route::get('/student/profile', [ProfileController::class, 'studentProfile'])

@@ -259,15 +259,6 @@
   .topbar-title { font-size: 16px; font-weight: 800; color: var(--blue-dark); margin: 0; }
   .topbar-subtitle { font-size: 12.5px; color: #ad9cdb; margin: 0; }
 
-  .info-btn {
-    margin-left: auto;
-    background: none;
-    border: none;
-    cursor: pointer;
-  }
-
-  .info-btn svg { width: 20px; height: 20px; stroke: var(--blue-primary); }
-
   .empty-state {
     text-align: center;
     max-width: 420px;
@@ -409,51 +400,31 @@
     min-width: 0; /* penting supaya text truncate still work */
 }
 
-.recent-menu-btn {
-    background: transparent;
-    border: none;
-    color: inherit;
-    opacity: 0.6;
-    font-size: 18px;
-    cursor: pointer;
-    padding: 4px 8px;
-    border-radius: 6px;
+.recent-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     flex-shrink: 0;
 }
 
-.recent-menu-btn:hover {
-    opacity: 1;
-    background: rgba(255,255,255,0.1);
-}
-
-.recent-menu-dropdown {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-    overflow: hidden;
-    z-index: 999;
-    display: flex;
-    flex-direction: column;
-    min-width: 140px;
-}
-
-.recent-menu-dropdown button {
-    background: none;
+.recent-action-btn {
+    background: transparent;
     border: none;
-    text-align: left;
-    padding: 10px 14px;
-    font-size: 13px;
+    color: rgba(255,255,255,0.65);
     cursor: pointer;
-    color: #1e293b;
+    padding: 3px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.recent-menu-dropdown button:hover {
-    background: #f1f5f9;
+.recent-action-btn:hover {
+    color: #ffffff;
+    background: rgba(255,255,255,0.14);
 }
 
-.menu-delete {
-    color: #dc2626 !important;
-}
+.recent-action-btn svg { width: 13px; height: 13px; }
 
 #recentSearchInput::placeholder {
   color: rgba(255,255,255,0.7);
@@ -531,9 +502,6 @@
           <p class="topbar-title">New Conversation</p>
           <p class="topbar-subtitle">RakanKampus AI · Politeknik Assistant</p>
         </div>
-        <button class="info-btn" aria-label="Info">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
-        </button>
       </div>
 
       <div class="chat-area" id="chatArea">
@@ -689,54 +657,30 @@ function renderRecentList(conversations) {
                 <p class="recent-title">${escapeHtml(conv.title)}</p>
                 <p class="recent-preview">${escapeHtml(conv.preview)}</p>
             </div>
-            <button class="recent-menu-btn" type="button" data-id="${conv.id}">⋮</button>
+            <div class="recent-actions">
+                <button class="recent-action-btn" type="button" data-action="edit" aria-label="Edit">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+                </button>
+                <button class="recent-action-btn" type="button" data-action="delete" aria-label="Delete">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
         `;
 
         item.addEventListener('click', () => openConversation(conv.id));
 
-        const menuBtn = item.querySelector('.recent-menu-btn');
-        menuBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // elak trigger openConversation bila klik ⋮
-            showRecentMenu(e, conv.id, conv.title);
+        item.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            renameConversation(conv.id, conv.title);
+        });
+
+        item.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteConversation(conv.id);
         });
 
         recentList.appendChild(item);
     });
-}
-
-function showRecentMenu(event, id, currentTitle) {
-    document.querySelectorAll('.recent-menu-dropdown').forEach(el => el.remove());
-
-    const menu = document.createElement('div');
-    menu.className = 'recent-menu-dropdown';
-    menu.innerHTML = `
-      <button type="button" class="menu-rename">✏️ Rename</button>
-      <button type="button" class="menu-delete">🗑️ Delete</button>
-`;
-
-    const rect = event.target.getBoundingClientRect();
-    menu.style.position = 'fixed';
-    menu.style.top = rect.bottom + 'px';
-    menu.style.left = (rect.left - 110) + 'px';
-
-    menu.querySelector('.menu-rename').addEventListener('click', () => {
-        renameConversation(id, currentTitle);
-        menu.remove();
-    });
-
-    menu.querySelector('.menu-delete').addEventListener('click', () => {
-        deleteConversation(id);
-        menu.remove();
-    });
-
-    document.body.appendChild(menu);
-
-    setTimeout(() => {
-        document.addEventListener('click', function closeMenu() {
-            menu.remove();
-            document.removeEventListener('click', closeMenu);
-        }, { once: true });
-    }, 0);
 }
 
 function renameConversation(id, currentTitle) {
