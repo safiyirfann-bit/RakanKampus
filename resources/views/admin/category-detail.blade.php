@@ -258,7 +258,7 @@ tbody tr:last-child td{ border-bottom:none; }
                                 @csrf
                                 @method('DELETE')
                                 <button type="button" class="delete-btn"
-                                    onclick="openDeleteModal(this.closest('form'), 'Padam entry ini?', 'Tindakan ini tidak boleh dibuat asal.')">Delete</button>
+                                    onclick="openDeleteModal(this.closest('form'), 'Delete this entry?', 'This action cannot be undone.')">Delete</button>
                             </form>
                         </div>
                     </td>
@@ -266,7 +266,7 @@ tbody tr:last-child td{ border-bottom:none; }
             @empty
                 <tr>
                     <td colspan="6" style="text-align:center; color:#8b96b8;">
-                        Belum ada data untuk topik ini.
+                        No data available for this topic yet.
                     </td>
                 </tr>
             @endforelse
@@ -375,8 +375,8 @@ tbody tr:last-child td{ border-bottom:none; }
                 <line x1="14" y1="11" x2="14" y2="17"></line>
             </svg>
         </div>
-        <h2 class="confirm-title" id="deleteConfirmTitle">Padam entry ini?</h2>
-        <p class="confirm-message" id="deleteConfirmMessage">Tindakan ini tidak boleh dibuat asal.</p>
+        <h2 class="confirm-title" id="deleteConfirmTitle">Delete this entry?</h2>
+        <p class="confirm-message" id="deleteConfirmMessage">This action cannot be undone.</p>
         <div class="modal-actions">
             <button type="button" class="cancel-btn" onclick="closeDeleteModal()">Cancel</button>
             <button type="button" class="delete-confirm-btn" onclick="confirmDeleteAction()">Delete</button>
@@ -389,8 +389,8 @@ tbody tr:last-child td{ border-bottom:none; }
 
   function openDeleteModal(formEl, title, message) {
       __deleteFormTarget = formEl;
-      document.getElementById('deleteConfirmTitle').textContent = title || 'Padam entry ini?';
-      document.getElementById('deleteConfirmMessage').textContent = message || 'Tindakan ini tidak boleh dibuat asal.';
+      document.getElementById('deleteConfirmTitle').textContent = title || 'Delete this entry?';
+      document.getElementById('deleteConfirmMessage').textContent = message || 'This action cannot be undone.';
       document.getElementById('deleteConfirmModal').style.display = 'flex';
   }
 

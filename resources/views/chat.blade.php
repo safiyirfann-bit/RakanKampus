@@ -6,7 +6,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>RakanKampus - New Conversation</title>
 <style>
-  
+
   :root {
     --blue-primary: #60a5fa;
     --blue-dark: #3355a6;
@@ -50,6 +50,7 @@
   .app {
     display: flex;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
   }
 
@@ -57,6 +58,7 @@
     width: 300px;
     min-width: 300px;
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     background: linear-gradient(160deg, #24476b, #60a5fa, #24476b);
     color: #fff;
@@ -76,6 +78,26 @@
     gap: 10px;
     padding: 20px 20px 16px;
   }
+
+  .sidebar-close-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-close-btn:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .sidebar-close-btn svg { width: 20px; height: 20px; }
 
   .sidebar-logo {
     width: 42px;
@@ -226,6 +248,12 @@
     display: flex;
   }
 
+  .hidden { display: none !important; }
+
+.stop-btn {
+  background: #ef4444;
+}
+
   .menu-btn svg { width: 22px; height: 22px; stroke: var(--blue-primary); }
 
   .topbar-title { font-size: 16px; font-weight: 800; color: var(--blue-dark); margin: 0; }
@@ -360,6 +388,7 @@
       position: fixed;
       z-index: 20;
       height: 100vh;
+      height: 100dvh;
     }
     .app.sidebar-collapsed .sidebar {
       margin-left: -300px;
@@ -426,8 +455,8 @@
     color: #dc2626 !important;
 }
 
-#recentSearchInput::placeholder { 
-  color: rgba(255,255,255,0.7); 
+#recentSearchInput::placeholder {
+  color: rgba(255,255,255,0.7);
   }
 
   @keyframes gradientShift {
@@ -448,6 +477,12 @@
           <x-brand-logo size="42" />
         </div>
         <span class="sidebar-brand">RakanKampus</span>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
       </div>
 
       <a href="{{ route('student.profile') }}" class="sidebar-user" style="text-decoration:none; color:inherit; cursor:pointer;">
@@ -521,6 +556,11 @@
               <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
             </svg>
           </button>
+          <button class="send-btn stop-btn hidden" id="stopBtn" aria-label="Stop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
+              <rect x="7" y="7" width="10" height="10" rx="2"></rect>
+            </svg>
+          </button>
         </div>
       </div>
     </div>
@@ -536,9 +576,16 @@ const newChatBtn = document.getElementById('newChatBtn');
 const recentList = document.getElementById('recentList');
 let emptyState = document.getElementById('emptyState');
 let currentConversationId = null;
+const stopBtn = document.getElementById('stopBtn');
+let currentController = null;
 
 menuBtn.addEventListener('click', () => {
   app.classList.toggle('sidebar-collapsed');
+});
+
+const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+sidebarCloseBtn.addEventListener('click', () => {
+  app.classList.add('sidebar-collapsed');
 });
 
 function showEmptyState(){
@@ -575,8 +622,12 @@ function sendMessage(){
   addMessage(text, 'user');
   messageInput.value = '';
 
-  const typingMsg = addMessage('Menaip...', 'bot');
+  const typingMsg = addMessage('Typing...', 'bot');
   typingMsg.id = 'typingIndicator';
+
+  currentController = new AbortController();
+  sendBtn.classList.add('hidden');
+  stopBtn.classList.remove('hidden');
 
   fetch('/chatbot', {
     method: 'POST',
@@ -585,6 +636,7 @@ function sendMessage(){
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
     },
     body: JSON.stringify({ message: text, conversation_id: currentConversationId }),
+    signal: currentController.signal,
   })
     .then(res => res.json())
     .then(data => {
@@ -595,12 +647,21 @@ function sendMessage(){
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
-        addMessage('Maaf, ada masalah semasa mendapatkan jawapan. Sila cuba lagi.', 'bot');
+        addMessage('Sorry, there was a problem getting a response. Please try again.', 'bot');
       }
     })
-    .catch(() => {
+    .catch((error) => {
       document.getElementById('typingIndicator')?.remove();
-      addMessage('Maaf, tidak dapat sambung ke server. Sila cuba lagi.', 'bot');
+      if (error.name === 'AbortError') {
+        addMessage('(Stopped)', 'bot');
+      } else {
+        addMessage('Sorry, unable to connect to the server. Please try again.', 'bot');
+      }
+    })
+    .finally(() => {
+      sendBtn.classList.remove('hidden');
+      stopBtn.classList.add('hidden');
+      currentController = null;
     });
 }
 
@@ -734,6 +795,9 @@ newChatBtn.addEventListener('click', () => {
 });
 
 sendBtn.addEventListener('click', sendMessage);
+stopBtn.addEventListener('click', () => {
+  if (currentController) currentController.abort();
+});
 
 messageInput.addEventListener('keypress', function(e){
   if(e.key === 'Enter'){

@@ -33,7 +33,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
         body > div:not(.bg-blob) { animation: fadeInUp 0.45s ease both; }
-    
+
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -216,10 +216,29 @@
 
         </div>
 
-        <!-- Actions -->
-        <div class="px-6 grid grid-cols-2 gap-4 mb-5">
+        <!-- Live camera view (hidden until Take selfie is pressed) -->
+        <div id="cameraView" class="hidden flex-col items-center px-6 pb-4">
 
-            <button type="button"
+            <video id="cameraVideo" autoplay playsinline muted class="w-full rounded-2xl bg-black"></video>
+            <canvas id="cameraCanvas" class="hidden"></canvas>
+
+            <div class="grid grid-cols-2 gap-4 w-full mt-4">
+                <button type="button" onclick="cancelCamera()"
+                    class="rounded-2xl border border-indigo-100 bg-indigo-50/50 py-3 font-medium text-indigo-700 hover:bg-indigo-100 transition">
+                    Cancel
+                </button>
+                <button type="button" onclick="snapPhoto()"
+                    class="rounded-2xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 transition">
+                    Snap photo
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Actions -->
+        <div id="actionsRow" class="px-6 grid grid-cols-2 gap-4 mb-5">
+
+            <button type="button" onclick="openCamera()"
                 class="rounded-2xl border border-indigo-100 bg-indigo-50/50 py-4 flex flex-col items-center gap-2 hover:bg-indigo-100 transition">
 
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -227,6 +246,8 @@
                 </svg>
 
                 <span class="font-medium text-indigo-700">Take selfie</span>
+
+                <input type="file" accept="image/*" capture="user" class="hidden" id="selfieInput">
 
             </button>
 
@@ -266,7 +287,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
             </svg>
         </div>
-        <h2 id="alertTitle" class="text-lg font-bold text-indigo-900 mb-1">Perhatian</h2>
+        <h2 id="alertTitle" class="text-lg font-bold text-indigo-900 mb-1">Notice</h2>
         <p id="alertMessage" class="text-sm text-indigo-400 mb-6">&nbsp;</p>
         <button type="button" onclick="closeAlertModal()"
             class="w-full rounded-2xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 transition">
@@ -300,6 +321,7 @@ function openPhotoModal() {
 }
 
 function closePhotoModal() {
+    stopCamera();
     const modal = document.getElementById('photoModal');
     modal.classList.add('hidden');
     modal.classList.remove('flex');
@@ -312,9 +334,63 @@ document.getElementById('photoModal').addEventListener('click', function(e) {
 });
 
 let selectedFile = null;
+let cameraStream = null;
 
-document.getElementById('photoInput').addEventListener('change', function(e) {
-    selectedFile = e.target.files[0];
+async function openCamera() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        // Browser doesn't support live camera access - fall back to native file picker.
+        document.getElementById('selfieInput').click();
+        return;
+    }
+
+    try {
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: 'user' },
+            audio: false,
+        });
+
+        document.getElementById('cameraVideo').srcObject = cameraStream;
+        document.getElementById('previewWrapper').classList.add('hidden');
+        document.getElementById('actionsRow').classList.add('hidden');
+        document.getElementById('cameraView').classList.remove('hidden');
+        document.getElementById('cameraView').classList.add('flex');
+    } catch (err) {
+        console.error(err);
+        showAlert('error', 'Camera unavailable', 'Unable to access the camera. Please allow camera permission, or use Choose photo instead.');
+    }
+}
+
+function stopCamera() {
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+    document.getElementById('cameraView').classList.add('hidden');
+    document.getElementById('cameraView').classList.remove('flex');
+    document.getElementById('previewWrapper').classList.remove('hidden');
+    document.getElementById('actionsRow').classList.remove('hidden');
+}
+
+function cancelCamera() {
+    stopCamera();
+}
+
+function snapPhoto() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('cameraCanvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(function (blob) {
+        const file = new File([blob], 'selfie.jpg', { type: 'image/jpeg' });
+        stopCamera();
+        handlePhotoFile(file);
+    }, 'image/jpeg', 0.9);
+}
+
+function handlePhotoFile(file) {
+    selectedFile = file;
     if (selectedFile) {
         const reader = new FileReader();
         reader.onload = function(ev) {
@@ -324,7 +400,16 @@ document.getElementById('photoInput').addEventListener('change', function(e) {
             document.getElementById('noPhotoText').classList.add('hidden');
         };
         reader.readAsDataURL(selectedFile);
+        uploadPhoto();
     }
+}
+
+document.getElementById('photoInput').addEventListener('change', function(e) {
+    handlePhotoFile(e.target.files[0]);
+});
+
+document.getElementById('selfieInput').addEventListener('change', function(e) {
+    handlePhotoFile(e.target.files[0]);
 });
 
 function showAlert(type, title, message) {
@@ -353,7 +438,7 @@ document.getElementById('alertModal').addEventListener('click', function(e) {
 
 function uploadPhoto() {
     if (!selectedFile) {
-        showAlert('warning', 'Perhatian', 'Sila pilih gambar dahulu.');
+        showAlert('warning', 'Notice', 'Please choose an image first.');
         return;
     }
 
@@ -374,12 +459,12 @@ function uploadPhoto() {
                 `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="Profile photo">`;
             closePhotoModal();
         } else {
-            showAlert('error', 'Gagal', 'Gagal upload gambar.');
+            showAlert('error', 'Failed', 'Failed to upload image.');
         }
     })
     .catch(err => {
         console.error(err);
-        showAlert('error', 'Ralat', 'Ada ralat semasa upload.');
+        showAlert('error', 'Error', 'An error occurred during upload.');
     });
 }
 </script>
