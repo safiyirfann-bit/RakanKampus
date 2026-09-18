@@ -388,6 +388,12 @@
       margin-left: 0;
     }
   }
+  @media (max-width: 860px) {
+    .app {
+      height: calc(100vh - 64px);
+      height: calc(100dvh - 64px);
+    }
+  }
   .recent-item {
     display: flex;
     align-items: center;
@@ -438,6 +444,8 @@
 </style>
 </head>
 <body>
+
+@include('partials.app-nav', ['active' => 'chat', 'user' => $user])
 
   <div class="app" id="app">
 

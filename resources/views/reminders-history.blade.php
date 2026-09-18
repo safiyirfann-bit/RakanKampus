@@ -268,9 +268,15 @@
 
   .bulk-delete-btn.open { display: flex; }
   .bulk-delete-btn svg { width: 15px; height: 15px; }
+
+  @media (max-width: 860px) {
+    .bulk-delete-btn { bottom: 88px; }
+  }
 </style>
 </head>
 <body>
+
+@include('partials.app-nav', ['active' => 'reminders', 'user' => $user])
 
 <div class="container" id="pageContainer">
   <div class="header">

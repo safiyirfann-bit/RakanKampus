@@ -1,0 +1,101 @@
+@php
+  $navActive = $active ?? 'home';
+  $navUser = $user ?? auth()->user();
+  $navItems = [
+    ['key' => 'home', 'route' => 'student.home', 'label' => 'Home', 'icon' => '<path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>'],
+    ['key' => 'chat', 'route' => 'student.chat', 'label' => 'Chat', 'icon' => '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>'],
+    ['key' => 'reminders', 'route' => 'student.reminders', 'label' => 'Reminders', 'icon' => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path>'],
+    ['key' => 'profile', 'route' => 'student.profile', 'label' => 'Profile', 'icon' => '<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>'],
+  ];
+@endphp
+<style>
+  .rk-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    background: linear-gradient(175deg, #14213d, #1b3a5c 55%, #1c4f57);
+    display: none;
+    flex-direction: column;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    z-index: 38;
+  }
+  .rk-sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 22px 20px 18px; flex-shrink: 0; }
+  .rk-sidebar-brand span { font-size: 15.5px; font-weight: 800; color: #fff; }
+  .rk-sidebar-nav { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; }
+  .rk-nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 10px; text-decoration: none; color: #a9c2d3; font-weight: 500; }
+  .rk-nav-link svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
+  .rk-nav-link span { font-size: 13px; }
+  .rk-nav-link.active { background: rgba(255,255,255,0.14); color: #fff; font-weight: 700; }
+  .rk-sidebar-user { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; text-decoration: none; }
+  .rk-sidebar-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2ec4c6; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: #14213d; flex-shrink: 0; overflow: hidden; }
+  .rk-sidebar-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .rk-sidebar-user-name { font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-sidebar-user-sub { font-size: 10px; color: #9fb8c9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .rk-tabbar {
+    display: none;
+    position: fixed;
+    left: 0; right: 0; bottom: 0;
+    height: 64px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    background: #ffffff;
+    border-top: 1px solid #eef1f5;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 38;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  .rk-tab-link { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #94a3b8; }
+  .rk-tab-link svg { width: 20px; height: 20px; stroke: currentColor; }
+  .rk-tab-link span { font-size: 10px; font-weight: 500; }
+  .rk-tab-link.active { color: #6366f1; }
+  .rk-tab-link.active span { font-weight: 700; }
+
+  @media (min-width: 861px) {
+    .rk-sidebar { display: flex; }
+    body { margin-left: 220px; }
+  }
+  @media (max-width: 860px) {
+    .rk-tabbar { display: flex; }
+    body { padding-bottom: 64px; }
+  }
+</style>
+
+<nav class="rk-sidebar">
+  <div class="rk-sidebar-brand">
+    <x-brand-logo size="30" />
+    <span>RakanKampus</span>
+  </div>
+  <div class="rk-sidebar-nav">
+    @foreach($navItems as $item)
+      <a href="{{ route($item['route']) }}" class="rk-nav-link {{ $navActive === $item['key'] ? 'active' : '' }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+        <span>{{ $item['label'] }}</span>
+      </a>
+    @endforeach
+  </div>
+  <a href="{{ route('student.profile') }}" class="rk-sidebar-user">
+    <div class="rk-sidebar-user-avatar">
+      @if($navUser && $navUser->photo)
+        <img src="{{ Storage::url($navUser->photo) }}" alt="">
+      @else
+        {{ strtoupper(substr($navUser->first_name ?? $navUser->name ?? 'U', 0, 1) . substr($navUser->last_name ?? '', 0, 1)) }}
+      @endif
+    </div>
+    <div style="min-width: 0;">
+      <div class="rk-sidebar-user-name">{{ $navUser->name ?? 'Student' }}</div>
+      <div class="rk-sidebar-user-sub">{{ $navUser->student_id ?? '' }}</div>
+    </div>
+  </a>
+</nav>
+
+<nav class="rk-tabbar">
+  @foreach($navItems as $item)
+    <a href="{{ route($item['route']) }}" class="rk-tab-link {{ $navActive === $item['key'] ? 'active' : '' }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+      <span>{{ $item['label'] }}</span>
+    </a>
+  @endforeach
+</nav>

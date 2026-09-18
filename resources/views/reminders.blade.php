@@ -360,6 +360,7 @@
     position: fixed;
     right: max(20px, calc(50% - 300px));
     bottom: 24px;
+    z-index: 30;
     display: flex;
     align-items: center;
     background: linear-gradient(90deg, #22d3ee, #34d399 50%, #facc15);
@@ -367,7 +368,6 @@
     border-radius: 999px;
     border: none;
     cursor: pointer;
-    z-index: 25;
     box-shadow: 0 8px 18px rgba(0,0,0,0.28);
   }
 
@@ -518,6 +518,11 @@
 
   .hint { font-size: 10.5px; color: #94a3b8; margin: -6px 0 12px; }
 
+  @media (max-width: 860px) {
+    .ai-fab { bottom: 88px; }
+    .bulk-delete-btn { bottom: 88px; }
+  }
+
   .ai-desc { font-size: 12.5px; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
 
   .ai-upload-label {
@@ -561,6 +566,8 @@
 </style>
 </head>
 <body>
+
+@include('partials.app-nav', ['active' => 'reminders', 'user' => $user])
 
 <div class="container" id="pageContainer">
   <div class="header">

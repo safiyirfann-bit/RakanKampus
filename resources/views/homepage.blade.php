@@ -560,6 +560,8 @@
 </head>
 <body>
 
+@include('partials.app-nav', ['active' => 'home', 'user' => $user])
+
 <div class="bg-blob b1"></div>
 <div class="bg-blob b2"></div>
 <div class="bg-blob b3"></div>
