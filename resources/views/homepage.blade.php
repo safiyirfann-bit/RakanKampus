@@ -21,7 +21,7 @@
 
   html, body {
     margin: 0;
-    height: 100%;
+    min-height: 100%;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     overflow-x: hidden;
   }
@@ -403,7 +403,34 @@
     gap: 12px;
   }
 
+  .conv-swipe-wrap {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  .conv-swipe-delete {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 90px;
+    background: #dc2626;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    color: #fff;
+  }
+
+  .conv-swipe-delete svg { width: 17px; height: 17px; }
+  .conv-swipe-delete span { font-size: 11px; font-weight: 700; }
+
   .conv-card {
+    position: relative;
     background: var(--bg-card);
     border: 1px solid var(--border-light);
     border-radius: 14px;
@@ -413,8 +440,9 @@
     gap: 14px;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
-    transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.2s ease;
     animation: fadeInUp 0.5s ease both;
+    touch-action: pan-y;
   }
 
   .conversation-list .conv-card:nth-child(1) { animation-delay: 0.45s; }
@@ -668,26 +696,33 @@
 
     @forelse($conversations as $conv)
 
-        <div class="conv-card" data-conv-id="{{ $conv['id'] }}" data-conv-title="{{ $conv['title'] }}" onclick="window.location='{{ route('student.chat') }}?conversation={{ $conv['id'] }}'">
-            <div class="conv-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-                </svg>
-            </div>
-            <div class="conv-body">
-                <p class="conv-title">{{ $conv['title'] }}</p>
-                <p class="conv-preview">{{ $conv['preview'] }}</p>
-            </div>
-            <div class="conv-meta">
-                <span class="conv-time">{{ $conv['time'] }}</span>
-            </div>
-            <div class="conv-actions">
-                <button type="button" class="conv-action-btn" aria-label="Edit" onclick="event.stopPropagation(); renameHomeConversation({{ $conv['id'] }}, {{ Js::from($conv['title']) }})">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
-                </button>
-                <button type="button" class="conv-action-btn" aria-label="Delete" onclick="event.stopPropagation(); deleteHomeConversation({{ $conv['id'] }})">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
+        <div class="conv-swipe-wrap">
+            <button type="button" class="conv-swipe-delete" aria-label="Delete" onclick="deleteHomeConversationDirect({{ $conv['id'] }})">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                <span>Delete</span>
+            </button>
+            <div class="conv-card" data-conv-id="{{ $conv['id'] }}" data-conv-title="{{ $conv['title'] }}" data-chat-url="{{ route('student.chat') }}?conversation={{ $conv['id'] }}"
+                 onpointerdown="startConvDrag(event, {{ $conv['id'] }})" onpointermove="moveConvDrag(event)" onpointerup="endConvDrag(event, {{ $conv['id'] }})" onpointerleave="endConvDrag(event, {{ $conv['id'] }})">
+                <div class="conv-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                    </svg>
+                </div>
+                <div class="conv-body">
+                    <p class="conv-title">{{ $conv['title'] }}</p>
+                    <p class="conv-preview">{{ $conv['preview'] }}</p>
+                </div>
+                <div class="conv-meta">
+                    <span class="conv-time">{{ $conv['time'] }}</span>
+                </div>
+                <div class="conv-actions">
+                    <button type="button" class="conv-action-btn" aria-label="Edit" onclick="event.stopPropagation(); renameHomeConversation({{ $conv['id'] }}, {{ Js::from($conv['title']) }})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
+                    </button>
+                    <button type="button" class="conv-action-btn" aria-label="Delete" onclick="event.stopPropagation(); deleteHomeConversation({{ $conv['id'] }})">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -706,6 +741,65 @@
   <button class="help-fab" aria-label="Help">?</button>
 
 <script>
+let convDragId = null;
+let convDragStartX = null;
+let convDragOffset = 0;
+let convDragMoved = false;
+
+function startConvDrag(e, id) {
+    convDragId = id;
+    convDragStartX = e.clientX;
+    convDragOffset = 0;
+    convDragMoved = false;
+}
+
+function moveConvDrag(e) {
+    if (convDragId === null) return;
+    let delta = e.clientX - convDragStartX;
+    if (Math.abs(delta) > 5) convDragMoved = true;
+    if (delta < 0) delta = 0;
+    if (delta > 90) delta = 90;
+    convDragOffset = delta;
+    const card = document.querySelector(`.conv-card[data-conv-id="${convDragId}"]`);
+    if (card) card.style.transform = `translateX(${convDragOffset}px)`;
+}
+
+function endConvDrag(e, id) {
+    if (convDragId === null) return;
+    const shouldDelete = convDragOffset > 45;
+    const moved = convDragMoved;
+    convDragId = null;
+    convDragStartX = null;
+    convDragOffset = 0;
+    convDragMoved = false;
+
+    if (shouldDelete) {
+        deleteHomeConversationDirect(id);
+        return;
+    }
+
+    const card = document.querySelector(`.conv-card[data-conv-id="${id}"]`);
+    if (card) card.style.transform = 'translateX(0px)';
+    if (!moved && card) {
+        window.location = card.dataset.chatUrl;
+    }
+}
+
+function deleteHomeConversationDirect(id) {
+    fetch(`/chatbot/${id}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+    })
+    .then(res => res.json())
+    .then(() => {
+        const wrap = document.querySelector(`.conv-card[data-conv-id="${id}"]`)?.closest('.conv-swipe-wrap');
+        if (wrap) wrap.remove();
+    })
+    .catch(err => console.error('Delete failed', err));
+}
+
 function renameHomeConversation(id, currentTitle) {
     const newTitle = prompt('Rename conversation:', currentTitle);
     if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
@@ -737,8 +831,8 @@ function deleteHomeConversation(id) {
     })
     .then(res => res.json())
     .then(() => {
-        const card = document.querySelector(`.conv-card[data-conv-id="${id}"]`);
-        if (card) card.remove();
+        const wrap = document.querySelector(`.conv-card[data-conv-id="${id}"]`)?.closest('.conv-swipe-wrap');
+        if (wrap) wrap.remove();
     })
     .catch(err => console.error('Delete failed', err));
 }
