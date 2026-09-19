@@ -523,6 +523,46 @@
     .bulk-delete-btn { bottom: 88px; }
   }
 
+  @media (min-width: 861px) {
+    body { background: #f0fafa; }
+
+    .container { max-width: 760px; margin: 0; padding: 36px 44px 90px; }
+
+    .back-btn { display: none; }
+    .header { padding: 0 0 18px; }
+    .header-title { color: #14213d; font-size: 22px; }
+    .header-sub { color: #0d9488; font-size: 13px; }
+
+    .add-btn { width: auto; }
+
+    .search-row { background: #ffffff; border: 1px solid #dbeeee; }
+    .search-row svg { stroke: #64748b; }
+    .search-row input { color: #14213d; }
+    .search-row input::placeholder { color: #94a3b8; }
+
+    .filter-wrap { flex: 0 0 auto; }
+    .filter-btn, .select-btn {
+      width: auto;
+      background: #ffffff;
+      border: 1px solid #dbeeee;
+      color: #0d9488;
+    }
+    .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
+
+    .section-label { color: #64748b; }
+    .history-link { color: #0d9488; }
+    .select-all-row span { color: #0d9488; }
+
+    .reminder-card { background: #ffffff; border-color: #dbeeee; }
+    .reminder-card.selected { background: #fef2f2; border-color: #fca5a5; }
+    .reminder-when { color: #64748b; }
+
+    .empty-state { background: #ffffff; border: 1px solid #dbeeee; color: #64748b; }
+
+    .ai-fab { right: 40px; bottom: 30px; }
+    .bulk-delete-btn { left: 264px; right: 44px; max-width: none; margin: 0; }
+  }
+
   .ai-desc { font-size: 12.5px; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
 
   .ai-upload-label {
