@@ -70,6 +70,7 @@ class ReminderController extends Controller
 
         $systemPrompt = "You extract reminder details from a photo of an exam slip, class timetable, or assignment brief for a Malaysian polytechnic student app. "
             . "Today's date is {$today->format('Y-m-d')} ({$today->format('l')}). Use this to resolve relative dates (e.g. 'esok', 'next Monday') and to infer the year when the image only shows day/month. "
+            . "If the image is a full exam timetable listing many different subjects/papers (e.g. an official exam board schedule for a whole cohort), extract ONLY the single earliest (soonest date/time) entry — don't try to merge or list them all. "
             . 'Reply with ONLY a single JSON object, no markdown, no code fences, no explanation, in exactly this shape: '
             . '{"detected": true|false, "subject": string|null, "type": "Exam"|"Assignment"|"Quiz"|"Other"|null, "due_date": "YYYY-MM-DD"|null, "due_time": "HH:MM"|null}. '
             . 'Set detected=false ONLY if the image clearly has no identifiable subject/title AND no identifiable due date (e.g. a random unrelated photo). '
@@ -79,7 +80,9 @@ class ReminderController extends Controller
         $response = Http::withToken(config('services.groq.key'))
             ->timeout(30)
             ->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'meta-llama/llama-4-scout-17b-16e-instruct',
+                'model' => 'qwen/qwen3.6-27b',
+                'reasoning_effort' => 'none',
+                'reasoning_format' => 'hidden',
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
                     ['role' => 'user', 'content' => [
