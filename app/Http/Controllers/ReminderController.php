@@ -59,7 +59,8 @@ class ReminderController extends Controller
 
         $data = $this->validateReminder($request);
 
-        $reminder->update($data);
+        // Due date or lead time may have changed, so allow it to notify again
+        $reminder->update($data + ['notified_at' => null]);
 
         return response()->json(['success' => true, 'reminder' => $this->toRaw($reminder)]);
     }

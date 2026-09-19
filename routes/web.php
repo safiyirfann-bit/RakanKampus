@@ -32,6 +32,11 @@ Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// External cron ping (token protected, see CronController)
+Route::get('/cron/reminders', [\App\Http\Controllers\CronController::class, 'reminders'])
+    ->middleware('throttle:30,1')
+    ->name('cron.reminders');
+
 /*
 |--------------------------------------------------------------------------
 | Student Routes
@@ -91,6 +96,10 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::delete('/reminders/{reminder}', [ReminderController::class, 'destroy'])->name('reminders.destroy');
     Route::post('/reminders/bulk-delete', [ReminderController::class, 'bulkDestroy'])->name('reminders.bulkDestroy');
     Route::post('/reminders/history/bulk-delete', [ReminderController::class, 'historyBulkDestroy'])->name('reminders.history.bulkDestroy');
+
+    // Web push subscriptions
+    Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
 
     // Profile
     Route::get('/student/profile', [ProfileController::class, 'studentProfile'])
