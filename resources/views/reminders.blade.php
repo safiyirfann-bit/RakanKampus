@@ -637,6 +637,22 @@
   .ai-success.open { display: flex; }
   .ai-success p { font-size: 11.5px; color: #15803d; margin: 0; line-height: 1.4; }
   .ai-success button { background: none; border: none; color: #15803d; font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; }
+
+  .ai-error {
+    margin-top: 14px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: none;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .ai-error.open { display: flex; }
+  .ai-error p { font-size: 11.5px; color: #b91c1c; margin: 0; line-height: 1.4; }
+  .ai-error button { background: none; border: none; color: #b91c1c; font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; }
 </style>
 </head>
 <body>
@@ -740,6 +756,10 @@
   <div class="ai-success" id="aiSuccess">
     <p id="aiSuccessMsg"></p>
     <button type="button" aria-label="Dismiss" onclick="dismissAiMsg()">×</button>
+  </div>
+  <div class="ai-error" id="aiError">
+    <p id="aiErrorMsg"></p>
+    <button type="button" aria-label="Dismiss" onclick="dismissAiError()">×</button>
   </div>
 </div>
 
@@ -1091,10 +1111,11 @@ function removeReminder(id) {
     .catch(err => console.error('Delete failed', err));
 }
 
-// AI Assistant simulation (matches prototype: fake scan, then real create)
+// AI Assistant: real image capture — upload photo, AI reads it, reminder created automatically
 function openAiModal() {
   document.getElementById('aiSuccess').classList.remove('open');
   document.getElementById('aiScanning').classList.remove('open');
+  document.getElementById('aiError').classList.remove('open');
   showModal('aiModal');
 }
 
@@ -1102,40 +1123,49 @@ function dismissAiMsg() {
   document.getElementById('aiSuccess').classList.remove('open');
 }
 
+function dismissAiError() {
+  document.getElementById('aiError').classList.remove('open');
+}
+
 function handlePhotoSelected(e) {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
+
   document.getElementById('aiScanning').classList.add('open');
   document.getElementById('aiSuccess').classList.remove('open');
+  document.getElementById('aiError').classList.remove('open');
 
-  const pool = [
-    { subject: 'Database Systems Final Exam', type: 'Exam', daysFromNow: 3, time: '09:00', leadHours: 3 },
-    { subject: 'Mobile App Development Assignment 3', type: 'Assignment', daysFromNow: 2, time: '23:59', leadHours: 6 },
-    { subject: 'Discrete Mathematics Quiz 2', type: 'Quiz', daysFromNow: 1, time: '14:00', leadHours: 1 },
-  ];
-  const pick = pool[Math.floor(Math.random() * pool.length)];
+  const formData = new FormData();
+  formData.append('photo', file);
 
-  setTimeout(() => {
-    const d = new Date(Date.now() + pick.daysFromNow * 24 * 3600 * 1000);
-    const dateStr = toDateStr(d.getTime());
-    const due = dateStr + 'T' + pick.time;
+  fetch('{{ route('reminders.aiCapture') }}', {
+    method: 'POST',
+    headers: { 'X-CSRF-TOKEN': csrfToken },
+    body: formData,
+  })
+    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(({ ok, data }) => {
+      document.getElementById('aiScanning').classList.remove('open');
+      e.target.value = '';
 
-    fetch('/reminders', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-      body: JSON.stringify({ subject: pick.subject, type: pick.type, due_at: due, lead_hours: pick.leadHours }),
+      if (!ok || !data.success) {
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Tak dapat proses gambar tu. Cuba lagi.');
+        document.getElementById('aiError').classList.add('open');
+        return;
+      }
+
+      reminders.push(data.reminder);
+      document.getElementById('aiSuccessMsg').textContent = '✅ Detected "' + data.reminder.subject + '" — reminder added automatically!';
+      document.getElementById('aiSuccess').classList.add('open');
+      render();
     })
-      .then(res => res.json())
-      .then(data => {
-        reminders.push(data.reminder);
-        document.getElementById('aiScanning').classList.remove('open');
-        document.getElementById('aiSuccessMsg').textContent = '✅ Detected "' + pick.subject + '" — reminder added automatically!';
-        document.getElementById('aiSuccess').classList.add('open');
-        e.target.value = '';
-        render();
-      })
-      .catch(err => console.error('AI add failed', err));
-  }, 1400);
+    .catch(err => {
+      console.error('AI capture failed', err);
+      document.getElementById('aiScanning').classList.remove('open');
+      document.getElementById('aiErrorMsg').textContent = '⚠️ Ada masalah sambungan. Cuba lagi.';
+      document.getElementById('aiError').classList.add('open');
+      e.target.value = '';
+    });
 }
 
 // Browser notifications: fire once per reminder when the lead time is reached (works while this page/tab is open)
