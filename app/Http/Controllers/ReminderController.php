@@ -80,9 +80,7 @@ class ReminderController extends Controller
         $response = Http::withToken(config('services.groq.key'))
             ->timeout(30)
             ->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'qwen/qwen3.6-27b',
-                'reasoning_effort' => 'none',
-                'reasoning_format' => 'hidden',
+                'model' => 'qwen/qwen3.8-27b',
                 'messages' => [
                     ['role' => 'system', 'content' => $systemPrompt],
                     ['role' => 'user', 'content' => [
@@ -91,6 +89,7 @@ class ReminderController extends Controller
                     ]],
                 ],
                 'temperature' => 0.2,
+                'response_format' => ['type' => 'json_object'],
             ]);
 
         if ($response->failed()) {
