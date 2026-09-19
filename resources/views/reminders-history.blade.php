@@ -127,6 +127,8 @@
 
   .filter-btn svg, .select-btn svg { width: 11px; height: 11px; }
 
+  .select-btn { flex: 1; width: auto; }
+
   .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
 
   .filter-dropdown {
@@ -319,6 +321,7 @@
 
     .filter-wrap { flex: 0 0 auto; }
     .filter-btn, .select-btn { width: auto; background: #ffffff; border: 1px solid #dbeeee; color: #0d9488; }
+    .select-btn { flex: 0 0 auto; }
     .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
 
     .select-all-row span { color: #0d9488; }

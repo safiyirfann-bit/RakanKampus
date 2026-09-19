@@ -125,6 +125,8 @@
 
   .filter-btn svg, .select-btn svg { width: 11px; height: 11px; }
 
+  .select-btn { flex: 1; width: auto; }
+
   .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
 
   .filter-dropdown {
@@ -551,6 +553,7 @@
       border: 1px solid #dbeeee;
       color: #0d9488;
     }
+    .select-btn { flex: 0 0 auto; }
     .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
 
     .section-label { color: #64748b; }
