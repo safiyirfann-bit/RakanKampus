@@ -92,6 +92,10 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::post('/reminders/bulk-delete', [ReminderController::class, 'bulkDestroy'])->name('reminders.bulkDestroy');
     Route::post('/reminders/history/bulk-delete', [ReminderController::class, 'historyBulkDestroy'])->name('reminders.history.bulkDestroy');
 
+    // Web push subscriptions
+    Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe');
+    Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
+
     // Profile
     Route::get('/student/profile', [ProfileController::class, 'studentProfile'])
         ->name('student.profile');

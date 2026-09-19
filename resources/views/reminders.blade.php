@@ -301,6 +301,32 @@
   .reminder-when { font-size: 11.5px; color: #94a3b8; margin: 0 0 4px; }
   .reminder-status { font-size: 11.5px; font-weight: 700; margin: 0; }
 
+  .notify-banner {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    color: #9a3412;
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 12.5px;
+  }
+  .notify-banner.open { display: flex; }
+  .notify-banner button {
+    background: #ea580c;
+    color: #ffffff;
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
   .reminder-actions {
     display: flex;
     align-items: center;
@@ -625,6 +651,11 @@
       <p class="header-title">Reminders</p>
       <p class="header-sub">For exams, assignments &amp; deadlines</p>
     </div>
+  </div>
+
+  <div class="notify-banner" id="notifyBanner">
+    <span>🔔 Turn on notifications to get alerted before your deadlines.</span>
+    <button type="button" onclick="enableNotifications()">Enable</button>
   </div>
 
   <button type="button" class="add-btn" onclick="openAddModal()">
@@ -1105,6 +1136,96 @@ function handlePhotoSelected(e) {
       .catch(err => console.error('AI add failed', err));
   }, 1400);
 }
+
+// Browser notifications: fire once per reminder when the lead time is reached (works while this page/tab is open)
+const NOTIFIED_KEY = 'reminders_notified_v1';
+
+function getNotified() {
+  try { return JSON.parse(localStorage.getItem(NOTIFIED_KEY)) || {}; } catch (e) { return {}; }
+}
+
+function markNotified(key) {
+  try {
+    const all = getNotified();
+    all[key] = Date.now();
+    localStorage.setItem(NOTIFIED_KEY, JSON.stringify(all));
+  } catch (e) {}
+}
+
+function updateNotifyBanner() {
+  const supported = 'Notification' in window;
+  document.getElementById('notifyBanner').classList.toggle('open', supported && Notification.permission === 'default');
+}
+
+// Web Push: lets the server notify even when this page is closed.
+const VAPID_PUBLIC_KEY = @json(config('webpush.vapid.public_key'));
+let pushActive = false;
+
+function urlBase64ToUint8Array(base64) {
+  const padding = '='.repeat((4 - base64.length % 4) % 4);
+  const raw = atob((base64 + padding).replace(/-/g, '+').replace(/_/g, '/'));
+  return Uint8Array.from(raw, c => c.charCodeAt(0));
+}
+
+async function ensurePushSubscription() {
+  if (!VAPID_PUBLIC_KEY || !('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (Notification.permission !== 'granted') return;
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      });
+    }
+    const res = await fetch('/push/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+      body: JSON.stringify(sub.toJSON()),
+    });
+    pushActive = res.ok;
+  } catch (e) {
+    console.error('Push subscribe failed', e);
+    pushActive = false;
+  }
+}
+
+function enableNotifications() {
+  if (!('Notification' in window)) return;
+  Notification.requestPermission().then(async () => {
+    updateNotifyBanner();
+    await ensurePushSubscription();
+    checkDueReminders();
+  });
+}
+
+function checkDueReminders() {
+  // When push is active the server sends the notification, so skip the in-page one to avoid duplicates
+  if (pushActive) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const now = Date.now();
+  reminders.forEach(r => {
+    const dueMs = new Date(r.due_at).getTime();
+    if (dueMs <= now) return;
+    if (dueMs - r.lead_hours * 3600000 > now) return;
+    const key = r.id + '@' + r.due_at + '@' + r.lead_hours;
+    if (getNotified()[key]) return;
+    markNotified(key);
+    const mins = Math.max(1, Math.round((dueMs - now) / 60000));
+    const left = mins >= 60 ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : mins + ' min';
+    new Notification(r.type + ' due in ' + left, {
+      body: r.subject + ' · ' + formatWhen(dueMs),
+      tag: 'reminder-' + r.id,
+    });
+  });
+}
+
+updateNotifyBanner();
+ensurePushSubscription().then(checkDueReminders);
+setInterval(checkDueReminders, 30000);
+setInterval(render, 60000);
 
 render();
 </script>
