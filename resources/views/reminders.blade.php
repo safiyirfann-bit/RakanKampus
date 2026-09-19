@@ -535,10 +535,14 @@
 
     .add-btn { width: auto; }
 
-    .search-row { background: #ffffff; border: 1px solid #dbeeee; }
+    .search-toolbar-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+
+    .search-row { background: #ffffff; border: 1px solid #dbeeee; flex: 1; margin-bottom: 0; }
     .search-row svg { stroke: #64748b; }
     .search-row input { color: #14213d; }
     .search-row input::placeholder { color: #94a3b8; }
+
+    .toolbar-row { margin: 0; }
 
     .filter-wrap { flex: 0 0 auto; }
     .filter-btn, .select-btn {
@@ -625,6 +629,7 @@
     Add Reminder
   </button>
 
+  <div class="search-toolbar-wrap">
   <div class="search-row">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
     <input type="text" id="searchInput" placeholder="Search reminders..." oninput="onSearchChange()">
@@ -646,6 +651,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 3 3 5-6"></path></svg>
       <span id="selectModeLabel">Select</span>
     </button>
+  </div>
   </div>
 
   <div class="section-row">

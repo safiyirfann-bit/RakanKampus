@@ -297,10 +297,16 @@
     .header-title { color: #14213d; font-size: 22px; }
     .header-sub { color: #0d9488; font-size: 13px; }
 
-    .search-row { background: #ffffff; border: 1px solid #dbeeee; }
+    .search-stats-toolbar-wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+
+    .search-row { background: #ffffff; border: 1px solid #dbeeee; flex: 1 1 260px; margin-bottom: 0; order: 1; }
     .search-row svg { stroke: #64748b; }
     .search-row input { color: #14213d; }
     .search-row input::placeholder { color: #94a3b8; }
+
+    .toolbar-row { margin: 0; order: 2; }
+
+    .stats-row { flex: 0 0 100%; order: 3; }
 
     .stat-card { background: #ffffff; border-color: #dbeeee; }
     .stat-card.active-all { background: #e6fbf9; border-color: #0d9488; }
@@ -346,6 +352,7 @@
     </div>
   </div>
 
+  <div class="search-stats-toolbar-wrap">
   <div class="search-row">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
     <input type="text" id="searchInput" placeholder="Search history..." oninput="onSearchChange()">
@@ -382,6 +389,7 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 3 3 5-6"></path></svg>
       <span id="selectModeLabel">Select</span>
     </button>
+  </div>
   </div>
 
   <button type="button" class="select-all-row" id="selectAllRow" onclick="toggleSelectAll()">
