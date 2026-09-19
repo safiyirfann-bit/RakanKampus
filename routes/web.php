@@ -32,6 +32,11 @@ Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.
 // Logout
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// External cron ping (token protected, see CronController)
+Route::get('/cron/reminders', [\App\Http\Controllers\CronController::class, 'reminders'])
+    ->middleware('throttle:30,1')
+    ->name('cron.reminders');
+
 /*
 |--------------------------------------------------------------------------
 | Student Routes
