@@ -8,6 +8,12 @@ RUN npm run build
 
 # Stage 2: bina app PHP sebenar
 FROM richarvey/nginx-php-fpm:3.1.6
+
+# bcmath diperlukan oleh minishlink/web-push (untuk pengiraan VAPID/JWT).
+# Base image ni tak include bcmath/gmp by default, jadi tanpa ni setiap
+# cubaan hantar push notification akan throw ErrorException (500).
+RUN docker-php-ext-install bcmath
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY . .
 RUN composer install --no-dev --working-dir=/var/www/html --optimize-autoloader --no-interaction
