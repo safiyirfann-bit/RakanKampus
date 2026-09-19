@@ -272,6 +272,59 @@
   @media (max-width: 860px) {
     .bulk-delete-btn { bottom: 88px; }
   }
+
+  .back-link-desktop {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #0d9488;
+    text-decoration: none;
+    margin-bottom: 14px;
+  }
+
+  .back-link-desktop svg { width: 13px; height: 13px; }
+
+  @media (min-width: 861px) {
+    body { background: #f0fafa; }
+
+    .container { max-width: 780px; margin: 0; padding: 36px 44px 90px; }
+
+    .back-btn { display: none; }
+    .back-link-desktop { display: inline-flex; }
+    .header { padding: 0 0 18px; }
+    .header-title { color: #14213d; font-size: 22px; }
+    .header-sub { color: #0d9488; font-size: 13px; }
+
+    .search-row { background: #ffffff; border: 1px solid #dbeeee; }
+    .search-row svg { stroke: #64748b; }
+    .search-row input { color: #14213d; }
+    .search-row input::placeholder { color: #94a3b8; }
+
+    .stat-card { background: #ffffff; border-color: #dbeeee; }
+    .stat-card.active-all { background: #e6fbf9; border-color: #0d9488; }
+    .stat-card.active-completed { background: #dcfce7; border-color: #4ade80; }
+    .stat-card.active-deleted { background: #fee2e2; border-color: #f87171; }
+    .stat-num { color: #14213d; }
+    .stat-label { color: #0d9488; }
+    #statCompleted .stat-label { color: #16a34a; }
+    #statDeleted .stat-label { color: #dc2626; }
+
+    .filter-wrap { flex: 0 0 auto; }
+    .filter-btn, .select-btn { width: auto; background: #ffffff; border: 1px solid #dbeeee; color: #0d9488; }
+    .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
+
+    .select-all-row span { color: #0d9488; }
+
+    .history-card { background: #ffffff; border-color: #dbeeee; }
+    .history-card.selected { background: #fef2f2; border-color: #fca5a5; }
+    .history-when { color: #64748b; }
+
+    .empty-state { background: #ffffff; border: 1px solid #dbeeee; color: #64748b; }
+
+    .bulk-delete-btn { left: 264px; right: 44px; max-width: none; margin: 0; }
+  }
 </style>
 </head>
 <body>
@@ -279,6 +332,10 @@
 @include('partials.app-nav', ['active' => 'reminders', 'user' => $user])
 
 <div class="container" id="pageContainer">
+  <a href="{{ route('student.reminders') }}" class="back-link-desktop">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m11 18-6-6 6-6"></path></svg>
+    Back to Reminders
+  </a>
   <div class="header">
     <a href="{{ route('student.reminders') }}" class="back-btn" aria-label="Back">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
