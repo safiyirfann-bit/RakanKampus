@@ -359,6 +359,18 @@ function openEditModal(id) {
   showModal('modal');
 }
 
+// Reads the response body as text first, then tries to parse JSON — a failed
+// request (expired session -> 419, route/record issue -> 404, etc.) often comes
+// back as an HTML error page, and calling res.json() directly on that throws and
+// gets swallowed by a bare .catch(), which is why "nothing happens" when it fails.
+function safeJson(res) {
+  return res.text().then((text) => {
+    let data = null;
+    try { data = JSON.parse(text); } catch (e) { /* not JSON, e.g. an HTML error page */ }
+    return { ok: res.ok, status: res.status, data };
+  });
+}
+
 function saveSchedule() {
   const id = document.getElementById('scheduleId').value;
   const subject = document.getElementById('subjectInput').value.trim();
@@ -382,10 +394,14 @@ function saveSchedule() {
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
     body: JSON.stringify(payload),
   })
-    .then(res => res.json())
-    .then(data => {
-      if (!data.success) {
-        document.getElementById('formError').style.display = 'block';
+    .then(safeJson)
+    .then(({ ok, status, data }) => {
+      if (!ok || !data || !data.success) {
+        if (status === 419) {
+          alert('Sesi kau dah tamat tempoh. Sila refresh page dan cuba lagi.');
+        } else {
+          document.getElementById('formError').style.display = 'block';
+        }
         return;
       }
       if (id) {
@@ -396,7 +412,10 @@ function saveSchedule() {
       closeModals();
       render();
     })
-    .catch(err => console.error('Save failed', err));
+    .catch((err) => {
+      console.error('Save failed', err);
+      document.getElementById('formError').style.display = 'block';
+    });
 }
 
 function removeSchedule(id) {
@@ -404,12 +423,26 @@ function removeSchedule(id) {
     method: 'DELETE',
     headers: { 'X-CSRF-TOKEN': csrfToken },
   })
-    .then(res => res.json())
-    .then(() => {
-      schedules = schedules.filter(s => s.id !== id);
-      render();
+    .then(safeJson)
+    .then(({ ok, status }) => {
+      // A 404 means this class is already gone on the server (stale local copy) —
+      // still remove it from the visible list instead of leaving a dead card the
+      // user can never clear. Any other failure gets an actual message, not silence.
+      if (ok || status === 404) {
+        schedules = schedules.filter(s => s.id !== id);
+        render();
+        return;
+      }
+      if (status === 419) {
+        alert('Sesi kau dah tamat tempoh. Sila refresh page dan cuba lagi.');
+      } else {
+        alert('Tak dapat padam kelas ni sekarang. Cuba lagi.');
+      }
     })
-    .catch(err => console.error('Delete failed', err));
+    .catch((err) => {
+      console.error('Delete failed', err);
+      alert('Ada masalah sambungan. Cuba lagi.');
+    });
 }
 
 function openAiModal() {
