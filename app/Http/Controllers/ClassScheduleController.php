@@ -77,7 +77,7 @@ class ClassScheduleController extends Controller
             . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in the image (directly, or via the legend table). Never output a generic-sounding subject name (e.g. a common course title) unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled result is far better than a fabricated one.';
 
         $response = Http::withToken(config('services.groq.key'))
-            ->timeout(60)
+            ->timeout(110)
             ->post('https://api.groq.com/openai/v1/chat/completions', [
                 'model' => 'qwen/qwen3.8-27b',
                 'messages' => [
@@ -95,9 +95,16 @@ class ClassScheduleController extends Controller
                 // so let it actually think before answering instead of pattern-matching a guess.
                 // reasoning_format=hidden keeps message.content pure JSON (required for json_object
                 // mode — Groq only allows 'hidden' or 'parsed' there, not 'raw').
-                'reasoning_effort' => 'high',
+                //
+                // First attempt at 'high' + max_completion_tokens=8000 hit a real production
+                // error: json_validate_failed with an EMPTY failed_generation — meaning the
+                // reasoning pass ate the entire 8000-token budget and got cut off before ever
+                // writing the final JSON answer. 'medium' uses fewer reasoning tokens, and the
+                // budget is raised close to this model's hard 16,384-token output ceiling so a
+                // reasoning pass that does run long still has room left to finish the JSON.
+                'reasoning_effort' => 'medium',
                 'reasoning_format' => 'hidden',
-                'max_completion_tokens' => 8000,
+                'max_completion_tokens' => 16000,
             ]);
 
         if ($response->failed()) {
