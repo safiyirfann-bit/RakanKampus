@@ -70,7 +70,10 @@ class ClassScheduleController extends Controller
             . 'Reply with ONLY a single JSON object, no markdown, no code fences, no explanation, in exactly this shape: '
             . '{"detected": true|false, "classes": [{"subject": string, "day_of_week": "' . $days . '", "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}. '
             . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] ONLY if the image clearly is not a class timetable at all. '
-            . "Extract every class slot you can find, one entry per class per day (if a subject repeats on multiple days, list it once per day it occurs). subject should be a short course name, not the whole cell text.";
+            . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around) — read the row/column headers carefully before extracting, and do not assume every table is laid out the same way. '
+            . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. '
+            . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — use it to resolve abbreviated course codes into a readable subject name if present, but the legend itself is not a class entry. '
+            . 'CRITICAL: only output an entry for a cell you can actually read with reasonable confidence. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. Never invent or duplicate the same subject/room/lecturer across many time slots just to fill the grid — an empty or partially-filled result is far better than a fabricated one.';
 
         $response = Http::withToken(config('services.groq.key'))
             ->timeout(45)
@@ -99,7 +102,16 @@ class ClassScheduleController extends Controller
             ], 422);
         }
 
-        $parsed = $this->extractJson($response->json('choices.0.message.content'));
+        $rawContent = $response->json('choices.0.message.content');
+
+        // Temporary: log the raw model reply (truncated) so we can see exactly what
+        // Groq returned if the extraction still looks wrong for a tricky timetable photo.
+        // Safe to remove once the vision extraction is confirmed reliable in production.
+        Log::info('Groq vision raw response (timetable)', [
+            'raw' => Str::limit((string) $rawContent, 3000),
+        ]);
+
+        $parsed = $this->extractJson($rawContent);
         $classes = $parsed['classes'] ?? null;
 
         if (! $parsed || empty($parsed['detected']) || ! is_array($classes) || count($classes) === 0) {
@@ -108,6 +120,8 @@ class ClassScheduleController extends Controller
                 'error' => 'Tak dapat kesan jadual kelas dalam gambar tu. Cuba gambar yang lebih jelas, atau isi manual.',
             ], 422);
         }
+
+        $classes = $this->mergeAdjacentDuplicates($classes);
 
         $created = [];
 
@@ -179,6 +193,58 @@ class ClassScheduleController extends Controller
         [$h, $m] = explode(':', $time);
 
         return ((int) $h) * 60 + (int) $m;
+    }
+
+    /**
+     * Safety net for a common vision-model mistake on grid timetables: instead of
+     * reading a merged cell (one class spanning several hour columns) as a single
+     * entry, the model sometimes emits one duplicate entry per hour column it touches
+     * (same day/subject/room/lecturer, back-to-back times). Collapse those runs into
+     * one entry covering the full span, regardless of whether the prompt was followed.
+     *
+     * @param array<int, array<string, mixed>> $classes
+     * @return array<int, array<string, mixed>>
+     */
+    private function mergeAdjacentDuplicates(array $classes): array
+    {
+        $key = fn (array $e) => implode('|', [
+            $e['day_of_week'] ?? '',
+            trim((string) ($e['subject'] ?? '')),
+            trim((string) ($e['room'] ?? '')),
+            trim((string) ($e['lecturer'] ?? '')),
+        ]);
+
+        // Sort by day (in DAYS order), then start time, so back-to-back slots sit next to each other.
+        usort($classes, function ($a, $b) {
+            $dayA = array_search($a['day_of_week'] ?? null, ClassSchedule::DAYS, true);
+            $dayB = array_search($b['day_of_week'] ?? null, ClassSchedule::DAYS, true);
+            $dayA = $dayA === false ? 99 : $dayA;
+            $dayB = $dayB === false ? 99 : $dayB;
+
+            return $dayA <=> $dayB ?: $this->toMinutes($a['start_time'] ?? null) <=> $this->toMinutes($b['start_time'] ?? null);
+        });
+
+        $merged = [];
+
+        foreach ($classes as $entry) {
+            $last = end($merged);
+
+            if (
+                $last !== false
+                && $key($last) === $key($entry)
+                && $this->isValidTime($last['end_time'] ?? null)
+                && $this->isValidTime($entry['start_time'] ?? null)
+                && $last['end_time'] === $entry['start_time']
+            ) {
+                // Extends the previous block directly — merge instead of adding a duplicate.
+                $merged[count($merged) - 1]['end_time'] = $entry['end_time'] ?? $last['end_time'];
+                continue;
+            }
+
+            $merged[] = $entry;
+        }
+
+        return $merged;
     }
 
     private function isValidTime(?string $time): bool
