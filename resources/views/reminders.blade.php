@@ -847,6 +847,7 @@ function render() {
   const cutoff = Date.now() + filterDays * 24 * 3600 * 1000;
   const visible = reminders
     .filter(r => !q || r.subject.toLowerCase().includes(q))
+    .filter(r => new Date(r.due_at).getTime() > Date.now())
     .filter(r => new Date(r.due_at).getTime() <= cutoff)
     .sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
 
