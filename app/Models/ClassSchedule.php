@@ -7,7 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 class ClassSchedule extends Model
 {
     protected $fillable = [
-        'user_id', 'subject', 'day_of_week', 'start_time', 'end_time', 'room', 'lecturer',
+        'user_id', 'subject', 'day_of_week', 'start_time', 'end_time', 'room', 'lecturer', 'last_notified_date',
+    ];
+
+    protected $casts = [
+        'last_notified_date' => 'date',
     ];
 
     public const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];

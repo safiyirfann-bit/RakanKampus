@@ -19,7 +19,13 @@ class CronController extends Controller
         abort_if($expected === '' || ! hash_equals($expected, $given), 404);
 
         Artisan::call('reminders:send-due');
+        $output = Artisan::output();
 
-        return response(trim(Artisan::output()), 200)->header('Content-Type', 'text/plain');
+        // Reuses the same external cron ping as reminders (no second cron-job.org
+        // entry needed) to also check for classes starting soon today.
+        Artisan::call('classes:send-upcoming');
+        $output .= Artisan::output();
+
+        return response(trim($output), 200)->header('Content-Type', 'text/plain');
     }
 }
