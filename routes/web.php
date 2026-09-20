@@ -69,9 +69,33 @@ Route::middleware('auth')->group(function () {
             ];
         });
 
+    $now = now();
+    $todayClasses = $user->classSchedules()
+        ->where('day_of_week', $now->format('l'))
+        ->get()
+        ->sortBy(fn ($s) => $s->start_time)
+        ->values()
+        ->map(function ($schedule) use ($now) {
+            $start = $now->copy()->setTimeFromTimeString($schedule->start_time . ':00');
+            $end = $now->copy()->setTimeFromTimeString($schedule->end_time . ':00');
+
+            $status = $now->lt($start) ? 'upcoming' : ($now->lt($end) ? 'ongoing' : 'past');
+
+            return [
+                'id' => $schedule->id,
+                'subject' => $schedule->subject,
+                'start_time' => $schedule->start_time,
+                'end_time' => $schedule->end_time,
+                'room' => $schedule->room,
+                'lecturer' => $schedule->lecturer,
+                'status' => $status,
+            ];
+        });
+
     return view('homepage', [
         'user' => $user,
         'conversations' => $conversations,
+        'todayClasses' => $todayClasses,
     ]);
 })->name('student.home');
 

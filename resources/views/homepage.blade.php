@@ -318,6 +318,44 @@
 
   .reminders-banner > svg { width: 16px; height: 16px; stroke: #fff; flex-shrink: 0; }
 
+  .today-classes-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: 18px;
+    padding: 16px 18px;
+    margin-bottom: 24px;
+    box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
+    animation: fadeInUp 0.5s ease 0.12s both;
+  }
+
+  .today-classes-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+
+  .today-classes-title-row { display: flex; align-items: center; gap: 9px; }
+
+  .today-classes-title-row svg { width: 17px; height: 17px; stroke: var(--blue-primary); }
+
+  .today-classes-title { font-size: 14px; font-weight: 800; color: #2d2560; margin: 0; }
+
+  .today-classes-link { font-size: 11.5px; font-weight: 700; color: var(--blue-primary); text-decoration: none; white-space: nowrap; }
+
+  .today-class-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-light); }
+
+  .today-class-time { flex-shrink: 0; width: 58px; font-size: 11px; font-weight: 800; color: #2d2560; line-height: 1.3; }
+
+  .today-class-body { flex: 1; min-width: 0; }
+
+  .today-class-subject { font-size: 13px; font-weight: 700; color: #2d2560; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .today-class-meta { font-size: 11px; color: var(--text-muted); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+  .today-class-row.is-past { opacity: 0.45; }
+
+  .today-class-row.is-ongoing .today-class-time { color: #16a34a; }
+
+  .today-class-row.is-ongoing .today-class-subject { color: #16a34a; }
+
+  .today-classes-empty { font-size: 12.5px; color: var(--text-muted); padding: 10px 0 2px; }
+
   .quick-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -672,6 +710,28 @@
       </div>
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
     </a>
+
+    <div class="today-classes-card">
+      <div class="today-classes-head">
+        <div class="today-classes-title-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
+          <p class="today-classes-title">Today's Classes</p>
+        </div>
+        <a href="{{ route('student.timetable') }}" class="today-classes-link">Lihat semua &rarr;</a>
+      </div>
+
+      @forelse($todayClasses as $class)
+        <div class="today-class-row {{ $class['status'] === 'past' ? 'is-past' : '' }} {{ $class['status'] === 'ongoing' ? 'is-ongoing' : '' }}">
+          <div class="today-class-time">{{ \Carbon\Carbon::createFromFormat('H:i', $class['start_time'])->format('g:i A') }}</div>
+          <div class="today-class-body">
+            <p class="today-class-subject">{{ $class['subject'] }}</p>
+            <p class="today-class-meta">{{ collect([$class['room'], $class['lecturer']])->filter()->implode(' · ') ?: ($class['status'] === 'ongoing' ? 'Sedang berlangsung' : '') }}</p>
+          </div>
+        </div>
+      @empty
+        <p class="today-classes-empty">Tiada kelas hari ini 🎉</p>
+      @endforelse
+    </div>
 
     <div class="quick-grid">
   <a href="{{ route('student.chat') }}?q={{ urlencode('How do I register for courses?') }}" class="quick-chip">How do I register for courses?</a>
