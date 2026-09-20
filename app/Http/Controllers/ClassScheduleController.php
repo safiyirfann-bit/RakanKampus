@@ -72,11 +72,12 @@ class ClassScheduleController extends Controller
             . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] ONLY if the image clearly is not a class timetable at all. '
             . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around) — read the row/column headers carefully before extracting, and do not assume every table is laid out the same way. '
             . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. '
-            . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — use it to resolve abbreviated course codes into a readable subject name if present, but the legend itself is not a class entry. '
-            . 'CRITICAL: only output an entry for a cell you can actually read with reasonable confidence. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. Never invent or duplicate the same subject/room/lecturer across many time slots just to fill the grid — an empty or partially-filled result is far better than a fabricated one.';
+            . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — read that legend FIRST and use it to resolve abbreviated course codes into a readable subject name. '
+            . 'Work through the grid systematically: for each day row, go column by column left to right, and for each occupied cell read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer. '
+            . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in the image (directly, or via the legend table). Never output a generic-sounding subject name (e.g. a common course title) unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled result is far better than a fabricated one.';
 
         $response = Http::withToken(config('services.groq.key'))
-            ->timeout(45)
+            ->timeout(60)
             ->post('https://api.groq.com/openai/v1/chat/completions', [
                 'model' => 'qwen/qwen3.8-27b',
                 'messages' => [
@@ -86,8 +87,17 @@ class ClassScheduleController extends Controller
                         ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
                     ]],
                 ],
-                'temperature' => 0.2,
+                'temperature' => 0.6,
                 'response_format' => ['type' => 'json_object'],
+                // qwen3.8-27b supports a reasoning_effort dial that "dedicates more tokens to
+                // analysis, improving accuracy on complex problems" (Groq's own docs) — this
+                // dense multi-day grid + separate legend table is exactly that kind of problem,
+                // so let it actually think before answering instead of pattern-matching a guess.
+                // reasoning_format=hidden keeps message.content pure JSON (required for json_object
+                // mode — Groq only allows 'hidden' or 'parsed' there, not 'raw').
+                'reasoning_effort' => 'high',
+                'reasoning_format' => 'hidden',
+                'max_completion_tokens' => 8000,
             ]);
 
         if ($response->failed()) {
@@ -122,6 +132,23 @@ class ClassScheduleController extends Controller
         }
 
         $classes = $this->mergeAdjacentDuplicates($classes);
+
+        // Sanity check independent of whether the model followed the prompt: a real weekly
+        // timetable never has two classes overlapping in time on the same day. If the
+        // extraction produced overlapping entries, that's a strong signal the model got
+        // confused reading the grid (this is exactly what happened with a fabricated,
+        // sliding-window result on a dense timetable) — refuse the whole batch rather than
+        // saving a pile of conflicting junk the user then has to clean up by hand.
+        if ($this->hasOverlaps($classes)) {
+            Log::warning('Timetable AI capture rejected: overlapping classes detected', [
+                'classes' => $classes,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'error' => 'AI kurang yakin baca jadual ni betul-betul (jumpa kelas yang bertindih masa). Cuba gambar yang lebih jelas/dekat, atau isi manual untuk elak data salah.',
+            ], 422);
+        }
 
         $created = [];
 
@@ -169,6 +196,38 @@ class ClassScheduleController extends Controller
         ]);
 
         return $data;
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $classes
+     */
+    private function hasOverlaps(array $classes): bool
+    {
+        $byDay = [];
+
+        foreach ($classes as $entry) {
+            $day = $entry['day_of_week'] ?? null;
+            $start = $entry['start_time'] ?? null;
+            $end = $entry['end_time'] ?? null;
+
+            if (! in_array($day, ClassSchedule::DAYS, true) || ! $this->isValidTime($start) || ! $this->isValidTime($end)) {
+                continue; // invalid entries are dropped later anyway; don't let them trigger a false overlap
+            }
+
+            $byDay[$day][] = [$this->toMinutes($start), $this->toMinutes($end)];
+        }
+
+        foreach ($byDay as $ranges) {
+            usort($ranges, fn ($a, $b) => $a[0] <=> $b[0]);
+
+            for ($i = 1; $i < count($ranges); $i++) {
+                if ($ranges[$i][0] < $ranges[$i - 1][1]) {
+                    return true; // this range starts before the previous one ends -> overlap
+                }
+            }
+        }
+
+        return false;
     }
 
     private function toRaw(ClassSchedule $schedule): array
