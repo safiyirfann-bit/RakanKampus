@@ -85,6 +85,87 @@
 
   .empty-day { font-size: 12px; color: rgba(255,255,255,0.55); padding: 2px 2px 0; }
 
+  /* Mobile "Today" heading — replaces the plain header title on small screens,
+     hidden again on desktop where the original header text is shown instead. */
+  .today-heading { display: none; margin-bottom: 16px; }
+  .today-date { font-size: 12px; font-weight: 700; color: #bfe9ea; margin: 0 0 2px; }
+  .today-title { font-size: 23px; font-weight: 900; color: #fff; margin: 0; }
+
+  /* Mon-Sun day-picker strip with real calendar dates for the current week */
+  .day-picker { display: flex; gap: 7px; overflow-x: auto; padding-bottom: 2px; margin-bottom: 18px; }
+  .day-picker-item {
+    flex: 1; min-width: 40px; border: none; background: rgba(255,255,255,0.1); border-radius: 14px;
+    padding: 9px 4px; display: flex; flex-direction: column; align-items: center; gap: 5px; cursor: pointer;
+  }
+  .dp-label { font-size: 10px; font-weight: 800; color: #bfe9ea; text-transform: uppercase; letter-spacing: 0.02em; }
+  .dp-date {
+    font-size: 12.5px; font-weight: 800; color: #fff; width: 22px; height: 22px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .day-picker-item.active { background: #fff; }
+  .day-picker-item.active .dp-label { color: #14213d; }
+  .day-picker-item.active .dp-date { background: #14213d; color: #fff; }
+
+  /* Single-day timeline (mobile "Today" view) */
+  .timeline { display: flex; flex-direction: column; }
+
+  .timeline-row { display: flex; gap: 12px; align-items: flex-start; }
+
+  .timeline-time {
+    flex-shrink: 0; width: 50px; padding-top: 14px;
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+  }
+  .timeline-time span { font-size: 10.5px; font-weight: 800; color: #e6fbfa; text-align: center; line-height: 1.2; }
+  .timeline-dot {
+    width: 10px; height: 10px; border-radius: 50%; background: #2ec4c6;
+    border: 2px solid #14213d; box-shadow: 0 0 0 2px rgba(255,255,255,0.25);
+  }
+
+  .timeline-card {
+    flex: 1; min-width: 0; border-radius: 16px; padding: 13px 12px 13px 15px;
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;
+    margin-bottom: 14px; position: relative; border-left: 4px solid transparent;
+  }
+  .timeline-card.t1 { background: #eafbfa; border-left-color: #2ec4c6; }
+  .timeline-card.t2 { background: #eef1f8; border-left-color: #14213d; }
+  .timeline-card.t3 { background: #e8f6f0; border-left-color: #17a589; }
+  .timeline-card.t4 { background: #eaf3fb; border-left-color: #1b6ea6; }
+
+  .timeline-card-main { flex: 1; min-width: 0; }
+  .timeline-subject { font-size: 13.5px; font-weight: 800; color: #14213d; margin: 0 0 3px; }
+  .timeline-meta { font-size: 11.5px; color: #475569; margin: 0 0 3px; }
+  .timeline-lecturer { font-size: 11px; color: #64748b; margin: 0; }
+
+  .timeline-menu-wrap { position: relative; flex-shrink: 0; }
+  .timeline-menu-btn {
+    width: 26px; height: 26px; border-radius: 8px; border: none;
+    background: rgba(20,33,61,0.07); color: #14213d; font-size: 15px; font-weight: 900;
+    display: flex; align-items: center; justify-content: center; cursor: pointer; line-height: 1;
+  }
+  .timeline-menu {
+    display: none; position: absolute; right: 0; top: 30px; z-index: 10;
+    background: #fff; border-radius: 10px; box-shadow: 0 10px 26px rgba(0,0,0,0.2);
+    overflow: hidden; min-width: 108px;
+  }
+  .timeline-menu.open { display: block; }
+  .timeline-menu button {
+    display: block; width: 100%; text-align: left; padding: 10px 14px; border: none;
+    background: none; font-size: 12.5px; font-weight: 700; color: #14213d; cursor: pointer;
+  }
+  .timeline-menu button.danger { color: #dc2626; }
+  .timeline-menu button:hover { background: #f1f5f9; }
+
+  .break-pill { display: flex; align-items: center; margin: 0 0 14px 62px; }
+  .break-pill span {
+    font-size: 10.5px; font-weight: 700; color: #bfe9ea; background: rgba(255,255,255,0.1);
+    padding: 4px 10px; border-radius: 999px;
+  }
+
+  @media (max-width: 860px) {
+    .header-title, .header-sub { display: none; }
+    .today-heading { display: block; }
+  }
+
   .ai-fab {
     position: fixed; right: 20px; bottom: 88px; z-index: 30;
     background: #ffffff; border: none; border-radius: 999px;
@@ -230,6 +311,7 @@
     .ai-fab { right: 40px; bottom: 30px; }
 
     #scheduleList { display: none; }
+    .day-picker { display: none; }
     .grid-wrap { display: block; }
   }
 </style>
@@ -253,6 +335,13 @@
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     Add Class
   </button>
+
+  <div class="today-heading" id="todayHeading">
+    <p class="today-date" id="todayDateLine"></p>
+    <p class="today-title" id="todayTitleLine"></p>
+  </div>
+
+  <div class="day-picker" id="dayPicker"></div>
 
   <div id="scheduleList"></div>
 
@@ -357,6 +446,122 @@ function toMinutes(hhmm) {
   return h * 60 + m;
 }
 
+function formatDuration(mins) {
+  if (mins < 60) return mins + ' min';
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return h + 'h' + (m > 0 ? ' ' + m + 'min' : '');
+}
+
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// Real Mon-Sun dates for the current calendar week, matching DAYS order (Monday-first).
+function getWeekDates() {
+  const now = new Date();
+  const jsDay = now.getDay(); // 0 = Sunday ... 6 = Saturday
+  const mondayOffset = jsDay === 0 ? -6 : 1 - jsDay;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + mondayOffset);
+  return DAYS.map((_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i));
+}
+
+const weekDates = getWeekDates();
+const todayName = DAYS[(new Date().getDay() + 6) % 7]; // convert JS Sunday-first index to Monday-first
+let selectedDay = todayName;
+
+function renderTodayHeading() {
+  const dateLine = document.getElementById('todayDateLine');
+  const titleLine = document.getElementById('todayTitleLine');
+  if (!dateLine || !titleLine) return;
+  const d = weekDates[DAYS.indexOf(selectedDay)];
+  dateLine.textContent = d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
+  titleLine.textContent = selectedDay === todayName ? 'Today' : selectedDay;
+}
+
+function renderDayPicker() {
+  const picker = document.getElementById('dayPicker');
+  if (!picker) return;
+  picker.innerHTML = DAYS.map((day, i) => {
+    const d = weekDates[i];
+    return `<button type="button" class="day-picker-item ${day === selectedDay ? 'active' : ''}" onclick="selectDay('${day}')">
+        <span class="dp-label">${day.slice(0, 3)}</span>
+        <span class="dp-date">${d.getDate()}</span>
+      </button>`;
+  }).join('');
+}
+
+function selectDay(day) {
+  selectedDay = day;
+  renderDayPicker();
+  renderTodayHeading();
+  renderMobileTimeline();
+}
+
+function toggleTimelineMenu(e, id) {
+  e.stopPropagation();
+  const menu = document.getElementById('timelineMenu-' + id);
+  if (!menu) return;
+  const wasOpen = menu.classList.contains('open');
+  closeTimelineMenus();
+  if (!wasOpen) menu.classList.add('open');
+}
+
+function closeTimelineMenus() {
+  document.querySelectorAll('.timeline-menu.open').forEach(m => m.classList.remove('open'));
+}
+
+document.addEventListener('click', closeTimelineMenus);
+
+const TIMELINE_TINTS = ['t1', 't2', 't3', 't4'];
+
+function renderMobileTimeline() {
+  const list = document.getElementById('scheduleList');
+  if (!list) return;
+
+  const items = schedules
+    .filter(s => s.day_of_week === selectedDay)
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+  if (items.length === 0) {
+    list.innerHTML = `<p class="empty-day">No classes ${selectedDay === todayName ? 'today' : 'on ' + selectedDay}</p>`;
+    return;
+  }
+
+  let html = '<div class="timeline">';
+  items.forEach((s, idx) => {
+    if (idx > 0) {
+      const gap = toMinutes(s.start_time) - toMinutes(items[idx - 1].end_time);
+      if (gap > 0) {
+        html += `<div class="break-pill"><span>Break · ${formatDuration(gap)}</span></div>`;
+      }
+    }
+
+    const tint = TIMELINE_TINTS[idx % TIMELINE_TINTS.length];
+    html += `
+      <div class="timeline-row">
+        <div class="timeline-time">
+          <span>${formatTime12(s.start_time)}</span>
+          <span class="timeline-dot"></span>
+        </div>
+        <div class="timeline-card ${tint}" data-id="${s.id}">
+          <div class="timeline-card-main">
+            <p class="timeline-subject">${escapeHtml(s.subject)}</p>
+            <p class="timeline-meta">${formatTime12(s.start_time)} - ${formatTime12(s.end_time)}${s.room ? ' · ' + escapeHtml(s.room) : ''}</p>
+            ${s.lecturer ? `<p class="timeline-lecturer">${escapeHtml(s.lecturer)}</p>` : ''}
+          </div>
+          <div class="timeline-menu-wrap">
+            <button type="button" class="timeline-menu-btn" aria-label="More options" onclick="toggleTimelineMenu(event, ${s.id})">⋮</button>
+            <div class="timeline-menu" id="timelineMenu-${s.id}">
+              <button type="button" onclick="closeTimelineMenus(); openEditModal(${s.id})">Edit</button>
+              <button type="button" class="danger" onclick="closeTimelineMenus(); removeSchedule(${s.id})">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  list.innerHTML = html;
+}
+
 const GRID_HOUR_HEIGHT = 56; // px per hour in the desktop weekly grid
 
 function renderDesktopGrid() {
@@ -419,35 +624,9 @@ function renderDesktopGrid() {
 }
 
 function render() {
-  const list = document.getElementById('scheduleList');
-  list.innerHTML = DAYS.map(day => {
-    const items = schedules
-      .filter(s => s.day_of_week === day)
-      .sort((a, b) => a.start_time.localeCompare(b.start_time));
-
-    const body = items.length === 0
-      ? `<p class="empty-day">No classes</p>`
-      : `<div class="class-list">${items.map(s => `
-          <div class="class-card" data-id="${s.id}">
-            <div class="class-time">${formatTime12(s.start_time)}<br>${formatTime12(s.end_time)}</div>
-            <div class="class-body">
-              <p class="class-subject">${escapeHtml(s.subject)}</p>
-              <p class="class-meta">${[s.room, s.lecturer].filter(Boolean).map(escapeHtml).join(' · ') || '&nbsp;'}</p>
-            </div>
-            <div class="class-actions">
-              <button type="button" class="class-action-btn" aria-label="Edit" onclick="openEditModal(${s.id})">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
-              </button>
-              <button type="button" class="class-action-btn" aria-label="Delete" onclick="removeSchedule(${s.id})">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-              </button>
-            </div>
-          </div>
-        `).join('')}</div>`;
-
-    return `<div class="day-section"><p class="day-label">${day}</p>${body}</div>`;
-  }).join('');
-
+  renderTodayHeading();
+  renderDayPicker();
+  renderMobileTimeline();
   renderDesktopGrid();
 }
 
@@ -467,7 +646,7 @@ function openAddModal() {
   document.getElementById('modalTitle').textContent = 'Add Class';
   document.getElementById('scheduleId').value = '';
   document.getElementById('subjectInput').value = '';
-  document.getElementById('dayInput').value = 'Monday';
+  document.getElementById('dayInput').value = selectedDay;
   document.getElementById('startInput').value = '';
   document.getElementById('endInput').value = '';
   document.getElementById('roomInput').value = '';
