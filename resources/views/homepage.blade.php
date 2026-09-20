@@ -356,6 +356,9 @@
 
   .today-classes-empty { font-size: 12.5px; color: var(--text-muted); padding: 10px 0 2px; }
 
+  .today-classes-body { touch-action: pan-y; transition: transform 0.2s ease; }
+  .today-classes-body.dragging { transition: none; }
+
   .quick-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -715,22 +718,14 @@
       <div class="today-classes-head">
         <div class="today-classes-title-row">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
-          <p class="today-classes-title">Today's Classes</p>
+          <p class="today-classes-title" id="todayClassesTitle">Today's Classes</p>
         </div>
         <a href="{{ route('student.timetable') }}" class="today-classes-link">Lihat semua &rarr;</a>
       </div>
 
-      @forelse($todayClasses as $class)
-        <div class="today-class-row {{ $class['status'] === 'past' ? 'is-past' : '' }} {{ $class['status'] === 'ongoing' ? 'is-ongoing' : '' }}">
-          <div class="today-class-time">{{ \Carbon\Carbon::createFromFormat('H:i', $class['start_time'])->format('g:i A') }}</div>
-          <div class="today-class-body">
-            <p class="today-class-subject">{{ $class['subject'] }}</p>
-            <p class="today-class-meta">{{ collect([$class['room'], $class['lecturer']])->filter()->implode(' · ') ?: ($class['status'] === 'ongoing' ? 'Sedang berlangsung' : '') }}</p>
-          </div>
-        </div>
-      @empty
-        <p class="today-classes-empty">Tiada kelas hari ini 🎉</p>
-      @endforelse
+      <div class="today-classes-body" id="todayClassesBody"
+           onpointerdown="startClassesDrag(event)" onpointermove="moveClassesDrag(event)"
+           onpointerup="endClassesDrag(event)" onpointerleave="endClassesDrag(event)"></div>
     </div>
 
     <div class="quick-grid">
@@ -802,6 +797,139 @@
   <button class="help-fab" aria-label="Help">?</button>
 
 <script>
+const classSchedules = @json($classSchedules);
+const CLASS_DAYS = @json($classDays);
+let dayOffset = 0; // 0 = today, +1 = tomorrow, -1 = yesterday, etc.
+
+function getViewedDate() {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + dayOffset);
+    return d;
+}
+
+function formatClassTime(hhmm) {
+    const [h, m] = hhmm.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    return h12 + ':' + (m < 10 ? '0' + m : m) + ' ' + period;
+}
+
+function escapeHtmlHome(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function renderTodayClasses() {
+    const titleEl = document.getElementById('todayClassesTitle');
+    const bodyEl = document.getElementById('todayClassesBody');
+    if (!titleEl || !bodyEl) return;
+
+    const viewedDate = getViewedDate();
+    const dayName = CLASS_DAYS[(viewedDate.getDay() + 6) % 7]; // JS Sunday-first -> Monday-first index
+
+    if (dayOffset === 0) titleEl.textContent = "Today's Classes";
+    else if (dayOffset === 1) titleEl.textContent = "Tomorrow's Classes";
+    else if (dayOffset === -1) titleEl.textContent = "Yesterday's Classes";
+    else titleEl.textContent = dayName + "'s Classes";
+
+    const isActualToday = dayOffset === 0;
+    const now = new Date();
+
+    const items = classSchedules
+        .filter(s => s.day_of_week === dayName)
+        .sort((a, b) => a.start_time.localeCompare(b.start_time));
+
+    if (items.length === 0) {
+        bodyEl.innerHTML = `<p class="today-classes-empty">${isActualToday ? 'Tiada kelas hari ini 🎉' : 'Tiada kelas'}</p>`;
+        return;
+    }
+
+    bodyEl.innerHTML = items.map(s => {
+        let status = 'upcoming';
+        if (isActualToday) {
+            const [sh, sm] = s.start_time.split(':').map(Number);
+            const [eh, em] = s.end_time.split(':').map(Number);
+            const start = new Date(); start.setHours(sh, sm, 0, 0);
+            const end = new Date(); end.setHours(eh, em, 0, 0);
+            status = now < start ? 'upcoming' : (now < end ? 'ongoing' : 'past');
+        }
+        const meta = [s.room, s.lecturer].filter(Boolean).map(escapeHtmlHome).join(' · ')
+            || (status === 'ongoing' ? 'Sedang berlangsung' : '');
+
+        return `<div class="today-class-row ${status === 'past' ? 'is-past' : ''} ${status === 'ongoing' ? 'is-ongoing' : ''}">
+            <div class="today-class-time">${formatClassTime(s.start_time)}</div>
+            <div class="today-class-body">
+              <p class="today-class-subject">${escapeHtmlHome(s.subject)}</p>
+              <p class="today-class-meta">${meta}</p>
+            </div>
+          </div>`;
+    }).join('');
+}
+
+// Swipe the "Today's Classes" card left/right to browse days (left = tomorrow,
+// right = previous day) — mirrors the pointer-drag pattern already used for the
+// conversation swipe-to-delete cards below, scoped to just this card.
+const CLASSES_SWIPE_THRESHOLD = 50;
+let classesDragStartX = null;
+let classesDragStartY = null;
+let classesDragDeltaX = 0;
+let classesDragging = false;
+
+function startClassesDrag(e) {
+    classesDragStartX = e.clientX;
+    classesDragStartY = e.clientY;
+    classesDragDeltaX = 0;
+    classesDragging = false;
+}
+
+function moveClassesDrag(e) {
+    if (classesDragStartX === null) return;
+    const dx = e.clientX - classesDragStartX;
+    const dy = e.clientY - classesDragStartY;
+
+    if (!classesDragging) {
+        // Only claim the gesture once it's clearly more horizontal than vertical,
+        // so an ordinary vertical page scroll that starts over the card isn't hijacked.
+        if (Math.abs(dx) < 8 || Math.abs(dx) <= Math.abs(dy)) return;
+        classesDragging = true;
+    }
+
+    classesDragDeltaX = dx;
+    const bodyEl = document.getElementById('todayClassesBody');
+    if (bodyEl) {
+        bodyEl.classList.add('dragging');
+        bodyEl.style.transform = `translateX(${Math.max(-90, Math.min(90, dx))}px)`;
+    }
+}
+
+function endClassesDrag(e) {
+    if (classesDragStartX === null) return;
+    const dx = classesDragDeltaX;
+    const wasDragging = classesDragging;
+    classesDragStartX = null;
+    classesDragStartY = null;
+    classesDragDeltaX = 0;
+    classesDragging = false;
+
+    const bodyEl = document.getElementById('todayClassesBody');
+    if (bodyEl) {
+        bodyEl.classList.remove('dragging');
+        bodyEl.style.transform = 'translateX(0px)';
+    }
+
+    if (!wasDragging) return;
+
+    if (dx <= -CLASSES_SWIPE_THRESHOLD) {
+        dayOffset += 1;
+        renderTodayClasses();
+    } else if (dx >= CLASSES_SWIPE_THRESHOLD) {
+        dayOffset -= 1;
+        renderTodayClasses();
+    }
+}
+
+renderTodayClasses();
+
 let convDragId = null;
 let convDragStartX = null;
 let convDragOffset = 0;

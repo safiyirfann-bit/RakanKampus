@@ -69,33 +69,29 @@ Route::middleware('auth')->group(function () {
             ];
         });
 
-    $now = now();
-    $todayClasses = $user->classSchedules()
-        ->where('day_of_week', $now->format('l'))
+    // Full week of classes, sent as raw data (same shape as the Timetable page) so
+    // the "Today's Classes" card on Home can swipe between days client-side without
+    // another request — status (past/ongoing/upcoming) is computed in JS, since it
+    // only ever applies to the actual current day.
+    $classSchedules = $user->classSchedules()
         ->get()
-        ->sortBy(fn ($s) => $s->start_time)
+        ->sortBy(fn ($s) => array_search($s->day_of_week, \App\Models\ClassSchedule::DAYS) * 1440 + (int) str_replace(':', '', $s->start_time))
         ->values()
-        ->map(function ($schedule) use ($now) {
-            $start = $now->copy()->setTimeFromTimeString($schedule->start_time . ':00');
-            $end = $now->copy()->setTimeFromTimeString($schedule->end_time . ':00');
-
-            $status = $now->lt($start) ? 'upcoming' : ($now->lt($end) ? 'ongoing' : 'past');
-
-            return [
-                'id' => $schedule->id,
-                'subject' => $schedule->subject,
-                'start_time' => $schedule->start_time,
-                'end_time' => $schedule->end_time,
-                'room' => $schedule->room,
-                'lecturer' => $schedule->lecturer,
-                'status' => $status,
-            ];
-        });
+        ->map(fn ($schedule) => [
+            'id' => $schedule->id,
+            'subject' => $schedule->subject,
+            'day_of_week' => $schedule->day_of_week,
+            'start_time' => $schedule->start_time,
+            'end_time' => $schedule->end_time,
+            'room' => $schedule->room,
+            'lecturer' => $schedule->lecturer,
+        ]);
 
     return view('homepage', [
         'user' => $user,
         'conversations' => $conversations,
-        'todayClasses' => $todayClasses,
+        'classSchedules' => $classSchedules,
+        'classDays' => \App\Models\ClassSchedule::DAYS,
     ]);
 })->name('student.home');
 
