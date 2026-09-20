@@ -979,14 +979,20 @@ function moveRowDrag(e) {
 function endRowDrag() {
   if (dragId === null) return;
   const id = dragId;
+  const moved = dragOffset > 0;
   const shouldDelete = dragOffset > 44;
   dragId = null;
   dragStartX = null;
   dragOffset = 0;
   if (shouldDelete) {
     removeReminder(id);
-  } else {
-    render();
+  } else if (moved) {
+    // Only snap the card back if it was actually dragged. Calling render()
+    // here unconditionally (even for a plain tap with zero movement) replaces
+    // the card's DOM node between pointerup and the browser's click event,
+    // which silently swallows clicks on the Edit/Delete buttons inside it.
+    const card = document.querySelector(`.reminder-card[data-id="${id}"]`);
+    if (card) card.style.transform = 'translateX(0px)';
   }
 }
 
