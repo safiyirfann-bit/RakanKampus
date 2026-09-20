@@ -165,9 +165,60 @@
   .ai-error p { font-size: 11.5px; color: #b91c1c; margin: 0; line-height: 1.4; }
   .ai-error button { background: none; border: none; color: #b91c1c; font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; }
 
+  /* Desktop weekly grid — hidden on mobile, shown instead of the day-list at >=861px */
+  .grid-wrap { display: none; }
+
+  .grid-header {
+    display: grid;
+    grid-template-columns: 56px repeat(7, minmax(96px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .grid-day-head {
+    font-size: 11px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase;
+    color: #64748b; text-align: center; padding-bottom: 4px;
+  }
+
+  .grid-body { display: grid; grid-template-columns: 56px 1fr; gap: 8px; overflow-x: auto; }
+
+  .grid-gutter { position: relative; }
+
+  .grid-hour-label {
+    position: absolute; right: 8px; transform: translateY(-50%);
+    font-size: 10.5px; font-weight: 700; color: #94a3b8; white-space: nowrap;
+  }
+
+  .grid-columns {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(96px, 1fr));
+    gap: 8px;
+  }
+
+  .grid-day-column {
+    position: relative;
+    background-color: #ffffff;
+    border: 1px solid #dbeeee;
+    border-radius: 10px;
+  }
+
+  .grid-block {
+    position: absolute; left: 3px; right: 3px; min-height: 26px;
+    background: linear-gradient(120deg, #14213d, #2ec4c6);
+    border-radius: 8px; padding: 5px 7px; overflow: hidden; cursor: pointer;
+    box-shadow: 0 3px 8px rgba(20,33,61,0.18);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .grid-block:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(20,33,61,0.28); }
+
+  .grid-block-time { font-size: 9.5px; font-weight: 800; color: #bfe9ea; margin: 0; line-height: 1.2; }
+  .grid-block-subject { font-size: 11px; font-weight: 800; color: #fff; margin: 1px 0 0; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .grid-block-meta { font-size: 9.5px; color: #bfe9ea; margin: 2px 0 0; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
   @media (min-width: 861px) {
     body { background: #f0fafa; }
-    .container { max-width: 760px; margin: 0; padding: 36px 44px 90px; }
+    .container { max-width: 1060px; margin: 0; padding: 36px 44px 90px; }
     .back-btn { display: none; }
     .header-title { color: #14213d; }
     .header-sub { color: #64748b; }
@@ -177,6 +228,9 @@
     .class-meta { color: #64748b; }
     .empty-day { color: #94a3b8; }
     .ai-fab { right: 40px; bottom: 30px; }
+
+    #scheduleList { display: none; }
+    .grid-wrap { display: block; }
   }
 </style>
 </head>
@@ -201,6 +255,14 @@
   </button>
 
   <div id="scheduleList"></div>
+
+  <div class="grid-wrap" id="scheduleGridWrap">
+    <div class="grid-header" id="gridHeaderRow"></div>
+    <div class="grid-body">
+      <div class="grid-gutter" id="gridGutter"></div>
+      <div class="grid-columns" id="gridColumns"></div>
+    </div>
+  </div>
 </div>
 
 <button type="button" class="ai-fab" aria-label="AI Assistant" onclick="openAiModal()">
@@ -290,6 +352,72 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+function toMinutes(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return h * 60 + m;
+}
+
+const GRID_HOUR_HEIGHT = 56; // px per hour in the desktop weekly grid
+
+function renderDesktopGrid() {
+  const headerRow = document.getElementById('gridHeaderRow');
+  const gutter = document.getElementById('gridGutter');
+  const columns = document.getElementById('gridColumns');
+  if (!headerRow || !gutter || !columns) return;
+
+  // Default window 7 AM - 6 PM, widened to fit any class outside that range,
+  // rounded to whole hours so gridlines/labels land cleanly.
+  let minStart = 7 * 60;
+  let maxEnd = 18 * 60;
+  schedules.forEach(s => {
+    minStart = Math.min(minStart, toMinutes(s.start_time));
+    maxEnd = Math.max(maxEnd, toMinutes(s.end_time));
+  });
+  minStart = Math.floor(minStart / 60) * 60;
+  maxEnd = Math.ceil(maxEnd / 60) * 60;
+  const totalMinutes = Math.max(maxEnd - minStart, 60);
+  const totalHeight = (totalMinutes / 60) * GRID_HOUR_HEIGHT;
+
+  headerRow.innerHTML = '<div></div>' + DAYS.map(d => `<div class="grid-day-head">${d.slice(0, 3)}</div>`).join('');
+
+  gutter.style.height = totalHeight + 'px';
+  let hourLabels = '';
+  for (let m = minStart; m <= maxEnd; m += 60) {
+    const top = ((m - minStart) / totalMinutes) * 100;
+    const hh = String(Math.floor(m / 60)).padStart(2, '0');
+    hourLabels += `<div class="grid-hour-label" style="top:${top}%;">${formatTime12(hh + ':00')}</div>`;
+  }
+  gutter.innerHTML = hourLabels;
+
+  columns.style.height = totalHeight + 'px';
+  columns.style.backgroundImage = `repeating-linear-gradient(to bottom, #e7f1f1 0, #e7f1f1 1px, transparent 1px, transparent ${GRID_HOUR_HEIGHT}px)`;
+
+  columns.innerHTML = DAYS.map(day => {
+    const items = schedules.filter(s => s.day_of_week === day);
+
+    const blocks = items.map(s => {
+      const start = toMinutes(s.start_time);
+      const realEnd = toMinutes(s.end_time);
+      // Actual short classes (a 15-min quiz slot, say) still get a real duration-
+      // proportioned block, but never so thin the time/subject text has no room —
+      // stretch the drawn box to a readable minimum without touching the saved data.
+      const durationMinutes = Math.max(realEnd - start, 1);
+      const drawnEnd = Math.max(realEnd, start + 40);
+      const top = ((start - minStart) / totalMinutes) * 100;
+      const height = ((drawnEnd - start) / totalMinutes) * 100;
+      const meta = [s.room, s.lecturer].filter(Boolean).map(escapeHtml).join(' · ');
+
+      return `<div class="grid-block" style="top:${top}%; height:${height}%;" onclick="openEditModal(${s.id})" title="${escapeHtml(s.subject)}">
+          <p class="grid-block-time">${formatTime12(s.start_time)}</p>
+          <p class="grid-block-subject">${escapeHtml(s.subject)}</p>
+          ${meta && durationMinutes >= 45 ? `<p class="grid-block-meta">${meta}</p>` : ''}
+        </div>`;
+    }).join('');
+
+    return `<div class="grid-day-column">${blocks}</div>`;
+  }).join('');
+}
+
 function render() {
   const list = document.getElementById('scheduleList');
   list.innerHTML = DAYS.map(day => {
@@ -319,6 +447,8 @@ function render() {
 
     return `<div class="day-section"><p class="day-label">${day}</p>${body}</div>`;
   }).join('');
+
+  renderDesktopGrid();
 }
 
 function showModal(id) {
