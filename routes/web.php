@@ -6,6 +6,7 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\InformationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReminderController;
+use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\Admin\KnowledgeBaseController;
 use App\Http\Controllers\Admin\UnansweredQuestionController;
 use App\Http\Controllers\FeedbackController;
@@ -97,6 +98,13 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::delete('/reminders/{reminder}', [ReminderController::class, 'destroy'])->name('reminders.destroy');
     Route::post('/reminders/bulk-delete', [ReminderController::class, 'bulkDestroy'])->name('reminders.bulkDestroy');
     Route::post('/reminders/history/bulk-delete', [ReminderController::class, 'historyBulkDestroy'])->name('reminders.history.bulkDestroy');
+
+    // Timetable
+    Route::get('/student/timetable', [ClassScheduleController::class, 'index'])->name('student.timetable');
+    Route::post('/timetable', [ClassScheduleController::class, 'store'])->name('timetable.store');
+    Route::post('/timetable/ai-capture', [ClassScheduleController::class, 'aiCapture'])->middleware('throttle:10,1')->name('timetable.aiCapture');
+    Route::put('/timetable/{schedule}', [ClassScheduleController::class, 'update'])->name('timetable.update');
+    Route::delete('/timetable/{schedule}', [ClassScheduleController::class, 'destroy'])->name('timetable.destroy');
 
     // Web push subscriptions
     Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe');

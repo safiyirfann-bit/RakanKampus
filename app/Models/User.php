@@ -57,4 +57,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Reminder::class);
     }
+
+    public function classSchedules()
+    {
+        return $this->hasMany(ClassSchedule::class);
+    }
 }
