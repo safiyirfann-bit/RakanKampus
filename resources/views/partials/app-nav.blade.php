@@ -8,6 +8,14 @@
     ['key' => 'timetable', 'route' => 'student.timetable', 'label' => 'Timetable', 'icon' => '<rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path>'],
     ['key' => 'profile', 'route' => 'student.profile', 'label' => 'Profile', 'icon' => '<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>'],
   ];
+
+  // Mobile bottom bar keeps the same 5 destinations/icons as the desktop sidebar
+  // above, just reordered so Chat sits in the middle as the raised circular button.
+  $tabOrder = ['home', 'reminders', 'chat', 'timetable', 'profile'];
+  $tabItems = collect($tabOrder)
+    ->map(fn ($key) => collect($navItems)->firstWhere('key', $key))
+    ->filter()
+    ->values();
 @endphp
 <style>
   .rk-sidebar {
@@ -38,21 +46,33 @@
   .rk-tabbar {
     display: none;
     position: fixed;
-    left: 0; right: 0; bottom: 0;
-    height: 64px;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    left: 16px; right: 16px;
+    bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    height: 62px;
     background: #ffffff;
-    border-top: 1px solid #eef1f5;
+    border-radius: 26px;
     align-items: center;
     justify-content: space-around;
+    box-shadow: 0 14px 30px rgba(20, 33, 61, 0.2);
     z-index: 38;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  .rk-tab-link { display: flex; flex-direction: column; align-items: center; gap: 3px; text-decoration: none; color: #94a3b8; }
-  .rk-tab-link svg { width: 20px; height: 20px; stroke: currentColor; }
-  .rk-tab-link span { font-size: 10px; font-weight: 500; }
+  .rk-tab-link { display: flex; flex: 1; align-items: center; justify-content: center; text-decoration: none; color: #94a3b8; }
+  .rk-tab-link svg { width: 21px; height: 21px; stroke: currentColor; }
   .rk-tab-link.active { color: #6366f1; }
-  .rk-tab-link.active span { font-weight: 700; }
+
+  .rk-tab-link.elevated {
+    flex: 0 0 auto;
+    position: relative;
+    top: -20px;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(120deg, #14213d, #2ec4c6);
+    box-shadow: 0 8px 18px rgba(20,33,61,0.42);
+    color: #fff;
+  }
+  .rk-tab-link.elevated svg { width: 23px; height: 23px; }
+  .rk-tab-link.elevated.active { color: #fff; }
 
   @media (min-width: 861px) {
     .rk-sidebar { display: flex; }
@@ -60,7 +80,7 @@
   }
   @media (max-width: 860px) {
     .rk-tabbar { display: flex; }
-    body { padding-bottom: 64px; }
+    body { padding-bottom: 92px; }
   }
 </style>
 
@@ -93,10 +113,11 @@
 </nav>
 
 <nav class="rk-tabbar">
-  @foreach($navItems as $item)
-    <a href="{{ route($item['route']) }}" class="rk-tab-link {{ $navActive === $item['key'] ? 'active' : '' }}">
+  @foreach($tabItems as $item)
+    <a href="{{ route($item['route']) }}"
+       class="rk-tab-link {{ $item['key'] === 'chat' ? 'elevated' : '' }} {{ $navActive === $item['key'] ? 'active' : '' }}"
+       aria-label="{{ $item['label'] }}">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
-      <span>{{ $item['label'] }}</span>
     </a>
   @endforeach
 </nav>
