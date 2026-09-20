@@ -48,7 +48,7 @@
     position: fixed;
     left: 16px; right: 16px;
     bottom: calc(14px + env(safe-area-inset-bottom, 0px));
-    height: 62px;
+    height: 70px;
     background: #ffffff;
     border-radius: 26px;
     align-items: center;
@@ -57,14 +57,16 @@
     z-index: 38;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
-  .rk-tab-link { display: flex; flex: 1; align-items: center; justify-content: center; text-decoration: none; color: #94a3b8; }
-  .rk-tab-link svg { width: 21px; height: 21px; stroke: currentColor; }
+  .rk-tab-link { display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #94a3b8; }
+  .rk-tab-link svg { width: 20px; height: 20px; stroke: currentColor; }
+  .rk-tab-link span { font-size: 9.5px; font-weight: 600; }
   .rk-tab-link.active { color: #6366f1; }
+  .rk-tab-link.active span { font-weight: 700; }
 
   .rk-tab-link.elevated {
     flex: 0 0 auto;
     position: relative;
-    top: -20px;
+    top: -22px;
     width: 52px; height: 52px;
     border-radius: 50%;
     background: linear-gradient(120deg, #14213d, #2ec4c6);
@@ -72,6 +74,7 @@
     color: #fff;
   }
   .rk-tab-link.elevated svg { width: 23px; height: 23px; }
+  .rk-tab-link.elevated span { display: none; }
   .rk-tab-link.elevated.active { color: #fff; }
 
   @media (min-width: 861px) {
@@ -80,7 +83,7 @@
   }
   @media (max-width: 860px) {
     .rk-tabbar { display: flex; }
-    body { padding-bottom: 92px; }
+    body { padding-bottom: 100px; }
   }
 </style>
 
@@ -118,6 +121,7 @@
        class="rk-tab-link {{ $item['key'] === 'chat' ? 'elevated' : '' }} {{ $navActive === $item['key'] ? 'active' : '' }}"
        aria-label="{{ $item['label'] }}">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+      <span>{{ $item['label'] }}</span>
     </a>
   @endforeach
 </nav>

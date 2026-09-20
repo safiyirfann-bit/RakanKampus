@@ -162,7 +162,6 @@
   }
 
   @media (max-width: 860px) {
-    .header-title, .header-sub { display: none; }
     .today-heading { display: block; }
   }
 
