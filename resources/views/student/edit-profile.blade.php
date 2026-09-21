@@ -449,24 +449,36 @@ function uploadPhoto() {
     fetch('{{ route("profile.photo.upload") }}', {
         method: 'POST',
         headers: {
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json',
         },
         body: formData
     })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('avatarWrapper').innerHTML =
-                `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="Profile photo">`;
-            closePhotoModal();
-        } else {
-            showAlert('error', 'Failed', 'Failed to upload image.');
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        showAlert('error', 'Error', 'An error occurred during upload.');
-    });
+        // Read as text first, then try to parse JSON — a validation failure (wrong
+        // file type, too large, etc.) without an Accept header would otherwise come
+        // back as an HTML page, and res.json() on that throws and lands in .catch()
+        // with no useful message, which is why this used to just say "an error
+        // occurred" for every failure reason.
+        .then(res => res.text().then((text) => {
+            let data = null;
+            try { data = JSON.parse(text); } catch (e) { /* not JSON */ }
+            return { ok: res.ok, data };
+        }))
+        .then(({ ok, data }) => {
+            if (ok && data && data.success) {
+                document.getElementById('avatarWrapper').innerHTML =
+                    `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="Profile photo">`;
+                closePhotoModal();
+                return;
+            }
+
+            const validationMsg = data && data.errors && data.errors.photo && data.errors.photo[0];
+            showAlert('error', 'Failed', validationMsg || (data && data.message) || 'Failed to upload image.');
+        })
+        .catch(err => {
+            console.error(err);
+            showAlert('error', 'Error', 'An error occurred during upload.');
+        });
 }
 </script>
 </body>
