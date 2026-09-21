@@ -403,7 +403,7 @@ body{
     </div>
 
     <div class="brand">RakanKampus</div>
-    <div class="subtitle">Your University AI Assistant</div>
+    <div class="subtitle">Your Politeknik AI Assistant</div>
 
     <form method="POST" action="{{ route('register') }}">
       @csrf
@@ -518,7 +518,7 @@ body{
   </div>
 
   <div class="copyright">
-    © 2026 RakanKampus · Universiti Teknologi Malaysia
+    © 2026 RakanKampus · Politeknik Ungku Omar
   </div>
 
 </div>

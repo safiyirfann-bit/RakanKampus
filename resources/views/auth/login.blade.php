@@ -273,7 +273,7 @@
   </div>
 
   <h1>RakanKampus</h1>
-  <p class="subtitle">Your University AI Assistant</p>
+  <p class="subtitle">Your Politeknik AI Assistant</p>
 
   @if(session('success'))
   <div style="background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4); color: #fff; padding: 14px 18px; border-radius: 14px; margin-bottom: 20px; text-align: center; font-size: 14px;">

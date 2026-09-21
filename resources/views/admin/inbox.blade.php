@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Feedback Inbox</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css">
@@ -236,6 +237,28 @@
             white-space:nowrap;
         }
 
+        .item-delete-btn{
+            flex-shrink:0;
+            width:34px;
+            height:34px;
+            border-radius:10px;
+            border:1px solid var(--admin-border);
+            background:transparent;
+            color:var(--admin-muted);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            font-size:15px;
+            transition:.2s;
+        }
+
+        .item-delete-btn:hover{
+            background:rgba(239,68,68,.15);
+            border-color:#ef4444;
+            color:#ef4444;
+        }
+
         .fab{
             position:fixed;
             right:28px;
@@ -331,7 +354,7 @@
             @forelse($feedbacks as $item)
 
                 @if($item->feedback)
-                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="feedback">
+                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="feedback" data-feedback-id="{{ $item->id }}">
 
                         <div class="type-icon feedback">
                             <i class="ti ti-message-2" aria-hidden="true"></i>
@@ -350,11 +373,15 @@
 
                         </div>
 
+                        <button type="button" class="item-delete-btn" aria-label="Delete" onclick="deleteFeedbackItem({{ $item->id }})">
+                            <i class="ti ti-trash" aria-hidden="true"></i>
+                        </button>
+
                     </div>
                 @endif
 
                 @if($item->feature_request)
-                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="feature">
+                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="feature" data-feedback-id="{{ $item->id }}">
 
                         <div class="type-icon feature">
                             <i class="ti ti-bulb" aria-hidden="true"></i>
@@ -372,6 +399,10 @@
                             </p>
 
                         </div>
+
+                        <button type="button" class="item-delete-btn" aria-label="Delete" onclick="deleteFeedbackItem({{ $item->id }})">
+                            <i class="ti ti-trash" aria-hidden="true"></i>
+                        </button>
 
                     </div>
                 @endif
@@ -416,6 +447,56 @@ function setInboxTab(type, btn) {
 
     });
 
+}
+
+function deleteFeedbackItem(id) {
+    if (!confirm('Delete this feedback? This cannot be undone.')) return;
+
+    fetch(`/admin/inbox/${id}`, {
+        method: 'DELETE',
+        headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (!data || !data.success) {
+                alert('Tak dapat padam feedback ni sekarang. Cuba lagi.');
+                return;
+            }
+
+            document.querySelectorAll(`.item[data-feedback-id="${id}"]`).forEach(el => el.remove());
+            updateInboxStats();
+
+            const list = document.getElementById('inboxList');
+            if (!list.querySelector('.item')) {
+                list.innerHTML = `
+                    <div class="item">
+                        <div class="body">
+                            <div class="title">No feedback yet</div>
+                            <p class="preview">No student feedback or feature requests received.</p>
+                        </div>
+                    </div>`;
+            }
+        })
+        .catch(() => alert('Ada masalah sambungan. Cuba lagi.'));
+}
+
+function updateInboxStats() {
+    const items = document.querySelectorAll('#inboxList .item[data-feedback-id]');
+    // A single feedback record can render as two rows (feedback + feature request),
+    // so count distinct record ids rather than rows for the "Total" stat.
+    const ids = new Set();
+    let unread = 0;
+    items.forEach(el => {
+        const id = el.dataset.feedbackId;
+        if (!ids.has(id)) {
+            ids.add(id);
+            if (el.classList.contains('unread')) unread++;
+        }
+    });
+    const totalEl = document.querySelector('.stat-card .value');
+    const unreadEl = document.querySelector('.stat-card .value.accent');
+    if (totalEl) totalEl.textContent = ids.size;
+    if (unreadEl) unreadEl.textContent = unread;
 }
 </script>
 </body>

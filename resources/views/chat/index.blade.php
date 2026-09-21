@@ -413,7 +413,7 @@
 
       <div class="input-bar">
         <div class="input-row">
-          <input type="text" placeholder="Ask me anything about university...">
+          <input type="text" placeholder="Ask me anything about Politeknik...">
           <button class="mic-btn" aria-label="Voice input">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
@@ -425,7 +425,7 @@
             <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
           </button>
         </div>
-        <p class="disclaimer">RakanKampus AI may make mistakes. Verify important information with university staff.</p>
+        <p class="disclaimer">RakanKampus AI may make mistakes. Verify important information with Politeknik staff.</p>
       </div>
     </div>
 

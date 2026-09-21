@@ -217,6 +217,8 @@ Route::middleware(['auth', 'admin'])
         // Inbox
         Route::get('/inbox', [FeedbackController::class, 'inbox'])
             ->name('inbox');
+        Route::delete('/inbox/{feedback}', [FeedbackController::class, 'destroy'])
+            ->name('inbox.destroy');
 
         // Unanswered questions
 Route::get('/unanswered', [UnansweredQuestionController::class, 'index'])

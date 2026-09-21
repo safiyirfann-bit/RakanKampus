@@ -137,6 +137,23 @@
             border-color:white;
         }
 
+        .sort-select{
+            margin-left:auto;
+            background:var(--admin-card);
+            border:1px solid var(--admin-border);
+            color:white;
+            font-size:13px;
+            font-weight:700;
+            padding:10px 14px;
+            border-radius:10px;
+            cursor:pointer;
+        }
+
+        .sort-select:focus{
+            outline:none;
+            border-color:var(--green);
+        }
+
         .list{
             display:flex;
             flex-direction:column;
@@ -359,6 +376,12 @@
                 <i class="ti ti-history" aria-hidden="true"></i>
                 History
             </button>
+
+            <select class="sort-select" id="sortSelect" onchange="location.href = '{{ route('admin.unanswered.index') }}?sort=' + this.value">
+                <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>Sort: Newest first</option>
+                <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Sort: Oldest first</option>
+                <option value="most_asked" {{ $sort === 'most_asked' ? 'selected' : '' }}>Sort: Most asked</option>
+            </select>
         </div>
 
         <!-- PENDING LIST -->
@@ -504,6 +527,10 @@
 
             document.getElementById('pendingListWrap').style.display = tab === 'pending' ? 'flex' : 'none';
             document.getElementById('historyListWrap').style.display = tab === 'history' ? 'flex' : 'none';
+
+            // The sort control only affects the Unanswered (pending) list, so hide it
+            // on the History tab where it wouldn't do anything.
+            document.getElementById('sortSelect').style.display = tab === 'pending' ? 'block' : 'none';
         }
 
         function openAnswerModal(id, questionText) {

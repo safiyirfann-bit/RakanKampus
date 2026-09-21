@@ -26,4 +26,11 @@ class FeedbackController extends Controller
 
         return view('admin.inbox', compact('feedbacks'));
     }
+
+    public function destroy(Feedback $feedback)
+    {
+        $feedback->delete();
+
+        return response()->json(['success' => true]);
+    }
 }

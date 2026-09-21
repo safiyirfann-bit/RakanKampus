@@ -353,23 +353,42 @@
     justify-content:center;
   }
 
+  .message-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 75%;
+  }
+  .message-row.user { align-self: flex-end; flex-direction: row-reverse; }
+  .message-row.bot { align-self: flex-start; flex-direction: row; }
+
+  .msg-avatar {
+    width: 26px; height: 26px; min-width: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+    font-size: 10.5px; font-weight: 700;
+  }
+  .msg-avatar.user-avatar-mini { background: var(--blue-primary); color: #fff; }
+  .msg-avatar.user-avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
+  .msg-avatar.bot-avatar-mini { background: #fff; border: 1px solid var(--border-light); padding: 4px; }
+  .msg-avatar.bot-avatar-mini svg { width: 100%; height: 100%; }
+
  .message{
-    max-width:75%;
     padding:14px 18px;
     border-radius:18px;
     line-height:1.5;
     font-size:14px;
     white-space: pre-line;
+    min-width: 0;
 }
 
   .message.user{
-    align-self:flex-end;
     background:var(--blue-primary);
     color:white;
   }
 
   .message.bot{
-    align-self:flex-start;
     background:white;
     color:var(--blue-dark);
     border:1px solid var(--border-light);
@@ -513,6 +532,9 @@
         </div>
       </div>
 
+      <template id="userAvatarTpl"><div class="msg-avatar user-avatar-mini">@if($user->photo)<img src="{{ Storage::url($user->photo) }}" alt="">@else{{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}@endif</div></template>
+      <template id="botAvatarTpl"><div class="msg-avatar bot-avatar-mini"><x-brand-logo size="18" /></div></template>
+
       <div class="chat-area" id="chatArea">
         <div class="empty-state" id="emptyState">
           <div class="empty-icon">
@@ -527,7 +549,7 @@
 
       <div class="input-bar">
         <div class="input-row">
-          <input type="text" id="messageInput" placeholder="Ask me anything about university...">
+          <input type="text" id="messageInput" placeholder="Ask me anything about Politeknik...">
           <button class="send-btn" id="sendBtn" aria-label="Send">
             <svg viewBox="0 0 24 24">
               <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
@@ -584,12 +606,23 @@ function addMessage(text, sender){
     emptyState.remove();
     emptyState = null;
   }
+
+  const row = document.createElement('div');
+  row.className = `message-row ${sender}`;
+
+  const avatarTpl = document.getElementById(sender === 'user' ? 'userAvatarTpl' : 'botAvatarTpl');
+  if (avatarTpl) {
+    row.appendChild(avatarTpl.content.firstElementChild.cloneNode(true));
+  }
+
   const msg = document.createElement('div');
   msg.className = `message ${sender}`;
   msg.textContent = text;
-  chatArea.appendChild(msg);
+  row.appendChild(msg);
+
+  chatArea.appendChild(row);
   chatArea.scrollTop = chatArea.scrollHeight;
-  return msg;
+  return row;
 }
 
 function sendMessage(){

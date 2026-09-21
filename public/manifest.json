@@ -1,7 +1,7 @@
 {
   "name": "RakanKampus",
   "short_name": "RakanKampus",
-  "description": "Your University AI Assistant",
+  "description": "Your Politeknik AI Assistant",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

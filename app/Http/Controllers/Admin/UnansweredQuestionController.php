@@ -10,11 +10,17 @@ use Illuminate\Support\Str;
 
 class UnansweredQuestionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $sort = $request->query('sort', 'newest');
+        if (! in_array($sort, ['newest', 'oldest', 'most_asked'], true)) {
+            $sort = 'newest';
+        }
+
         $questions = UnansweredQuestion::where('status', 'pending')
-            ->orderByDesc('asked_count')
-            ->latest()
+            ->when($sort === 'newest', fn ($q) => $q->latest())
+            ->when($sort === 'oldest', fn ($q) => $q->oldest())
+            ->when($sort === 'most_asked', fn ($q) => $q->orderByDesc('asked_count')->latest())
             ->get();
 
         $history = UnansweredQuestion::where('status', 'resolved')
@@ -24,7 +30,7 @@ class UnansweredQuestionController extends Controller
 
         $topics = Information::orderBy('main_topic')->get();
 
-        return view('admin.unanswered', compact('questions', 'history', 'topics'));
+        return view('admin.unanswered', compact('questions', 'history', 'topics', 'sort'));
     }
 
     public function storeAndResolve(Request $request, UnansweredQuestion $unansweredQuestion)
