@@ -431,7 +431,7 @@ body{
 
       <div class="input-group">
         <label class="field-label">Email address</label>
-        <input class="input" type="email" name="email" placeholder="you@graduate.utm.my" value="{{ old('email') }}">
+        <input class="input" type="email" name="email" placeholder="you@student.puo.edu.my" value="{{ old('email') }}">
       </div>
 
       <div class="input-group">
@@ -499,7 +499,7 @@ body{
 
       <div class="input-group">
         <label class="field-label">Student ID</label>
-        <input class="input" type="text" name="student_id" placeholder="e.g. D157EKP1085" value="{{ old('student_id') }}">
+        <input class="input" type="text" name="student_id" value="{{ old('student_id') }}">
       </div>
 
       <div class="footer-row">
