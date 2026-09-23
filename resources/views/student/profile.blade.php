@@ -10,7 +10,7 @@
     <style>
         html, body { overflow-x: hidden; }
         body {
-            background: linear-gradient(120deg, #a78bfa, #f472b6, #60a5fa, #a78bfa);
+            background: linear-gradient(120deg, #14213d, #1b3a5c, #2ec4c6, #14213d);
     background-size: 300% 300%;
     animation: gradientShift 15s ease infinite;
         }
@@ -79,7 +79,7 @@
 <!-- Profile Card -->
 <div class="bg-white rounded-3xl border border-indigo-100 p-5 flex items-center gap-4 shadow-sm fade-up">
 
-    <div class="w-14 h-14 rounded-full text-white flex items-center justify-center font-bold text-lg overflow-hidden" style="background: linear-gradient(135deg, #f472b6, #fb923c);">
+    <div class="w-14 h-14 rounded-full text-white flex items-center justify-center font-bold text-lg overflow-hidden" style="background: linear-gradient(135deg, #14213d, #2ec4c6);">
         @if($user->photo)
             <img src="{{ Storage::url($user->photo) }}" class="w-full h-full object-cover" alt="Profile photo">
         @else

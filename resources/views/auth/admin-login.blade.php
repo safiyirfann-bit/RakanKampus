@@ -7,9 +7,6 @@
 <title>RakanKampus Admin - Sign In</title>
 <style>
   :root {
-    --purple: #a78bfa;
-    --pink: #f472b6;
-    --blue: #60a5fa;
     --teal: #5eead4;
     --card-bg: rgba(255,255,255,0.10);
     --card-border: rgba(255,255,255,0.18);
@@ -37,7 +34,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: linear-gradient(120deg, #4c3d7a, #a78bfa, #60a5fa, #4c3d7a);
+    background: linear-gradient(120deg, #2a5f59, #2dd4bf, #3355a6, #2a5f59);
     background-size: 300% 300%;
     animation: gradientShift 15s ease infinite;
   }
@@ -128,8 +125,8 @@
     padding: 14px;
     border: none;
     border-radius: 10px;
-    background: linear-gradient(120deg, var(--purple), var(--pink));
-    color: #ffffff;
+    background: #c084fc;
+    color: #4c3d7a;
     font-size: 15px;
     font-weight: 700;
     cursor: pointer;

@@ -9,7 +9,7 @@
     <style>
         html, body { overflow-x: hidden; }
         body {
-            background: linear-gradient(120deg, #f472b6, #fb923c, #a78bfa, #f472b6);
+            background: linear-gradient(120deg, #14213d, #1b3a5c, #2ec4c6, #14213d);
     background-size: 300% 300%;
     animation: gradientShift 15s ease infinite;
         }
