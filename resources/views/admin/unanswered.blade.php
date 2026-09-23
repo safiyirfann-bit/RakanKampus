@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Unanswered Questions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.44.0/tabler-icons.min.css">
@@ -277,6 +278,64 @@
             color:var(--admin-muted);
         }
 
+        .bulk-bar{
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-bottom:12px;
+        }
+
+        .select-all-label{
+            display:flex;
+            align-items:center;
+            gap:8px;
+            font-size:13px;
+            color:var(--admin-muted);
+            cursor:pointer;
+        }
+
+        .select-all-label input,
+        .q-select-checkbox{
+            width:16px;
+            height:16px;
+            accent-color:var(--green);
+            cursor:pointer;
+        }
+
+        .bulk-delete-btn{
+            display:none;
+            align-items:center;
+            gap:6px;
+            background:#ef4444;
+            border:1px solid #ef4444;
+            color:white;
+            font-size:12px;
+            font-weight:700;
+            padding:8px 14px;
+            border-radius:8px;
+            cursor:pointer;
+        }
+
+        .history-delete-btn{
+            background:transparent;
+            border:1px solid var(--admin-border);
+            color:var(--admin-muted);
+            width:34px;
+            height:34px;
+            border-radius:8px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+            flex-shrink:0;
+            transition:.2s;
+        }
+
+        .history-delete-btn:hover{
+            border-color:#ef4444;
+            color:#ef4444;
+        }
+
         /* ===== Modal ===== */
         .modal{
             display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
@@ -385,11 +444,24 @@
         </div>
 
         <!-- PENDING LIST -->
+        <div id="pendingToolbar" class="bulk-bar">
+            <label class="select-all-label">
+                <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this)">
+                Select all
+            </label>
+            <button type="button" id="bulkDeleteBtn" class="bulk-delete-btn" onclick="bulkDeleteSelected()">
+                <i class="ti ti-trash" aria-hidden="true"></i>
+                Delete Selected (<span id="selectedCount">0</span>)
+            </button>
+        </div>
+
         <div class="list" id="pendingListWrap">
 
             @forelse($questions as $q)
 
-                <div class="item {{ $q->asked_count >= 3 ? 'hot' : '' }}">
+                <div class="item {{ $q->asked_count >= 3 ? 'hot' : '' }}" data-question-id="{{ $q->id }}" data-asked-count="{{ $q->asked_count }}">
+
+                    <input type="checkbox" class="q-select-checkbox" value="{{ $q->id }}" onchange="updateBulkToolbar()" aria-label="Select this question">
 
                     <div class="type-icon">
                         <i class="ti ti-help-circle" aria-hidden="true"></i>
@@ -436,7 +508,7 @@
 
             @forelse($history as $h)
 
-                <div class="item">
+                <div class="item" data-history-id="{{ $h->id }}">
 
                     <div class="type-icon done">
                         <i class="ti ti-check" aria-hidden="true"></i>
@@ -453,6 +525,10 @@
                             <div class="time">diselesaikan {{ $h->updated_at->diffForHumans() }}</div>
                         </div>
                     </div>
+
+                    <button type="button" class="history-delete-btn" onclick="deleteHistoryItem({{ $h->id }})" aria-label="Delete this record">
+                        <i class="ti ti-trash" aria-hidden="true"></i>
+                    </button>
 
                 </div>
 
@@ -527,10 +603,115 @@
 
             document.getElementById('pendingListWrap').style.display = tab === 'pending' ? 'flex' : 'none';
             document.getElementById('historyListWrap').style.display = tab === 'history' ? 'flex' : 'none';
+            document.getElementById('pendingToolbar').style.display = tab === 'pending' ? 'flex' : 'none';
 
             // The sort control only affects the Unanswered (pending) list, so hide it
             // on the History tab where it wouldn't do anything.
             document.getElementById('sortSelect').style.display = tab === 'pending' ? 'block' : 'none';
+        }
+
+        function csrfToken() {
+            return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        }
+
+        function safeJsonFetch(url, options) {
+            return fetch(url, options).then(res => res.text().then((text) => {
+                let data = null;
+                try { data = JSON.parse(text); } catch (e) { /* not JSON */ }
+                return { ok: res.ok, data };
+            }));
+        }
+
+        function toggleSelectAll(checkbox) {
+            document.querySelectorAll('.q-select-checkbox').forEach(el => { el.checked = checkbox.checked; });
+            updateBulkToolbar();
+        }
+
+        function updateBulkToolbar() {
+            const all = document.querySelectorAll('.q-select-checkbox');
+            const checked = document.querySelectorAll('.q-select-checkbox:checked');
+
+            document.getElementById('selectedCount').textContent = checked.length;
+            document.getElementById('bulkDeleteBtn').style.display = checked.length > 0 ? 'inline-flex' : 'none';
+
+            const selectAllCb = document.getElementById('selectAllCheckbox');
+            selectAllCb.checked = all.length > 0 && checked.length === all.length;
+        }
+
+        function updatePendingStats() {
+            const items = document.querySelectorAll('#pendingListWrap .item[data-question-id]');
+            const values = document.querySelectorAll('.stat-card .value');
+            let askedSum = 0;
+            items.forEach(el => { askedSum += parseInt(el.getAttribute('data-asked-count') || '0', 10); });
+            if (values[0]) values[0].textContent = items.length;
+            if (values[1]) values[1].textContent = askedSum;
+        }
+
+        function updateHistoryStats() {
+            const items = document.querySelectorAll('#historyListWrap .item[data-history-id]');
+            const values = document.querySelectorAll('.stat-card .value');
+            if (values[2]) values[2].textContent = items.length;
+        }
+
+        function bulkDeleteSelected() {
+            const ids = Array.from(document.querySelectorAll('.q-select-checkbox:checked')).map(el => el.value);
+            if (ids.length === 0) return;
+            if (!confirm(`Padam ${ids.length} soalan yang dipilih? Tindakan ini tak boleh undo.`)) return;
+
+            safeJsonFetch("{{ route('admin.unanswered.bulkDestroy') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                },
+                body: JSON.stringify({ ids }),
+            }).then(({ ok, data }) => {
+                if (!ok || !data || !data.success) {
+                    alert('Tak dapat padam soalan-soalan ni sekarang. Cuba lagi.');
+                    return;
+                }
+
+                ids.forEach(id => {
+                    const el = document.querySelector(`.item[data-question-id="${id}"]`);
+                    if (el) el.remove();
+                });
+
+                document.getElementById('selectAllCheckbox').checked = false;
+                updateBulkToolbar();
+                updatePendingStats();
+
+                if (!document.querySelector('#pendingListWrap .item[data-question-id]')) {
+                    document.getElementById('pendingListWrap').innerHTML =
+                        '<div class="item"><div class="body"><div class="title">No unanswered questions \u{1F389}</div><p class="preview">All student questions are already in the knowledge base.</p></div></div>';
+                }
+            }).catch(() => alert('Ada masalah sambungan. Cuba lagi.'));
+        }
+
+        function deleteHistoryItem(id) {
+            if (!confirm('Padam rekod ni dari history? Tindakan ini tak boleh undo.')) return;
+
+            safeJsonFetch(`/admin/unanswered/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken(),
+                },
+            }).then(({ ok, data }) => {
+                if (!ok || !data || !data.success) {
+                    alert('Tak dapat padam rekod ni sekarang. Cuba lagi.');
+                    return;
+                }
+
+                const el = document.querySelector(`.item[data-history-id="${id}"]`);
+                if (el) el.remove();
+                updateHistoryStats();
+
+                if (!document.querySelector('#historyListWrap .item[data-history-id]')) {
+                    document.getElementById('historyListWrap').innerHTML =
+                        '<div class="item"><div class="body"><div class="title">No history yet</div><p class="preview">Resolved questions will appear here.</p></div></div>';
+                }
+            }).catch(() => alert('Ada masalah sambungan. Cuba lagi.'));
         }
 
         function openAnswerModal(id, questionText) {

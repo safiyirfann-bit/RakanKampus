@@ -230,6 +230,12 @@ Route::post('/unanswered/{unansweredQuestion}/answer', [UnansweredQuestionContro
 Route::put('/unanswered/{unansweredQuestion}/resolve', [UnansweredQuestionController::class, 'resolve'])
     ->name('unanswered.resolve');
 
+Route::delete('/unanswered/{unansweredQuestion}', [UnansweredQuestionController::class, 'destroy'])
+    ->name('unanswered.destroy');
+
+Route::post('/unanswered/bulk-delete', [UnansweredQuestionController::class, 'bulkDestroy'])
+    ->name('unanswered.bulkDestroy');
+
         // Category pages
         Route::view('/category/mpp', 'admin.category-detail')
             ->name('category.mpp');

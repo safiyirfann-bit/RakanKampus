@@ -13,6 +13,14 @@ class AuthController extends Controller
      */
     public function showLogin()
     {
+        // If someone is already logged in (e.g. still has an admin session
+        // open) and lands on the student login page, send them to where
+        // they already belong instead of showing a login form that will
+        // just fight with their existing session.
+        if (Auth::check()) {
+            return redirect()->to(Auth::user()->isAdmin() ? route('admin.dashboard') : route('student.home'));
+        }
+
         return view('auth.login');
     }
 
@@ -85,6 +93,10 @@ class AuthController extends Controller
      */
     public function showAdminLogin()
     {
+        if (Auth::check()) {
+            return redirect()->to(Auth::user()->isAdmin() ? route('admin.dashboard') : route('student.home'));
+        }
+
         return view('auth.admin-login');
     }
 
@@ -100,8 +112,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
 
-            $request->session()->regenerate();
-
+            // Only rotate the session once we've confirmed this really is an
+            // admin account — regenerating it for a rejected (non-admin)
+            // attempt and then immediately logging out again was leaving the
+            // already-rendered login page holding a stale CSRF token, which
+            // surfaced as a confusing error until the page was refreshed.
             if (! Auth::user()->isAdmin()) {
 
                 Auth::logout();
@@ -110,6 +125,8 @@ class AuthController extends Controller
                     'email' => 'Access is for admin only.',
                 ]);
             }
+
+            $request->session()->regenerate();
 
             return redirect()->route('admin.dashboard');
         }

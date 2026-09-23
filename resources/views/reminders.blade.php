@@ -547,6 +547,43 @@
 
   .hint { font-size: 10.5px; color: #94a3b8; margin: -6px 0 12px; }
 
+  .repeat-toggle-row { margin: 4px 0 12px; }
+
+  .repeat-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #334155;
+    cursor: pointer;
+  }
+
+  .repeat-toggle-label input { width: 16px; height: 16px; accent-color: #2ec4c6; cursor: pointer; }
+
+  .repeat-options-wrap { margin: -2px 0 12px; }
+
+  .repeat-options-wrap.hidden { display: none; }
+
+  .repeat-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+
+  .repeat-chip {
+    background: #fff;
+    border: 1px solid #dbe4ea;
+    color: #334155;
+    border-radius: 999px;
+    padding: 7px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .repeat-chip.active {
+    background: linear-gradient(120deg, #14213d, #2ec4c6);
+    color: #fff;
+    border-color: transparent;
+  }
+
   @media (max-width: 860px) {
     .ai-fab { bottom: 88px; }
     .bulk-delete-btn { bottom: 88px; }
@@ -783,6 +820,25 @@
   <p class="field-label">Notify me how many hours before?</p>
   <input type="number" id="leadInput" min="0" step="0.5" value="1">
   <p class="hint">Type any number of hours — use 0.5 for 30 minutes.</p>
+
+  <div class="repeat-toggle-row">
+    <label class="repeat-toggle-label">
+      <input type="checkbox" id="repeatToggle" onchange="toggleRepeatOptions()">
+      Remind me more than once
+    </label>
+  </div>
+  <div class="repeat-options-wrap hidden" id="repeatOptionsWrap">
+    <p class="field-label">Also remind me at (pick as many as you like)</p>
+    <div class="repeat-chip-row" id="repeatChipRow">
+      <button type="button" class="repeat-chip" data-hours="72" onclick="toggleRepeatChip(this)">3 days before</button>
+      <button type="button" class="repeat-chip" data-hours="24" onclick="toggleRepeatChip(this)">1 day before</button>
+      <button type="button" class="repeat-chip" data-hours="3" onclick="toggleRepeatChip(this)">3 hours before</button>
+      <button type="button" class="repeat-chip" data-hours="1" onclick="toggleRepeatChip(this)">1 hour before</button>
+      <button type="button" class="repeat-chip" data-hours="0.5" onclick="toggleRepeatChip(this)">30 min before</button>
+    </div>
+    <p class="hint">On top of the main notification above.</p>
+  </div>
+
   <p id="formError" style="color:#e11d48; font-size: 11.5px; display:none; margin: -6px 0 10px;">Please fill in a subject and date.</p>
   <button type="button" class="modal-save" onclick="saveReminder()">Save Reminder</button>
 </div>
@@ -801,6 +857,7 @@ let dragId = null;
 let dragStartX = null;
 let dragOffset = 0;
 let pageDragStartX = null;
+let selectedRepeatHours = [];
 
 function typeStyle(type) {
   if (type === 'Assignment') return { color: '#0d9488', bg: '#f0fdfa' };
@@ -1031,6 +1088,30 @@ function selectType(type) {
   });
 }
 
+function toggleRepeatOptions() {
+  document.getElementById('repeatOptionsWrap').classList.toggle('hidden', !document.getElementById('repeatToggle').checked);
+}
+
+function toggleRepeatChip(btn) {
+  const hours = parseFloat(btn.getAttribute('data-hours'));
+  btn.classList.toggle('active');
+  if (btn.classList.contains('active')) {
+    if (!selectedRepeatHours.includes(hours)) selectedRepeatHours.push(hours);
+  } else {
+    selectedRepeatHours = selectedRepeatHours.filter(h => h !== hours);
+  }
+}
+
+function resetRepeatOptions(presetHours) {
+  selectedRepeatHours = Array.isArray(presetHours) ? presetHours.slice() : [];
+  document.getElementById('repeatToggle').checked = selectedRepeatHours.length > 0;
+  document.getElementById('repeatOptionsWrap').classList.toggle('hidden', selectedRepeatHours.length === 0);
+  document.querySelectorAll('.repeat-chip').forEach(chip => {
+    const hours = parseFloat(chip.getAttribute('data-hours'));
+    chip.classList.toggle('active', selectedRepeatHours.includes(hours));
+  });
+}
+
 function openAddModal() {
   document.getElementById('modalTitle').textContent = 'Add Reminder';
   document.getElementById('reminderId').value = '';
@@ -1039,6 +1120,7 @@ function openAddModal() {
   document.getElementById('timeInput').value = '';
   document.getElementById('leadInput').value = '1';
   selectType('Exam');
+  resetRepeatOptions([]);
   showModal('modal');
 }
 
@@ -1053,6 +1135,7 @@ function openEditModal(id) {
   document.getElementById('timeInput').value = toTimeStr(dueMs);
   document.getElementById('leadInput').value = r.lead_hours;
   selectType(r.type);
+  resetRepeatOptions(r.repeat_lead_hours || []);
   showModal('modal');
 }
 
@@ -1084,10 +1167,12 @@ function saveReminder() {
   const url = id ? `/reminders/${id}` : '/reminders';
   const method = id ? 'PUT' : 'POST';
 
+  const repeatLeadHours = document.getElementById('repeatToggle').checked ? selectedRepeatHours : [];
+
   fetch(url, {
     method,
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-    body: JSON.stringify({ subject, type: selectedType, due_at: due, lead_hours: lead }),
+    body: JSON.stringify({ subject, type: selectedType, due_at: due, lead_hours: lead, repeat_lead_hours: repeatLeadHours }),
   })
     .then(res => res.json())
     .then(data => {

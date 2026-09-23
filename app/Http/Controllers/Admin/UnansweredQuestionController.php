@@ -71,4 +71,23 @@ class UnansweredQuestionController extends Controller
 
         return redirect()->back()->with('status', 'Ditandakan selesai.');
     }
+
+    public function destroy(UnansweredQuestion $unansweredQuestion)
+    {
+        $unansweredQuestion->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    public function bulkDestroy(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array|min:1',
+            'ids.*' => 'integer|exists:unanswered_questions,id',
+        ]);
+
+        UnansweredQuestion::whereIn('id', $data['ids'])->delete();
+
+        return response()->json(['success' => true, 'deleted' => count($data['ids'])]);
+    }
 }

@@ -339,6 +339,37 @@
 
   .send-btn svg { width: 16px; height: 16px; fill: #fff; }
 
+  .mic-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1.5px solid var(--input-placeholder, #b9c2d6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .mic-btn svg { width: 17px; height: 17px; stroke: var(--blue-dark); fill: none; }
+
+  .mic-btn.listening {
+    background: #ef4444;
+    border-color: #ef4444;
+    animation: micPulse 1.1s ease-in-out infinite;
+  }
+
+  .mic-btn.listening svg { stroke: #fff; }
+
+  .mic-btn.hidden { display: none; }
+
+  @keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.35); }
+    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
+  }
+
   .chat-area{
     flex:1;
     padding:24px;
@@ -550,6 +581,13 @@
       <div class="input-bar">
         <div class="input-row">
           <input type="text" id="messageInput" placeholder="Ask me anything about Politeknik...">
+          <button type="button" class="mic-btn hidden" id="micBtn" aria-label="Voice input">
+            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
+              <path d="M19 11a7 7 0 0 1-14 0"></path>
+              <line x1="12" y1="18" x2="12" y2="22"></line>
+            </svg>
+          </button>
           <button class="send-btn" id="sendBtn" aria-label="Send">
             <svg viewBox="0 0 24 24">
               <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
@@ -577,6 +615,61 @@ let emptyState = document.getElementById('emptyState');
 let currentConversationId = null;
 const stopBtn = document.getElementById('stopBtn');
 let currentController = null;
+const micBtn = document.getElementById('micBtn');
+
+// Voice-to-text: fills the message input from speech instead of typing.
+// Uses the browser's built-in Web Speech API — only Chrome/Edge/Safari
+// support it, so the mic button stays hidden everywhere else.
+const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechRecognitionAPI && micBtn) {
+  micBtn.classList.remove('hidden');
+
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = 'ms-MY';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isListening = true;
+    micBtn.classList.add('listening');
+  };
+
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+  };
+
+  recognition.onerror = (event) => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      alert('Sila benarkan akses mikrofon untuk guna voice input.');
+    }
+  };
+
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    messageInput.value = messageInput.value
+      ? `${messageInput.value} ${transcript}`
+      : transcript;
+    messageInput.focus();
+  };
+
+  micBtn.addEventListener('click', () => {
+    if (isListening) {
+      recognition.stop();
+      return;
+    }
+    try {
+      recognition.start();
+    } catch (e) {
+      // start() throws if already started; ignore.
+    }
+  });
+}
 
 menuBtn.addEventListener('click', () => {
   app.classList.toggle('sidebar-collapsed');

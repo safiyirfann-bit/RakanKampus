@@ -186,7 +186,7 @@ class ReminderController extends Controller
         $data = $this->validateReminder($request);
 
         // Due date or lead time may have changed, so allow it to notify again
-        $reminder->update($data + ['notified_at' => null]);
+        $reminder->update($data + ['notified_at' => null, 'notified_leads' => null]);
 
         return response()->json(['success' => true, 'reminder' => $this->toRaw($reminder)]);
     }
@@ -238,13 +238,23 @@ class ReminderController extends Controller
             'type' => 'nullable|string|in:Exam,Assignment,Quiz,Other',
             'due_at' => 'required|date',
             'lead_hours' => 'nullable|numeric|min:0',
+            'repeat_lead_hours' => 'nullable|array|max:8',
+            'repeat_lead_hours.*' => 'numeric|min:0',
         ]);
+
+        $repeatLeadHours = collect($data['repeat_lead_hours'] ?? [])
+            ->map(fn ($h) => (float) $h)
+            ->unique()
+            ->sortDesc()
+            ->values()
+            ->all();
 
         return [
             'subject' => $data['subject'],
             'type' => $data['type'] ?? 'Other',
             'due_at' => $data['due_at'],
             'lead_hours' => $data['lead_hours'] ?? 1,
+            'repeat_lead_hours' => empty($repeatLeadHours) ? null : $repeatLeadHours,
         ];
     }
 
@@ -256,6 +266,7 @@ class ReminderController extends Controller
             'type' => $reminder->type,
             'due_at' => $reminder->due_at->toIso8601String(),
             'lead_hours' => (float) $reminder->lead_hours,
+            'repeat_lead_hours' => $reminder->repeat_lead_hours ?? [],
         ];
     }
 
