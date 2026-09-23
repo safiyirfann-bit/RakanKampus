@@ -441,8 +441,11 @@
   }
   @media (max-width: 860px) {
     .app {
-      height: calc(100vh - 64px);
-      height: calc(100dvh - 64px);
+      /* Reserve the same 100px the floating bottom nav pill takes up
+         app-wide (see partials/app-nav.blade.php) so the message input
+         bar doesn't sit flush against — or under — it. */
+      height: calc(100vh - 100px);
+      height: calc(100dvh - 100px);
     }
   }
   .recent-item {
