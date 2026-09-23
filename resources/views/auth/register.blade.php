@@ -499,7 +499,7 @@ body{
 
       <div class="input-group">
         <label class="field-label">Student ID</label>
-        <input class="input" type="text" name="student_id" value="{{ old('student_id') }}">
+        <input class="input" type="text" name="student_id" placeholder="e.g. 01DIT24F1000" value="{{ old('student_id') }}">
       </div>
 
       <div class="footer-row">
