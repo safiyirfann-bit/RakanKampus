@@ -60,8 +60,10 @@
     <div class="bg-white border-b border-indigo-100 px-6 py-5 flex items-center gap-4">
 
         <a href="{{ route('student.profile') }}"
-           class="text-indigo-500 hover:text-indigo-700 text-2xl transition">
-            ←
+           class="w-10 h-10 rounded-full hover:bg-indigo-50 flex items-center justify-center text-indigo-500 transition">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
         </a>
 
         <div>
