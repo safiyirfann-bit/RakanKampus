@@ -28,7 +28,7 @@
   }
 
   body {
-    background: linear-gradient(120deg, #a78bfa, #f472b6, #60a5fa, #a78bfa);
+    background: linear-gradient(120deg, #14213d, #1b3a5c, #2ec4c6, #14213d);
     background-size: 300% 300%;
     animation: gradientShift 15s ease infinite;
   }
@@ -189,7 +189,7 @@
   .greeting-card {
     position: relative;
     overflow: hidden;
-    background: linear-gradient(120deg, #c084fc 0%, #a78bfa 55%, #f472b6 100%);
+    background: linear-gradient(120deg, #14213d 0%, #1b3a5c 55%, #2ec4c6 100%);
     border-radius: 28px;
     padding: 28px 32px;
     margin-bottom: 28px;
@@ -395,7 +395,7 @@
 
   .start-chat-btn {
     width: 100%;
-    background: linear-gradient(135deg, #a78bfa, #f472b6);
+    background: linear-gradient(135deg, #14213d, #2ec4c6);
     color: #fff;
     border: none;
     border-radius: 18px;
@@ -593,7 +593,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #a78bfa, #f472b6);
+    background: linear-gradient(135deg, #14213d, #2ec4c6);
     display: flex;
     align-items: center;
     justify-content: center;
