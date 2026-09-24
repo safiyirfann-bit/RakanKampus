@@ -593,33 +593,6 @@
 
   .conv-action-btn svg { width: 15px; height: 15px; }
 
-  /* Help FAB */
-  .help-fab {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #14213d, #2ec4c6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 18px;
-    font-weight: 700;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    animation: fadeInUp 0.5s ease 0.8s both;
-  }
-
-  .help-fab:hover {
-    transform: scale(1.1) rotate(-8deg);
-    box-shadow: 0 10px 22px rgba(124, 58, 237, 0.45);
-  }
-
   @media (max-width: 480px) {
     .quick-grid {
       grid-template-columns: 1fr;
@@ -805,8 +778,6 @@
 </div>
 
   </div>
-
-  <button class="help-fab" aria-label="Help">?</button>
 
 <script>
 const classSchedules = @json($classSchedules);
