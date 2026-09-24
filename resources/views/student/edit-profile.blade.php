@@ -150,6 +150,19 @@
             @enderror
         </div>
 
+        <!-- Registration Number -->
+        <div>
+            <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
+                Registration Number
+            </label>
+
+            <input type="text" name="student_id" value="{{ old('student_id', $user->student_id) }}"
+                   class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            @error('student_id')
+                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+            @enderror
+        </div>
+
         <!-- Faculty -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
