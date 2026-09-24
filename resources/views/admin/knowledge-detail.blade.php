@@ -9,40 +9,16 @@
 <style>
 body{
     margin:0;
-    background: linear-gradient(120deg, #2a5f59, #2dd4bf, #3355a6, #2a5f59);
-    background-size: 300% 300%;
-    animation: gradientShift 15s ease infinite;
-    color:white;
+    background: #f5faf6;
+    color:#1f2937;
     font-family:Arial,Helvetica,sans-serif;
 }
 
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:24px 32px;
-    border-bottom:1px solid #1c2746;
+.page-header{
+    padding:28px 32px;
+    background: linear-gradient(120deg, #2f4f3a, #4a7856 55%, #5f9370);
+    color:#fff;
 }
-
-.logo{ display:flex; align-items:center; gap:14px; }
-
-.logo-box{
-    width:52px; height:52px; border-radius:14px;
-    background:#c084fc; color:#081124;
-    display:flex; align-items:center; justify-content:center;
-    font-weight:900;
-}
-
-.logo h1{ margin:0; font-size:28px; }
-.logo h1 span{ color:#c084fc; }
-.logo p{ margin:4px 0 0; color:#8b96b8; }
-
-.logout{
-    background:#121a33; border:1px solid #273150; color:white;
-    padding:12px 18px; border-radius:12px; font-weight:700; cursor:pointer;
-}
-
-.container{ max-width:1200px; margin:auto; padding:32px; }
 
 .page-title{ display:flex; align-items:center; gap:16px; margin-bottom:6px; }
 
@@ -50,12 +26,12 @@ body{
     width:36px;
     height:36px;
     border-radius:10px;
-    border:1px solid #273150;
-    background:#121a33;
+    border:1px solid rgba(255,255,255,.28);
+    background:rgba(255,255,255,.16);
     display:flex;
     align-items:center;
     justify-content:center;
-    color:#c4b5fd;
+    color:#fff;
     text-decoration:none;
     font-size:18px;
     transition:.2s;
@@ -63,12 +39,13 @@ body{
 }
 
 .back-btn:hover{
-    border-color:#c084fc;
-    color:#c084fc;
+    background:rgba(255,255,255,.26);
 }
 
-.page-title h2{ margin:0; font-size:26px; }
-.container > p.subtitle{ color:#8b96b8; margin:0 0 24px 52px; }
+.page-title h2{ margin:0; font-size:22px; }
+.page-header p.subtitle{ color:#d7e8da; margin:4px 0 0 52px; font-size:13px; }
+
+.container{ max-width:1200px; margin:auto; padding:32px; }
 
 .top-row{
     display:flex;
@@ -78,17 +55,18 @@ body{
 }
 
 .stat-card{
-    background:#121a33;
-    border:1px solid #273150;
+    background:#fff;
+    border:1px solid #e0e7ff;
     border-radius:16px;
     padding:16px 20px;
     flex:1;
     min-width:140px;
+    box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
 }
 
 .stat-card p.label{
     font-size:12px;
-    color:#8b96b8;
+    color:#64748b;
     margin:0 0 4px;
     text-transform:uppercase;
     letter-spacing:.05em;
@@ -98,12 +76,12 @@ body{
     font-size:24px;
     font-weight:800;
     margin:0;
-    color:#c084fc;
+    color:#3f7a52;
 }
 
 .search-card{
-    background:#121a33;
-    border:1px solid #273150;
+    background:#fff;
+    border:1px solid #e0e7ff;
     border-radius:16px;
     padding:16px 20px;
     flex:2.5;
@@ -111,66 +89,67 @@ body{
     display:flex;
     align-items:center;
     gap:10px;
+    box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
 }
 
 .search-card i{
     font-size:18px;
-    color:#8b96b8;
+    color:#64748b;
 }
 
 .search-card input{
     border:none;
     background:transparent;
-    color:white;
+    color:#1f2937;
     font-size:14px;
     width:100%;
     outline:none;
 }
 
 .search-card input::placeholder{
-    color:#5f6a8a;
+    color:#94a3b8;
 }
 
 .add-btn{
-    background:#c084fc; color:#081124; border:none;
+    background:#4a7856; color:#fff; border:none;
     padding:14px 22px; border-radius:14px; font-weight:800; cursor:pointer;
     margin-bottom:20px;
 }
 
 table{
     width:100%; border-collapse:collapse;
-    background:#121a33; border:1px solid #273150; border-radius:18px;
+    background:#fff; border:1px solid #e0e7ff; border-radius:18px;
     overflow:hidden;
 }
 
 thead th{
     text-align:left; padding:14px 18px; font-size:11px;
-    letter-spacing:.06em; color:#8b96b8; border-bottom:1px solid #273150;
+    letter-spacing:.06em; color:#64748b; border-bottom:1px solid #e0e7ff;
     text-transform:uppercase;
     white-space:nowrap;
 }
 
 tbody td{
-    padding:14px 18px; border-bottom:1px solid #1c2746;
+    padding:14px 18px; border-bottom:1px solid #eef2f7;
     vertical-align:middle; font-size:14px;
 }
 
 tbody tr:last-child td{ border-bottom:none; }
-tbody tr:hover{ background:#0d1530; }
+tbody tr:hover{ background:#f5faf6; }
 
 .intent-tag{
-    display:inline-block; background:rgba(59,130,246,.12);
-    border:1px solid rgba(59,130,246,.3); color:#a78bfa;
+    display:inline-block; background:rgba(59,130,246,.1);
+    border:1px solid rgba(59,130,246,.25); color:#3b82f6;
     padding:4px 10px; border-radius:6px; font-size:12px; font-family:monospace;
 }
 
 .category-tag{
-    display:inline-block; background:rgba(168,85,247,.12);
-    border:1px solid rgba(168,85,247,.3); color:#c99bf7;
+    display:inline-block; background:rgba(74,120,86,.12);
+    border:1px solid rgba(74,120,86,.3); color:#3f7a52;
     padding:5px 12px; border-radius:6px; font-size:12px; font-weight:600;
 }
 
-.keywords{ color:#8b96b8; font-size:13px; }
+.keywords{ color:#64748b; font-size:13px; }
 
 .truncate{
     display:block;
@@ -193,16 +172,16 @@ tbody tr:hover{ background:#0d1530; }
     border-radius:8px;
     cursor:pointer;
     font-size:16px;
-    background:#1a2550;
-    color:#cbd5e1;
+    background:#f1f5f9;
+    color:#64748b;
     text-decoration:none;
 }
 
-.icon-btn:hover{ background:#22305f; }
-.icon-btn.view-btn{ color:#a78bfa; }
-.icon-btn.edit-btn{ color:#f5c563; }
-.icon-btn.delete-btn{ color:#f0757a; }
-.icon-btn.delete-btn:hover{ background:rgba(240,117,122,.15); }
+.icon-btn:hover{ background:#e2e8f0; }
+.icon-btn.view-btn{ color:#7c3aed; }
+.icon-btn.edit-btn{ color:#d97706; }
+.icon-btn.delete-btn{ color:#dc2626; }
+.icon-btn.delete-btn:hover{ background:rgba(220,38,38,.12); }
 
 .modal{
     display:none; position:fixed; inset:0; background:rgba(0,0,0,.6);
@@ -276,24 +255,19 @@ tbody tr:hover{ background:#0d1530; }
 .delete-confirm-btn:hover{ background:#dc2626; }
 
 .status-msg{
-    background:rgba(31,216,143,.1); border:1px solid rgba(31,216,143,.35);
-    color:#c084fc; padding:12px 18px; border-radius:12px; margin-bottom:20px; font-size:14px;
+    background:#ecfdf5; border:1px solid #a7f3d0;
+    color:#065f46; padding:12px 18px; border-radius:12px; margin-bottom:20px; font-size:14px;
 }
 
 @media (max-width: 768px){
-    .header{
-        flex-wrap:wrap;
-        padding:16px 20px;
-        gap:12px;
+    .page-header{
+        padding:20px 20px;
     }
-
-    .logo h1{ font-size:20px; }
-    .logo p{ font-size:13px; }
 
     .container{ padding:16px; }
 
     .page-title h2{ font-size:20px; }
-    .container > p.subtitle{ margin-left:0; margin-top:8px; }
+    .page-header p.subtitle{ margin-left:0; margin-top:8px; }
 
     .top-row{
         flex-direction:column;
@@ -309,43 +283,26 @@ tbody tr:hover{ background:#0d1530; }
 
     table{ min-width:700px; }
 }
-
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-    <div class="logo">
-        <x-brand-logo size="48" />
-        <div>
-            <h1>Administrator <span>RakanKampus</span></h1>
-            <p>Knowledge Base Management</p>
-        </div>
-    </div>
+@include('partials.admin-nav', ['active' => 'dashboard', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
 
-    <div style="display:flex; gap:14px; align-items:center;">
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="logout" type="submit">Logout</button>
-        </form>
-    </div>
-</div>
-
-<div class="container">
-
+<div class="page-header">
     <div class="page-title">
         <a href="{{ route('admin.dashboard') }}" class="back-btn" aria-label="Back to dashboard">
             <i class="ti ti-arrow-left" aria-hidden="true"></i>
         </a>
         <h2>{{ $information->main_topic }}</h2>
     </div>
-<p class="subtitle">{{ $information->description }}</p>    @if(session('status'))
+    <p class="subtitle">{{ $information->description }}</p>
+</div>
+
+<div class="container">
+
+    @if(session('status'))
         <div class="status-msg">{{ session('status') }}</div>
     @endif
 
@@ -415,7 +372,7 @@ tbody tr:hover{ background:#0d1530; }
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="text-align:center; color:#8b96b8;">
+                    <td colspan="6" style="text-align:center; color:#64748b;">
                         No data available for this topic yet.
                     </td>
                 </tr>
@@ -423,7 +380,7 @@ tbody tr:hover{ background:#0d1530; }
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="6" style="padding:14px 18px; font-size:13px; color:#5f6a8a; border-top:1px solid #273150;">
+                <td colspan="6" style="padding:14px 18px; font-size:13px; color:#64748b; border-top:1px solid #e0e7ff;">
                     Showing {{ $entries->count() }} {{ Str::plural('entry', $entries->count()) }}
                 </td>
             </tr>

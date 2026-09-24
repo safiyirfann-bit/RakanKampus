@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Feedback;
 use App\Models\Information;
 use App\Models\KnowledgeBase;
+use App\Models\UnansweredQuestion;
 use Illuminate\Http\Request;
 
 class KnowledgeBaseController extends Controller
@@ -16,6 +18,8 @@ class KnowledgeBaseController extends Controller
         return view('admin.knowledge-detail', [
             'information' => $information,
             'entries' => $entries,
+            'unansweredCount' => UnansweredQuestion::where('status', 'pending')->count(),
+            'unreadFeedbackCount' => Feedback::where('is_read', false)->count(),
         ]);
     }
 
