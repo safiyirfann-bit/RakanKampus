@@ -180,6 +180,22 @@
     body {
         background: #f0fafa;
     }
+
+    .container {
+        max-width: 1080px;
+        padding: 36px 44px 90px;
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: 20px;
+    }
+
+    .greeting-card { grid-column: 1 / -1; order: 1; margin-bottom: 0; }
+    .today-classes-card { grid-column: 1 / 2; order: 2; margin-bottom: 0; }
+    .reminders-banner { grid-column: 2 / 3; order: 3; margin-bottom: 0; }
+    .quick-grid { grid-column: 1 / -1; order: 4; margin-bottom: 0; }
+    .start-chat-btn { grid-column: 1 / -1; order: 5; margin-bottom: 0; }
+    .section-label { grid-column: 1 / -1; order: 6; margin-bottom: 0; }
+    .conversation-list { grid-column: 1 / -1; order: 7; }
 }
 
   /* Main content */
