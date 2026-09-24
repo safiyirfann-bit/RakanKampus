@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Feedback;
 use App\Models\Information;
 use App\Models\UnansweredQuestion;
 use Illuminate\Http\Request;
@@ -29,8 +30,9 @@ class UnansweredQuestionController extends Controller
             ->get();
 
         $topics = Information::orderBy('main_topic')->get();
+        $unreadFeedbackCount = Feedback::where('is_read', false)->count();
 
-        return view('admin.unanswered', compact('questions', 'history', 'topics', 'sort'));
+        return view('admin.unanswered', compact('questions', 'history', 'topics', 'sort', 'unreadFeedbackCount'));
     }
 
     public function storeAndResolve(Request $request, UnansweredQuestion $unansweredQuestion)
@@ -59,7 +61,7 @@ class UnansweredQuestionController extends Controller
         ]);
 
         return redirect()->route('admin.unanswered.index')
-            ->with('status', 'Jawapan ditambah ke knowledge base & soalan ditandakan selesai!');
+            ->with('status', 'Answer added to the knowledge base & question marked as resolved!');
     }
 
     public function resolve(UnansweredQuestion $unansweredQuestion)
@@ -69,7 +71,7 @@ class UnansweredQuestionController extends Controller
             'resolution' => 'ignored',
         ]);
 
-        return redirect()->back()->with('status', 'Ditandakan selesai.');
+        return redirect()->back()->with('status', 'Marked as resolved.');
     }
 
     public function destroy(UnansweredQuestion $unansweredQuestion)
