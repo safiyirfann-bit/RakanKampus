@@ -298,7 +298,7 @@
 
   @media (min-width: 861px) {
     body { background: #f0fafa; }
-    .container { max-width: 1060px; margin: 0; padding: 36px 44px 90px; }
+    .container { max-width: 1080px; margin: 0; padding: 36px 44px 90px; }
     .back-btn { display: none; }
     .header-title { color: #14213d; }
     .header-sub { color: #64748b; }
