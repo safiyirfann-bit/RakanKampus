@@ -9,7 +9,7 @@
 <style>
 body{
     margin:0;
-    background: linear-gradient(160deg, #ffffff, #E5F5E0);
+    background: linear-gradient(160deg, #ffffff, #F3FAF1);
     color:#1f2937;
     font-family:Arial,Helvetica,sans-serif;
 }
