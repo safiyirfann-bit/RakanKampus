@@ -139,6 +139,24 @@ class ProfileController extends Controller
         return redirect()->route('student.profile.notifications')->with('success', 'Notification settings updated!');
     }
 
+    public function language(Request $request): View
+    {
+        return view('student.language', [
+            'currentLanguage' => $request->user()->language ?? 'en',
+        ]);
+    }
+
+    public function updateLanguage(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'language' => 'required|string|in:' . implode(',', \App\Http\Middleware\SetLocale::SUPPORTED),
+        ]);
+
+        $request->user()->update(['language' => $request->language]);
+
+        return redirect()->route('student.profile.language')->with('success', __('Language updated!'));
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
         $request->user()->delete();

@@ -2,11 +2,11 @@
   $navActive = $active ?? 'home';
   $navUser = $user ?? auth()->user();
   $navItems = [
-    ['key' => 'home', 'route' => 'student.home', 'label' => 'Home', 'icon' => '<path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>'],
-    ['key' => 'chat', 'route' => 'student.chat', 'label' => 'Chat', 'icon' => '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>'],
-    ['key' => 'reminders', 'route' => 'student.reminders', 'label' => 'Reminders', 'icon' => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path>'],
-    ['key' => 'timetable', 'route' => 'student.timetable', 'label' => 'Timetable', 'icon' => '<rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path>'],
-    ['key' => 'profile', 'route' => 'student.profile', 'label' => 'Profile', 'icon' => '<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>'],
+    ['key' => 'home', 'route' => 'student.home', 'label' => __('Home'), 'icon' => '<path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path>'],
+    ['key' => 'chat', 'route' => 'student.chat', 'label' => __('Chat'), 'icon' => '<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>'],
+    ['key' => 'reminders', 'route' => 'student.reminders', 'label' => __('Reminders'), 'icon' => '<path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path>'],
+    ['key' => 'timetable', 'route' => 'student.timetable', 'label' => __('Timetable'), 'icon' => '<rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path>'],
+    ['key' => 'profile', 'route' => 'student.profile', 'label' => __('Profile'), 'icon' => '<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>'],
   ];
 
   // Mobile bottom bar keeps the same 5 destinations/icons as the desktop sidebar
@@ -127,7 +127,7 @@
     @csrf
     <button type="submit" class="rk-sidebar-logout">
       <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
-      Logout
+      {{ __('Logout') }}
     </button>
   </form>
 </nav>

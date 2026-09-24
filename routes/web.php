@@ -162,6 +162,13 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::view('/student/profile/security', 'student.security-settings')
         ->name('student.profile.security');
 
+    // Language
+    Route::get('/student/profile/language', [ProfileController::class, 'language'])
+        ->name('student.profile.language');
+
+    Route::put('/student/profile/language', [ProfileController::class, 'updateLanguage'])
+        ->name('student.profile.language.update');
+
     // Help & Support page
     Route::view('/student/help-support', 'student.help-support')
         ->name('student.help-support');

@@ -22,6 +22,13 @@ return Application::configure(
 
         ]);
 
+        // Applies the logged-in student's saved language preference (see
+        // the "language" column on users) to every request so translated
+        // pages render in the right language without needing to opt in.
+        $middleware->appendToGroup('web', [
+            \App\Http\Middleware\SetLocale::class,
+        ]);
+
     })
 
     ->withExceptions(function (Exceptions $exceptions): void {

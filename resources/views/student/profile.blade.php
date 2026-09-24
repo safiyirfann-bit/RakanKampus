@@ -102,8 +102,8 @@
     </a>
 
     <div>
-        <h1>Profile & Settings</h1>
-        <p>Manage your student account</p>
+        <h1>{{ __('Profile & Settings') }}</h1>
+        <p>{{ __('Manage your student account') }}</p>
     </div>
 
 </div>
@@ -141,7 +141,7 @@
         <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm fade-up" style="animation-delay: 0.08s;">
 
     <div class="px-5 pt-4 pb-2">
-        <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Account</p>
+        <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Account') }}</p>
     </div>
 
     <div class="divide-y divide-indigo-50">
@@ -151,7 +151,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h2m-1-1v2m-7 9l9-9 4 4-9 9H5v-4z"/>
                 </svg>
-                <span class="font-medium text-indigo-900">Edit Profile</span>
+                <span class="font-medium text-indigo-900">{{ __('Edit Profile') }}</span>
             </div>
             <span class="text-indigo-300 chevron">›</span>
         </a>
@@ -161,7 +161,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2h-1V9a5 5 0 00-10 0v2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
                 </svg>
-                <span class="font-medium text-indigo-900">Change Password</span>
+                <span class="font-medium text-indigo-900">{{ __('Change Password') }}</span>
             </div>
             <span class="text-indigo-300 chevron">›</span>
         </a>
@@ -171,17 +171,17 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 11-6 0m6 0H9"/>
                 </svg>
-                <span class="font-medium text-indigo-900">Notification Settings</span>
+                <span class="font-medium text-indigo-900">{{ __('Notification Settings') }}</span>
             </div>
             <span class="text-indigo-300 chevron">›</span>
         </a>
 
-        <a href="#" class="menu-row flex items-center justify-between px-5 py-4 hover:bg-indigo-50">
+        <a href="{{ route('student.profile.language') }}" class="menu-row flex items-center justify-between px-5 py-4 hover:bg-indigo-50">
             <div class="flex items-center gap-4">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1 13l-2 2m0 0l-2-2m2 2V9m11-4h-4m2-2v4"/>
                 </svg>
-                <span class="font-medium text-indigo-900">Language & Region</span>
+                <span class="font-medium text-indigo-900">{{ __('Language') }}</span>
             </div>
             <span class="text-indigo-300 chevron">›</span>
         </a>
@@ -193,7 +193,7 @@
 <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm fade-up" style="animation-delay: 0.16s;">
 
     <div class="px-5 pt-4 pb-2">
-        <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Preferences</p>
+        <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Preferences') }}</p>
     </div>
 
     <div class="divide-y divide-indigo-50">
@@ -211,8 +211,8 @@
                 </svg>
 
                 <div>
-    <p class="font-medium text-indigo-900">Privacy Settings</p>
-    <p class="text-sm text-indigo-400">Control your personal data and visibility</p>
+    <p class="font-medium text-indigo-900">{{ __('Privacy Settings') }}</p>
+    <p class="text-sm text-indigo-400">{{ __('Control your personal data and visibility') }}</p>
 </div>
 
             </div>
@@ -235,8 +235,8 @@
                 </svg>
 
                 <div>
-    <p class="font-medium text-indigo-900">Security</p>
-    <p class="text-sm text-indigo-400">Protect your account and password</p>
+    <p class="font-medium text-indigo-900">{{ __('Security') }}</p>
+    <p class="text-sm text-indigo-400">{{ __('Protect your account and password') }}</p>
 </div>
 
             </div>
@@ -256,8 +256,8 @@
         </svg>
 
         <div>
-            <p class="font-medium text-indigo-900">Feedback & feature requests</p>
-            <p class="text-sm text-indigo-400">Tell us what we can improve</p>
+            <p class="font-medium text-indigo-900">{{ __('Feedback & feature requests') }}</p>
+            <p class="text-sm text-indigo-400">{{ __('Tell us what we can improve') }}</p>
         </div>
 
     </div>
@@ -278,8 +278,8 @@
                 </svg>
 
                 <div>
-    <p class="font-medium text-indigo-900">Help & Support</p>
-    <p class="text-sm text-indigo-400">Get assistance and contact support</p>
+    <p class="font-medium text-indigo-900">{{ __('Help & Support') }}</p>
+    <p class="text-sm text-indigo-400">{{ __('Get assistance and contact support') }}</p>
 </div>
 
             </div>
@@ -300,8 +300,8 @@
                 </svg>
 
                <div>
-    <p class="font-medium text-indigo-900">About RakanKampus</p>
-    <p class="text-sm text-indigo-400">App version and project information</p>
+    <p class="font-medium text-indigo-900">{{ __('About RakanKampus') }}</p>
+    <p class="text-sm text-indigo-400">{{ __('App version and project information') }}</p>
 </div>
             </div>
 
@@ -328,8 +328,8 @@
             </svg>
 
             <div>
-                <p class="font-medium text-indigo-900">Log Out</p>
-                <p class="text-xs text-indigo-400 mt-1">Sign out of your RakanKampus account</p>
+                <p class="font-medium text-indigo-900">{{ __('Log Out') }}</p>
+                <p class="text-xs text-indigo-400 mt-1">{{ __('Sign out of your RakanKampus account') }}</p>
             </div>
 
         </div>
@@ -359,25 +359,25 @@
         </div>
 
         <h2 class="text-xl font-bold text-center text-indigo-900 mb-2">
-            Log out?
+            {{ __('Log out?') }}
         </h2>
 
         <p class="text-sm text-indigo-400 text-center mb-6">
-            Are you sure you want to sign out of your RakanKampus account?
+            {{ __('Are you sure you want to sign out of your RakanKampus account?') }}
         </p>
 
         <div class="flex gap-3">
 
             <button onclick="closeLogoutModal()"
                     class="flex-1 rounded-2xl border border-indigo-200 py-3 font-medium text-indigo-600 hover:bg-indigo-50 transition">
-                Cancel
+                {{ __('Cancel') }}
             </button>
 
             <form method="POST" action="{{ route('logout') }}" class="flex-1">
                 @csrf
                 <button type="submit"
                         class="w-full rounded-2xl bg-red-500 py-3 font-semibold text-white hover:bg-red-600 transition">
-                    Log Out
+                    {{ __('Log Out') }}
                 </button>
             </form>
 
@@ -417,9 +417,9 @@ document.getElementById('logoutModal').addEventListener('click', function(e) {
             <!-- Header -->
             <div class="flex items-start justify-between p-6 border-b border-indigo-100">
                 <div>
-                    <h2 class="text-2xl font-bold text-indigo-900">Help us improve</h2>
+                    <h2 class="text-2xl font-bold text-indigo-900">{{ __('Help us improve') }}</h2>
                     <p class="text-sm text-indigo-400 mt-1">
-                        Share feedback or suggest a feature for RakanKampus.
+                        {{ __('Share feedback or suggest a feature for RakanKampus.') }}
                     </p>
                 </div>
                 <button type="button" onclick="closeFeedbackModal()"
@@ -433,11 +433,11 @@ document.getElementById('logoutModal').addEventListener('click', function(e) {
                 <!-- Feedback -->
                 <div>
                     <label class="block text-sm font-semibold text-indigo-700 mb-2">
-                        Feedback
+                        {{ __('Feedback') }}
                     </label>
                     <textarea name="feedback" id="feedbackText" rows="5"
                         maxlength="4000"
-                        placeholder="What could we do better?"
+                        placeholder="{{ __('What could we do better?') }}"
                         oninput="updateCounter('feedbackText', 'feedbackCount')"
                         class="w-full rounded-2xl border border-indigo-100 bg-indigo-50/50 px-4 py-4 text-indigo-900 placeholder-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none"></textarea>
                     <p class="text-right text-xs text-indigo-300 mt-2"><span id="feedbackCount">0</span>/4000</p>
@@ -446,11 +446,11 @@ document.getElementById('logoutModal').addEventListener('click', function(e) {
                 <!-- Feature Request -->
                 <div>
                     <label class="block text-sm font-semibold text-indigo-700 mb-2">
-                        Feature request
+                        {{ __('Feature request') }}
                     </label>
                     <textarea name="feature_request" id="featureText" rows="5"
                         maxlength="4000"
-                        placeholder="What would you like us to add?"
+                        placeholder="{{ __('What would you like us to add?') }}"
                         oninput="updateCounter('featureText', 'featureCount')"
                         class="w-full rounded-2xl border border-indigo-100 bg-indigo-50/50 px-4 py-4 text-indigo-900 placeholder-indigo-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none"></textarea>
                     <p class="text-right text-xs text-indigo-300 mt-2"><span id="featureCount">0</span>/4000</p>
@@ -461,7 +461,7 @@ document.getElementById('logoutModal').addEventListener('click', function(e) {
             <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-indigo-100">
                 <button type="button" onclick="closeFeedbackModal()"
                     class="px-5 py-2.5 rounded-xl border border-indigo-200 text-indigo-600 hover:bg-indigo-50 transition font-medium">
-                    Cancel
+                    {{ __('Cancel') }}
                 </button>
                 <button type="submit"
                     class="px-5 py-2.5 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition font-semibold shadow-lg shadow-indigo-200 flex items-center gap-2">
@@ -469,7 +469,7 @@ document.getElementById('logoutModal').addEventListener('click', function(e) {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M5 12l14-7-4 14-3-5-5-2z"/>
                     </svg>
-                    Send feedback
+                    {{ __('Send feedback') }}
                 </button>
             </div>
         </form>
