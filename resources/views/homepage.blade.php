@@ -8,14 +8,14 @@
 <title>RakanKampus - Home</title>
 <style>
   :root {
-    --blue-primary: #a78bfa;
-    --blue-dark: #4c1d95;
-    --bg-page: #eef0ff;
+    --blue-primary: #0d9488;
+    --blue-dark: #14213d;
+    --bg-page: #f0fafa;
     --bg-card: #ffffff;
-    --icon-bg: #ede4ff;
-    --border-light: #ece6fb;
-    --text-muted: #8b7fae;
-    --chip-text: #a78bfa;
+    --icon-bg: #e6fbfa;
+    --border-light: #dbeeee;
+    --text-muted: #64748b;
+    --chip-text: #0d9488;
   }
 
   * { box-sizing: border-box; }
@@ -66,15 +66,15 @@
   }
 
   @keyframes softPulse {
-    0%, 100% { box-shadow: 0 10px 24px rgba(124, 58, 237, 0.30); }
-    50% { box-shadow: 0 16px 36px rgba(124, 58, 237, 0.50); }
+    0%, 100% { box-shadow: 0 10px 24px rgba(20, 33, 61, 0.30); }
+    50% { box-shadow: 0 16px 36px rgba(20, 33, 61, 0.50); }
   }
 
   /* Top bar */
   .topbar {
     background: rgba(255, 255, 255, 0.92);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e7efff;
+    border-bottom: 1px solid #dbeeee;
     padding: 16px 24px;
     display: flex;
     align-items: center;
@@ -121,8 +121,8 @@
     align-items: center;
     justify-content: center;
     text-decoration: none;
-    border: 1px solid #e5edff;
-    box-shadow: 0 4px 12px rgba(59, 99, 238, 0.12);
+    border: 1px solid #dbeeee;
+    box-shadow: 0 4px 12px rgba(20, 33, 61, 0.12);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
 }
@@ -137,13 +137,13 @@
 .avatar-btn:active {
     background: #ffffff !important;
     transform: scale(1.03);
-    box-shadow: 0 8px 20px rgba(59, 99, 238, 0.18);
+    box-shadow: 0 8px 20px rgba(20, 33, 61, 0.18);
 }
 
 .avatar-btn svg {
     width: 20px;
     height: 20px;
-    stroke: #3b63ee !important;
+    stroke: #14213d !important;
 }
 
 .avatar-btn img {
@@ -153,7 +153,7 @@
 }
 
 .profile-link:hover {
-    background: #f5f8ff;
+    background: #eafbfa;
 }
 
 @media (max-width: 640px) {
@@ -202,7 +202,7 @@
     padding: 28px 32px;
     margin-bottom: 28px;
     color: #fff;
-    box-shadow: 0 16px 40px rgba(41, 84, 229, 0.28);
+    box-shadow: 0 16px 40px rgba(20, 33, 61, 0.28);
     animation: fadeInUp 0.55s ease both;
 }
 
@@ -266,13 +266,13 @@
 
   .greeting-meta {
     font-size: 12.5px;
-    color: #c9d5fb;
+    color: #bfe9ea;
     margin: 0;
   }
 
   .greeting-hello {
     font-size: 14.5px;
-    color: #dbe4fd;
+    color: #bfe9ea;
     margin: 0 0 4px;
     position: relative;
     z-index: 1;
@@ -342,17 +342,17 @@
 
   .today-classes-title-row svg { width: 17px; height: 17px; stroke: var(--blue-primary); }
 
-  .today-classes-title { font-size: 14px; font-weight: 800; color: #2d2560; margin: 0; }
+  .today-classes-title { font-size: 14px; font-weight: 800; color: #14213d; margin: 0; }
 
   .today-classes-link { font-size: 11.5px; font-weight: 700; color: var(--blue-primary); text-decoration: none; white-space: nowrap; }
 
   .today-class-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--border-light); }
 
-  .today-class-time { flex-shrink: 0; width: 58px; font-size: 11px; font-weight: 800; color: #2d2560; line-height: 1.3; }
+  .today-class-time { flex-shrink: 0; width: 58px; font-size: 11px; font-weight: 800; color: #14213d; line-height: 1.3; }
 
   .today-class-body { flex: 1; min-width: 0; }
 
-  .today-class-subject { font-size: 13px; font-weight: 700; color: #2d2560; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .today-class-subject { font-size: 13px; font-weight: 700; color: #14213d; margin: 0 0 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   .today-class-meta { font-size: 11px; color: var(--text-muted); margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -397,7 +397,7 @@
   .quick-grid a:nth-child(4) { animation-delay: 0.31s; }
 
   .quick-chip:hover {
-    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.16);
+    box-shadow: 0 6px 16px rgba(20, 33, 61, 0.16);
     transform: translateY(-2px) scale(1.02);
   }
 
@@ -416,7 +416,7 @@
     gap: 10px;
     cursor: pointer;
     margin-bottom: 32px;
-    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.30);
+    box-shadow: 0 10px 24px rgba(20, 33, 61, 0.30);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     text-decoration: none;
     animation: fadeInUp 0.5s ease 0.35s both, softPulse 2.8s ease-in-out 1.2s infinite;
@@ -424,7 +424,7 @@
 
 .start-chat-btn:hover {
     transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 16px 32px rgba(124, 58, 237, 0.42);
+    box-shadow: 0 16px 32px rgba(20, 33, 61, 0.42);
     animation: fadeInUp 0.5s ease 0.35s both;
 }
 
@@ -501,9 +501,9 @@
   .conversation-list .conv-card:nth-child(4) { animation-delay: 0.66s; }
 
   .conv-card:hover {
-    box-shadow: 0 10px 24px rgba(124, 58, 237, 0.14);
+    box-shadow: 0 10px 24px rgba(20, 33, 61, 0.14);
     transform: translateY(-2px);
-    border-color: #d9cef5;
+    border-color: #b8e6e6;
 }
 
   .conv-card:hover .conv-icon {
@@ -564,7 +564,7 @@
   .conv-meta svg {
     width: 16px;
     height: 16px;
-    stroke: #b8c3e0;
+    stroke: #94a3b8;
   }
 
   .conv-actions {
@@ -587,8 +587,8 @@
   }
 
   .conv-action-btn:hover {
-    color: #6d28d9;
-    background: #f5f2ff;
+    color: #0d9488;
+    background: #eafbfa;
   }
 
   .conv-action-btn svg { width: 15px; height: 15px; }
