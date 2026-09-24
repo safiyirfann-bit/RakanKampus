@@ -90,6 +90,24 @@
         border-radius: 8px; padding: 5px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;
     }
     .delete-btn:hover { background: #fee2e2; }
+
+    .online-banner {
+        display: flex; align-items: center; gap: 10px;
+        background: #fff; border: 1px solid #e0e7ff; border-radius: 14px;
+        padding: 14px 18px; margin-bottom: 16px;
+        box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
+    }
+    .online-dot {
+        width: 10px; height: 10px; border-radius: 50%; background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    }
+    .online-banner strong { color: #166534; font-size: 15px; }
+    .online-banner span { color: #64748b; font-size: 12.5px; }
+
+    .status-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+    .status-pill.online { color: #166534; }
+    .status-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; }
+    .status-pill.online .dot { background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18); }
 </style>
 </head>
 <body>
@@ -107,6 +125,12 @@
     @if (session('db_viewer_error'))
         <div class="flash error">{{ session('db_viewer_error') }}</div>
     @endif
+
+    <div class="online-banner">
+        <div class="online-dot"></div>
+        <strong>{{ $onlineNowCount }} user online sekarang</strong>
+        <span>&mdash; aktif dalam {{ (int) ($onlineWindowSeconds / 60) }} minit lepas</span>
+    </div>
 
     <div class="stat-grid">
         @foreach ($counts as $t => $count)
@@ -138,6 +162,9 @@
                             @foreach ($columns as $col)
                                 <th>{{ $col }}</th>
                             @endforeach
+                            @if ($table === 'users')
+                                <th>Last online</th>
+                            @endif
                             @if ($hasId)
                                 <th>Aksi</th>
                             @endif
@@ -149,6 +176,25 @@
                                 @foreach ($columns as $col)
                                     <td title="{{ $row->$col }}">{{ \Illuminate\Support\Str::limit((string) $row->$col, 60) }}</td>
                                 @endforeach
+                                @if ($table === 'users')
+                                    <td>
+                                        @php
+                                            $lastTs = $lastActiveMap[$row->id] ?? null;
+                                            $isOnline = $lastTs && (time() - $lastTs) <= $onlineWindowSeconds;
+                                        @endphp
+                                        @if ($lastTs)
+                                            <span class="status-pill {{ $isOnline ? 'online' : '' }}">
+                                                <span class="dot"></span>
+                                                {{ $isOnline ? 'Online sekarang' : \Carbon\Carbon::createFromTimestamp($lastTs)->diffForHumans() }}
+                                            </span>
+                                        @else
+                                            <span class="status-pill">
+                                                <span class="dot"></span>
+                                                Tiada sesi aktif
+                                            </span>
+                                        @endif
+                                    </td>
+                                @endif
                                 @if ($hasId)
                                     <td>
                                         <form method="POST" action="{{ route('admin.database.destroy', ['table' => $table, 'id' => $row->id]) }}"

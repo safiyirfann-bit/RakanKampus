@@ -44,6 +44,8 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
+
         return redirect()->route('student.home');
     }
 
@@ -127,6 +129,8 @@ class AuthController extends Controller
             }
 
             $request->session()->regenerate();
+
+            Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
 
             return redirect()->route('admin.dashboard');
         }

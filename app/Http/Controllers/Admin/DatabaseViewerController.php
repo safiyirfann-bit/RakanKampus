@@ -27,12 +27,17 @@ class DatabaseViewerController extends Controller
         'reminders',
         'class_schedules',
         'push_subscriptions',
+        'sessions',
     ];
 
     private const HIDDEN_COLUMNS = [
         'users' => ['password', 'remember_token'],
         'push_subscriptions' => ['public_key', 'auth_token'],
+        'sessions' => ['payload'],
     ];
+
+    /** How recent a session's last_activity has to be to count as "online now". */
+    private const ONLINE_WINDOW_SECONDS = 300;
 
     public function index(Request $request)
     {
@@ -58,6 +63,31 @@ class DatabaseViewerController extends Controller
             }
         }
 
+        // "Last online" / "online now" per user, read live from the
+        // sessions table (SESSION_DRIVER=database keeps last_activity
+        // fresh on every request) rather than a separately-maintained
+        // column, so it's only computed when actually viewing users.
+        $lastActiveMap = [];
+        $onlineNowCount = 0;
+        if (Schema::hasTable('sessions')) {
+            $cutoff = now()->subSeconds(self::ONLINE_WINDOW_SECONDS)->timestamp;
+
+            if ($table === 'users') {
+                $lastActiveMap = DB::table('sessions')
+                    ->whereNotNull('user_id')
+                    ->selectRaw('user_id, MAX(last_activity) as last_activity')
+                    ->groupBy('user_id')
+                    ->pluck('last_activity', 'user_id')
+                    ->all();
+            }
+
+            $onlineNowCount = DB::table('sessions')
+                ->whereNotNull('user_id')
+                ->where('last_activity', '>=', $cutoff)
+                ->distinct('user_id')
+                ->count('user_id');
+        }
+
         return view('admin.database', [
             'tables' => self::TABLES,
             'table' => $table,
@@ -65,6 +95,9 @@ class DatabaseViewerController extends Controller
             'rows' => $rows,
             'counts' => $counts,
             'hasId' => $hasId,
+            'lastActiveMap' => $lastActiveMap,
+            'onlineWindowSeconds' => self::ONLINE_WINDOW_SECONDS,
+            'onlineNowCount' => $onlineNowCount,
         ]);
     }
 
