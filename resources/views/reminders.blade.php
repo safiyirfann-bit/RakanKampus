@@ -708,7 +708,7 @@
   </div>
 
   <div class="notify-banner" id="notifyBanner">
-    <span>🔔 Turn on notifications to get alerted before your deadlines.</span>
+    <span>Turn on notifications to get alerted before your deadlines.</span>
     <button type="button" onclick="enableNotifications()">Enable</button>
   </div>
 
@@ -874,7 +874,7 @@ function computeStatus(dueMs, leadHours) {
   if (diffHours <= leadHours) {
     const h = Math.floor(diffHours);
     const m = Math.floor((diffHours - h) * 60);
-    return { text: '🔔 Notified · ' + h + 'h ' + m + 'm left', color: '#ea580c', dotBg: '#ffedd5', dotStroke: '#ea580c' };
+    return { text: 'Notified · ' + h + 'h ' + m + 'm left', color: '#ea580c', dotBg: '#ffedd5', dotStroke: '#ea580c' };
   }
   if (diffHours <= 24) return { text: 'Upcoming · in ' + Math.floor(diffHours) + 'h', color: '#2563eb', dotBg: '#dbeafe', dotStroke: '#2563eb' };
   return { text: 'Upcoming · in ' + Math.floor(diffHours / 24) + 'd', color: '#0d9488', dotBg: '#ccfbf1', dotStroke: '#0d9488' };
