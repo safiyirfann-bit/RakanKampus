@@ -40,7 +40,26 @@
         .menu-row .chevron { transition: transform 0.15s ease; display: inline-block; }
         .menu-row:hover .chevron { transform: translateX(3px); }
         header, .relative, .max-w-md { position: relative; z-index: 1; }
-    
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px 20px 18px;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-header .back-btn {
+            width: 38px; height: 38px; min-width: 38px; border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            display: flex; align-items: center; justify-content: center;
+            color: #fff; text-decoration: none; transition: background 0.15s ease;
+        }
+        .profile-header .back-btn:hover { background: rgba(255,255,255,0.2); }
+        .profile-header .back-btn svg { width: 18px; height: 18px; stroke: currentColor; }
+        .profile-header h1 { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
+        .profile-header p { font-size: 12.5px; color: #bfe9ea; margin: 2px 0 0; }
+
   @keyframes gradientShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
@@ -51,6 +70,16 @@
     body {
         background: #f0fafa;
     }
+    .profile-header {
+        background: rgba(255,255,255,0.9);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid #e0e7ff;
+        padding: 16px 24px;
+    }
+    .profile-header .back-btn { background: transparent; color: #6366f1; }
+    .profile-header .back-btn:hover { background: #eef2ff; }
+    .profile-header h1 { color: #312e81; }
+    .profile-header p { color: #818cf8; }
   }
 </style>
 </head>
@@ -64,18 +93,17 @@
 <div class="bg-blob b3"></div>
 
     <!-- Header -->
-<div class="bg-white/90 backdrop-blur border-b border-indigo-100 px-6 py-4 flex items-center gap-3 relative z-10">
+<div class="profile-header">
 
-    <a href="{{ route('student.home') }}"
-       class="w-10 h-10 rounded-full hover:bg-indigo-50 flex items-center justify-center text-indigo-500 transition">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    <a href="{{ route('student.home') }}" class="back-btn" aria-label="Back">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 19l-7-7 7-7"/>
         </svg>
     </a>
 
     <div>
-        <h1 class="font-bold text-indigo-900">Profile & Settings</h1>
-        <p class="text-sm text-indigo-400">Manage your student account</p>
+        <h1>Profile & Settings</h1>
+        <p>Manage your student account</p>
     </div>
 
 </div>
