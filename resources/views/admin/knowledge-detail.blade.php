@@ -189,39 +189,40 @@ tbody tr:hover{ background:#f5faf6; }
 }
 
 .modal-content{
-    width:90%; max-width:600px; background:#07133a;
-    border:1px solid rgba(255,255,255,.08); border-radius:24px; padding:24px;
+    width:90%; max-width:600px; background:#fff;
+    border:1px solid #e0e7ff; border-radius:24px; padding:24px;
     max-height:85vh; overflow-y:auto;
+    box-shadow: 0 20px 44px rgba(20, 40, 100, 0.18);
 }
 
 .modal-header{
     display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;
 }
 
-.modal-header h2{ color:#fff; margin:0; }
+.modal-header h2{ color:#1f2937; margin:0; }
 
-.close-btn{ background:none; border:none; color:#c4b5fd; font-size:30px; cursor:pointer; }
+.close-btn{ background:none; border:none; color:#64748b; font-size:30px; cursor:pointer; }
 
 .form-group{ margin-bottom:18px; }
 
 .form-group label{
-    display:block; color:#c4b5fd; margin-bottom:8px; font-size:14px;
+    display:block; color:#3f7a52; margin-bottom:8px; font-size:14px;
     font-weight:700; letter-spacing:.08em; text-transform:uppercase;
 }
 
 .form-group input,
 .form-group textarea{
     width:100%; padding:16px 18px; border-radius:16px;
-    border:1px solid rgba(255,255,255,.08); background:#13214d; color:#fff;
+    border:1px solid #e0e7ff; background:#f8fafc; color:#1f2937;
     font-size:16px; outline:none; box-sizing:border-box;
 }
 
 .view-field{
-    background:#13214d;
-    border:1px solid rgba(255,255,255,.08);
+    background:#f8fafc;
+    border:1px solid #e0e7ff;
     border-radius:16px;
     padding:16px 18px;
-    color:#fff;
+    color:#1f2937;
     font-size:15px;
     white-space:pre-wrap;
     word-break:break-word;
@@ -234,19 +235,19 @@ tbody tr:hover{ background:#f5faf6; }
     font-size:16px; font-weight:700; cursor:pointer;
 }
 
-.cancel-btn{ background:#0d183f; color:#fff; border:1px solid rgba(255,255,255,.08); }
-.submit-btn{ background:#c084fc; color:#4c3d7a; }
+.cancel-btn{ background:#f1f5f9; color:#374151; border:1px solid #e0e7ff; }
+.submit-btn{ background:#4a7856; color:#fff; }
 
 .confirm-icon{
     width:64px; height:64px; margin:0 auto 16px;
     border-radius:50%;
-    background:rgba(240,117,122,.15);
+    background:rgba(220,38,38,.1);
     display:flex; align-items:center; justify-content:center;
-    color:#f0757a;
+    color:#dc2626;
 }
 .confirm-icon svg{ width:28px; height:28px; }
-.confirm-title{ color:#fff; font-size:19px; font-weight:800; margin:0 0 8px; text-align:center; }
-.confirm-message{ color:#8b96b8; font-size:14px; margin:0; text-align:center; line-height:1.5; }
+.confirm-title{ color:#1f2937; font-size:19px; font-weight:800; margin:0 0 8px; text-align:center; }
+.confirm-message{ color:#64748b; font-size:14px; margin:0; text-align:center; line-height:1.5; }
 .delete-confirm-btn{
     flex:1; padding:16px; border:none; border-radius:16px;
     font-size:16px; font-weight:700; cursor:pointer;
