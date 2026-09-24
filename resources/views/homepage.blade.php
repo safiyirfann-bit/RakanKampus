@@ -59,14 +59,6 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  @keyframes waveHand {
-    0%, 100% { transform: rotate(0deg); }
-    20% { transform: rotate(16deg); }
-    40% { transform: rotate(-10deg); }
-    60% { transform: rotate(14deg); }
-    80% { transform: rotate(-6deg); }
-  }
-
   @keyframes iconWiggle {
     0%, 100% { transform: rotate(0deg); }
     25% { transform: rotate(-10deg); }
@@ -76,12 +68,6 @@
   @keyframes softPulse {
     0%, 100% { box-shadow: 0 10px 24px rgba(124, 58, 237, 0.30); }
     50% { box-shadow: 0 16px 36px rgba(124, 58, 237, 0.50); }
-  }
-
-  .wave-emoji {
-    display: inline-block;
-    animation: waveHand 2.2s ease-in-out infinite;
-    transform-origin: 70% 70%;
   }
 
   /* Top bar */
@@ -725,7 +711,7 @@
               $greeting = 'Good evening';
           }
       @endphp
-      <p class="greeting-hello"><span id="greetingHello">{{ $greeting }}</span>! <span class="wave-emoji">👋</span></p>
+      <p class="greeting-hello"><span id="greetingHello">{{ $greeting }}</span>!</p>
       <p class="greeting-question">How can I help you today?</p>
     </div>
 
