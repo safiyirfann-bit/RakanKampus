@@ -493,6 +493,15 @@ body{
             @endif
         </a>
 
+        <!-- Database viewer -->
+        <a href="{{ route('admin.database') }}" class="inbox-btn" aria-label="Database viewer">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <ellipse cx="12" cy="5" rx="8" ry="3" stroke-width="2"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
+            </svg>
+        </a>
+
         <!-- Logout -->
         <form method="POST" action="{{ route('logout') }}">
             @csrf

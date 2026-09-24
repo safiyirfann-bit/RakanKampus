@@ -9,6 +9,7 @@ use App\Http\Controllers\ReminderController;
 use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\Admin\KnowledgeBaseController;
 use App\Http\Controllers\Admin\UnansweredQuestionController;
+use App\Http\Controllers\Admin\DatabaseViewerController;
 use App\Http\Controllers\FeedbackController;
 
 /*
@@ -235,6 +236,10 @@ Route::delete('/unanswered/{unansweredQuestion}', [UnansweredQuestionController:
 
 Route::post('/unanswered/bulk-delete', [UnansweredQuestionController::class, 'bulkDestroy'])
     ->name('unanswered.bulkDestroy');
+
+        // Database viewer (read-only)
+        Route::get('/database', [DatabaseViewerController::class, 'index'])
+            ->name('database');
 
         // Category pages
         Route::view('/category/mpp', 'admin.category-detail')
