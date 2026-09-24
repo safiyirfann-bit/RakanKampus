@@ -176,6 +176,12 @@
     }
 }
 
+@media (min-width: 861px) {
+    body {
+        background: #f0fafa;
+    }
+}
+
   /* Main content */
   .container {
     max-width: 600px;
