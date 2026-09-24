@@ -180,7 +180,7 @@
         max-width: 1080px;
         padding: 36px 44px 90px;
         display: grid;
-        grid-template-columns: 1.1fr 1fr;
+        grid-template-columns: 1fr 1fr;
         gap: 20px;
     }
 
