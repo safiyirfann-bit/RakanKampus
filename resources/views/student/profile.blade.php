@@ -64,7 +64,7 @@
 <div class="bg-blob b3"></div>
 
     <!-- Header -->
-<div class="px-6 py-4 flex items-center gap-3 relative z-10 shadow-md" style="background: linear-gradient(120deg, #14213d 0%, #1b3a5c 55%, #2ec4c6 100%);">
+<div class="px-6 py-4 flex items-center gap-3 relative z-10 shadow-md" style="background: linear-gradient(90deg, #4f46e5 0%, #6366f1 55%, #2ec4c6 100%);">
 
     <a href="{{ route('student.home') }}"
        class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-white transition">

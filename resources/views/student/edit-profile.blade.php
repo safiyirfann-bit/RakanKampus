@@ -59,7 +59,7 @@
 
 
 <!-- Header -->
-<div class="px-6 py-5 flex items-center gap-4 shadow-md" style="background: linear-gradient(120deg, #14213d 0%, #1b3a5c 55%, #2ec4c6 100%);">
+<div class="px-6 py-5 flex items-center gap-4 shadow-md" style="background: linear-gradient(90deg, #4f46e5 0%, #6366f1 55%, #2ec4c6 100%);">
 
     <a href="{{ route('student.profile') }}"
        class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-white transition">
