@@ -67,7 +67,7 @@
     height: 100vh;
     height: 100dvh;
     overflow: hidden;
-    background: linear-gradient(160deg, #24476b, #60a5fa, #24476b);
+    background: linear-gradient(175deg, #14213d, #1b3a5c 55%, #1c4f57);
     color: #fff;
     display: flex;
     flex-direction: column;
