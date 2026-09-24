@@ -317,9 +317,23 @@
     .empty-day { color: #94a3b8; }
     .ai-fab { right: 40px; bottom: 30px; }
 
-    #scheduleList { display: none; }
-    .day-picker { display: none; }
-    .grid-wrap { display: block; }
+    /* Keep the same day-picker + single-day timeline layout used on mobile,
+       just recolored to the site's light desktop palette instead of the
+       dark gradient body. The weekly grid stays hidden (default). */
+    .today-heading { display: block; }
+    .today-date { color: #0d9488; }
+    .today-title { color: #14213d; }
+
+    .day-picker-item { background: #eef2f5; }
+    .dp-label { color: #64748b; }
+    .dp-date { color: #14213d; }
+    .day-picker-item.active { background: #14213d; }
+    .day-picker-item.active .dp-label { color: #bfe9ea; }
+    .day-picker-item.active .dp-date { background: #fff; color: #14213d; }
+
+    .timeline-time span { color: #94a3b8; }
+    .timeline-card { border: 1.5px solid rgba(20,33,61,0.08); }
+    .break-pill span { color: #64748b; background: #eef2f5; }
   }
 </style>
 </head>
