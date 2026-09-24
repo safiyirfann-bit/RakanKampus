@@ -42,6 +42,16 @@
   .rk-sidebar-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
   .rk-sidebar-user-name { font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-sidebar-user-sub { font-size: 10px; color: #9fb8c9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .rk-sidebar-logout {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 18px;
+    flex-shrink: 0;
+    background: none; border: none; width: 100%;
+    color: #fff; font-size: 13px; font-weight: 700;
+    cursor: pointer; text-align: left;
+  }
+  .rk-sidebar-logout svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; }
+  .rk-sidebar-logout:hover { background: rgba(0,0,0,0.12); }
 
   .rk-tabbar {
     display: none;
@@ -113,6 +123,13 @@
       <div class="rk-sidebar-user-sub">{{ $navUser->student_id ?? '' }}</div>
     </div>
   </a>
+  <form method="POST" action="{{ route('logout') }}">
+    @csrf
+    <button type="submit" class="rk-sidebar-logout">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      Logout
+    </button>
+  </form>
 </nav>
 
 <nav class="rk-tabbar">
