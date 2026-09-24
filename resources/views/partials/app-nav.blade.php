@@ -70,7 +70,7 @@
   .rk-tab-link { display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #94a3b8; }
   .rk-tab-link svg { width: 20px; height: 20px; stroke: currentColor; }
   .rk-tab-link span { font-size: 9.5px; font-weight: 600; }
-  .rk-tab-link.active { color: #6366f1; }
+  .rk-tab-link.active { color: #0d9488; }
   .rk-tab-link.active span { font-weight: 700; }
 
   .rk-tab-link.elevated {

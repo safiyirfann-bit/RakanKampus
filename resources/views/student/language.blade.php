@@ -7,6 +7,27 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Language</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        indigo: {
+                            50: '#e6fbfa',
+                            100: '#dbeeee',
+                            200: '#b8e6e6',
+                            300: '#94a3b8',
+                            400: '#64748b',
+                            500: '#0d9488',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            900: '#14213d',
+                        },
+                    },
+                },
+            },
+        };
+    </script>
     <style>
         html, body { overflow-x: hidden; }
         body {
@@ -68,13 +89,13 @@
     .page-header {
         background: rgba(255,255,255,0.9);
         backdrop-filter: blur(8px);
-        border-bottom: 1px solid #e0e7ff;
+        border-bottom: 1px solid #dbeeee;
         padding: 16px 24px;
     }
-    .page-header .back-btn { background: transparent; color: #6366f1; }
-    .page-header .back-btn:hover { background: #eef2ff; }
-    .page-header h1 { color: #312e81; }
-    .page-header p { color: #818cf8; }
+    .page-header .back-btn { background: transparent; color: #0d9488; }
+    .page-header .back-btn:hover { background: #eafbfa; }
+    .page-header h1 { color: #14213d; }
+    .page-header p { color: #64748b; }
   }
 </style>
 </head>
