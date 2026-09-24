@@ -9,121 +9,26 @@
 <style>
 body{
     margin:0;
-    background: #f0fafa;
+    background: #f5faf6;
     color:#1f2937;
     font-family:Arial,Helvetica,sans-serif;
 }
 
-.header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:20px 32px;
-    background: linear-gradient(120deg, #2a5f59, #2dd4bf 55%, #3355a6);
-    flex-wrap:wrap;
-    gap:16px;
+.page-header{
+    padding:28px 32px;
+    background: linear-gradient(120deg, #2f4f3a, #4a7856 55%, #5f9370);
+    color:#fff;
 }
 
-.logo{
-    display:flex;
-    align-items:center;
-    gap:14px;
-}
-
-.logo-box{
-    width:48px;
-    height:48px;
-    border-radius:14px;
-    background:#c084fc;
-    color:#081124;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:900;
-    flex-shrink:0;
-}
-
-.logo h1{
+.page-header h1{
     margin:0;
     font-size:22px;
-    color:#fff;
 }
 
-.logo h1 span{
-    color:#c084fc;
-}
-
-.logo p{
-    margin:2px 0 0;
-    color:#8b96b8;
+.page-header p{
+    margin:4px 0 0;
+    color:#d7e8da;
     font-size:13px;
-}
-
-.header-actions{
-    display:flex;
-    align-items:center;
-    gap:12px;
-}
-
-.inbox-btn{
-    width:44px;
-    height:44px;
-    border-radius:12px;
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.24);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    cursor:pointer;
-    transition:.2s;
-    text-decoration:none;
-}
-
-.inbox-btn:hover{
-    background:rgba(255,255,255,.26);
-}
-
-.inbox-btn .icon{
-    width:20px;
-    height:20px;
-    color:#fff;
-}
-
-.badge-count{
-    position:absolute;
-    top:-6px;
-    right:-6px;
-    width:20px;
-    height:20px;
-    border-radius:9999px;
-    background:#ef4444;
-    color:white;
-    font-size:11px;
-    font-weight:700;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-.logout{
-    background:rgba(255,255,255,.16);
-    border:1px solid rgba(255,255,255,.24);
-    color:white;
-    padding:11px 18px;
-    border-radius:12px;
-    font-weight:700;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-}
-
-.logout:hover{
-    background:rgba(240,117,122,.22);
-    border-color:rgba(240,117,122,.4);
-    color:#fff;
 }
 
 .container{
@@ -161,7 +66,7 @@ body{
     font-size:24px;
     font-weight:800;
     margin:0;
-    color:#c084fc;
+    color:#3f7a52;
 }
 
 .search-card{
@@ -196,8 +101,8 @@ body{
 }
 
 .add-btn{
-    background:#c084fc;
-    color:#081124;
+    background:#4a7856;
+    color:#fff;
     border:none;
     padding:14px 22px;
     border-radius:14px;
@@ -230,7 +135,7 @@ body{
 }
 
 .card:hover{
-    border-color:#c084fc;
+    border-color:#5f9370;
     box-shadow: 0 6px 16px rgba(20, 40, 100, 0.1);
 }
 
@@ -238,12 +143,12 @@ body{
     width:44px;
     height:44px;
     border-radius:12px;
-    background:rgba(31,216,143,.12);
+    background:rgba(74,120,86,.12);
     display:flex;
     align-items:center;
     justify-content:center;
     flex-shrink:0;
-    color:#c084fc;
+    color:#3f7a52;
     font-size:20px;
 }
 
@@ -423,8 +328,8 @@ body{
 }
 
 @media (max-width: 768px){
-    .header{
-        padding:16px 20px;
+    .page-header{
+        padding:20px 20px;
     }
 
     .container{ padding:16px; }
@@ -462,61 +367,11 @@ body{
 
 <body>
 
-<div class="header">
+@include('partials.admin-nav', ['active' => 'dashboard', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
 
-    <div class="logo">
-        <x-brand-logo size="48" />
-        <div>
-            <h1>Administrator <span>RakanKampus</span></h1>
-            <p>Content Management System</p>
-        </div>
-    </div>
-
-    <!-- Right Actions -->
-    <div class="header-actions">
-
-        <!-- Unanswered Questions -->
-        <a href="{{ route('admin.unanswered.index') }}" class="inbox-btn" aria-label="Unanswered questions">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            @if($unansweredCount > 0)
-                <span class="badge-count">{{ $unansweredCount }}</span>
-            @endif
-        </a>
-
-        <!-- Feedback Inbox -->
-        <a href="{{ route('admin.inbox') }}" class="inbox-btn" aria-label="Feedback inbox">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8m-2 10H5a2 2 0 01-2-2V8a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2z"/>
-            </svg>
-            @if($unreadFeedbackCount > 0)
-                <span class="badge-count">{{ $unreadFeedbackCount }}</span>
-            @endif
-        </a>
-
-        <!-- Database viewer -->
-        <a href="{{ route('admin.database') }}" class="inbox-btn" aria-label="Database viewer">
-            <svg xmlns="http://www.w3.org/2000/svg" class="icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <ellipse cx="12" cy="5" rx="8" ry="3" stroke-width="2"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"/>
-            </svg>
-        </a>
-
-        <!-- Logout -->
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="logout" type="submit">
-                <i class="ti ti-logout" aria-hidden="true"></i>
-                Logout
-            </button>
-        </form>
-
-    </div>
-
+<div class="page-header">
+    <h1>Administrator Dashboard</h1>
+    <p>Manage knowledge base topics and content</p>
 </div>
 
 
