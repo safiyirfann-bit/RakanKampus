@@ -712,8 +712,12 @@
         </div>
       </div>
       @php
+          // Server-rendered fallback for first paint (before the client-side
+          // clock in the script below takes over and keeps this live).
           $hour = now()->hour;
-          if ($hour < 12) {
+          if ($hour < 5 || $hour >= 22) {
+              $greeting = 'Good night';
+          } elseif ($hour < 12) {
               $greeting = 'Good morning';
           } elseif ($hour < 18) {
               $greeting = 'Good afternoon';
@@ -721,7 +725,7 @@
               $greeting = 'Good evening';
           }
       @endphp
-      <p class="greeting-hello">{{ $greeting }}! <span class="wave-emoji">👋</span></p>
+      <p class="greeting-hello"><span id="greetingHello">{{ $greeting }}</span>! <span class="wave-emoji">👋</span></p>
       <p class="greeting-question">How can I help you today?</p>
     </div>
 
@@ -951,6 +955,27 @@ function endClassesDrag(e) {
 }
 
 renderTodayClasses();
+
+// Greeting text (morning/afternoon/evening/night) based on the student's own
+// device clock — updates immediately on load and keeps itself live while the
+// page stays open, so it stays correct across an hour boundary without a
+// refresh, and matches the student's local time even if the server isn't in
+// the same timezone.
+function updateGreeting() {
+    const el = document.getElementById('greetingHello');
+    if (!el) return;
+
+    const hour = new Date().getHours();
+    let greeting;
+    if (hour < 5 || hour >= 22) greeting = 'Good night';
+    else if (hour < 12) greeting = 'Good morning';
+    else if (hour < 18) greeting = 'Good afternoon';
+    else greeting = 'Good evening';
+
+    if (el.textContent !== greeting) el.textContent = greeting;
+}
+updateGreeting();
+setInterval(updateGreeting, 60000);
 
 let convDragId = null;
 let convDragStartX = null;
