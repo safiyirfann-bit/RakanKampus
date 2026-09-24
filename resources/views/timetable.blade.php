@@ -217,6 +217,14 @@
     font-weight: 800; cursor: pointer;
   }
 
+  .delete-btn {
+    width: 100%; margin-top: 10px; background: #fef2f2; color: #dc2626;
+    border: 1.5px solid #fecaca; border-radius: 12px; padding: 12px; font-size: 13.5px;
+    font-weight: 800; cursor: pointer; display: none;
+  }
+  .delete-btn.open { display: block; }
+  .delete-btn:hover { background: #fee2e2; }
+
   .form-error { display: none; color: #dc2626; font-size: 11.5px; margin-top: 8px; }
 
   .ai-desc { font-size: 12.5px; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
@@ -419,6 +427,7 @@
   <p class="form-error" id="formError">Please fill in subject, day and time.</p>
 
   <button type="button" class="save-btn" onclick="saveSchedule()">Save</button>
+  <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">Delete Class</button>
 </div>
 
 <script>
@@ -650,6 +659,7 @@ function openAddModal() {
   document.getElementById('endInput').value = '';
   document.getElementById('roomInput').value = '';
   document.getElementById('lecturerInput').value = '';
+  document.getElementById('deleteScheduleBtn').classList.remove('open');
   showModal('modal');
 }
 
@@ -664,7 +674,16 @@ function openEditModal(id) {
   document.getElementById('endInput').value = s.end_time;
   document.getElementById('roomInput').value = s.room || '';
   document.getElementById('lecturerInput').value = s.lecturer || '';
+  document.getElementById('deleteScheduleBtn').classList.add('open');
   showModal('modal');
+}
+
+function confirmDeleteFromModal() {
+  const id = parseInt(document.getElementById('scheduleId').value, 10);
+  if (!id) return;
+  if (!confirm('Padam kelas ni?')) return;
+  closeModals();
+  removeSchedule(id);
 }
 
 // Reads the response body as text first, then tries to parse JSON — a failed
