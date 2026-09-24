@@ -176,6 +176,15 @@
     }
 }
 
+  /* Main content */
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 32px 16px 64px;
+    position: relative;
+    z-index: 1;
+  }
+
 @media (min-width: 861px) {
     body {
         background: #f0fafa;
@@ -197,15 +206,6 @@
     .section-label { grid-column: 1 / -1; order: 6; margin-bottom: 0; }
     .conversation-list { grid-column: 1 / -1; order: 7; }
 }
-
-  /* Main content */
-  .container {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 32px 16px 64px;
-    position: relative;
-    z-index: 1;
-  }
 
   /* Greeting card */
   .greeting-card {
