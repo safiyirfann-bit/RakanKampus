@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1241,7 +1241,7 @@ function handlePhotoSelected(e) {
       e.target.value = '';
 
       if (!ok || !data.success) {
-        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Tak dapat proses gambar tu. Cuba lagi.');
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Could not process that image. Please try again.');
         document.getElementById('aiError').classList.add('open');
         return;
       }

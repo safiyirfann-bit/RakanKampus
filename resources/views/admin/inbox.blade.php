@@ -459,7 +459,7 @@ function deleteFeedbackItem(id) {
         .then(res => res.json())
         .then(data => {
             if (!data || !data.success) {
-                alert('Tak dapat padam feedback ni sekarang. Cuba lagi.');
+                alert('Could not delete this feedback right now. Please try again.');
                 return;
             }
 

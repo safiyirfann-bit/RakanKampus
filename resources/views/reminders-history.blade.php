@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -547,7 +547,7 @@ function toggleSelectAll() {
 function deleteSelected() {
   const ids = selectedIds.slice();
   if (ids.length === 0) return;
-  if (!confirm('Padam ' + ids.length + ' rekod ni secara kekal?')) return;
+  if (!confirm('Permanently delete ' + ids.length + ' record(s)?')) return;
   fetch('/reminders/history/bulk-delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },

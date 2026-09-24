@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -128,8 +128,8 @@
 
     <div class="online-banner">
         <div class="online-dot"></div>
-        <strong>{{ $onlineNowCount }} user online sekarang</strong>
-        <span>&mdash; aktif dalam {{ (int) ($onlineWindowSeconds / 60) }} minit lepas</span>
+        <strong>{{ $onlineNowCount }} user online now</strong>
+        <span>&mdash; active within the last {{ (int) ($onlineWindowSeconds / 60) }} minutes</span>
     </div>
 
     <div class="stat-grid">
@@ -149,11 +149,11 @@
         @endforeach
     </div>
 
-    <p class="record-count">Jumlah rekod dalam <strong>{{ $table }}</strong>: {{ number_format($rows->total()) }}</p>
+    <p class="record-count">Total records in <strong>{{ $table }}</strong>: {{ number_format($rows->total()) }}</p>
 
     <div class="table-card">
         @if ($rows->isEmpty())
-            <div class="empty">Tiada data dalam table ini.</div>
+            <div class="empty">No data in this table.</div>
         @else
             <div class="table-wrap">
                 <table>
@@ -185,12 +185,12 @@
                                         @if ($lastTs)
                                             <span class="status-pill {{ $isOnline ? 'online' : '' }}">
                                                 <span class="dot"></span>
-                                                {{ $isOnline ? 'Online sekarang' : \Carbon\Carbon::createFromTimestamp($lastTs)->diffForHumans() }}
+                                                {{ $isOnline ? 'Online now' : \Carbon\Carbon::createFromTimestamp($lastTs)->diffForHumans() }}
                                             </span>
                                         @else
                                             <span class="status-pill">
                                                 <span class="dot"></span>
-                                                Tiada sesi aktif
+                                                No active session
                                             </span>
                                         @endif
                                     </td>
@@ -198,10 +198,10 @@
                                 @if ($hasId)
                                     <td>
                                         <form method="POST" action="{{ route('admin.database.destroy', ['table' => $table, 'id' => $row->id]) }}"
-                                              onsubmit="return confirm('Padam rekod #{{ $row->id }} dalam {{ $table }}? Ini tak boleh undo.');">
+                                              onsubmit="return confirm('Delete record #{{ $row->id }} in {{ $table }}? This cannot be undone.');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="delete-btn">Padam</button>
+                                            <button type="submit" class="delete-btn">Delete</button>
                                         </form>
                                     </td>
                                 @endif

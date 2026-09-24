@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -681,7 +681,7 @@ function openEditModal(id) {
 function confirmDeleteFromModal() {
   const id = parseInt(document.getElementById('scheduleId').value, 10);
   if (!id) return;
-  if (!confirm('Padam kelas ni?')) return;
+  if (!confirm('Delete this class?')) return;
   closeModals();
   removeSchedule(id);
 }
@@ -725,7 +725,7 @@ function saveSchedule() {
     .then(({ ok, status, data }) => {
       if (!ok || !data || !data.success) {
         if (status === 419) {
-          alert('Sesi kau dah tamat tempoh. Sila refresh page dan cuba lagi.');
+          alert('Your session has expired. Please refresh the page and try again.');
         } else {
           document.getElementById('formError').style.display = 'block';
         }
@@ -761,9 +761,9 @@ function removeSchedule(id) {
         return;
       }
       if (status === 419) {
-        alert('Sesi kau dah tamat tempoh. Sila refresh page dan cuba lagi.');
+        alert('Your session has expired. Please refresh the page and try again.');
       } else {
-        alert('Tak dapat padam kelas ni sekarang. Cuba lagi.');
+        alert('Could not delete this class right now. Please try again.');
       }
     })
     .catch((err) => {
@@ -809,7 +809,7 @@ function handlePhotoSelected(e) {
       e.target.value = '';
 
       if (!ok || !data.success) {
-        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Tak dapat proses gambar tu. Cuba lagi.');
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Could not process that image. Please try again.');
         document.getElementById('aiError').classList.add('open');
         return;
       }

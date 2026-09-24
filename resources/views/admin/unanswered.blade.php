@@ -477,7 +477,7 @@
                         <div style="display:flex; gap:8px; margin-top:10px;">
                             <button type="button" class="resolve-btn" style="background:#8b5cf6; border-color:#8b5cf6; color:white;"
                                 onclick="openAnswerModal({{ $q->id }}, {{ json_encode($q->question) }})">
-                                + Tambah ke Knowledge Base
+                                + Add to Knowledge Base
                             </button>
 
                             <form action="{{ route('admin.unanswered.resolve', $q->id) }}" method="POST">
@@ -551,7 +551,7 @@
     <div id="answerModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Tambah ke Knowledge Base</h2>
+                <h2>Add to Knowledge Base</h2>
                 <button type="button" class="close-btn" onclick="closeAnswerModal()">&times;</button>
             </div>
 
@@ -656,7 +656,7 @@
         function bulkDeleteSelected() {
             const ids = Array.from(document.querySelectorAll('.q-select-checkbox:checked')).map(el => el.value);
             if (ids.length === 0) return;
-            if (!confirm(`Padam ${ids.length} soalan yang dipilih? Tindakan ini tak boleh undo.`)) return;
+            if (!confirm(`Delete ${ids.length} selected question(s)? This action cannot be undone.`)) return;
 
             safeJsonFetch("{{ route('admin.unanswered.bulkDestroy') }}", {
                 method: 'POST',
@@ -668,7 +668,7 @@
                 body: JSON.stringify({ ids }),
             }).then(({ ok, data }) => {
                 if (!ok || !data || !data.success) {
-                    alert('Tak dapat padam soalan-soalan ni sekarang. Cuba lagi.');
+                    alert('Could not delete the selected question(s) right now. Please try again.');
                     return;
                 }
 
@@ -689,7 +689,7 @@
         }
 
         function deleteHistoryItem(id) {
-            if (!confirm('Padam rekod ni dari history? Tindakan ini tak boleh undo.')) return;
+            if (!confirm('Delete this record from history? This action cannot be undone.')) return;
 
             safeJsonFetch(`/admin/unanswered/${id}`, {
                 method: 'DELETE',
@@ -699,7 +699,7 @@
                 },
             }).then(({ ok, data }) => {
                 if (!ok || !data || !data.success) {
-                    alert('Tak dapat padam rekod ni sekarang. Cuba lagi.');
+                    alert('Could not delete this record right now. Please try again.');
                     return;
                 }
 

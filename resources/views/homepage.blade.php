@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -705,7 +705,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
           <p class="today-classes-title" id="todayClassesTitle">Today's Classes</p>
         </div>
-        <a href="{{ route('student.timetable') }}" class="today-classes-link">Lihat semua &rarr;</a>
+        <a href="{{ route('student.timetable') }}" class="today-classes-link">View all &rarr;</a>
       </div>
 
       <div class="today-classes-body" id="todayClassesBody"
@@ -823,7 +823,7 @@ function renderTodayClasses() {
         .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
     if (items.length === 0) {
-        bodyEl.innerHTML = `<p class="today-classes-empty">${isActualToday ? 'Tiada kelas hari ini 🎉' : 'Tiada kelas'}</p>`;
+        bodyEl.innerHTML = `<p class="today-classes-empty">${isActualToday ? 'No classes today 🎉' : 'No classes'}</p>`;
         return;
     }
 
@@ -837,7 +837,7 @@ function renderTodayClasses() {
             status = now < start ? 'upcoming' : (now < end ? 'ongoing' : 'past');
         }
         const meta = [s.room, s.lecturer].filter(Boolean).map(escapeHtmlHome).join(' · ')
-            || (status === 'ongoing' ? 'Sedang berlangsung' : '');
+            || (status === 'ongoing' ? 'Ongoing now' : '');
 
         return `<div class="today-class-row ${status === 'past' ? 'is-past' : ''} ${status === 'ongoing' ? 'is-ongoing' : ''}">
             <div class="today-class-time">${formatClassTime(s.start_time)}</div>

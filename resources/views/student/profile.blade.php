@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -483,7 +483,7 @@ function updateCounter(textareaId, counterId) {
     document.getElementById(counterId).textContent = textarea.value.length;
 }
 
-// tutup modal bila klik di luar kad modal
+// close modal when clicking outside the modal card
 document.getElementById('feedbackModal').addEventListener('click', function(e) {
     if (e.target === this) {
         closeFeedbackModal();

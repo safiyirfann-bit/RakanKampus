@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -655,7 +655,7 @@ if (SpeechRecognitionAPI && micBtn) {
     isListening = false;
     micBtn.classList.remove('listening');
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      alert('Sila benarkan akses mikrofon untuk guna voice input.');
+      alert('Please allow microphone access to use voice input.');
     }
   };
 

@@ -1,6 +1,6 @@
 {{-- resources/views/auth/admin-login.blade.php --}}
 <!DOCTYPE html>
-<html lang="ms">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
