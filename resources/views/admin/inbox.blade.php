@@ -10,61 +10,37 @@
 
     <style>
         :root{
-            --admin-bg:#020b24;
-            --admin-card:#0f1738;
-            --admin-border:#1c2746;
-            --admin-muted:#93a4d1;
-            --green:#c084fc;
+            --admin-bg:#f5faf6;
+            --admin-card:#fff;
+            --admin-border:#e0e7ff;
+            --admin-muted:#64748b;
+            --green:#3f7a52;
         }
 
         *{box-sizing:border-box}
 
         body{
             margin:0;
-            background: linear-gradient(120deg, #2a5f59, #2dd4bf, #3355a6, #2a5f59);
-    background-size: 300% 300%;
-    animation: gradientShift 15s ease infinite;
-            color:white;
+            background: var(--admin-bg);
+            color:#1f2937;
             font-family:Arial,Helvetica,sans-serif;
         }
 
-        .topbar{
-            display:flex;
-            align-items:center;
-            gap:16px;
-            padding:24px 32px;
-            border-bottom:1px solid var(--admin-border);
+        .page-header{
+            padding:28px 32px;
+            background: linear-gradient(120deg, #2f4f3a, #4a7856 55%, #5f9370);
+            color:#fff;
         }
 
-        .back-btn{
-            width:52px;
-            height:52px;
-            border-radius:16px;
-            background:var(--admin-card);
-            border:1px solid var(--admin-border);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            color:white;
-            text-decoration:none;
-            transition:.2s;
-            font-size:20px;
-        }
-
-        .back-btn:hover{
-            border-color:var(--green);
-        }
-
-        .topbar h1{
+        .page-header h1{
             margin:0;
-            font-size:24px;
-            font-weight:800;
+            font-size:22px;
         }
 
-        .topbar p{
+        .page-header p{
             margin:4px 0 0;
-            color:var(--admin-muted);
-            font-size:14px;
+            color:#d7e8da;
+            font-size:13px;
         }
 
         .page{
@@ -87,6 +63,7 @@
             padding:16px 20px;
             flex:1;
             min-width:120px;
+            box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
         }
 
         .stat-card p.label{
@@ -105,7 +82,7 @@
         }
 
         .stat-card p.value.accent{
-            color:#8b5cf6;
+            color:#d97706;
         }
 
         .tabs{
@@ -140,9 +117,9 @@
         }
 
         .tab.active{
-            background:white;
-            color:var(--admin-bg);
-            border-color:white;
+            background:#4a7856;
+            color:white;
+            border-color:#4a7856;
         }
 
         .list{
@@ -170,11 +147,11 @@
         }
 
         .item:hover{
-            background:#131f45;
+            background:#f5faf6;
         }
 
         .item.unread{
-            border-left-color:#8b5cf6;
+            border-left-color:#d97706;
         }
 
         .type-icon{
@@ -189,13 +166,13 @@
         }
 
         .type-icon.feedback{
-            background:rgba(79,124,255,.15);
-            color:#a78bfa;
+            background:rgba(59,130,246,.12);
+            color:#3b82f6;
         }
 
         .type-icon.feature{
-            background:rgba(168,85,247,.15);
-            color:#c99bf7;
+            background:rgba(168,85,247,.12);
+            color:#9333ea;
         }
 
         .body{
@@ -213,7 +190,7 @@
         .title{
             font-size:14px;
             font-weight:700;
-            color:white;
+            color:#1f2937;
         }
 
         .title span{
@@ -259,27 +236,6 @@
             color:#ef4444;
         }
 
-        .fab{
-            position:fixed;
-            right:28px;
-            bottom:28px;
-            width:64px;
-            height:64px;
-            border-radius:9999px;
-            border:none;
-            background:#f472b6;
-            color:white;
-            font-size:32px;
-            font-weight:300;
-            cursor:pointer;
-            box-shadow:0 14px 28px rgba(244,63,142,.45);
-            transition:.2s;
-        }
-
-        .fab:hover{
-            transform:translateY(-2px) scale(1.03);
-        }
-
         @media (max-width: 640px){
             .top-row{
                 flex-direction:column;
@@ -293,28 +249,16 @@
                 flex-wrap:nowrap;
             }
         }
-    
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
 </style>
 </head>
 <body>
 
-    <div class="topbar">
+@include('partials.admin-nav', ['active' => 'inbox', 'unansweredCount' => $unansweredCount])
 
-        <a href="{{ route('admin.dashboard') }}" class="back-btn" aria-label="Back to dashboard">
-            <i class="ti ti-arrow-left" aria-hidden="true"></i>
-        </a>
-
-        <div>
-            <h1>Feedback Inbox</h1>
-            <p>Student feedback, feature requests & reported issues</p>
-        </div>
-
-    </div>
+<div class="page-header">
+    <h1>Feedback Inbox</h1>
+    <p>Student feedback, feature requests & reported issues</p>
+</div>
 
     <div class="page">
 
@@ -422,8 +366,6 @@
 
     </div>
 
-    <button class="fab">+</button>
-
 <script>
 function setInboxTab(type, btn) {
 
@@ -477,7 +419,7 @@ function deleteFeedbackItem(id) {
                     </div>`;
             }
         })
-        .catch(() => alert('Ada masalah sambungan. Cuba lagi.'));
+        .catch(() => alert('Connection problem. Please try again.'));
 }
 
 function updateInboxStats() {

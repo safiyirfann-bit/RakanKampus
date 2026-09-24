@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Feedback;
+use App\Models\UnansweredQuestion;
 use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
@@ -21,10 +22,11 @@ class FeedbackController extends Controller
     public function inbox()
     {
         $feedbacks = Feedback::latest()->get();
+        $unansweredCount = UnansweredQuestion::where('status', 'pending')->count();
 
         Feedback::where('is_read', false)->update(['is_read' => true]);
 
-        return view('admin.inbox', compact('feedbacks'));
+        return view('admin.inbox', compact('feedbacks', 'unansweredCount'));
     }
 
     public function destroy(Feedback $feedback)
