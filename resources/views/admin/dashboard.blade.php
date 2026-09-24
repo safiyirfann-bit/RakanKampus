@@ -9,10 +9,8 @@
 <style>
 body{
     margin:0;
-    background: linear-gradient(120deg, #2a5f59, #2dd4bf, #3355a6, #2a5f59);
-    background-size: 300% 300%;
-    animation: gradientShift 15s ease infinite;
-    color:white;
+    background: #f0fafa;
+    color:#1f2937;
     font-family:Arial,Helvetica,sans-serif;
 }
 
@@ -21,7 +19,7 @@ body{
     justify-content:space-between;
     align-items:center;
     padding:20px 32px;
-    border-bottom:1px solid #1c2746;
+    background: linear-gradient(120deg, #2a5f59, #2dd4bf 55%, #3355a6);
     flex-wrap:wrap;
     gap:16px;
 }
@@ -48,6 +46,7 @@ body{
 .logo h1{
     margin:0;
     font-size:22px;
+    color:#fff;
 }
 
 .logo h1 span{
@@ -70,8 +69,8 @@ body{
     width:44px;
     height:44px;
     border-radius:12px;
-    background:#121a33;
-    border:1px solid #273150;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.24);
     display:flex;
     align-items:center;
     justify-content:center;
@@ -82,13 +81,13 @@ body{
 }
 
 .inbox-btn:hover{
-    border-color:#c084fc;
+    background:rgba(255,255,255,.26);
 }
 
 .inbox-btn .icon{
     width:20px;
     height:20px;
-    color:#cbd5e1;
+    color:#fff;
 }
 
 .badge-count{
@@ -108,8 +107,8 @@ body{
 }
 
 .logout{
-    background:#121a33;
-    border:1px solid #273150;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.24);
     color:white;
     padding:11px 18px;
     border-radius:12px;
@@ -122,8 +121,9 @@ body{
 }
 
 .logout:hover{
+    background:rgba(240,117,122,.22);
     border-color:rgba(240,117,122,.4);
-    color:#f0757a;
+    color:#fff;
 }
 
 .container{
@@ -140,17 +140,18 @@ body{
 }
 
 .stat-card{
-    background:#121a33;
-    border:1px solid #273150;
+    background:#fff;
+    border:1px solid #e0e7ff;
     border-radius:16px;
     padding:16px 20px;
     flex:1;
     min-width:140px;
+    box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
 }
 
 .stat-card p.label{
     font-size:12px;
-    color:#8b96b8;
+    color:#64748b;
     margin:0 0 4px;
     text-transform:uppercase;
     letter-spacing:.05em;
@@ -164,8 +165,8 @@ body{
 }
 
 .search-card{
-    background:#121a33;
-    border:1px solid #273150;
+    background:#fff;
+    border:1px solid #e0e7ff;
     border-radius:16px;
     padding:16px 20px;
     flex:2.5;
@@ -173,24 +174,25 @@ body{
     display:flex;
     align-items:center;
     gap:10px;
+    box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
 }
 
 .search-card i{
     font-size:18px;
-    color:#8b96b8;
+    color:#64748b;
 }
 
 .search-card input{
     border:none;
     background:transparent;
-    color:white;
+    color:#1f2937;
     font-size:14px;
     width:100%;
     outline:none;
 }
 
 .search-card input::placeholder{
-    color:#5f6a8a;
+    color:#94a3b8;
 }
 
 .add-btn{
@@ -215,8 +217,8 @@ body{
 }
 
 .card{
-    background:#121a33;
-    border:1px solid #273150;
+    background:#fff;
+    border:1px solid #e0e7ff;
     border-radius:16px;
     padding:16px 20px;
     display:flex;
@@ -224,10 +226,12 @@ body{
     gap:16px;
     flex-wrap:wrap;
     transition:.2s;
+    box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
 }
 
 .card:hover{
     border-color:#c084fc;
+    box-shadow: 0 6px 16px rgba(20, 40, 100, 0.1);
 }
 
 .card-icon{
@@ -256,7 +260,7 @@ body{
 
 .card-info p{
     margin:0;
-    color:#8b96b8;
+    color:#64748b;
     font-size:13px;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -279,12 +283,12 @@ body{
     border-radius:9px;
     cursor:pointer;
     font-size:16px;
-    background:#1a2550;
-    color:#cbd5e1;
+    background:#f1f5f9;
+    color:#64748b;
     text-decoration:none;
 }
 
-.icon-btn:hover{ background:#22305f; }
+.icon-btn:hover{ background:#e2e8f0; }
 .icon-btn.view-btn{ color:#a78bfa; }
 .icon-btn.edit-btn{ color:#f5c563; }
 .icon-btn.delete-btn{ color:#f0757a; }
@@ -402,16 +406,16 @@ body{
 }
 
 .no-results{
-    color:#8b96b8;
+    color:#64748b;
     text-align:center;
     padding:24px;
     display:none;
 }
 
 .status-msg{
-    background:rgba(31,216,143,.1);
-    border:1px solid rgba(31,216,143,.35);
-    color:#c084fc;
+    background:#ecfdf5;
+    border:1px solid #a7f3d0;
+    color:#065f46;
     padding:12px 18px;
     border-radius:12px;
     margin-bottom:20px;
