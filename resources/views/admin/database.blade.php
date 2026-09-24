@@ -10,12 +10,13 @@
     body {
         margin: 0;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        background: #f0fafa;
+        background: linear-gradient(160deg, #ffffff, #E5F5E0);
         color: #1f2937;
     }
     .header {
-        background: linear-gradient(120deg, var(--navy), var(--teal) 55%, var(--blue));
-        color: #fff;
+        background: #fff;
+        border-bottom: 1px solid #e0e7ff;
+        color: #1f2937;
         padding: 18px 28px;
         display: flex;
         justify-content: space-between;
@@ -23,17 +24,18 @@
         flex-wrap: wrap;
         gap: 12px;
     }
-    .header strong { font-size: 16px; }
+    .header strong { font-size: 16px; color: #1f2937; }
     .header a.back-link {
-        color: #fff;
-        background: rgba(255,255,255,0.16);
+        color: #3f7a52;
+        background: #f1f5f9;
+        border: 1px solid #e0e7ff;
         border-radius: 10px;
         padding: 8px 14px;
         text-decoration: none;
         font-size: 13px;
         font-weight: 700;
     }
-    .header a.back-link:hover { background: rgba(255,255,255,0.26); }
+    .header a.back-link:hover { background: #e2e8f0; }
 
     .content { padding: 24px 28px 60px; max-width: 1200px; margin: 0 auto; }
 
@@ -114,7 +116,7 @@
 
 <div class="header">
     <strong>RakanKampus &mdash; Database Viewer</strong>
-    <a href="{{ route('admin.dashboard') }}" class="back-link">&larr; Balik ke Dashboard</a>
+    <a href="{{ route('admin.dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
 </div>
 
 <div class="content">

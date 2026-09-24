@@ -9,15 +9,16 @@
 <style>
 body{
     margin:0;
-    background: #f5faf6;
+    background: linear-gradient(160deg, #ffffff, #E5F5E0);
     color:#1f2937;
     font-family:Arial,Helvetica,sans-serif;
 }
 
 .page-header{
     padding:28px 32px;
-    background: linear-gradient(120deg, #2f4f3a, #4a7856 55%, #5f9370);
-    color:#fff;
+    background: #fff;
+    border-bottom:1px solid #e0e7ff;
+    color:#1f2937;
 }
 
 .page-title{ display:flex; align-items:center; gap:16px; margin-bottom:6px; }
@@ -26,12 +27,12 @@ body{
     width:36px;
     height:36px;
     border-radius:10px;
-    border:1px solid rgba(255,255,255,.28);
-    background:rgba(255,255,255,.16);
+    border:1px solid #e0e7ff;
+    background:#f1f5f9;
     display:flex;
     align-items:center;
     justify-content:center;
-    color:#fff;
+    color:#3f7a52;
     text-decoration:none;
     font-size:18px;
     transition:.2s;
@@ -39,11 +40,11 @@ body{
 }
 
 .back-btn:hover{
-    background:rgba(255,255,255,.26);
+    background:#e2e8f0;
 }
 
-.page-title h2{ margin:0; font-size:22px; }
-.page-header p.subtitle{ color:#d7e8da; margin:4px 0 0 52px; font-size:13px; }
+.page-title h2{ margin:0; font-size:22px; color:#1f2937; }
+.page-header p.subtitle{ color:#64748b; margin:4px 0 0 52px; font-size:13px; }
 
 .container{ max-width:1200px; margin:auto; padding:32px; }
 

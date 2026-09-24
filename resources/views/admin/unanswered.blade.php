@@ -21,25 +21,27 @@
 
         body{
             margin:0;
-            background: var(--admin-bg);
+            background: linear-gradient(160deg, #ffffff, #E5F5E0);
             color:#1f2937;
             font-family:Arial,Helvetica,sans-serif;
         }
 
         .page-header{
             padding:28px 32px;
-            background: linear-gradient(120deg, #2f4f3a, #4a7856 55%, #5f9370);
-            color:#fff;
+            background: #fff;
+            border-bottom:1px solid #e0e7ff;
+            color:#1f2937;
         }
 
         .page-header h1{
             margin:0;
             font-size:22px;
+            color:#1f2937;
         }
 
         .page-header p{
             margin:4px 0 0;
-            color:#d7e8da;
+            color:#64748b;
             font-size:13px;
         }
 
