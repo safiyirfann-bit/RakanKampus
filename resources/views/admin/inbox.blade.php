@@ -36,6 +36,7 @@
         .page-header h1{
             margin:0;
             font-size:22px;
+            font-weight:800;
             color:#1f2937;
         }
 

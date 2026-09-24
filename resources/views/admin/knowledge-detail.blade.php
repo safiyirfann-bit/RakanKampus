@@ -43,7 +43,7 @@ body{
     background:#e2e8f0;
 }
 
-.page-title h2{ margin:0; font-size:22px; color:#1f2937; }
+.page-title h2{ margin:0; font-size:22px; font-weight:800; color:#1f2937; }
 .page-header p.subtitle{ color:#64748b; margin:4px 0 0 52px; font-size:13px; }
 
 .container{ max-width:1200px; margin:auto; padding:32px; }
