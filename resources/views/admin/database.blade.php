@@ -80,16 +80,33 @@
     .pagination { margin-top: 16px; }
     .empty { padding: 40px 24px; text-align: center; color: #6b7280; font-size: 13.5px; }
     .record-count { color: #64748b; font-size: 13px; margin: 0 0 14px; }
+
+    .flash { border-radius: 12px; padding: 12px 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+    .flash.status { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+    .flash.error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+
+    .delete-btn {
+        background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca;
+        border-radius: 8px; padding: 5px 10px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    }
+    .delete-btn:hover { background: #fee2e2; }
 </style>
 </head>
 <body>
 
 <div class="header">
-    <strong>RakanKampus &mdash; Database Viewer (read-only)</strong>
+    <strong>RakanKampus &mdash; Database Viewer</strong>
     <a href="{{ route('admin.dashboard') }}" class="back-link">&larr; Balik ke Dashboard</a>
 </div>
 
 <div class="content">
+
+    @if (session('db_viewer_status'))
+        <div class="flash status">{{ session('db_viewer_status') }}</div>
+    @endif
+    @if (session('db_viewer_error'))
+        <div class="flash error">{{ session('db_viewer_error') }}</div>
+    @endif
 
     <div class="stat-grid">
         @foreach ($counts as $t => $count)
@@ -121,6 +138,9 @@
                             @foreach ($columns as $col)
                                 <th>{{ $col }}</th>
                             @endforeach
+                            @if ($hasId)
+                                <th>Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -129,6 +149,16 @@
                                 @foreach ($columns as $col)
                                     <td title="{{ $row->$col }}">{{ \Illuminate\Support\Str::limit((string) $row->$col, 60) }}</td>
                                 @endforeach
+                                @if ($hasId)
+                                    <td>
+                                        <form method="POST" action="{{ route('admin.database.destroy', ['table' => $table, 'id' => $row->id]) }}"
+                                              onsubmit="return confirm('Padam rekod #{{ $row->id }} dalam {{ $table }}? Ini tak boleh undo.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="delete-btn">Padam</button>
+                                        </form>
+                                    </td>
+                                @endif
                             </tr>
                         @endforeach
                     </tbody>

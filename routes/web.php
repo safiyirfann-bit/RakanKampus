@@ -237,9 +237,12 @@ Route::delete('/unanswered/{unansweredQuestion}', [UnansweredQuestionController:
 Route::post('/unanswered/bulk-delete', [UnansweredQuestionController::class, 'bulkDestroy'])
     ->name('unanswered.bulkDestroy');
 
-        // Database viewer (read-only)
+        // Database viewer (read-only + guarded row delete)
         Route::get('/database', [DatabaseViewerController::class, 'index'])
             ->name('database');
+        Route::delete('/database/{table}/{id}', [DatabaseViewerController::class, 'destroy'])
+            ->where(['table' => '[a-z_]+', 'id' => '[0-9]+'])
+            ->name('database.destroy');
 
         // Category pages
         Route::view('/category/mpp', 'admin.category-detail')

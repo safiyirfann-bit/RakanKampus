@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -44,8 +45,9 @@ class DatabaseViewerController extends Controller
         $columns = Schema::getColumnListing($table);
         $hidden = self::HIDDEN_COLUMNS[$table] ?? [];
         $visibleColumns = array_values(array_diff($columns, $hidden));
+        $hasId = in_array('id', $columns, true);
 
-        $orderColumn = in_array('id', $columns, true) ? 'id' : $columns[0];
+        $orderColumn = $hasId ? 'id' : $columns[0];
 
         $rows = DB::table($table)->orderByDesc($orderColumn)->paginate(50);
 
@@ -62,6 +64,34 @@ class DatabaseViewerController extends Controller
             'columns' => $visibleColumns,
             'rows' => $rows,
             'counts' => $counts,
+            'hasId' => $hasId,
         ]);
+    }
+
+    /**
+     * Delete a single row from an allow-listed table by its id. Table and
+     * id are both validated before touching the database — the table name
+     * is never taken as free text, and an admin can never delete their own
+     * user row (which would break their own session mid-request).
+     */
+    public function destroy(Request $request, string $table, int $id)
+    {
+        if (! in_array($table, self::TABLES, true) || ! Schema::hasTable($table)) {
+            abort(404);
+        }
+
+        if (! in_array('id', Schema::getColumnListing($table), true)) {
+            abort(404);
+        }
+
+        if ($table === 'users' && $id === Auth::id()) {
+            return back()->with('db_viewer_error', 'Tak boleh delete akaun admin yang sedang log masuk.');
+        }
+
+        $deleted = DB::table($table)->where('id', $id)->delete();
+
+        return redirect()
+            ->route('admin.database', ['table' => $table])
+            ->with('db_viewer_status', $deleted ? 'Rekod #'.$id.' dah dipadam.' : 'Rekod #'.$id.' tak dijumpai.');
     }
 }
