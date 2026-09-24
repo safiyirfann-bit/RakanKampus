@@ -59,16 +59,16 @@
 
 
     <!-- Header -->
-    <div class="bg-white border-b border-indigo-100 px-6 py-5 flex items-center gap-4">
+    <div class="px-6 py-5 flex items-center gap-4 shadow-md" style="background: linear-gradient(120deg, #14213d 0%, #1b3a5c 55%, #2ec4c6 100%);">
 
         <a href="{{ route('student.profile') }}"
-           class="w-10 h-10 rounded-full hover:bg-indigo-50 flex items-center justify-center text-indigo-500 transition">
+           class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-white transition">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
-        <h1 class="text-2xl font-bold text-indigo-900">Change Password</h1>
+        <h1 class="text-2xl font-bold text-white">Change Password</h1>
 
     </div>
 

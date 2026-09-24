@@ -64,18 +64,18 @@
 <div class="bg-blob b3"></div>
 
     <!-- Header -->
-<div class="bg-white/90 backdrop-blur border-b border-indigo-100 px-6 py-4 flex items-center gap-3 relative z-10">
+<div class="px-6 py-4 flex items-center gap-3 relative z-10 shadow-md" style="background: linear-gradient(120deg, #14213d 0%, #1b3a5c 55%, #2ec4c6 100%);">
 
     <a href="{{ route('student.home') }}"
-       class="w-10 h-10 rounded-full hover:bg-indigo-50 flex items-center justify-center text-indigo-500 transition">
+       class="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center text-white transition">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
     </a>
 
     <div>
-        <h1 class="font-bold text-indigo-900">Profile & Settings</h1>
-        <p class="text-sm text-indigo-400">Manage your student account</p>
+        <h1 class="font-bold text-white">Profile & Settings</h1>
+        <p class="text-sm text-indigo-100">Manage your student account</p>
     </div>
 
 </div>
