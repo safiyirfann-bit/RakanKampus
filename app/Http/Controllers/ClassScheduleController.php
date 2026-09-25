@@ -84,38 +84,53 @@ class ClassScheduleController extends Controller
         $file = $request->file('photo');
         $dataUri = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
 
-        $days = ClassSchedule::DAYS;
+        // Malaysian polytechnic weekly timetables are Isnin-Jumaat only in
+        // practice (this is also true of the real timetable this was tested
+        // against) — skipping Saturday/Sunday here cuts 2 of 7 calls, which
+        // matters now that calls are sequential (see below). This only skips
+        // them for AI capture; they're still selectable when adding a class
+        // by hand, in case that assumption is ever wrong for someone.
+        $days = array_values(array_diff(ClassSchedule::DAYS, ['Saturday', 'Sunday']));
 
-        // One Groq call per day, run concurrently via Http::pool, instead of one
-        // call asking for the whole week at once. A real production test on a
-        // dense multi-day grid surfaced two related failure modes: content from
-        // one day's row bled into a completely different day (a Tuesday-only
-        // class showing up, mislabeled, under Wednesday), and a room code that
-        // repeats on almost every row ("APDV1") got confidently misread the same
-        // wrong way ("APVY1") over and over rather than re-read per cell — both
-        // are classic "too much to track in one pass" mistakes on a packed
-        // table. Asking about a single day at a time gives the model far less
-        // to hold in its head per call, so it has much less room to blend rows
-        // together or anchor on an earlier (wrong) reading of a repeated value.
-        // day_of_week is forced from which call this is (not trusted from the
-        // model's own answer) below, so a still-confused read can never
-        // mislabel a class onto the wrong day even if it gets the content wrong.
-        $responses = Http::pool(function ($pool) use ($days, $dataUri) {
-            foreach ($days as $day) {
-                $pool->as($day)
-                    ->withToken(config('services.groq.key'))
-                    ->timeout(110)
-                    ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri, $day));
-            }
-        });
-
+        // One Groq call per day, run ONE AT A TIME — a real production test showed
+        // this account's Groq plan has a very tight output-tokens-per-minute cap
+        // (server logs: "Limit 1000" OTPM). Firing all days concurrently via
+        // Http::pool(), as this used to, requested far more than that shared budget
+        // in the same instant and got every single call rejected with 429s. Going
+        // one call at a time, waiting for each to actually finish before starting
+        // the next, naturally spreads requests out over real wall-clock time instead
+        // of stacking them all in one burst, which is what that per-minute budget
+        // needs. This makes the whole capture noticeably slower than before, but a
+        // slower capture that actually returns data beats an instant one that
+        // doesn't — the account's Groq plan is simply not able to sustain 7
+        // concurrent vision calls right now.
+        //
+        // A single day at a time (rather than the whole week in one call) is still
+        // worth keeping on top of that: a real production test on a dense multi-day
+        // grid surfaced two related failure modes when reading the whole table in
+        // one pass — content from one day's row bled into a completely different
+        // day, and a room code that repeats on almost every row ("APDV1") got
+        // confidently misread the same wrong way ("APVY1") over and over rather than
+        // re-read per cell — both are classic "too much to track in one pass"
+        // mistakes on a packed table. day_of_week is forced from which call this is
+        // (not trusted from the model's own answer) below, so a still-confused read
+        // can never mislabel a class onto the wrong day even if it gets the content
+        // wrong.
         $classes = [];
         $anyRequestSucceeded = false;
 
         foreach ($days as $day) {
-            $response = $responses[$day] ?? null;
+            $response = Http::withToken(config('services.groq.key'))
+                ->timeout(110)
+                ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri, $day));
 
             if (! $response || $response->failed()) {
+                // Deliberately not retried inline: this account's Groq plan is already
+                // rate-limit-constrained (see above), and stacking a retry-with-sleep
+                // per day risks pushing total request time past the web server's own
+                // timeout, which would fail the ENTIRE capture instead of just this one
+                // day. Skipping cleanly here means the user still gets whatever days did
+                // come back, and can re-run the capture (or add this one day by hand).
                 Log::error('Groq vision API error (timetable)', [
                     'day' => $day,
                     'status' => $response?->status(),
@@ -282,16 +297,19 @@ class ClassScheduleController extends Controller
             // that's either right there in the image or it isn't.
             'temperature' => 0.3,
             'response_format' => ['type' => 'json_object'],
-            // Raised back up from an earlier 8000: a real test showed two full days
-            // (a simple one and a genuinely busy one) coming back completely empty,
-            // and hidden reasoning tokens are spent from this same budget before the
-            // visible JSON answer — 8000 most likely wasn't leaving enough room for
-            // a longer reasoning trace on a crowded row, silently truncating the
-            // answer. finish_reason is now logged below so this is confirmed from
-            // real API responses instead of guessed at again next time.
+            // This account's Groq plan has a tight, shared "output tokens per
+            // minute" cap (real server logs showed "Limit 1000" OTPM, and Groq
+            // rejects a single request outright — "Request too large" — once its
+            // own estimate of that request's expected output crosses it, separate
+            // from the per-minute accounting). A single day's worth of classes plus
+            // reasoning doesn't need anywhere near the 8000-14000 this was
+            // previously set to, and asking for that much made Groq's own estimate
+            // for this one request alone cross the ceiling well before considering
+            // any other calls at all. Kept modest so a single call reliably requests
+            // less than the account's entire per-minute budget by itself.
             'reasoning_effort' => 'medium',
             'reasoning_format' => 'hidden',
-            'max_completion_tokens' => 14000,
+            'max_completion_tokens' => 2500,
         ];
     }
 

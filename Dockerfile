@@ -48,6 +48,12 @@ ENV REAL_IP_HEADER=1
 ENV APP_ENV=production
 ENV APP_DEBUG=false
 ENV LOG_CHANNEL=stderr
+# Matches nginx's fastcgi_read_timeout (conf/nginx/nginx-site.conf) — the AI
+# timetable capture now makes several Groq calls one at a time (a rate-limit
+# fix) and can legitimately run longer than PHP's usual default, so it needs
+# raising here too or PHP would kill the script with its own timeout before
+# nginx's ever came into play.
+ENV PHP_MAX_EXECUTION_TIME=240
 
 EXPOSE 80
 
