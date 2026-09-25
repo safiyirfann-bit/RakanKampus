@@ -75,6 +75,10 @@
     transition: transform 0.25s ease, margin-left 0.25s ease;
 }
 
+  .sidebar-backdrop {
+    display: none;
+  }
+
   .app.sidebar-collapsed .sidebar {
     margin-left: -300px;
   }
@@ -410,23 +414,40 @@
   }
 
   @media (max-width: 768px) {
-    /* On mobile the conversation list takes over the full screen instead of
-       floating as a narrow panel over the chat — that peekaboo overlap was
-       the "bertindih" clutter. Full-screen also means the bottom tab bar
-       (hidden below via body.chat-panel-open) has nothing to clash with. */
+    /* ChatGPT-style drawer: the panel doesn't take the whole screen, it
+       slides in over a dimmed backdrop instead — the backdrop is what
+       replaces the old "raw chat content peeking through" clutter. Tapping
+       the backdrop closes the panel, same as tapping outside a drawer. */
     .sidebar {
       position: fixed;
       z-index: 20;
       height: 100vh;
       height: 100dvh;
-      width: 100%;
-      min-width: 100%;
+      width: 85vw;
+      max-width: 320px;
+      transition: transform 0.25s ease;
     }
     .app.sidebar-collapsed .sidebar {
-      margin-left: -100%;
+      margin-left: 0;
+      transform: translateX(-100%);
     }
     .app:not(.sidebar-collapsed) .sidebar {
       margin-left: 0;
+      transform: translateX(0);
+    }
+    .sidebar-backdrop {
+      display: block;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 19;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    body.chat-panel-open .sidebar-backdrop {
+      opacity: 1;
+      pointer-events: auto;
     }
     body.chat-panel-open .rk-tabbar {
       display: none !important;
@@ -495,6 +516,8 @@
 @include('partials.app-nav', ['active' => 'chat', 'user' => $user])
 
   <div class="app" id="app">
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -681,6 +704,13 @@ menuBtn.addEventListener('click', () => {
 
 const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 sidebarCloseBtn.addEventListener('click', () => {
+  setSidebarOpen(false);
+});
+
+// Tapping the dimmed backdrop (mobile drawer only — hidden on desktop)
+// closes the panel too, same as tapping outside any drawer/modal.
+const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+sidebarBackdrop.addEventListener('click', () => {
   setSidebarOpen(false);
 });
 
