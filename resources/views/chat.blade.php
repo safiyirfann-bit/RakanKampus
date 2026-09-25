@@ -509,6 +509,22 @@
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
   }
+
+  @media (min-width: 861px) {
+    /* From this width up, the campus-wide sidebar (partials/app-nav.blade.php)
+       is already on screen with its own "RakanKampus" branding and a Profile
+       item showing the user's real photo — so this panel repeating both as
+       its own header row + avatar/name card was just the same two things
+       twice, not new information. Below 861px there's no such persistent
+       sidebar (it's replaced by the bottom tab bar), so the mobile drawer
+       keeps both: they're what identifies the panel while it's open and
+       covering the screen. Placed last so it wins over the base rules above
+       at this width, since both share the same selector specificity. */
+    .sidebar-header,
+    .sidebar-user {
+      display: none;
+    }
+  }
 </style>
 </head>
 <body>
