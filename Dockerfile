@@ -16,13 +16,19 @@ RUN docker-php-ext-install bcmath
 
 # Base image install libwebp-dev tapi configure GD tanpa --with-webp, so
 # imagecreatefromstring() gagal senyap untuk fail .webp (profile photo
-# upload return "Could not process the uploaded image"). libwebp-dev dah
-# ada, tapi first attempt kat sini gagal build sebab pkg-config binary tu
-# sendiri takde dalam base image (GD's --with-webp detection guna
-# pkg-config untuk cari libwebp) — so kena install `pkgconf` (nama
-# package pkg-config kat Alpine) dulu sebelum configure.
-RUN apk add --no-cache pkgconf \
-    && docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp \
+# upload return "Could not process the uploaded image"). Dua attempt lepas
+# ni gagal sebab pkg-config (walaupun dah install `pkgconf` package) tetap
+# tak jumpa libwebp.pc dia — so instead of terus bergantung pada
+# pkg-config, terus bagi GD punya configure script CFLAGS/LIBS tu secara
+# eksplisit (ni exact workaround yang error message sendiri cadangkan).
+# Print listing fail libwebp sekali supaya kalau ni pun gagal, log build
+# tu terus tunjuk path sebenar fail-fail tu berada kat mana.
+RUN echo "--- libwebp files on this image ---" \
+    && (find / -iname "libwebp*" -o -iname "*webp*.pc" 2>/dev/null | grep -v proc || true) \
+    && echo "-----------------------------------"
+ENV WEBP_CFLAGS="-I/usr/include"
+ENV WEBP_LIBS="-L/usr/lib -lwebp"
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install gd
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
