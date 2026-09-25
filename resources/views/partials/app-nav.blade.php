@@ -37,6 +37,13 @@
   .rk-nav-link svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
   .rk-nav-link span { font-size: 13px; }
   .rk-nav-link.active { background: rgba(255,255,255,0.14); color: #fff; font-weight: 700; }
+  .rk-nav-avatar {
+    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: #2ec4c6; color: #14213d; font-size: 8px; font-weight: 700;
+  }
+  .rk-nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .rk-nav-link.active .rk-nav-avatar { box-shadow: 0 0 0 2px rgba(255,255,255,0.65); }
   .rk-sidebar-logout {
     display: flex; align-items: center; gap: 10px;
     padding: 14px 18px;
@@ -67,6 +74,13 @@
   .rk-tab-link span { font-size: 9.5px; font-weight: 600; }
   .rk-tab-link.active { color: #0d9488; }
   .rk-tab-link.active span { font-weight: 700; }
+  .rk-tab-avatar {
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+    background: #2ec4c6; color: #14213d; font-size: 9px; font-weight: 700;
+  }
+  .rk-tab-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .rk-tab-link.active .rk-tab-avatar { box-shadow: 0 0 0 2px #0d9488; }
 
   .rk-tab-link.elevated {
     flex: 0 0 auto;
@@ -100,7 +114,17 @@
   <div class="rk-sidebar-nav">
     @foreach($navItems as $item)
       <a href="{{ route($item['route']) }}" class="rk-nav-link {{ $navActive === $item['key'] ? 'active' : '' }}">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+        @if($item['key'] === 'profile')
+          <span class="rk-nav-avatar">
+            @if($navUser && $navUser->photo_data)
+              <img src="{{ $navUser->photo_data }}" alt="">
+            @else
+              {{ strtoupper(substr($navUser->first_name ?? $navUser->name ?? 'U', 0, 1) . substr($navUser->last_name ?? '', 0, 1)) }}
+            @endif
+          </span>
+        @else
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+        @endif
         <span>{{ $item['label'] }}</span>
       </a>
     @endforeach
@@ -119,7 +143,17 @@
     <a href="{{ route($item['route']) }}"
        class="rk-tab-link {{ $item['key'] === 'chat' ? 'elevated' : '' }} {{ $navActive === $item['key'] ? 'active' : '' }}"
        aria-label="{{ $item['label'] }}">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+      @if($item['key'] === 'profile')
+        <span class="rk-tab-avatar">
+          @if($navUser && $navUser->photo_data)
+            <img src="{{ $navUser->photo_data }}" alt="">
+          @else
+            {{ strtoupper(substr($navUser->first_name ?? $navUser->name ?? 'U', 0, 1) . substr($navUser->last_name ?? '', 0, 1)) }}
+          @endif
+        </span>
+      @else
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
+      @endif
       <span>{{ $item['label'] }}</span>
     </a>
   @endforeach
