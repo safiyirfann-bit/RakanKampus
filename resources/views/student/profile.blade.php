@@ -135,8 +135,8 @@
 <div class="bg-white rounded-3xl border border-indigo-100 p-5 flex items-center gap-4 shadow-sm fade-up">
 
     <div class="w-14 h-14 rounded-full text-white flex items-center justify-center font-bold text-lg overflow-hidden" style="background: linear-gradient(135deg, #14213d, #2ec4c6);">
-        @if($user->photo)
-            <img src="{{ Storage::url($user->photo) }}" class="w-full h-full object-cover" alt="Profile photo">
+        @if($user->photo_data)
+            <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="Profile photo">
         @else
             {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
         @endif

@@ -129,8 +129,8 @@
         <button type="button" onclick="openPhotoModal()" class="relative group">
 
             <div class="w-24 h-24 rounded-full bg-indigo-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg overflow-hidden" id="avatarWrapper">
-                @if($user->photo)
-                    <img src="{{ Storage::url($user->photo) }}" class="w-full h-full object-cover" alt="Profile photo">
+                @if($user->photo_data)
+                    <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="Profile photo">
                 @else
                     {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
                 @endif

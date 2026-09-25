@@ -533,8 +533,8 @@
 
       <a href="{{ route('student.profile') }}" class="sidebar-user" style="text-decoration:none; color:inherit; cursor:pointer;">
         <div class="user-avatar">
-          @if($user->photo)
-            <img src="{{ Storage::url($user->photo) }}" alt="Profile photo" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+          @if($user->photo_data)
+            <img src="{{ $user->photo_data }}" alt="Profile photo" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
           @else
             {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
           @endif
@@ -574,7 +574,7 @@
         </div>
       </div>
 
-      <template id="userAvatarTpl"><div class="msg-avatar user-avatar-mini">@if($user->photo)<img src="{{ Storage::url($user->photo) }}" alt="">@else{{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}@endif</div></template>
+      <template id="userAvatarTpl"><div class="msg-avatar user-avatar-mini">@if($user->photo_data)<img src="{{ $user->photo_data }}" alt="">@else{{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}@endif</div></template>
       <template id="botAvatarTpl"><div class="msg-avatar bot-avatar-mini"><x-brand-logo size="18" /></div></template>
 
       <div class="chat-area" id="chatArea">

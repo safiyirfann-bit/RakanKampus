@@ -632,8 +632,8 @@
 
     <a href="{{ route('student.profile') }}" class="avatar-btn" aria-label="Profile">
 
-        @if($user->photo)
-            <img src="{{ Storage::url($user->photo) }}" alt="Profile photo">
+        @if($user->photo_data)
+            <img src="{{ $user->photo_data }}" alt="Profile photo">
         @else
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="8" r="4"></circle>
@@ -655,8 +655,8 @@
     <div class="greeting-card">
       <div class="greeting-top">
         <div class="greeting-avatar">
-            @if($user->photo)
-                <img src="{{ Storage::url($user->photo) }}" alt="Profile photo">
+            @if($user->photo_data)
+                <img src="{{ $user->photo_data }}" alt="Profile photo">
             @else
                 {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
             @endif

@@ -112,8 +112,8 @@
   </div>
   <a href="{{ route('student.profile') }}" class="rk-sidebar-user">
     <div class="rk-sidebar-user-avatar">
-      @if($navUser && $navUser->photo)
-        <img src="{{ Storage::url($navUser->photo) }}" alt="">
+      @if($navUser && $navUser->photo_data)
+        <img src="{{ $navUser->photo_data }}" alt="">
       @else
         {{ strtoupper(substr($navUser->first_name ?? $navUser->name ?? 'U', 0, 1) . substr($navUser->last_name ?? '', 0, 1)) }}
       @endif
