@@ -287,17 +287,29 @@ class ClassScheduleController extends Controller
             // 1000"), and separately rejects a request outright — "Request too
             // large" — the moment Groq's OWN estimate of that single request's
             // expected output crosses 1000, even with a completely fresh budget.
-            // A whole week's worth of JSON is inherently more than one day's, so
-            // there's no room left in this budget for a deep reasoning trace on
-            // top of it — 'low' (down from 'medium') trades away some of that
-            // extra care, leaving the row-verification and anti-hallucination
-            // instructions above to do more of that job instead. If this still
-            // reports "Request too large" in production, max_completion_tokens
-            // needs lowering further based on what Groq's error reports as
-            // "Requested" for this exact prompt.
+            // 'low' reasoning_effort (down from 'medium') avoids that pre-flight
+            // rejection at this prompt length — confirmed in production, this no
+            // longer gets rejected outright.
+            //
+            // But at max_completion_tokens=3000 it then failed a DIFFERENT way:
+            // Groq returned status 400 "json_validate_failed" with an EMPTY
+            // failed_generation, twice in a row. That's not truncation (truncation
+            // still returns partial content plus finish_reason=length) — an empty
+            // failed_generation means nothing was left to validate at all. Hidden
+            // reasoning tokens still count against max_completion_tokens even
+            // though reasoning_format=hidden strips them from the response, so the
+            // likely story is: reasoning alone (now working through 5 days instead
+            // of 1) used up the entire 3000-token budget, leaving zero left for the
+            // actual JSON answer. Raised to 5000 to give the visible answer room to
+            // exist without changing reasoning_effort — isolating this from the
+            // OTPM fix above, since that one is already confirmed working. If Groq
+            // starts rejecting the request outright again ("Request too large"),
+            // this number is what needs pulling back down; if json_validate_failed
+            // persists even with room to spare, that would instead point at the
+            // schema/prompt itself rather than the token budget.
             'reasoning_effort' => 'low',
             'reasoning_format' => 'hidden',
-            'max_completion_tokens' => 3000,
+            'max_completion_tokens' => 5000,
         ];
     }
 
