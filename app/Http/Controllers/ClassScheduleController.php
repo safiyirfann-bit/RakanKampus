@@ -61,6 +61,20 @@ class ClassScheduleController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function bulkDestroy(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+        ]);
+
+        $request->user()->classSchedules()
+            ->whereIn('id', $data['ids'])
+            ->delete();
+
+        return response()->json(['success' => true]);
+    }
+
     public function aiCapture(Request $request)
     {
         $request->validate([

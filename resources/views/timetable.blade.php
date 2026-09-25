@@ -66,6 +66,36 @@
   .delete-all-btn:hover { background: #fee2e2; }
   .delete-all-btn.hidden { display: none; }
 
+  .select-toggle-btn {
+    flex-shrink: 0; box-sizing: border-box;
+    background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.28);
+    border-radius: 12px; padding: 14px 16px;
+    font-size: 13px; font-weight: 800;
+    cursor: pointer;
+  }
+  .select-toggle-btn:hover { background: rgba(255,255,255,0.2); }
+  .select-toggle-btn.hidden { display: none; }
+
+  /* Bulk-select bar — shown instead of the day-picker while picking classes
+     to delete, so "select all" only ever applies to what's on screen. */
+  .select-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    background: rgba(255,255,255,0.1); border-radius: 14px; padding: 11px 14px; margin-bottom: 18px;
+  }
+  .select-bar.hidden { display: none; }
+  .select-all-label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer; }
+  .select-all-label input { width: 16px; height: 16px; accent-color: #2ec4c6; cursor: pointer; }
+  .select-bar-actions { display: flex; gap: 8px; }
+  .select-cancel-btn {
+    background: none; border: 1.5px solid rgba(255,255,255,0.32); color: #fff;
+    border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+  }
+  .select-delete-btn {
+    background: #dc2626; color: #fff; border: none;
+    border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+  }
+  .select-delete-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
   .day-section { margin-bottom: 18px; }
   .day-label {
     font-size: 11.5px; font-weight: 800; letter-spacing: 0.06em;
@@ -149,6 +179,9 @@
   .timeline-subject { font-size: 13.5px; font-weight: 800; color: #14213d; margin: 0 0 3px; }
   .timeline-meta { font-size: 11.5px; color: #475569; margin: 0 0 3px; }
   .timeline-lecturer { font-size: 11px; color: #64748b; margin: 0; }
+
+  .timeline-checkbox { flex-shrink: 0; display: flex; align-items: center; padding-top: 3px; }
+  .timeline-checkbox input { width: 18px; height: 18px; accent-color: #2ec4c6; cursor: pointer; }
 
   .timeline-menu-wrap { position: relative; flex-shrink: 0; }
   .timeline-menu-btn {
@@ -327,6 +360,11 @@
     .action-row { justify-content: flex-start; }
     .add-btn { flex: 0 0 auto; width: auto; padding: 12px 22px; }
     .delete-all-btn { padding: 12px 18px; }
+    .select-toggle-btn { padding: 12px 18px; background: #eef2f5; color: #14213d; border-color: transparent; }
+    .select-toggle-btn:hover { background: #e2e8f0; }
+    .select-bar { background: #eef2f5; }
+    .select-all-label { color: #14213d; }
+    .select-cancel-btn { color: #14213d; border-color: rgba(20,33,61,0.2); }
     .day-label { color: #64748b; }
     .class-card { background: #ffffff; border: 1.5px solid #dbeeee; }
     .class-meta { color: #64748b; }
@@ -377,6 +415,20 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
       Delete All
     </button>
+    <button type="button" class="select-toggle-btn hidden" id="selectToggleBtn" onclick="toggleSelectMode()">
+      Select
+    </button>
+  </div>
+
+  <div class="select-bar hidden" id="selectBar">
+    <label class="select-all-label">
+      <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)">
+      Select all
+    </label>
+    <div class="select-bar-actions">
+      <button type="button" class="select-cancel-btn" onclick="toggleSelectMode()">Cancel</button>
+      <button type="button" class="select-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()" disabled>Delete</button>
+    </div>
   </div>
 
   <div class="today-heading" id="todayHeading">
@@ -471,6 +523,12 @@ let schedules = @json($schedules);
 const DAYS = @json($days);
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
+// Bulk-select state for deleting a mix of classes at once — scoped to the
+// currently viewed day (the only list the user can actually see), so it's
+// reset whenever the selected day changes rather than growing invisibly.
+let selectMode = false;
+let selectedIds = new Set();
+
 function pad(n) { return n < 10 ? '0' + n : '' + n; }
 
 function formatTime12(hhmm) {
@@ -535,9 +593,14 @@ function renderDayPicker() {
 
 function selectDay(day) {
   selectedDay = day;
+  selectedIds.clear();
+  selectMode = false;
+  document.getElementById('selectBar').classList.add('hidden');
   renderDayPicker();
   renderTodayHeading();
   renderMobileTimeline();
+  updateSelectToggleVisibility();
+  updateSelectBar();
 }
 
 function toggleTimelineMenu(e, id) {
@@ -587,18 +650,23 @@ function renderMobileTimeline() {
           <span class="timeline-dot"></span>
         </div>
         <div class="timeline-card ${tint}" data-id="${s.id}">
+          ${selectMode ? `
+          <label class="timeline-checkbox">
+            <input type="checkbox" data-id="${s.id}" ${selectedIds.has(s.id) ? 'checked' : ''} onchange="toggleScheduleSelected(${s.id}, this.checked)">
+          </label>` : ''}
           <div class="timeline-card-main">
             <p class="timeline-subject">${escapeHtml(s.subject)}</p>
             <p class="timeline-meta">${formatTime12(s.start_time)} - ${formatTime12(s.end_time)}${s.room ? ' · ' + escapeHtml(s.room) : ''}</p>
             ${s.lecturer ? `<p class="timeline-lecturer">${escapeHtml(s.lecturer)}</p>` : ''}
           </div>
+          ${!selectMode ? `
           <div class="timeline-menu-wrap">
             <button type="button" class="timeline-menu-btn" aria-label="More options" onclick="toggleTimelineMenu(event, ${s.id})">⋮</button>
             <div class="timeline-menu" id="timelineMenu-${s.id}">
               <button type="button" onclick="closeTimelineMenus(); openEditModal(${s.id})">Edit</button>
               <button type="button" class="danger" onclick="closeTimelineMenus(); removeSchedule(${s.id})">Delete</button>
             </div>
-          </div>
+          </div>` : ''}
         </div>
       </div>`;
   });
@@ -673,6 +741,65 @@ function render() {
   renderMobileTimeline();
   renderDesktopGrid();
   document.getElementById('deleteAllBtn').classList.toggle('hidden', schedules.length === 0);
+  updateSelectToggleVisibility();
+  updateSelectBar();
+}
+
+// Shows/hides the "Select" entry point based on whether the currently viewed
+// day has any classes, and backs selection mode out on its own if that day
+// just emptied (e.g. its last class was deleted another way). Called both
+// after a full render() and after switching days, since selectDay() doesn't
+// otherwise go through render().
+function updateSelectToggleVisibility() {
+  const dayHasClasses = schedules.some(s => s.day_of_week === selectedDay);
+  document.getElementById('selectToggleBtn').classList.toggle('hidden', !dayHasClasses);
+  if (selectMode && !dayHasClasses) {
+    selectMode = false;
+    selectedIds.clear();
+    document.getElementById('selectBar').classList.add('hidden');
+    renderMobileTimeline();
+  }
+}
+
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  selectedIds.clear();
+  document.getElementById('selectBar').classList.toggle('hidden', !selectMode);
+  renderMobileTimeline();
+  updateSelectBar();
+}
+
+function toggleScheduleSelected(id, checked) {
+  if (checked) {
+    selectedIds.add(id);
+  } else {
+    selectedIds.delete(id);
+  }
+  updateSelectBar();
+}
+
+function toggleSelectAll(checked) {
+  const dayIds = schedules.filter(s => s.day_of_week === selectedDay).map(s => s.id);
+  if (checked) {
+    dayIds.forEach(id => selectedIds.add(id));
+  } else {
+    selectedIds.clear();
+  }
+  renderMobileTimeline();
+  updateSelectBar();
+}
+
+function updateSelectBar() {
+  const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+  const deleteBtn = document.getElementById('selectDeleteBtn');
+  if (!selectAllCheckbox || !deleteBtn) return;
+
+  const dayIds = schedules.filter(s => s.day_of_week === selectedDay).map(s => s.id);
+  const selectedOnDay = dayIds.filter(id => selectedIds.has(id));
+
+  selectAllCheckbox.checked = dayIds.length > 0 && selectedOnDay.length === dayIds.length;
+  deleteBtn.disabled = selectedOnDay.length === 0;
+  deleteBtn.textContent = selectedOnDay.length > 0 ? `Delete (${selectedOnDay.length})` : 'Delete';
 }
 
 function showModal(id) {
@@ -832,6 +959,38 @@ function deleteAllSchedules() {
     })
     .catch((err) => {
       console.error('Delete all failed', err);
+      alert('Ada masalah sambungan. Cuba lagi.');
+    });
+}
+
+function deleteSelectedSchedules() {
+  const ids = Array.from(selectedIds);
+  if (ids.length === 0) return;
+  if (!confirm(`Delete ${ids.length} selected class(es)? This cannot be undone.`)) return;
+
+  fetch('{{ route('timetable.bulkDestroy') }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+    body: JSON.stringify({ ids }),
+  })
+    .then(safeJson)
+    .then(({ ok, status }) => {
+      if (ok) {
+        schedules = schedules.filter(s => !selectedIds.has(s.id));
+        selectMode = false;
+        selectedIds.clear();
+        document.getElementById('selectBar').classList.add('hidden');
+        render();
+        return;
+      }
+      if (status === 419) {
+        alert('Your session has expired. Please refresh the page and try again.');
+      } else {
+        alert('Could not delete the selected classes right now. Please try again.');
+      }
+    })
+    .catch((err) => {
+      console.error('Bulk delete failed', err);
       alert('Ada masalah sambungan. Cuba lagi.');
     });
 }
