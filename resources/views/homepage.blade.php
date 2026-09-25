@@ -112,56 +112,6 @@
     color: var(--blue-dark);
   }
 
- .avatar-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #ffffff !important;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-decoration: none;
-    border: 1px solid #dbeeee;
-    box-shadow: 0 4px 12px rgba(20, 33, 61, 0.12);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    overflow: hidden;
-}
-
-.topbar-right a.avatar-btn,
-.topbar-right a.avatar-btn:hover {
-    background: #ffffff !important;
-}
-
-.avatar-btn:hover,
-.avatar-btn:focus,
-.avatar-btn:active {
-    background: #ffffff !important;
-    transform: scale(1.03);
-    box-shadow: 0 8px 20px rgba(20, 33, 61, 0.18);
-}
-
-.avatar-btn svg {
-    width: 20px;
-    height: 20px;
-    stroke: #14213d !important;
-}
-
-.avatar-btn img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.profile-link:hover {
-    background: #eafbfa;
-}
-
-@media (max-width: 640px) {
-    .profile-text {
-        display: none;
-    }
-}
-
   /* Main content */
   .container {
     max-width: 600px;
@@ -627,23 +577,6 @@
 
         <span class="brand-name">RakanKampus</span>
     </div>
-
-    <div class="topbar-right">
-
-    <a href="{{ route('student.profile') }}" class="avatar-btn" aria-label="Profile">
-
-        @if($user->photo_data)
-            <img src="{{ $user->photo_data }}" alt="Profile photo">
-        @else
-            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="8" r="4"></circle>
-                <path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>
-            </svg>
-        @endif
-
-    </a>
-
-</div>
 
     </div>
 

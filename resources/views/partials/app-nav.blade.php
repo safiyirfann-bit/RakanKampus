@@ -104,6 +104,9 @@
   </div>
   <div class="rk-sidebar-nav">
     @foreach($navItems as $item)
+      {{-- Profile has its own entry point right below (the avatar + name card),
+           so listing it again here would just be the same destination twice. --}}
+      @continue($item['key'] === 'profile')
       <a href="{{ route($item['route']) }}" class="rk-nav-link {{ $navActive === $item['key'] ? 'active' : '' }}">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
         <span>{{ $item['label'] }}</span>
