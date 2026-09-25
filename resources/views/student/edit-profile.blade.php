@@ -387,10 +387,33 @@
 </style>
 
 <script>
+// Current saved photo, so the modal can show it instead of always defaulting
+// to the "No photo" placeholder when reopened.
+let currentPhotoUrl = @json($user->photo_data ?: null);
+
 function openPhotoModal() {
     const modal = document.getElementById('photoModal');
     modal.classList.remove('hidden');
     modal.classList.add('flex');
+    resetPreview();
+}
+
+function resetPreview() {
+    selectedFile = null;
+    document.getElementById('photoInput').value = '';
+    document.getElementById('selfieInput').value = '';
+
+    const previewImg = document.getElementById('previewImg');
+    if (currentPhotoUrl) {
+        previewImg.src = currentPhotoUrl;
+        previewImg.classList.remove('hidden');
+        document.getElementById('noPhotoIcon').classList.add('hidden');
+        document.getElementById('noPhotoText').classList.add('hidden');
+    } else {
+        previewImg.classList.add('hidden');
+        document.getElementById('noPhotoIcon').classList.remove('hidden');
+        document.getElementById('noPhotoText').classList.remove('hidden');
+    }
 }
 
 function closePhotoModal() {
@@ -465,6 +488,10 @@ function snapPhoto() {
 function handlePhotoFile(file) {
     selectedFile = file;
     if (selectedFile) {
+        // Just preview here — don't upload yet. The user reviews the photo
+        // and taps "Upload photo" themselves; uploading immediately on pick
+        // (and closing the modal right after) felt like a forced auto-close
+        // with no chance to confirm or pick a different photo.
         const reader = new FileReader();
         reader.onload = function(ev) {
             document.getElementById('previewImg').src = ev.target.result;
@@ -473,7 +500,6 @@ function handlePhotoFile(file) {
             document.getElementById('noPhotoText').classList.add('hidden');
         };
         reader.readAsDataURL(selectedFile);
-        uploadPhoto();
     }
 }
 
@@ -540,6 +566,7 @@ function uploadPhoto() {
             if (ok && data && data.success) {
                 document.getElementById('avatarWrapper').innerHTML =
                     `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="Profile photo">`;
+                currentPhotoUrl = data.photoUrl;
                 closePhotoModal();
                 return;
             }
