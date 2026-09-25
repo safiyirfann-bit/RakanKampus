@@ -41,16 +41,30 @@
   .header-title { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
   .header-sub { font-size: 12.5px; color: #bfe9ea; margin: 2px 0 0; }
 
+  .action-row { display: flex; gap: 10px; margin-bottom: 20px; }
+
   .add-btn {
-    width: 100%; box-sizing: border-box;
+    flex: 1; box-sizing: border-box;
     background: linear-gradient(120deg, #14213d, #2ec4c6);
     color: #fff; border: none; border-radius: 12px; padding: 14px;
     font-size: 14px; font-weight: 800;
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    cursor: pointer; margin-bottom: 20px;
+    cursor: pointer;
     box-shadow: 0 10px 22px rgba(0,0,0,0.22);
   }
   .add-btn svg { width: 16px; height: 16px; }
+
+  .delete-all-btn {
+    flex-shrink: 0; box-sizing: border-box;
+    background: rgba(254,242,242,0.95); color: #dc2626; border: 1.5px solid rgba(254,202,202,0.9);
+    border-radius: 12px; padding: 14px 16px;
+    font-size: 13px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    cursor: pointer;
+  }
+  .delete-all-btn svg { width: 15px; height: 15px; }
+  .delete-all-btn:hover { background: #fee2e2; }
+  .delete-all-btn.hidden { display: none; }
 
   .day-section { margin-bottom: 18px; }
   .day-label {
@@ -310,7 +324,9 @@
     .back-btn { display: none; }
     .header-title { color: #14213d; }
     .header-sub { color: #64748b; }
-    .add-btn { width: auto; padding: 12px 22px; }
+    .action-row { justify-content: flex-start; }
+    .add-btn { flex: 0 0 auto; width: auto; padding: 12px 22px; }
+    .delete-all-btn { padding: 12px 18px; }
     .day-label { color: #64748b; }
     .class-card { background: #ffffff; border: 1.5px solid #dbeeee; }
     .class-meta { color: #64748b; }
@@ -352,10 +368,16 @@
     </div>
   </div>
 
-  <button type="button" class="add-btn" onclick="openAddModal()">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    Add Class
-  </button>
+  <div class="action-row">
+    <button type="button" class="add-btn" onclick="openAddModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Add Class
+    </button>
+    <button type="button" class="delete-all-btn hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+      Delete All
+    </button>
+  </div>
 
   <div class="today-heading" id="todayHeading">
     <p class="today-date" id="todayDateLine"></p>
@@ -650,6 +672,7 @@ function render() {
   renderDayPicker();
   renderMobileTimeline();
   renderDesktopGrid();
+  document.getElementById('deleteAllBtn').classList.toggle('hidden', schedules.length === 0);
 }
 
 function showModal(id) {
@@ -782,6 +805,33 @@ function removeSchedule(id) {
     })
     .catch((err) => {
       console.error('Delete failed', err);
+      alert('Ada masalah sambungan. Cuba lagi.');
+    });
+}
+
+function deleteAllSchedules() {
+  if (schedules.length === 0) return;
+  if (!confirm(`Delete all ${schedules.length} class(es) from your timetable? This cannot be undone.`)) return;
+
+  fetch('{{ route('timetable.destroyAll') }}', {
+    method: 'POST',
+    headers: { 'X-CSRF-TOKEN': csrfToken },
+  })
+    .then(safeJson)
+    .then(({ ok, status }) => {
+      if (ok) {
+        schedules = [];
+        render();
+        return;
+      }
+      if (status === 419) {
+        alert('Your session has expired. Please refresh the page and try again.');
+      } else {
+        alert('Could not delete your classes right now. Please try again.');
+      }
+    })
+    .catch((err) => {
+      console.error('Delete all failed', err);
       alert('Ada masalah sambungan. Cuba lagi.');
     });
 }

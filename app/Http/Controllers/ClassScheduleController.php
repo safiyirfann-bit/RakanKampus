@@ -54,6 +54,13 @@ class ClassScheduleController extends Controller
         return response()->json(['success' => true]);
     }
 
+    public function destroyAll(Request $request)
+    {
+        $request->user()->classSchedules()->delete();
+
+        return response()->json(['success' => true]);
+    }
+
     public function aiCapture(Request $request)
     {
         $request->validate([

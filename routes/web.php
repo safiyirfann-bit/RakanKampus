@@ -124,6 +124,7 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::get('/student/timetable', [ClassScheduleController::class, 'index'])->name('student.timetable');
     Route::post('/timetable', [ClassScheduleController::class, 'store'])->name('timetable.store');
     Route::post('/timetable/ai-capture', [ClassScheduleController::class, 'aiCapture'])->middleware('throttle:10,1')->name('timetable.aiCapture');
+    Route::post('/timetable/delete-all', [ClassScheduleController::class, 'destroyAll'])->name('timetable.destroyAll');
     Route::put('/timetable/{schedule}', [ClassScheduleController::class, 'update'])->name('timetable.update');
     Route::delete('/timetable/{schedule}', [ClassScheduleController::class, 'destroy'])->name('timetable.destroy');
 
