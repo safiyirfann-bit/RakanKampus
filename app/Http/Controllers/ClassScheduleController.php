@@ -63,75 +63,78 @@ class ClassScheduleController extends Controller
         $file = $request->file('photo');
         $dataUri = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
 
-        $days = implode('", "', ClassSchedule::DAYS);
+        $days = ClassSchedule::DAYS;
 
-        $systemPrompt = 'You extract a weekly class timetable from a photo for a Malaysian polytechnic student app. '
-            . "The photo may be in English or Bahasa Melayu (e.g. Isnin=Monday, Selasa=Tuesday, Rabu=Wednesday, Khamis=Thursday, Jumaat=Friday, Sabtu=Saturday, Ahad=Sunday) — always translate day names to English in your reply. "
-            . 'Reply with ONLY a single JSON object, no markdown, no code fences, no explanation, in exactly this shape: '
-            . '{"detected": true|false, "classes": [{"subject": string, "day_of_week": "' . $days . '", "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}. '
-            . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] ONLY if the image clearly is not a class timetable at all. '
-            . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around) — read the row/column headers carefully before extracting, and do not assume every table is laid out the same way. '
-            . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. '
-            . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — read that legend FIRST and use it to resolve abbreviated course codes into a readable subject name. '
-            . 'Work through the grid systematically: for each day row, go column by column left to right, and for each occupied cell read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer. '
-            . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in the image (directly, or via the legend table). Never output a generic-sounding subject name (e.g. a common course title) unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled result is far better than a fabricated one.';
+        // One Groq call per day, run concurrently via Http::pool, instead of one
+        // call asking for the whole week at once. A real production test on a
+        // dense multi-day grid surfaced two related failure modes: content from
+        // one day's row bled into a completely different day (a Tuesday-only
+        // class showing up, mislabeled, under Wednesday), and a room code that
+        // repeats on almost every row ("APDV1") got confidently misread the same
+        // wrong way ("APVY1") over and over rather than re-read per cell — both
+        // are classic "too much to track in one pass" mistakes on a packed
+        // table. Asking about a single day at a time gives the model far less
+        // to hold in its head per call, so it has much less room to blend rows
+        // together or anchor on an earlier (wrong) reading of a repeated value.
+        // day_of_week is forced from which call this is (not trusted from the
+        // model's own answer) below, so a still-confused read can never
+        // mislabel a class onto the wrong day even if it gets the content wrong.
+        $responses = Http::pool(function ($pool) use ($days, $dataUri) {
+            foreach ($days as $day) {
+                $pool->as($day)
+                    ->withToken(config('services.groq.key'))
+                    ->timeout(110)
+                    ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri, $day));
+            }
+        });
 
-        $response = Http::withToken(config('services.groq.key'))
-            ->timeout(110)
-            ->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'qwen/qwen3.8-27b',
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user', 'content' => [
-                        ['type' => 'text', 'text' => 'Extract every class from this timetable image.'],
-                        ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
-                    ]],
-                ],
-                'temperature' => 0.6,
-                'response_format' => ['type' => 'json_object'],
-                // qwen3.8-27b supports a reasoning_effort dial that "dedicates more tokens to
-                // analysis, improving accuracy on complex problems" (Groq's own docs) — this
-                // dense multi-day grid + separate legend table is exactly that kind of problem,
-                // so let it actually think before answering instead of pattern-matching a guess.
-                // reasoning_format=hidden keeps message.content pure JSON (required for json_object
-                // mode — Groq only allows 'hidden' or 'parsed' there, not 'raw').
-                //
-                // First attempt at 'high' + max_completion_tokens=8000 hit a real production
-                // error: json_validate_failed with an EMPTY failed_generation — meaning the
-                // reasoning pass ate the entire 8000-token budget and got cut off before ever
-                // writing the final JSON answer. 'medium' uses fewer reasoning tokens, and the
-                // budget is raised close to this model's hard 16,384-token output ceiling so a
-                // reasoning pass that does run long still has room left to finish the JSON.
-                'reasoning_effort' => 'medium',
-                'reasoning_format' => 'hidden',
-                'max_completion_tokens' => 16000,
+        $classes = [];
+        $anyRequestSucceeded = false;
+
+        foreach ($days as $day) {
+            $response = $responses[$day] ?? null;
+
+            if (! $response || $response->failed()) {
+                Log::error('Groq vision API error (timetable)', [
+                    'day' => $day,
+                    'status' => $response?->status(),
+                    'body' => $response?->body(),
+                ]);
+                continue;
+            }
+
+            $anyRequestSucceeded = true;
+            $rawContent = $response->json('choices.0.message.content');
+
+            // Temporary: log the raw model reply (truncated) so we can see exactly what
+            // Groq returned if the extraction still looks wrong for a tricky timetable photo.
+            // Safe to remove once the vision extraction is confirmed reliable in production.
+            Log::info('Groq vision raw response (timetable)', [
+                'day' => $day,
+                'raw' => Str::limit((string) $rawContent, 1500),
             ]);
 
-        if ($response->failed()) {
-            Log::error('Groq vision API error (timetable)', [
-                'status' => $response->status(),
-                'body' => $response->body(),
-            ]);
+            $parsed = $this->extractJson($rawContent);
+            $dayClasses = $parsed['classes'] ?? null;
 
+            if (! $parsed || empty($parsed['detected']) || ! is_array($dayClasses)) {
+                continue;
+            }
+
+            foreach ($dayClasses as $entry) {
+                $entry['day_of_week'] = $day;
+                $classes[] = $entry;
+            }
+        }
+
+        if (! $anyRequestSucceeded) {
             return response()->json([
                 'success' => false,
                 'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
             ], 422);
         }
 
-        $rawContent = $response->json('choices.0.message.content');
-
-        // Temporary: log the raw model reply (truncated) so we can see exactly what
-        // Groq returned if the extraction still looks wrong for a tricky timetable photo.
-        // Safe to remove once the vision extraction is confirmed reliable in production.
-        Log::info('Groq vision raw response (timetable)', [
-            'raw' => Str::limit((string) $rawContent, 3000),
-        ]);
-
-        $parsed = $this->extractJson($rawContent);
-        $classes = $parsed['classes'] ?? null;
-
-        if (! $parsed || empty($parsed['detected']) || ! is_array($classes) || count($classes) === 0) {
+        if (count($classes) === 0) {
             return response()->json([
                 'success' => false,
                 'error' => 'Tak dapat kesan jadual kelas dalam gambar tu. Cuba gambar yang lebih jelas, atau isi manual.',
@@ -189,6 +192,65 @@ class ClassScheduleController extends Controller
         }
 
         return response()->json(['success' => true, 'schedules' => $created]);
+    }
+
+    /**
+     * The Groq request payload for extracting a single day's row out of the
+     * timetable photo. Kept separate from aiCapture() so it can be built once
+     * per day inside the Http::pool() closure above.
+     */
+    private function visionPayload(string $dataUri, string $day): array
+    {
+        $systemPrompt = 'You extract ONE DAY of a weekly class timetable from a photo for a Malaysian polytechnic student app. '
+            . "The photo may be in English or Bahasa Melayu (e.g. Isnin=Monday, Selasa=Tuesday, Rabu=Wednesday, Khamis=Thursday, Jumaat=Friday, Sabtu=Saturday, Ahad=Sunday). "
+            . "You are looking ONLY for the row labelled \"{$this->localDayLabel($day)}\" (English: {$day}) — completely ignore every other day's row, even though they are visible in the same image. "
+            . 'Reply with ONLY a single JSON object, no markdown, no code fences, no explanation, in exactly this shape: '
+            . '{"detected": true|false, "classes": [{"subject": string, "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}. '
+            . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] if this day has no classes, or the image is not a class timetable at all. '
+            . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around) — find the correct row by its day label first, then read only along that row. '
+            . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. '
+            . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — read that legend FIRST and use it to resolve abbreviated course codes into a readable subject name. '
+            . "Go column by column left to right ALONG THIS ONE ROW ONLY, and for each occupied cell read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer, and do not let anything you noticed in a different row influence this row's answer. "
+            . 'Read every value directly from this row\'s cells, even if it looks identical to a room/lecturer/subject you would expect to repeat — re-read the actual cell rather than reusing a value from memory or pattern. '
+            . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in this row (directly, or via the legend table). Never output a generic-sounding subject name unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled result is far better than a fabricated one.';
+
+        return [
+            'model' => 'qwen/qwen3.8-27b',
+            'messages' => [
+                ['role' => 'system', 'content' => $systemPrompt],
+                ['role' => 'user', 'content' => [
+                    ['type' => 'text', 'text' => "Extract every class on {$day} only from this timetable image."],
+                    ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
+                ]],
+            ],
+            // Lower than the previous whole-week call (0.6) — a more deterministic
+            // read is worth more than variety when the job is transcribing text
+            // that's either right there in the image or it isn't.
+            'temperature' => 0.3,
+            'response_format' => ['type' => 'json_object'],
+            // See the whole-week version's original comment on reasoning_effort/
+            // reasoning_format — same reasoning applies per-day. max_completion_tokens
+            // is lower here since one day's worth of classes is a fraction of what
+            // the old single call had to fit, so there's no need to push it as
+            // close to the model's 16,384-token ceiling.
+            'reasoning_effort' => 'medium',
+            'reasoning_format' => 'hidden',
+            'max_completion_tokens' => 8000,
+        ];
+    }
+
+    private function localDayLabel(string $day): string
+    {
+        return match ($day) {
+            'Monday' => 'Isnin',
+            'Tuesday' => 'Selasa',
+            'Wednesday' => 'Rabu',
+            'Thursday' => 'Khamis',
+            'Friday' => 'Jumaat',
+            'Saturday' => 'Sabtu',
+            'Sunday' => 'Ahad',
+            default => $day,
+        };
     }
 
     private function validateSchedule(Request $request): array
