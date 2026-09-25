@@ -86,95 +86,83 @@ class ClassScheduleController extends Controller
 
         // Malaysian polytechnic weekly timetables are Isnin-Jumaat only in
         // practice (this is also true of the real timetable this was tested
-        // against) — skipping Saturday/Sunday here cuts 2 of 7 calls, which
-        // matters now that calls are sequential (see below). This only skips
-        // them for AI capture; they're still selectable when adding a class
-        // by hand, in case that assumption is ever wrong for someone.
+        // against) — leaving Saturday/Sunday out of what's asked for keeps the
+        // response smaller. This only affects AI capture; both days are still
+        // selectable when adding a class by hand, in case that's ever wrong
+        // for someone.
         $days = array_values(array_diff(ClassSchedule::DAYS, ['Saturday', 'Sunday']));
 
-        // One Groq call per day, run ONE AT A TIME — a real production test showed
-        // this account's Groq plan has a very tight output-tokens-per-minute cap
-        // (server logs: "Limit 1000" OTPM). Firing all days concurrently via
-        // Http::pool(), as this used to, requested far more than that shared budget
-        // in the same instant and got every single call rejected with 429s. Going
-        // one call at a time, waiting for each to actually finish before starting
-        // the next, naturally spreads requests out over real wall-clock time instead
-        // of stacking them all in one burst, which is what that per-minute budget
-        // needs. This makes the whole capture noticeably slower than before, but a
-        // slower capture that actually returns data beats an instant one that
-        // doesn't — the account's Groq plan is simply not able to sustain 7
-        // concurrent vision calls right now.
-        //
-        // A single day at a time (rather than the whole week in one call) is still
-        // worth keeping on top of that: a real production test on a dense multi-day
-        // grid surfaced two related failure modes when reading the whole table in
-        // one pass — content from one day's row bled into a completely different
-        // day, and a room code that repeats on almost every row ("APDV1") got
-        // confidently misread the same wrong way ("APVY1") over and over rather than
-        // re-read per cell — both are classic "too much to track in one pass"
-        // mistakes on a packed table. day_of_week is forced from which call this is
-        // (not trusted from the model's own answer) below, so a still-confused read
-        // can never mislabel a class onto the wrong day even if it gets the content
-        // wrong.
-        $classes = [];
-        $anyRequestSucceeded = false;
+        // ONE Groq call for the whole week, sending the photo only once — not one
+        // call per day. Real production logs from this account's actual Groq plan
+        // showed why that didn't work: the plan caps this vision model at only
+        // 1000 OUTPUT tokens/minute AND only 7000 INPUT tokens/minute, and every
+        // per-day call re-sends the full image, which alone costs roughly
+        // 2500-2900 input tokens. Even switching from concurrent to one-at-a-time
+        // calls (a prior attempt at fixing this) still burned through the INPUT
+        // budget after just two or three calls, on top of the output-budget
+        // problem concurrency hit first — there is no way to fit 5+ image-bearing
+        // calls into one minute on this plan. So this goes back to a single call,
+        // and leans on the model self-reporting which row it actually read for
+        // each day (see the schema in visionPayload()) so a day whose content
+        // came from the wrong row can still be caught and discarded below rather
+        // than trusted, instead of relying on splitting the days apart to
+        // prevent that in the first place.
+        $response = Http::withToken(config('services.groq.key'))
+            ->timeout(110)
+            ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri, $days));
 
-        foreach ($days as $day) {
-            $response = Http::withToken(config('services.groq.key'))
-                ->timeout(110)
-                ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri, $day));
-
-            if (! $response || $response->failed()) {
-                // Deliberately not retried inline: this account's Groq plan is already
-                // rate-limit-constrained (see above), and stacking a retry-with-sleep
-                // per day risks pushing total request time past the web server's own
-                // timeout, which would fail the ENTIRE capture instead of just this one
-                // day. Skipping cleanly here means the user still gets whatever days did
-                // come back, and can re-run the capture (or add this one day by hand).
-                Log::error('Groq vision API error (timetable)', [
-                    'day' => $day,
-                    'status' => $response?->status(),
-                    'body' => $response?->body(),
-                ]);
-                continue;
-            }
-
-            $anyRequestSucceeded = true;
-            $rawContent = $response->json('choices.0.message.content');
-            $finishReason = $response->json('choices.0.finish_reason');
-
-            // Temporary: log the raw model reply (truncated) so we can see exactly what
-            // Groq returned if the extraction still looks wrong for a tricky timetable photo.
-            // Safe to remove once the vision extraction is confirmed reliable in production.
-            Log::info('Groq vision raw response (timetable)', [
-                'day' => $day,
-                'finish_reason' => $finishReason,
-                'raw' => Str::limit((string) $rawContent, 1500),
+        if (! $response || $response->failed()) {
+            Log::error('Groq vision API error (timetable)', [
+                'status' => $response?->status(),
+                'body' => $response?->body(),
             ]);
 
-            if ($finishReason === 'length') {
-                // The model ran out of its token budget mid-answer — what we have is
-                // likely truncated JSON that will fail to parse below. Flagged loudly
-                // here so a day going missing is diagnosable from the logs instead of
-                // only from a user screenshot next time.
-                Log::warning('Groq vision response for timetable was cut off by max_completion_tokens', ['day' => $day]);
-            }
+            return response()->json([
+                'success' => false,
+                'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
+            ], 422);
+        }
 
-            $parsed = $this->extractJson($rawContent);
-            $dayClasses = $parsed['classes'] ?? null;
+        $rawContent = $response->json('choices.0.message.content');
+        $finishReason = $response->json('choices.0.finish_reason');
 
-            if (! $parsed || empty($parsed['detected']) || ! is_array($dayClasses)) {
+        // Temporary: log the raw model reply (truncated) so we can see exactly what
+        // Groq returned if the extraction still looks wrong for a tricky timetable photo.
+        // Safe to remove once the vision extraction is confirmed reliable in production.
+        Log::info('Groq vision raw response (timetable)', [
+            'finish_reason' => $finishReason,
+            'raw' => Str::limit((string) $rawContent, 4000),
+        ]);
+
+        if ($finishReason === 'length') {
+            // The model ran out of its token budget mid-answer — what we have is
+            // likely truncated JSON that will fail to parse below. Flagged loudly
+            // here so this is diagnosable from the logs instead of only from a
+            // user screenshot next time.
+            Log::warning('Groq vision response for timetable was cut off by max_completion_tokens');
+        }
+
+        $parsed = $this->extractJson($rawContent);
+        $dayResults = is_array($parsed['days'] ?? null) ? $parsed['days'] : [];
+
+        $classes = [];
+
+        foreach ($days as $day) {
+            $dayResult = $dayResults[$day] ?? null;
+            $dayClasses = is_array($dayResult) ? ($dayResult['classes'] ?? null) : null;
+
+            if (! is_array($dayResult) || empty($dayResult['detected']) || ! is_array($dayClasses)) {
                 continue;
             }
 
-            // Cross-check the model's own account of which row it read against the day
-            // this call actually asked for. A dense/crowded table can make the model
-            // drift onto a neighbouring row while still answering under the label it
-            // was asked about — this is exactly what produced a wrong day's class
-            // showing up under the wrong day in a real test. Trusting content whose
-            // self-reported row doesn't match is worse than showing nothing for that
-            // day, so it's discarded here rather than saved.
-            $rowLabelFound = $this->normalizeDayLabel($parsed['row_label_found'] ?? null);
+            // Cross-check the model's own account of which row it read against the
+            // day this entry is supposed to be. A dense/crowded table can make the
+            // model drift onto a neighbouring row while still answering under the
+            // label it was asked about — this is exactly what produced a wrong
+            // day's class showing up under the wrong day in a real test. Trusting
+            // content whose self-reported row doesn't match is worse than showing
+            // nothing for that day, so it's discarded here rather than saved.
+            $rowLabelFound = $this->normalizeDayLabel($dayResult['row_label_found'] ?? null);
             $expectedLabels = [$this->normalizeDayLabel($this->localDayLabel($day)), $this->normalizeDayLabel($day)];
 
             if ($rowLabelFound !== '' && ! in_array($rowLabelFound, $expectedLabels, true)) {
@@ -190,13 +178,6 @@ class ClassScheduleController extends Controller
                 $entry['day_of_week'] = $day;
                 $classes[] = $entry;
             }
-        }
-
-        if (! $anyRequestSucceeded) {
-            return response()->json([
-                'success' => false,
-                'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
-            ], 422);
         }
 
         if (count($classes) === 0) {
@@ -260,56 +241,63 @@ class ClassScheduleController extends Controller
     }
 
     /**
-     * The Groq request payload for extracting a single day's row out of the
-     * timetable photo. Kept separate from aiCapture() so it can be built once
-     * per day inside the Http::pool() closure above.
+     * The Groq request payload for extracting the whole week out of the
+     * timetable photo in a single call. $days is the list of English day
+     * names to extract (Saturday/Sunday already excluded by the caller).
      */
-    private function visionPayload(string $dataUri, string $day): array
+    private function visionPayload(string $dataUri, array $days): array
     {
-        $localLabel = $this->localDayLabel($day);
+        $dayList = collect($days)
+            ->map(fn (string $d) => "\"{$d}\" ({$this->localDayLabel($d)})")
+            ->implode(', ');
 
-        $systemPrompt = 'You extract ONE DAY of a weekly class timetable from a photo for a Malaysian polytechnic student app. '
-            . "The photo may be in English or Bahasa Melayu (e.g. Isnin=Monday, Selasa=Tuesday, Rabu=Wednesday, Khamis=Thursday, Jumaat=Friday, Sabtu=Saturday, Ahad=Sunday). "
-            . "You are looking ONLY for the row labelled \"{$localLabel}\" (English: {$day}) — completely ignore every other day's row, even though they are visible in the same image. "
+        $exampleDay = $days[0] ?? 'Monday';
+
+        $systemPrompt = 'You extract a weekly class timetable from a single photo for a Malaysian polytechnic student app. '
+            . "The photo may be in English or Bahasa Melayu (e.g. Isnin=Monday, Selasa=Tuesday, Rabu=Wednesday, Khamis=Thursday, Jumaat=Friday). "
+            . "Extract exactly these days, each as its own entry keyed by its English name: {$dayList}. "
             . 'Reply with ONLY a single JSON object, no markdown, no code fences, no explanation, in exactly this shape: '
-            . '{"row_label_found": string|null, "detected": true|false, "classes": [{"subject": string, "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}. '
-            . "\"row_label_found\" is the day-label text exactly as printed in the leftmost day/HARI column next to the row you actually read (for example \"{$localLabel}\" or \"{$day}\") — this is how a second automated check confirms you read the right row, so it must reflect the REAL row you read, not just repeat the day you were asked for. Set it to null only if you could not locate this day's row at all. "
-            . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] if this day has no classes, or the image is not a class timetable at all. '
-            . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around) — find the correct row by its day label first, then read only along that row. '
+            . '{"days": {"' . $exampleDay . '": {"row_label_found": string|null, "detected": true|false, "classes": [{"subject": string, "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}, ... one such entry per day listed above, using exactly its English name as the key}}. '
+            . '"row_label_found" is the day-label text exactly as printed in the leftmost day/HARI column next to the row you read FOR THAT DAY (e.g. "ISNIN") — this is how a second automated check confirms you read the right row for each day, so it must reflect the REAL row you read, not just repeat the day key. Set it to null only if you could not locate that day\'s row at all. '
+            . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] for a day with no classes, or if the image is not a class timetable at all. '
+            . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around). Process the days ONE AT A TIME, in order: for each day, first find its row by its day label, read only along that one row, and fully finish and double-check it before starting the next day — do not read across rows at once or let one row\'s content leak into another\'s answer. '
             . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. Read the start_time and end_time directly off the column headers the cell spans — do not shift or guess the hour. '
             . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — read that legend FIRST and use it to resolve abbreviated course codes into a readable subject name. '
-            . "Go column by column left to right ALONG THIS ONE ROW ONLY, and for each occupied cell read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer, and do not let anything you noticed in a different row (including an adjacent day's row) influence this row's answer. "
-            . 'Read every value directly from this row\'s cells, even if it looks identical to a room/lecturer/subject you would expect to repeat — re-read the actual cell rather than reusing a value from memory or pattern. '
-            . "Before finalizing your answer, double-check: trace the row you read back to the leftmost column and confirm its label really is \"{$localLabel}\" / \"{$day}\" and not a neighbouring day — if it turns out you actually read a different day's row, or a busy/crowded row was hard to fully segment, set detected=false and classes=[] rather than submit a guess or another day's content under this label. "
-            . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in this row (directly, or via the legend table). Never output a generic-sounding subject name unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled result is far better than a fabricated one.';
+            . 'For each occupied cell, read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer. '
+            . 'Read every value directly from the cell, even if it looks identical to a room/lecturer/subject you would expect to repeat elsewhere on the same row or a different day — re-read the actual cell rather than reusing a value from memory or pattern. '
+            . 'Before finalizing each day, double-check: trace that day\'s row back to the leftmost column and confirm its label really matches the day you\'re filling in — if it turns out you actually read a different day\'s row, or a busy/crowded row was hard to fully segment, set detected=false and classes=[] for THAT DAY rather than submit a guess or another day\'s content under it. '
+            . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in that row (directly, or via the legend table). Never output a generic-sounding subject name unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled day is far better than a fabricated one.';
 
         return [
             'model' => 'qwen/qwen3.8-27b',
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => [
-                    ['type' => 'text', 'text' => "Extract every class on {$day} only from this timetable image."],
+                    ['type' => 'text', 'text' => 'Extract every class for every day listed above from this timetable image.'],
                     ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
                 ]],
             ],
-            // Lower than the previous whole-week call (0.6) — a more deterministic
-            // read is worth more than variety when the job is transcribing text
-            // that's either right there in the image or it isn't.
+            // A more deterministic read is worth more than variety when the job
+            // is transcribing text that's either right there in the image or it
+            // isn't.
             'temperature' => 0.3,
             'response_format' => ['type' => 'json_object'],
-            // This account's Groq plan has a tight, shared "output tokens per
-            // minute" cap (real server logs showed "Limit 1000" OTPM, and Groq
-            // rejects a single request outright — "Request too large" — once its
-            // own estimate of that request's expected output crosses it, separate
-            // from the per-minute accounting). A single day's worth of classes plus
-            // reasoning doesn't need anywhere near the 8000-14000 this was
-            // previously set to, and asking for that much made Groq's own estimate
-            // for this one request alone cross the ceiling well before considering
-            // any other calls at all. Kept modest so a single call reliably requests
-            // less than the account's entire per-minute budget by itself.
-            'reasoning_effort' => 'medium',
+            // This account's Groq plan caps this vision model at only 1000 OUTPUT
+            // tokens/minute total (real server logs: "Rate limit reached... Limit
+            // 1000"), and separately rejects a request outright — "Request too
+            // large" — the moment Groq's OWN estimate of that single request's
+            // expected output crosses 1000, even with a completely fresh budget.
+            // A whole week's worth of JSON is inherently more than one day's, so
+            // there's no room left in this budget for a deep reasoning trace on
+            // top of it — 'low' (down from 'medium') trades away some of that
+            // extra care, leaving the row-verification and anti-hallucination
+            // instructions above to do more of that job instead. If this still
+            // reports "Request too large" in production, max_completion_tokens
+            // needs lowering further based on what Groq's error reports as
+            // "Requested" for this exact prompt.
+            'reasoning_effort' => 'low',
             'reasoning_format' => 'hidden',
-            'max_completion_tokens' => 2500,
+            'max_completion_tokens' => 3000,
         ];
     }
 
