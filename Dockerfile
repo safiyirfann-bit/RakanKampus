@@ -14,18 +14,22 @@ FROM richarvey/nginx-php-fpm:3.1.6
 # cubaan hantar push notification akan throw ErrorException (500).
 RUN docker-php-ext-install bcmath
 
-# Base image install libwebp-dev tapi configure GD tanpa --with-webp, so
-# imagecreatefromstring() gagal senyap untuk fail .webp (profile photo
-# upload return "Could not process the uploaded image"). Dua attempt lepas
-# ni gagal sebab pkg-config (walaupun dah install `pkgconf` package) tetap
-# tak jumpa libwebp.pc dia — so instead of terus bergantung pada
-# pkg-config, terus bagi GD punya configure script CFLAGS/LIBS tu secara
-# eksplisit (ni exact workaround yang error message sendiri cadangkan).
-# Print listing fail libwebp sekali supaya kalau ni pun gagal, log build
-# tu terus tunjuk path sebenar fail-fail tu berada kat mana.
+# GD needs webp support so .webp profile photo uploads don't fail with
+# "Could not process the uploaded image". Earlier attempts here assumed
+# the base image already had libwebp installed (its own Dockerfile lists
+# libwebp-dev) and just tried to point GD's configure at it — but the
+# diagnostic listing below came back completely empty on this image tag,
+# meaning libwebp genuinely isn't there at all. `checking for libwebp...
+# yes` in the previous build's log was misleading: with WEBP_CFLAGS/
+# WEBP_LIBS set explicitly, configure trusts those paths without
+# verifying the files exist, and only the later link/build test caught
+# that libwebp.so was never actually present. So: actually install it.
+RUN apk add --no-cache libwebp libwebp-dev
+
 RUN echo "--- libwebp files on this image ---" \
     && (find / -iname "libwebp*" -o -iname "*webp*.pc" 2>/dev/null | grep -v proc || true) \
     && echo "-----------------------------------"
+
 ENV WEBP_CFLAGS="-I/usr/include"
 ENV WEBP_LIBS="-L/usr/lib -lwebp"
 RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp \
