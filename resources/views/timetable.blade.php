@@ -71,8 +71,10 @@
     background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.28);
     border-radius: 12px; padding: 14px 16px;
     font-size: 13px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
     cursor: pointer;
   }
+  .select-toggle-btn svg { width: 15px; height: 15px; }
   .select-toggle-btn:hover { background: rgba(255,255,255,0.2); }
   .select-toggle-btn.hidden { display: none; }
 
@@ -416,6 +418,7 @@
       Delete All
     </button>
     <button type="button" class="select-toggle-btn hidden" id="selectToggleBtn" onclick="toggleSelectMode()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 2 2 4-4"></path><path d="M11 7h10"></path><path d="m3 17 2 2 4-4"></path><path d="M11 17h10"></path></svg>
       Select
     </button>
   </div>
