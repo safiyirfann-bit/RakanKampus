@@ -126,19 +126,48 @@ class ClassScheduleController extends Controller
 
             $anyRequestSucceeded = true;
             $rawContent = $response->json('choices.0.message.content');
+            $finishReason = $response->json('choices.0.finish_reason');
 
             // Temporary: log the raw model reply (truncated) so we can see exactly what
             // Groq returned if the extraction still looks wrong for a tricky timetable photo.
             // Safe to remove once the vision extraction is confirmed reliable in production.
             Log::info('Groq vision raw response (timetable)', [
                 'day' => $day,
+                'finish_reason' => $finishReason,
                 'raw' => Str::limit((string) $rawContent, 1500),
             ]);
+
+            if ($finishReason === 'length') {
+                // The model ran out of its token budget mid-answer — what we have is
+                // likely truncated JSON that will fail to parse below. Flagged loudly
+                // here so a day going missing is diagnosable from the logs instead of
+                // only from a user screenshot next time.
+                Log::warning('Groq vision response for timetable was cut off by max_completion_tokens', ['day' => $day]);
+            }
 
             $parsed = $this->extractJson($rawContent);
             $dayClasses = $parsed['classes'] ?? null;
 
             if (! $parsed || empty($parsed['detected']) || ! is_array($dayClasses)) {
+                continue;
+            }
+
+            // Cross-check the model's own account of which row it read against the day
+            // this call actually asked for. A dense/crowded table can make the model
+            // drift onto a neighbouring row while still answering under the label it
+            // was asked about — this is exactly what produced a wrong day's class
+            // showing up under the wrong day in a real test. Trusting content whose
+            // self-reported row doesn't match is worse than showing nothing for that
+            // day, so it's discarded here rather than saved.
+            $rowLabelFound = $this->normalizeDayLabel($parsed['row_label_found'] ?? null);
+            $expectedLabels = [$this->normalizeDayLabel($this->localDayLabel($day)), $this->normalizeDayLabel($day)];
+
+            if ($rowLabelFound !== '' && ! in_array($rowLabelFound, $expectedLabels, true)) {
+                Log::warning('Timetable AI capture: discarding a day whose row label didn\'t match', [
+                    'day' => $day,
+                    'expected' => $expectedLabels,
+                    'row_label_found' => $rowLabelFound,
+                ]);
                 continue;
             }
 
@@ -222,17 +251,21 @@ class ClassScheduleController extends Controller
      */
     private function visionPayload(string $dataUri, string $day): array
     {
+        $localLabel = $this->localDayLabel($day);
+
         $systemPrompt = 'You extract ONE DAY of a weekly class timetable from a photo for a Malaysian polytechnic student app. '
             . "The photo may be in English or Bahasa Melayu (e.g. Isnin=Monday, Selasa=Tuesday, Rabu=Wednesday, Khamis=Thursday, Jumaat=Friday, Sabtu=Saturday, Ahad=Sunday). "
-            . "You are looking ONLY for the row labelled \"{$this->localDayLabel($day)}\" (English: {$day}) — completely ignore every other day's row, even though they are visible in the same image. "
+            . "You are looking ONLY for the row labelled \"{$localLabel}\" (English: {$day}) — completely ignore every other day's row, even though they are visible in the same image. "
             . 'Reply with ONLY a single JSON object, no markdown, no code fences, no explanation, in exactly this shape: '
-            . '{"detected": true|false, "classes": [{"subject": string, "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}. '
+            . '{"row_label_found": string|null, "detected": true|false, "classes": [{"subject": string, "start_time": "HH:MM", "end_time": "HH:MM", "room": string|null, "lecturer": string|null}]}. '
+            . "\"row_label_found\" is the day-label text exactly as printed in the leftmost day/HARI column next to the row you actually read (for example \"{$localLabel}\" or \"{$day}\") — this is how a second automated check confirms you read the right row, so it must reflect the REAL row you read, not just repeat the day you were asked for. Set it to null only if you could not locate this day's row at all. "
             . 'Use 24-hour HH:MM for times. Set detected=false and classes=[] if this day has no classes, or the image is not a class timetable at all. '
             . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around) — find the correct row by its day label first, then read only along that row. '
-            . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. '
+            . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. Read the start_time and end_time directly off the column headers the cell spans — do not shift or guess the hour. '
             . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — read that legend FIRST and use it to resolve abbreviated course codes into a readable subject name. '
-            . "Go column by column left to right ALONG THIS ONE ROW ONLY, and for each occupied cell read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer, and do not let anything you noticed in a different row influence this row's answer. "
+            . "Go column by column left to right ALONG THIS ONE ROW ONLY, and for each occupied cell read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer, and do not let anything you noticed in a different row (including an adjacent day's row) influence this row's answer. "
             . 'Read every value directly from this row\'s cells, even if it looks identical to a room/lecturer/subject you would expect to repeat — re-read the actual cell rather than reusing a value from memory or pattern. '
+            . "Before finalizing your answer, double-check: trace the row you read back to the leftmost column and confirm its label really is \"{$localLabel}\" / \"{$day}\" and not a neighbouring day — if it turns out you actually read a different day's row, or a busy/crowded row was hard to fully segment, set detected=false and classes=[] rather than submit a guess or another day's content under this label. "
             . 'CRITICAL — do not hallucinate: every subject, room and lecturer you output MUST be text you can actually point to in this row (directly, or via the legend table). Never output a generic-sounding subject name unless it literally appears in the image or legend. If a cell/subject/time is blurry, cut off, or ambiguous, SKIP that cell entirely rather than guessing or repeating a nearby value. An empty or partially-filled result is far better than a fabricated one.';
 
         return [
@@ -249,15 +282,27 @@ class ClassScheduleController extends Controller
             // that's either right there in the image or it isn't.
             'temperature' => 0.3,
             'response_format' => ['type' => 'json_object'],
-            // See the whole-week version's original comment on reasoning_effort/
-            // reasoning_format — same reasoning applies per-day. max_completion_tokens
-            // is lower here since one day's worth of classes is a fraction of what
-            // the old single call had to fit, so there's no need to push it as
-            // close to the model's 16,384-token ceiling.
+            // Raised back up from an earlier 8000: a real test showed two full days
+            // (a simple one and a genuinely busy one) coming back completely empty,
+            // and hidden reasoning tokens are spent from this same budget before the
+            // visible JSON answer — 8000 most likely wasn't leaving enough room for
+            // a longer reasoning trace on a crowded row, silently truncating the
+            // answer. finish_reason is now logged below so this is confirmed from
+            // real API responses instead of guessed at again next time.
             'reasoning_effort' => 'medium',
             'reasoning_format' => 'hidden',
-            'max_completion_tokens' => 8000,
+            'max_completion_tokens' => 14000,
         ];
+    }
+
+    /**
+     * Normalizes a day-label string enough to compare the model's self-reported
+     * "row_label_found" against the day it was actually asked for — case/whitespace
+     * only, since the model may return either the Malay or English label.
+     */
+    private function normalizeDayLabel(?string $label): string
+    {
+        return mb_strtoupper(trim((string) $label));
     }
 
     private function localDayLabel(string $day): string
