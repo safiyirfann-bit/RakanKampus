@@ -210,27 +210,6 @@
 
   .recent-item.active .recent-preview { color: #e8e0fa; }
 
-  .sidebar-footer {
-    padding: 16px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #d9cef5;
-    cursor: pointer;
-    text-decoration: none;
-    transition: color 0.15s ease, background 0.15s ease;
-  }
-
-  .sidebar-footer:hover {
-    color: #ffffff;
-    background: rgba(255,255,255,0.06);
-  }
-
-  .sidebar-footer svg { width: 16px; height: 16px; stroke: currentColor; }
-
   .main {
     flex: 1;
     display: flex;
@@ -553,11 +532,6 @@
       <div class="recent-list" id="recentList">
         <!-- diisi secara dinamik oleh JavaScript -->
       </div>
-
-      <a href="{{ route('student.home') }}" class="sidebar-footer">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l9-9 9 9"></path><path d="M5 10v10h14V10"></path></svg>
-        Back to home
-      </a>
     </aside>
 
     <!-- Main -->
@@ -614,6 +588,14 @@
 
   <script>
 const app = document.getElementById('app');
+
+// On mobile the conversation list sits as a full-screen overlay (see the
+// `.sidebar { position: fixed }` rule under the 768px breakpoint), so it
+// should start closed and only open when the user taps the menu button —
+// not pop up automatically every time this page loads.
+if (window.matchMedia('(max-width: 768px)').matches) {
+  app.classList.add('sidebar-collapsed');
+}
 const menuBtn = document.getElementById('menuBtn');
 const sendBtn = document.getElementById('sendBtn');
 const messageInput = document.getElementById('messageInput');
