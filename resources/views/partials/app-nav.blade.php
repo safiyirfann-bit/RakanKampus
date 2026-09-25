@@ -37,16 +37,11 @@
   .rk-nav-link svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
   .rk-nav-link span { font-size: 13px; }
   .rk-nav-link.active { background: rgba(255,255,255,0.14); color: #fff; font-weight: 700; }
-  .rk-sidebar-user { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-top: 1px solid rgba(255,255,255,0.12); flex-shrink: 0; text-decoration: none; }
-  .rk-sidebar-user-avatar { width: 32px; height: 32px; border-radius: 50%; background: #2ec4c6; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; color: #14213d; flex-shrink: 0; overflow: hidden; }
-  .rk-sidebar-user-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .rk-sidebar-user-name { font-size: 12px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rk-sidebar-user-sub { font-size: 10px; color: #9fb8c9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-sidebar-logout {
     display: flex; align-items: center; gap: 10px;
     padding: 14px 18px;
     flex-shrink: 0;
-    background: none; border: none; width: 100%;
+    background: none; border: none; border-top: 1px solid rgba(255,255,255,0.12); width: 100%;
     color: #fff; font-size: 13px; font-weight: 700;
     cursor: pointer; text-align: left;
   }
@@ -104,28 +99,12 @@
   </div>
   <div class="rk-sidebar-nav">
     @foreach($navItems as $item)
-      {{-- Profile has its own entry point right below (the avatar + name card),
-           so listing it again here would just be the same destination twice. --}}
-      @continue($item['key'] === 'profile')
       <a href="{{ route($item['route']) }}" class="rk-nav-link {{ $navActive === $item['key'] ? 'active' : '' }}">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
         <span>{{ $item['label'] }}</span>
       </a>
     @endforeach
   </div>
-  <a href="{{ route('student.profile') }}" class="rk-sidebar-user">
-    <div class="rk-sidebar-user-avatar">
-      @if($navUser && $navUser->photo_data)
-        <img src="{{ $navUser->photo_data }}" alt="">
-      @else
-        {{ strtoupper(substr($navUser->first_name ?? $navUser->name ?? 'U', 0, 1) . substr($navUser->last_name ?? '', 0, 1)) }}
-      @endif
-    </div>
-    <div style="min-width: 0;">
-      <div class="rk-sidebar-user-name">{{ $navUser->name ?? 'Student' }}</div>
-      <div class="rk-sidebar-user-sub">{{ $navUser->student_id ?? '' }}</div>
-    </div>
-  </a>
   <form method="POST" action="{{ route('logout') }}">
     @csrf
     <button type="submit" class="rk-sidebar-logout">
