@@ -14,6 +14,14 @@ FROM richarvey/nginx-php-fpm:3.1.6
 # cubaan hantar push notification akan throw ErrorException (500).
 RUN docker-php-ext-install bcmath
 
+# Base image install libwebp-dev tapi configure GD tanpa --with-webp, so
+# imagecreatefromstring() gagal senyap untuk fail .webp (profile photo
+# upload return "Could not process the uploaded image"). libwebp-dev dah
+# ada dalam base image, so just kena reconfigure + reinstall gd dengan
+# flag webp tu — takyah install apa-apa package OS baru.
+RUN docker-php-ext-configure gd --enable-gd --with-freetype --with-jpeg --with-webp \
+    && docker-php-ext-install gd
+
 ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY . .
 RUN composer install --no-dev --working-dir=/var/www/html --optimize-autoloader --no-interaction
