@@ -524,6 +524,16 @@
     .sidebar-user {
       display: none;
     }
+
+    /* With that header row gone, "New Chat" was sitting flush against the
+       very top edge with no breathing room, and the panel — same gradient
+       as the campus sidebar right next to it — had nothing marking where
+       one ends and the other begins. A little top padding plus a faint
+       seam fixes both. */
+    .sidebar {
+      padding-top: 18px;
+      border-left: 1px solid rgba(255,255,255,0.08);
+    }
   }
 </style>
 </head>
@@ -641,13 +651,10 @@ function setSidebarOpen(open) {
   document.body.classList.toggle('chat-panel-open', open);
 }
 
-// On mobile the conversation list sits as a full-screen overlay (see the
-// `.sidebar { position: fixed }` rule under the 768px breakpoint), so it
-// should start closed and only open when the user taps the menu button —
-// not pop up automatically every time this page loads.
-if (window.matchMedia('(max-width: 768px)').matches) {
-  setSidebarOpen(false);
-}
+// The conversation list starts closed everywhere — mobile and desktop — and
+// only opens when the user taps the menu button, rather than popping up on
+// its own every time this page loads.
+setSidebarOpen(false);
 const menuBtn = document.getElementById('menuBtn');
 const sendBtn = document.getElementById('sendBtn');
 const messageInput = document.getElementById('messageInput');
