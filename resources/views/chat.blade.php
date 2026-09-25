@@ -87,7 +87,6 @@
   }
 
   .sidebar-close-btn {
-    margin-left: auto;
     background: none;
     border: none;
     cursor: pointer;
@@ -104,7 +103,7 @@
     background: rgba(255,255,255,0.1);
   }
 
-  .sidebar-close-btn svg { width: 20px; height: 20px; }
+  .sidebar-close-btn svg { width: 22px; height: 22px; }
 
   .sidebar-logo {
     width: 42px;
@@ -411,17 +410,26 @@
   }
 
   @media (max-width: 768px) {
+    /* On mobile the conversation list takes over the full screen instead of
+       floating as a narrow panel over the chat — that peekaboo overlap was
+       the "bertindih" clutter. Full-screen also means the bottom tab bar
+       (hidden below via body.chat-panel-open) has nothing to clash with. */
     .sidebar {
       position: fixed;
       z-index: 20;
       height: 100vh;
       height: 100dvh;
+      width: 100%;
+      min-width: 100%;
     }
     .app.sidebar-collapsed .sidebar {
-      margin-left: -300px;
+      margin-left: -100%;
     }
     .app:not(.sidebar-collapsed) .sidebar {
       margin-left: 0;
+    }
+    body.chat-panel-open .rk-tabbar {
+      display: none !important;
     }
   }
   @media (max-width: 860px) {
@@ -491,16 +499,13 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+        </button>
         <div class="sidebar-logo">
           <x-brand-logo size="42" />
         </div>
         <span class="sidebar-brand">RakanKampus</span>
-        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
       </div>
 
       <a href="{{ route('student.profile') }}" class="sidebar-user" style="text-decoration:none; color:inherit; cursor:pointer;">
@@ -589,12 +594,20 @@
   <script>
 const app = document.getElementById('app');
 
+// Keeps the sidebar's open/closed state and the "a full-screen panel is
+// covering the page" body flag (which hides the bottom tab bar on mobile,
+// see the 768px breakpoint) in sync in one place.
+function setSidebarOpen(open) {
+  app.classList.toggle('sidebar-collapsed', !open);
+  document.body.classList.toggle('chat-panel-open', open);
+}
+
 // On mobile the conversation list sits as a full-screen overlay (see the
 // `.sidebar { position: fixed }` rule under the 768px breakpoint), so it
 // should start closed and only open when the user taps the menu button —
 // not pop up automatically every time this page loads.
 if (window.matchMedia('(max-width: 768px)').matches) {
-  app.classList.add('sidebar-collapsed');
+  setSidebarOpen(false);
 }
 const menuBtn = document.getElementById('menuBtn');
 const sendBtn = document.getElementById('sendBtn');
@@ -663,12 +676,12 @@ if (SpeechRecognitionAPI && micBtn) {
 }
 
 menuBtn.addEventListener('click', () => {
-  app.classList.toggle('sidebar-collapsed');
+  setSidebarOpen(app.classList.contains('sidebar-collapsed'));
 });
 
 const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 sidebarCloseBtn.addEventListener('click', () => {
-  app.classList.add('sidebar-collapsed');
+  setSidebarOpen(false);
 });
 
 function showEmptyState(){
