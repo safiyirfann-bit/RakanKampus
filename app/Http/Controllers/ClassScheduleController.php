@@ -132,13 +132,21 @@ class ClassScheduleController extends Controller
 
         // Legend: course code -> full course name, straight from the KOD/NAMA KURSUS table.
         $legend = [];
-        foreach ((array) ($parsed['legend'] ?? []) as $row) {
-            if (! is_array($row) || count($row) < 2) {
+        foreach ((array) ($parsed['legend'] ?? []) as $k => $row) {
+            // Accept whatever shape the model used: ["CODE","NAME"], {"code":..,"name":..}, or {"CODE":"NAME"}.
+            if (is_string($row) && is_string($k)) {
+                [$rawCode, $rawName] = [$k, $row];
+            } elseif (is_array($row) && array_is_list($row)) {
+                [$rawCode, $rawName] = [$row[0] ?? '', $row[1] ?? ''];
+            } elseif (is_array($row)) {
+                $rawCode = $row['code'] ?? $row['kod'] ?? $row['CODE'] ?? $row['KOD'] ?? '';
+                $rawName = $row['name'] ?? $row['nama'] ?? $row['course'] ?? $row['NAME'] ?? $row['NAMA KURSUS'] ?? '';
+            } else {
                 continue;
             }
-            $code = $this->normalizeCode($row[0] ?? '');
-            $name = trim((string) ($row[1] ?? ''));
-            if ($code !== '' && $name !== '') {
+            $code = $this->normalizeCode($rawCode);
+            $name = trim((string) $rawName);
+            if ($code !== '' && $name !== '' && ! in_array(strtoupper($name), ['JUMLAH', 'TOTAL'], true)) {
                 $legend[$code] = $name;
             }
         }
@@ -186,24 +194,41 @@ class ClassScheduleController extends Controller
             ], 422);
         }
 
+        // The model often misreads one or two characters of a code (DFK50463 for
+        // DFP50463). Snap each code to the closest legend code before merging, so
+        // the course name can still be found.
+        foreach ($cells as &$cell) {
+            [$cell['code'], $cell['code_fixed']] = $this->matchLegendCode($cell['code'], array_keys($legend));
+        }
+        unset($cell);
+
         $classes = $this->mergeCells($cells);
 
         // Turn code + legend into the subject, and flag anything that looks off
         // so the preview highlights it for the student to double-check.
         foreach ($classes as &$c) {
             $name = $legend[$c['code']] ?? null;
-            $codeLabel = $c['code'] . ($c['type'] !== '' ? "({$c['type']})" : '');
-            $c['subject'] = Str::limit($name ? "{$name} · {$codeLabel}" : $codeLabel, 150, '');
+            $typeLabel = match ($c['type']) {
+                'L' => ' (Kuliah)',
+                'P' => ' (Amali)',
+                'TU' => ' (Tutorial)',
+                default => '',
+            };
+            // Subject shown to the student = the course NAME, not the code.
+            $c['subject'] = Str::limit(
+                $name ? Str::title(mb_strtolower($name)) . $typeLabel : $c['code'] . $typeLabel,
+                150,
+                ''
+            );
 
             $warnings = [];
             if (! $name) {
-                $warnings[] = 'Kod tak jumpa dalam jadual KOD/NAMA KURSUS — semak kod & nama subjek.';
-            }
-            if (! preg_match('/^[A-Z]{3}\d{5}$/', $c['code']) && ! $name) {
-                $warnings[] = 'Format kod pelik.';
+                $warnings[] = "Nama kursus untuk kod {$c['code']} tak jumpa — sila taip nama subjek.";
+            } elseif (! empty($c['code_fixed'])) {
+                $warnings[] = "AI baca kod kurang jelas, dipadankan ke {$c['code']} — pastikan subjek betul.";
             }
             $c['warnings'] = $warnings;
-            unset($c['code'], $c['type']);
+            unset($c['code'], $c['type'], $c['code_fixed']);
         }
         unset($c);
 
@@ -317,6 +342,7 @@ class ClassScheduleController extends Controller
         });
 
         $key = fn (array $c) => implode('|', [$c['day_of_week'], $c['code'], $c['type'], $c['room'], $c['lecturer']]);
+        // code_fixed must survive a merge if any merged cell was corrected.
         $merged = [];
 
         foreach ($cells as $cell) {
@@ -326,6 +352,7 @@ class ClassScheduleController extends Controller
             if ($last && $key($last) === $key($cell)) {
                 if ($last['end_time'] === $cell['start_time']) {
                     $merged[$lastIndex]['end_time'] = $cell['end_time'];
+                    $merged[$lastIndex]['code_fixed'] = ! empty($last['code_fixed']) || ! empty($cell['code_fixed']);
                     continue;
                 }
                 if ($last['start_time'] === $cell['start_time']) {
@@ -362,6 +389,35 @@ class ClassScheduleController extends Controller
         }
 
         return array_values($bad);
+    }
+
+    /**
+     * Snap a possibly-misread code to the nearest legend code (edit distance <= 2,
+     * and a unique best match). Returns [code, wasCorrected].
+     *
+     * @param array<int, string> $legendCodes
+     * @return array{0: string, 1: bool}
+     */
+    private function matchLegendCode(string $code, array $legendCodes): array
+    {
+        if ($code === '' || in_array($code, $legendCodes, true) || count($legendCodes) === 0) {
+            return [$code, false];
+        }
+
+        $best = null;
+        $bestDist = PHP_INT_MAX;
+        $tie = false;
+
+        foreach ($legendCodes as $candidate) {
+            $d = levenshtein($code, $candidate);
+            if ($d < $bestDist) {
+                [$best, $bestDist, $tie] = [$candidate, $d, false];
+            } elseif ($d === $bestDist) {
+                $tie = true;
+            }
+        }
+
+        return ($best !== null && $bestDist <= 2 && ! $tie) ? [$best, true] : [$code, false];
     }
 
     /** "JUMAAT" / "Fri" / "friday" -> "Friday" */
