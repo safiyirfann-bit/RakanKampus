@@ -276,7 +276,10 @@
 
   .form-error { display: none; color: #dc2626; font-size: 11.5px; margin-top: 8px; }
 
-  .ai-desc { font-size: 12.5px; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
+  .ai-desc { font-size: 13px; color: #334155; margin: 0 0 8px; line-height: 1.45; font-weight: 600; }
+  .ai-tips { margin: 0 0 16px; padding-left: 18px; font-size: 12px; color: #64748b; line-height: 1.5; }
+  .ai-tips li { margin-bottom: 2px; }
+  .ai-tips b { color: #0d9488; }
   .ai-upload-label {
     width: 100%; box-sizing: border-box; background: #eef2ff; border: 1.5px dashed #a5b4fc;
     color: #4338ca; border-radius: 10px; padding: 16px; font-size: 13px; font-weight: 700;
@@ -488,7 +491,12 @@
     </div>
     <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
   </div>
-  <p class="ai-desc">Upload your class timetable — the <b>official PDF</b> gives the most accurate result (read exactly, no guessing). A photo/screenshot also works but AI may misread some text. You'll see a preview to check before anything is saved.</p>
+  <p class="ai-desc">Upload your class timetable and we'll fill in your classes for you.</p>
+  <ul class="ai-tips">
+    <li><b>PDF (recommended)</b> — the official timetable PDF is read exactly, 100% accurate.</li>
+    <li><b>Photo / screenshot</b> — read by AI, so a few details may need fixing.</li>
+    <li>You'll get a preview to check and edit before anything is saved.</li>
+  </ul>
   <label class="ai-upload-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><circle cx="12" cy="13" r="4"></circle></svg>
     Upload PDF / Photo
@@ -504,7 +512,7 @@
     <button type="button" aria-label="Dismiss" onclick="dismissAiError()">×</button>
   </div>
   <div class="ai-preview" id="aiPreview">
-    <p class="ai-preview-note">Semak hasil AI di bawah. Betulkan apa-apa yang salah, buang yang tak perlu, kemudian tekan Simpan. Kad <b>kuning</b> = AI kurang pasti.</p>
+    <p class="ai-preview-note">Semak senarai kelas di bawah. Betulkan apa-apa yang salah, buang yang tak perlu, kemudian tekan Simpan. Kad <b>kuning</b> = perlu disemak.</p>
     <div id="aiPreviewList"></div>
     <div class="ai-pv-actions">
       <button type="button" class="ai-pv-cancel" onclick="cancelAiPreview()">Batal</button>

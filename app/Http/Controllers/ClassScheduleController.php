@@ -118,6 +118,19 @@ class ClassScheduleController extends Controller
             } catch (\RuntimeException $e) {
                 return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
             }
+        } elseif (config('services.gemini.key')) {
+            // Photo + Gemini key set: Gemini reads dense tables far better than the
+            // small Groq vision model (which kept misreading codes and names).
+            $rawContent = $this->geminiTranscribe($file->getRealPath(), $file->getMimeType());
+
+            if ($rawContent === null) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap, atau upload PDF jadual.',
+                ], 422);
+            }
+
+            $parsed = $this->extractJson($rawContent) ?? [];
         } else {
             $dataUri = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
 
@@ -308,9 +321,9 @@ class ClassScheduleController extends Controller
      * The Groq request payload. The model is asked to transcribe only — no
      * merging, no time maths, no guessing course names.
      */
-    private function visionPayload(string $dataUri): array
+    private function visionPrompt(): string
     {
-        $systemPrompt = 'You transcribe a Malaysian polytechnic class timetable image into JSON. You ONLY copy text; you never merge, calculate or guess. '
+        return 'You transcribe a Malaysian polytechnic class timetable image into JSON. You ONLY copy text; you never merge, calculate or guess. '
             . 'The main table is a grid: ROWS are days (ISNIN=MON, SELASA=TUE, RABU=WED, KHAMIS=THU, JUMAAT=FRI, SABTU=SAT, AHAD=SUN), COLUMNS are one-hour time slots whose header shows a start and end time (e.g. "8:00 ... 9:00", "2.00 ... 3:00"). '
             . 'For EVERY non-empty cell, output ONE entry, even if the cell next to it has the same text (the app merges them itself). Do not merge cells. Do not skip a cell because it repeats. '
             . 'Each cell usually has 3 lines: course code with type in brackets (e.g. "DFK50083(L)"), lecturer(s), room. '
@@ -321,6 +334,61 @@ class ClassScheduleController extends Controller
             . '{"legend":[["CODE","COURSE NAME"],...],"cells":[["DAY","START","END","CODE","TYPE","LECTURER","ROOM"],...]} '
             . 'Example cell: ["FRI","8:00","9:00","DFK50083","L","AINIE HAYATI,AFIFAH","APDV1"]. '
             . 'Use null for a value that is unreadable. If the image is not a timetable, return {"legend":[],"cells":[]}.';
+    }
+
+    /**
+     * Send the timetable photo to Google Gemini and return its raw JSON text,
+     * or null on failure. Key: GEMINI_API_KEY (free from aistudio.google.com).
+     * Model: GEMINI_MODEL (default gemini-2.5-flash).
+     */
+    private function geminiTranscribe(string $path, string $mime): ?string
+    {
+        $model = config('services.gemini.model') ?: 'gemini-2.5-flash';
+
+        $response = Http::timeout(110)
+            ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
+            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
+                'systemInstruction' => ['parts' => [['text' => $this->visionPrompt()]]],
+                'contents' => [[
+                    'role' => 'user',
+                    'parts' => [
+                        ['inline_data' => ['mime_type' => $mime, 'data' => base64_encode(file_get_contents($path))]],
+                        ['text' => 'Transcribe every occupied cell and the legend from this timetable.'],
+                    ],
+                ]],
+                'generationConfig' => [
+                    'temperature' => 0,
+                    'responseMimeType' => 'application/json',
+                    'maxOutputTokens' => 8192,
+                ],
+            ]);
+
+        if ($response->failed()) {
+            Log::error('Gemini vision API error (timetable)', [
+                'status' => $response->status(),
+                'body' => Str::limit($response->body(), 2000),
+            ]);
+
+            return null;
+        }
+
+        $text = collect($response->json('candidates.0.content.parts') ?? [])
+            ->pluck('text')->filter()->implode('');
+
+        Log::info('Gemini vision raw response (timetable)', [
+            'finish_reason' => $response->json('candidates.0.finishReason'),
+            'raw' => Str::limit($text, 4000),
+        ]);
+
+        return $text !== '' ? $text : null;
+    }
+
+    /**
+     * The Groq request payload (fallback when no Gemini key is configured).
+     */
+    private function visionPayload(string $dataUri): array
+    {
+        $systemPrompt = $this->visionPrompt();
 
         return [
             'model' => 'qwen/qwen3.8-27b',
