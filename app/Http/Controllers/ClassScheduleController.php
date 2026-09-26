@@ -277,21 +277,26 @@ class ClassScheduleController extends Controller
                     ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
                 ]],
             ],
-            // Fully deterministic: transcribing text that's either right there in
-            // the image or it isn't has no business sampling from alternatives.
-            // 0.3 (the previous value) still left room for the model to invent a
-            // plausible-sounding-but-wrong lecturer name or course name instead of
-            // the literal text in the cell — real production runs at 0.3 kept
-            // producing garbled names (e.g. "Ainie Hayati,Afifah" coming back as
-            // "Anne Havatilafrih"/"Anne Nakatlafrim", a different corruption each
-            // time) and fabricated hybrid course names, which is consistent with
-            // sampling noise rather than a one-off misread. This alone won't fix
-            // the harder structural mistakes (merging two different courses'
-            // cells into one span, missing a day entirely) — those look more like
-            // the model not having enough room to verify carefully at low
-            // reasoning effort — but it's a free change with no rate-limit cost,
-            // so worth ruling out before attempting a bigger architecture change.
-            'temperature' => 0,
+            // 0.3 (the original value) let the model invent a plausible-sounding-
+            // but-wrong lecturer/course name instead of the literal cell text —
+            // real runs kept producing a different garbled name each time (e.g.
+            // "Ainie Hayati,Afifah" coming back as "Anne Havatilafrih" on one run,
+            // "Anne Nakatlafrim" on another), consistent with sampling noise.
+            // Dropping all the way to 0 (fully greedy) traded that for a WORSE
+            // failure: real logs showed the exact same fabricated name
+            // ("Anne Havati Latifah") reused verbatim across three different
+            // cells for three different real lecturers — a known failure mode of
+            // greedy decoding, where it locks onto a completed pattern and
+            // repeats it for structurally-similar-looking cells instead of
+            // re-reading each one. 0.15 aims for the middle: still low enough to
+            // mostly suppress invented answers, but enough randomness to avoid
+            // that repeat-lock. Neither setting fixes the harder structural
+            // mistakes (merging two different courses' cells into one span,
+            // missing a day entirely) — those look more like the model not
+            // having enough room to verify carefully at low reasoning effort —
+            // but temperature costs nothing against the rate limit, so it's
+            // worth tuning before attempting a bigger architecture change.
+            'temperature' => 0.15,
             'response_format' => ['type' => 'json_object'],
             // This account's Groq plan caps this vision model at only 1000 OUTPUT
             // tokens/minute total (real server logs: "Rate limit reached... Limit
