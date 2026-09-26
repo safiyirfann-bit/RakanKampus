@@ -277,10 +277,21 @@ class ClassScheduleController extends Controller
                     ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
                 ]],
             ],
-            // A more deterministic read is worth more than variety when the job
-            // is transcribing text that's either right there in the image or it
-            // isn't.
-            'temperature' => 0.3,
+            // Fully deterministic: transcribing text that's either right there in
+            // the image or it isn't has no business sampling from alternatives.
+            // 0.3 (the previous value) still left room for the model to invent a
+            // plausible-sounding-but-wrong lecturer name or course name instead of
+            // the literal text in the cell — real production runs at 0.3 kept
+            // producing garbled names (e.g. "Ainie Hayati,Afifah" coming back as
+            // "Anne Havatilafrih"/"Anne Nakatlafrim", a different corruption each
+            // time) and fabricated hybrid course names, which is consistent with
+            // sampling noise rather than a one-off misread. This alone won't fix
+            // the harder structural mistakes (merging two different courses'
+            // cells into one span, missing a day entirely) — those look more like
+            // the model not having enough room to verify carefully at low
+            // reasoning effort — but it's a free change with no rate-limit cost,
+            // so worth ruling out before attempting a bigger architecture change.
+            'temperature' => 0,
             'response_format' => ['type' => 'json_object'],
             // This account's Groq plan caps this vision model at only 1000 OUTPUT
             // tokens/minute total (real server logs: "Rate limit reached... Limit
