@@ -230,12 +230,8 @@ class ClassScheduleController extends Controller
         // so the preview highlights it for the student to double-check.
         foreach ($classes as &$c) {
             $name = $legend[$c['code']] ?? null;
-            $typeLabel = match ($c['type']) {
-                'L' => ' (Kuliah)',
-                'P' => ' (Amali)',
-                'TU' => ' (Tutorial)',
-                default => '',
-            };
+            // Keep the type exactly as printed in the timetable: (L), (P), (TU), (O)...
+            $typeLabel = $c['type'] !== '' ? " ({$c['type']})" : '';
             // Subject shown to the student = the course NAME, not the code.
             $c['subject'] = Str::limit(
                 $name ? Str::title(mb_strtolower($name)) . $typeLabel : $c['code'] . $typeLabel,
