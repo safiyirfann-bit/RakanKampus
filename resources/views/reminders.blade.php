@@ -690,6 +690,26 @@
   .ai-error.open { display: flex; }
   .ai-error p { font-size: 11.5px; color: #b91c1c; margin: 0; line-height: 1.4; }
   .ai-error button { background: none; border: none; color: #b91c1c; font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; }
+
+  /* AI reminder preview */
+  .ai-rem-preview { display: none; margin-top: 16px; }
+  .ai-rem-preview.open { display: block; }
+  .ai-rem-note { font-size: 12px; color: #475569; margin: 0 0 10px; line-height: 1.45; }
+  .ai-rem-card { position: relative; border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+  .ai-rem-card.warn { border-color: #f59e0b; background: #fffbeb; }
+  .ai-rem-card.new { border-color: #2ec4c6; background: #f0fdfa; }
+  .ai-rem-remove { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border: none; border-radius: 7px; background: #f1f5f9; color: #64748b; cursor: pointer; font-size: 14px; }
+  .ai-rem-warn { font-size: 11px; color: #b45309; margin: 0 30px 6px 0; line-height: 1.35; }
+  .modal .ai-rem-card input[type="text"], .modal .ai-rem-card input[type="date"], .modal .ai-rem-card input[type="time"] { margin-bottom: 0; padding: 7px 9px; font-size: 12.5px; border-radius: 8px; }
+  .modal .ai-rem-card .ai-rem-subject { width: calc(100% - 30px); margin-bottom: 6px; }
+  .ai-rem-row { display: grid; grid-template-columns: 1fr 1.2fr 0.9fr; gap: 6px; }
+  .ai-rem-row select { width: 100%; box-sizing: border-box; border: 1px solid #dbe4ea; border-radius: 8px; padding: 7px 6px; font-size: 12.5px; color: #14213d; background: #fff; font-family: inherit; }
+  .ai-rem-add { width: 100%; margin-top: 4px; padding: 10px; border: 1.5px dashed #94a3b8; border-radius: 12px; background: #f8fafc; color: #0d9488; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; }
+  .ai-rem-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .ai-rem-actions button { flex: 1; border: none; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; }
+  .ai-rem-save { background: linear-gradient(120deg, #14213d, #2ec4c6); color: #fff; }
+  .ai-rem-save:disabled { opacity: 0.5; cursor: default; }
+  .ai-rem-cancel { background: #f1f5f9; color: #475569; }
 </style>
 </head>
 <body>
@@ -783,11 +803,11 @@
     </div>
     <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
-  <p class="ai-desc">{{ __('Upload a photo of your exam slip, timetable or assignment brief — AI will read it and add the reminder automatically.') }}</p>
+  <p class="ai-desc">{{ __('Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You\'ll get a list to check before anything is saved.') }}</p>
   <label class="ai-upload-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-    {{ __('Upload Photo') }}
-    <input type="file" accept="image/*" onchange="handlePhotoSelected(event)">
+    {{ __('Upload PDF / Photo') }}
+    <input type="file" accept="image/*,application/pdf,.pdf" onchange="handlePhotoSelected(event)">
   </label>
   <p class="ai-scanning" id="aiScanning">{{ __('🔎 Reading image and detecting details...') }}</p>
   <div class="ai-success" id="aiSuccess">
@@ -797,6 +817,15 @@
   <div class="ai-error" id="aiError">
     <p id="aiErrorMsg"></p>
     <button type="button" aria-label="{{ __('Dismiss') }}" onclick="dismissAiError()">×</button>
+  </div>
+  <div class="ai-rem-preview" id="aiRemPreview">
+    <p class="ai-rem-note">{{ __('Check the reminders below. Fix anything that is wrong, remove what you don\'t need, then press Save.') }} <b>{{ __('Yellow cards need checking.') }}</b></p>
+    <div id="aiRemPreviewList"></div>
+    <button type="button" class="ai-rem-add" onclick="addAiReminder()">{{ __('+ Add reminder') }}</button>
+    <div class="ai-rem-actions">
+      <button type="button" class="ai-rem-cancel" onclick="cancelAiReminderPreview()">{{ __('Cancel') }}</button>
+      <button type="button" class="ai-rem-save" id="aiRemSaveBtn" onclick="saveAiReminderPreview()">{{ __('Save') }}</button>
+    </div>
   </div>
 </div>
 
@@ -1206,6 +1235,7 @@ function removeReminder(id) {
 
 // AI Assistant: real image capture — upload photo, AI reads it, reminder created automatically
 function openAiModal() {
+  if (aiReminderPreview.length === 0) document.getElementById('aiRemPreview').classList.remove('open');
   document.getElementById('aiSuccess').classList.remove('open');
   document.getElementById('aiScanning').classList.remove('open');
   document.getElementById('aiError').classList.remove('open');
@@ -1233,24 +1263,22 @@ function handlePhotoSelected(e) {
 
   fetch('{{ route('reminders.aiCapture') }}', {
     method: 'POST',
-    headers: { 'X-CSRF-TOKEN': csrfToken },
+    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
     body: formData,
   })
-    .then(res => res.json().then(data => ({ ok: res.ok, data })))
+    .then(res => res.json().catch(() => null).then(data => ({ ok: res.ok, data })))
     .then(({ ok, data }) => {
       document.getElementById('aiScanning').classList.remove('open');
       e.target.value = '';
 
-      if (!ok || !data.success) {
-        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || t('Could not process that image. Please try again.'));
+      if (!ok || !data || !data.success) {
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + ((data && (data.error || data.message)) || t('Could not process that image. Please try again.'));
         document.getElementById('aiError').classList.add('open');
         return;
       }
 
-      reminders.push(data.reminder);
-      document.getElementById('aiSuccessMsg').textContent = '✅ ' + t('Detected ":subject" — reminder added automatically!', {subject: data.reminder.subject});
-      document.getElementById('aiSuccess').classList.add('open');
-      render();
+      aiReminderPreview = data.items.map(it => ({ ...it, warnings: it.warnings || [] }));
+      renderAiReminderPreview();
     })
     .catch(err => {
       console.error('AI capture failed', err);
@@ -1258,6 +1286,115 @@ function handlePhotoSelected(e) {
       document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Connection problem. Please try again.');
       document.getElementById('aiError').classList.add('open');
       e.target.value = '';
+    });
+}
+
+// ---- AI reminder preview: one photo can hold many reminders; nothing is saved until confirmed ----
+let aiReminderPreview = [];
+const REMINDER_TYPES = ['Exam', 'Assignment', 'Quiz', 'Other'];
+
+function renderAiReminderPreview() {
+  const wrap = document.getElementById('aiRemPreview');
+  const list = document.getElementById('aiRemPreviewList');
+  const saveBtn = document.getElementById('aiRemSaveBtn');
+
+  if (aiReminderPreview.length === 0) {
+    wrap.classList.remove('open');
+    list.innerHTML = '';
+    return;
+  }
+
+  list.innerHTML = aiReminderPreview.map((r, i) => {
+    const warn = r.warnings && r.warnings.length > 0;
+    return `<div class="ai-rem-card${warn ? ' warn' : ''}${r.isNew ? ' new' : ''}" data-idx="${i}">
+      <button type="button" class="ai-rem-remove" aria-label="${t('Remove')}" onclick="removeAiReminder(${i})">×</button>
+      ${warn ? r.warnings.map(w => `<p class="ai-rem-warn">⚠️ ${escapeHtml(w)}</p>`).join('') : ''}
+      <input class="ai-rem-subject" type="text" value="${escapeHtml(r.subject)}" placeholder="${t('Subject')}" oninput="editAiReminder(${i}, 'subject', this.value)">
+      <div class="ai-rem-row">
+        <select onchange="editAiReminder(${i}, 'type', this.value)">
+          ${REMINDER_TYPES.map(ty => `<option value="${ty}"${ty === r.type ? ' selected' : ''}>${t(ty)}</option>`).join('')}
+        </select>
+        <input type="date" value="${escapeHtml(r.due_date)}" onchange="editAiReminder(${i}, 'due_date', this.value)">
+        <input type="time" value="${escapeHtml(r.due_time)}" onchange="editAiReminder(${i}, 'due_time', this.value)">
+      </div>
+    </div>`;
+  }).join('');
+
+  saveBtn.textContent = t('Save :count reminders', {count: aiReminderPreview.length});
+  saveBtn.disabled = false;
+  wrap.classList.add('open');
+}
+
+function editAiReminder(i, field, value) {
+  if (aiReminderPreview[i]) aiReminderPreview[i][field] = value;
+}
+
+function removeAiReminder(i) {
+  aiReminderPreview.splice(i, 1);
+  renderAiReminderPreview();
+}
+
+function addAiReminder() {
+  aiReminderPreview.push({ subject: '', type: 'Exam', due_date: '', due_time: '09:00', lead_hours: 3, warnings: [], isNew: true });
+  renderAiReminderPreview();
+  const box = document.querySelector(`#aiRemPreviewList [data-idx="${aiReminderPreview.length - 1}"] .ai-rem-subject`);
+  if (box) { box.focus(); box.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+}
+
+function cancelAiReminderPreview() {
+  aiReminderPreview = [];
+  renderAiReminderPreview();
+}
+
+function saveAiReminderPreview() {
+  const bad = aiReminderPreview.find(r => !r.subject.trim() || !r.due_date || !r.due_time);
+  if (bad) {
+    document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Some reminders have no subject, date or time. Please fix them first.');
+    document.getElementById('aiError').classList.add('open');
+    return;
+  }
+
+  const saveBtn = document.getElementById('aiRemSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = t('Saving...');
+
+  const payload = aiReminderPreview.map(r => ({
+    subject: r.subject.trim(),
+    type: r.type,
+    due_date: r.due_date,
+    due_time: r.due_time,
+    lead_hours: r.lead_hours ?? (r.type === 'Exam' ? 3 : r.type === 'Assignment' ? 6 : 1),
+  }));
+
+  fetch('{{ route('reminders.bulkStore') }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+    body: JSON.stringify({ reminders: payload }),
+  })
+    .then(res => res.json().catch(() => null).then(data => ({ ok: res.ok, status: res.status, data })))
+    .then(({ ok, status, data }) => {
+      if (!ok || !data || !data.success) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = t('Save :count reminders', {count: aiReminderPreview.length});
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (status === 419
+          ? t('Your session has expired. Please refresh the page and try again.')
+          : t('Could not save. Check all fields and try again.'));
+        document.getElementById('aiError').classList.add('open');
+        return;
+      }
+      reminders = reminders.concat(data.reminders);
+      aiReminderPreview = [];
+      renderAiReminderPreview();
+      document.getElementById('aiSuccessMsg').textContent = '✅ ' + t(':count reminders added!', {count: data.reminders.length});
+      document.getElementById('aiSuccess').classList.add('open');
+      render();
+    })
+    .catch(err => {
+      console.error('AI reminder save failed', err);
+      saveBtn.disabled = false;
+      saveBtn.textContent = t('Save :count reminders', {count: aiReminderPreview.length});
+      document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Connection problem. Please try again.');
+      document.getElementById('aiError').classList.add('open');
     });
 }
 

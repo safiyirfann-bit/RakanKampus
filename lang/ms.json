@@ -399,5 +399,17 @@
     "— read by AI, so a few details may need fixing.": "— dibaca oleh AI, jadi beberapa butiran mungkin perlu dibetulkan.",
     "— the official timetable PDF is read exactly, 100% accurate.": "— PDF jadual rasmi dibaca tepat, 100% betul.",
     "🔎 Reading image and detecting details...": "🔎 Membaca gambar dan mengesan butiran...",
-    "🔎 Reading timetable and detecting classes...": "🔎 Membaca jadual dan mengesan kelas..."
+    "🔎 Reading timetable and detecting classes...": "🔎 Membaca jadual dan mengesan kelas...",
+    "The file must be an image (JPG/PNG) or a PDF.": "Fail mesti gambar (JPG/PNG) atau PDF.",
+    "Please upload a photo or screenshot instead of a PDF.": "Sila muat naik foto atau tangkapan skrin, bukan PDF.",
+    "No time was shown — check the time.": "Masa tidak ditunjukkan — semak masa.",
+    "The year was guessed — check the date.": "Tahun diteka — semak tarikh.",
+    ":type Reminder": "Peringatan :type",
+    "No title was found — please type one.": "Tiada tajuk dijumpai — sila taip tajuk.",
+    "Save :count reminders": "Simpan :count peringatan",
+    "Some reminders have no subject, date or time. Please fix them first.": "Ada peringatan yang tiada subjek, tarikh atau masa. Sila betulkan dahulu.",
+    ":count reminders added!": ":count peringatan ditambah!",
+    "Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You'll get a list to check before anything is saved.": "Muat naik foto atau PDF slip peperiksaan, jadual peperiksaan atau taklimat tugasan anda — AI akan mencari setiap tarikh di dalamnya. Anda akan mendapat senarai untuk disemak sebelum apa-apa disimpan.",
+    "Check the reminders below. Fix anything that is wrong, remove what you don't need, then press Save.": "Semak senarai peringatan di bawah. Betulkan apa-apa yang salah, buang yang tidak perlu, kemudian tekan Simpan.",
+    "+ Add reminder": "+ Tambah peringatan"
 }

@@ -399,5 +399,17 @@
     "— read by AI, so a few details may need fixing.": "— AI ஆல் படிக்கப்படுகிறது, எனவே சில விவரங்களைத் திருத்த வேண்டியிருக்கலாம்.",
     "— the official timetable PDF is read exactly, 100% accurate.": "— அதிகாரப்பூர்வ கால அட்டவணை PDF துல்லியமாகப் படிக்கப்படுகிறது, 100% சரியானது.",
     "🔎 Reading image and detecting details...": "🔎 படத்தைப் படித்து விவரங்களைக் கண்டறிகிறது...",
-    "🔎 Reading timetable and detecting classes...": "🔎 கால அட்டவணையைப் படித்து வகுப்புகளைக் கண்டறிகிறது..."
+    "🔎 Reading timetable and detecting classes...": "🔎 கால அட்டவணையைப் படித்து வகுப்புகளைக் கண்டறிகிறது...",
+    "The file must be an image (JPG/PNG) or a PDF.": "கோப்பு ஒரு படம் (JPG/PNG) அல்லது PDF ஆக இருக்க வேண்டும்.",
+    "Please upload a photo or screenshot instead of a PDF.": "PDF க்குப் பதிலாக புகைப்படம் அல்லது திரைப்பிடிப்பைப் பதிவேற்றவும்.",
+    "No time was shown — check the time.": "நேரம் காட்டப்படவில்லை — நேரத்தைச் சரிபார்க்கவும்.",
+    "The year was guessed — check the date.": "ஆண்டு ஊகிக்கப்பட்டது — தேதியைச் சரிபார்க்கவும்.",
+    ":type Reminder": ":type நினைவூட்டல்",
+    "No title was found — please type one.": "தலைப்பு கிடைக்கவில்லை — ஒன்றைத் தட்டச்சு செய்யவும்.",
+    "Save :count reminders": ":count நினைவூட்டல்களைச் சேமி",
+    "Some reminders have no subject, date or time. Please fix them first.": "சில நினைவூட்டல்களில் பாடம், தேதி அல்லது நேரம் இல்லை. முதலில் அவற்றைத் திருத்தவும்.",
+    ":count reminders added!": ":count நினைவூட்டல்கள் சேர்க்கப்பட்டன!",
+    "Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You'll get a list to check before anything is saved.": "உங்கள் தேர்வுச் சீட்டு, தேர்வு கால அட்டவணை அல்லது ஒப்படைப்பு விவரத்தின் புகைப்படம் அல்லது PDF ஐப் பதிவேற்றவும் — AI அதிலுள்ள ஒவ்வொரு தேதியையும் கண்டறியும். எதுவும் சேமிக்கப்படும் முன் சரிபார்க்க ஒரு பட்டியல் கிடைக்கும்.",
+    "Check the reminders below. Fix anything that is wrong, remove what you don't need, then press Save.": "கீழே உள்ள நினைவூட்டல்களைச் சரிபார்க்கவும். தவறானவற்றைத் திருத்தி, தேவையற்றவற்றை நீக்கி, பின் சேமி அழுத்தவும்.",
+    "+ Add reminder": "+ நினைவூட்டலைச் சேர்"
 }

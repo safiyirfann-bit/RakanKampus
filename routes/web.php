@@ -115,6 +115,7 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::get('/student/reminders/history', [ReminderController::class, 'history'])->name('student.reminders.history');
     Route::post('/reminders', [ReminderController::class, 'store'])->name('reminders.store');
     Route::post('/reminders/ai-capture', [ReminderController::class, 'aiCapture'])->middleware('throttle:10,1')->name('reminders.aiCapture');
+    Route::post('/reminders/bulk-store', [ReminderController::class, 'bulkStore'])->name('reminders.bulkStore');
     Route::put('/reminders/{reminder}', [ReminderController::class, 'update'])->name('reminders.update');
     Route::delete('/reminders/{reminder}', [ReminderController::class, 'destroy'])->name('reminders.destroy');
     Route::post('/reminders/bulk-delete', [ReminderController::class, 'bulkDestroy'])->name('reminders.bulkDestroy');

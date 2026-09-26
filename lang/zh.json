@@ -399,5 +399,17 @@
     "— read by AI, so a few details may need fixing.": "—— 由 AI 读取，部分细节可能需要修改。",
     "— the official timetable PDF is read exactly, 100% accurate.": "—— 官方课表 PDF 会被精确读取，100% 准确。",
     "🔎 Reading image and detecting details...": "🔎 正在读取图片并识别详情...",
-    "🔎 Reading timetable and detecting classes...": "🔎 正在读取课表并识别课程..."
+    "🔎 Reading timetable and detecting classes...": "🔎 正在读取课表并识别课程...",
+    "The file must be an image (JPG/PNG) or a PDF.": "文件必须是图片（JPG/PNG）或 PDF。",
+    "Please upload a photo or screenshot instead of a PDF.": "请上传照片或截图，而不是 PDF。",
+    "No time was shown — check the time.": "未显示时间 —— 请检查时间。",
+    "The year was guessed — check the date.": "年份为推测 —— 请检查日期。",
+    ":type Reminder": ":type 提醒",
+    "No title was found — please type one.": "未找到标题 —— 请输入标题。",
+    "Save :count reminders": "保存 :count 条提醒",
+    "Some reminders have no subject, date or time. Please fix them first.": "有些提醒缺少科目、日期或时间，请先修正。",
+    ":count reminders added!": "已添加 :count 条提醒！",
+    "Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You'll get a list to check before anything is saved.": "上传考试单、考试时间表或作业说明的照片或 PDF —— AI 会找出其中的每个日期。保存前您会看到一份清单供检查。",
+    "Check the reminders below. Fix anything that is wrong, remove what you don't need, then press Save.": "请检查以下提醒。修正错误、删除不需要的，然后点击保存。",
+    "+ Add reminder": "+ 添加提醒"
 }
