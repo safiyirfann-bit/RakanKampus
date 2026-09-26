@@ -10,6 +10,15 @@ use Illuminate\Support\Str;
 
 class ClassScheduleController extends Controller
 {
+    /**
+     * No class in a real Malaysian polytechnic weekly timetable runs longer than a
+     * few consecutive hour-columns (the longest in a real test photo was 3h). A
+     * merged block past this is far more likely to be the model repeating the same
+     * subject/room/lecturer across cells that actually held different classes (or a
+     * blank gap) than a genuinely long class — see dropImplausiblyLongDays().
+     */
+    private const MAX_PLAUSIBLE_CLASS_MINUTES = 240;
+
     public function index(Request $request)
     {
         $schedules = $request->user()->classSchedules()
@@ -188,6 +197,14 @@ class ClassScheduleController extends Controller
         }
 
         $classes = $this->mergeAdjacentDuplicates($classes);
+        $classes = $this->dropImplausiblyLongDays($classes);
+
+        if (count($classes) === 0) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Tak dapat kesan jadual kelas dalam gambar tu. Cuba gambar yang lebih jelas, atau isi manual.',
+            ], 422);
+        }
 
         // Sanity check independent of whether the model followed the prompt: a real weekly
         // timetable never has two classes overlapping in time on the same day. If the
@@ -263,6 +280,7 @@ class ClassScheduleController extends Controller
             . 'The timetable may be a dense grid table where DAYS are ROWS and TIME SLOTS are COLUMNS (not the other way around). Process the days ONE AT A TIME, in order: for each day, first find its row by its day label, read only along that one row, and fully finish and double-check it before starting the next day — do not read across rows at once or let one row\'s content leak into another\'s answer. '
             . 'A single class often SPANS MULTIPLE adjacent time-slot columns/cells (a merged cell) — treat that whole span as ONE class entry with the correct combined start_time and end_time, not one duplicate entry per column it touches. Read the start_time and end_time directly off the column headers the cell spans — do not shift or guess the hour. '
             . 'A span only continues for as long as the SAME course code is printed in each column it covers — the instant the code changes to a different one, or a column is blank, that class has ENDED there. Never stretch a class\'s end_time past the last column where its own code is actually printed, and never let it swallow a different class\'s columns into the same entry just because they sit next to each other. '
+            . 'A real class in this timetable format essentially never runs longer than 3-4 consecutive hour-columns. If you find yourself about to report a class spanning more than that, you have very likely locked onto a pattern and repeated the same subject/room/lecturer across later columns without actually re-reading them — those later columns almost certainly hold a DIFFERENT class, or are blank. Stop, go back, and re-read each of those columns individually from the image rather than continuing the previous answer. '
             . 'There may be a separate legend/key table (e.g. course code -> full course name) elsewhere in the image — read that legend FIRST and use it to resolve abbreviated course codes into a readable subject name. '
             . 'For each occupied cell, read the exact text in it (course code, lecturer initials/name, room) before deciding the subject/time/room/lecturer values — do not skip straight to an answer. '
             . 'Read every value directly from the cell, even if it looks identical to a room/lecturer/subject you would expect to repeat elsewhere on the same row or a different day — re-read the actual cell rather than reusing a value from memory or pattern. '
@@ -380,6 +398,52 @@ class ClassScheduleController extends Controller
         ]);
 
         return $data;
+    }
+
+    /**
+     * Safety net for the mirror-image failure of mergeAdjacentDuplicates(): when the
+     * model repeats the same subject/room/lecturer across several cells that actually
+     * held different classes (or a blank gap between them) — a known decoding failure
+     * mode, see the temperature note in visionPayload() — mergeAdjacentDuplicates()
+     * faithfully welds them into one implausibly long block (e.g. "Python Programming"
+     * reported as 08:00-18:00, when the real cell only said that for 3 columns). Rather
+     * than save that confidently-wrong block, drop the WHOLE DAY it belongs to — the
+     * same "show nothing rather than show a wrong answer" choice already made for a
+     * row-label mismatch above.
+     *
+     * @param array<int, array<string, mixed>> $classes
+     * @return array<int, array<string, mixed>>
+     */
+    private function dropImplausiblyLongDays(array $classes): array
+    {
+        $badDays = [];
+
+        foreach ($classes as $entry) {
+            $start = $entry['start_time'] ?? null;
+            $end = $entry['end_time'] ?? null;
+
+            if (! $this->isValidTime($start) || ! $this->isValidTime($end)) {
+                continue; // invalid entries are dropped later anyway; not this check's job
+            }
+
+            if ($this->toMinutes($end) - $this->toMinutes($start) > self::MAX_PLAUSIBLE_CLASS_MINUTES) {
+                $badDays[$entry['day_of_week'] ?? ''] = true;
+            }
+        }
+
+        if (empty($badDays)) {
+            return $classes;
+        }
+
+        Log::warning('Timetable AI capture: dropping day(s) with an implausibly long merged class', [
+            'days' => array_keys($badDays),
+            'max_plausible_minutes' => self::MAX_PLAUSIBLE_CLASS_MINUTES,
+        ]);
+
+        return array_values(array_filter(
+            $classes,
+            fn (array $entry) => ! isset($badDays[$entry['day_of_week'] ?? ''])
+        ));
     }
 
     /**
