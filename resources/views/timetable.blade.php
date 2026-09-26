@@ -311,11 +311,14 @@
   .ai-preview-day { font-size: 11px; font-weight: 800; color: #0d9488; letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 6px; }
   .ai-pv-card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; position: relative; }
   .ai-pv-card.warn { border-color: #f59e0b; background: #fffbeb; }
+  .ai-pv-card.new { border-color: #2ec4c6; background: #f0fdfa; }
   .ai-pv-card .ai-pv-remove { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border: none; border-radius: 7px; background: #f1f5f9; color: #64748b; cursor: pointer; font-size: 14px; }
   .ai-pv-warn { font-size: 11px; color: #b45309; margin: 0 30px 6px 0; line-height: 1.35; }
   .ai-pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .ai-pv-grid .full { grid-column: 1 / -1; padding-right: 30px; }
   .modal .ai-pv-grid input[type="text"], .modal .ai-pv-grid input[type="time"], .modal .ai-pv-grid select { padding: 7px 9px; font-size: 12.5px; border-radius: 8px; }
+  .ai-pv-add { width: 100%; margin-top: 4px; padding: 10px; border: 1.5px dashed #94a3b8; border-radius: 12px; background: #f8fafc; color: #0d9488; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; }
+  .ai-pv-add:hover { border-color: #0d9488; background: #f0fdfa; }
   .ai-pv-actions { display: flex; gap: 8px; margin-top: 12px; }
   .ai-pv-actions button { flex: 1; border: none; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; }
   .ai-pv-save { background: linear-gradient(120deg, #14213d, #2ec4c6); color: #fff; }
@@ -514,6 +517,7 @@
   <div class="ai-preview" id="aiPreview">
     <p class="ai-preview-note">Semak senarai kelas di bawah. Betulkan apa-apa yang salah, buang yang tak perlu, kemudian tekan Simpan. Kad <b>kuning</b> = perlu disemak.</p>
     <div id="aiPreviewList"></div>
+    <button type="button" class="ai-pv-add" onclick="addAiPreview()">+ Tambah kelas</button>
     <div class="ai-pv-actions">
       <button type="button" class="ai-pv-cancel" onclick="cancelAiPreview()">Batal</button>
       <button type="button" class="ai-pv-save" id="aiPreviewSaveBtn" onclick="saveAiPreview()">Simpan</button>
@@ -1126,7 +1130,7 @@ function renderAiPreview() {
       lastDay = c.day_of_week;
     }
     const warn = c.warnings && c.warnings.length > 0;
-    html += `<div class="ai-pv-card${warn ? ' warn' : ''}">
+    html += `<div class="ai-pv-card${warn ? ' warn' : ''}${c.isNew ? ' new' : ''}" data-idx="${i}">
       <button type="button" class="ai-pv-remove" aria-label="Remove" onclick="removeAiPreview(${i})">×</button>
       ${warn ? c.warnings.map(w => `<p class="ai-pv-warn">⚠️ ${escapeHtml(w)}</p>`).join('') : ''}
       <div class="ai-pv-grid">
@@ -1152,6 +1156,19 @@ function renderAiPreview() {
 
 function editAiPreview(i, field, value) {
   if (aiPreview[i]) aiPreview[i][field] = value;
+}
+
+// Add a blank class the AI missed. Defaults to the day currently open on the
+// timetable (or Monday), and focuses its subject box so the student can type straight away.
+function addAiPreview() {
+  const day = DAYS.includes(selectedDay) ? selectedDay : DAYS[0];
+  aiPreview.push({ subject: '', day_of_week: day, start_time: '', end_time: '', room: '', lecturer: '', warnings: [], isNew: true });
+  renderAiPreview();
+  const subjectBox = document.querySelector(`#aiPreviewList [data-idx="${aiPreview.length - 1}"] input.full`);
+  if (subjectBox) {
+    subjectBox.focus();
+    subjectBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
 }
 
 function removeAiPreview(i) {

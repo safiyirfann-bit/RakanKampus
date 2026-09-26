@@ -183,6 +183,15 @@ class ClassScheduleController extends Controller
             }
         }
 
+        // The AI now returns the grid position-by-position ("rows"): every day as
+        // an array with one entry per time column, null for empty. Enumerating
+        // every column stops it from blurring neighbouring cells together.
+        // Convert that to the flat cell list the rest of this method uses.
+        $shakyDays = [];
+        if (isset($parsed['rows']) && is_array($parsed['rows'])) {
+            [$parsed['cells'], $shakyDays] = $this->gridToCells($parsed['rows'], (array) ($parsed['headers'] ?? []));
+        }
+
         // Cells: one per occupied grid cell -> [day, start, end, code, type, lecturer, room].
         $cells = [];
         foreach ((array) ($parsed['cells'] ?? []) as $row) {
@@ -272,6 +281,13 @@ class ClassScheduleController extends Controller
         }
         unset($c);
 
+        foreach ($classes as &$c) {
+            if (in_array($c['day_of_week'], $shakyDays, true)) {
+                $c['warnings'][] = 'Bilangan lajur baris hari ni tak sama dengan jadual — semak masa.';
+            }
+        }
+        unset($c);
+
         // Overlapping classes on the same day = the model misread the grid somewhere.
         // Flag both sides instead of rejecting everything, since the student reviews anyway.
         foreach ($this->overlappingIndexes($classes) as $i) {
@@ -320,17 +336,111 @@ class ClassScheduleController extends Controller
      */
     private function visionPrompt(): string
     {
-        return 'You transcribe a Malaysian polytechnic class timetable image into JSON. You ONLY copy text; you never merge, calculate or guess. '
-            . 'The main table is a grid: ROWS are days (ISNIN=MON, SELASA=TUE, RABU=WED, KHAMIS=THU, JUMAAT=FRI, SABTU=SAT, AHAD=SUN), COLUMNS are one-hour time slots whose header shows a start and end time (e.g. "8:00 ... 9:00", "2.00 ... 3:00"). '
-            . 'For EVERY non-empty cell, output ONE entry, even if the cell next to it has the same text (the app merges them itself). Do not merge cells. Do not skip a cell because it repeats. '
-            . 'Each cell usually has 3 lines: course code with type in brackets (e.g. "DFK50083(L)"), lecturer(s), room. '
-            . 'Copy each value character-by-character exactly as printed. Codes look like 3 letters + 5 digits (e.g. DFP50463, MPU22071) or short codes like "PA". Room codes look like APDV1, DK-JTMK, M204-JTMK, CNW3. '
-            . 'Take start/end straight from THAT cell\'s column header, as printed. '
-            . 'Also transcribe the separate legend table (KOD, NAMA KURSUS) exactly. '
+        return 'You are an exact OCR transcriber for a Malaysian polytechnic class timetable (JADUAL WAKTU KELAS). Copy text only; never guess, merge or invent. '
+            . 'LAYOUT: the main table is a grid. The header row lists one-hour time columns; each column header shows a start time and an end time (e.g. "8:00" and "9:00", "2.00" and "3:00"). '
+            . 'Each following row is one day, labelled in the first column (ISNIN, SELASA, RABU, KHAMIS, JUMAAT, maybe SABTU, AHAD). '
+            . 'Each non-empty cell has up to 3 lines: line 1 = course code with its type in brackets exactly as printed (e.g. "DFK50083(L)", "MPU21072(TU)", "PA(O)"), line 2 = lecturer(s), line 3 = room. '
+            . 'STEPS: (1) Read the header row and list EVERY time column left to right as [start, end]. Count them. '
+            . '(2) For EACH day row, go column by column from left to right and output EXACTLY one entry per time column - the same count as the headers. Use null for an empty cell. '
+            . 'Adjacent cells in the same row often look almost identical but can differ ONLY in the bracketed type, e.g. "MPU21072(L)" in one column then "MPU21072(TU)" in the next. Read the brackets of EVERY cell separately; never copy them from the neighbour. '
+            . '(3) Transcribe the separate KOD / NAMA KURSUS table under the grid. '
+            . 'Copy characters exactly (codes are usually 3 letters + 5 digits like DFP50463; rooms look like APDV1, CNW3, DK-JTMK, M204-JTMK). '
             . 'Reply with ONLY this JSON, no markdown: '
-            . '{"legend":[["CODE","COURSE NAME"],...],"cells":[["DAY","START","END","CODE","TYPE","LECTURER","ROOM"],...]} '
-            . 'Example cell: ["FRI","8:00","9:00","DFK50083","L","AINIE HAYATI,AFIFAH","APDV1"]. '
-            . 'Use null for a value that is unreadable. If the image is not a timetable, return {"legend":[],"cells":[]}.';
+            . '{"headers":[["8:00","9:00"],["9:00","10:00"],...],'
+            . '"rows":{"ISNIN":["CODE(TYPE) | LECTURER | ROOM" or null, ...one per header...],"SELASA":[...],...},'
+            . '"legend":[["CODE","COURSE NAME"],...]} '
+            . 'Example row entry: "DFK50083(L) | AINIE HAYATI,AFIFAH | APDV1". '
+            . 'If the image is not a class timetable, return {"headers":[],"rows":{},"legend":[]}.';
+    }
+
+    /**
+     * Small screenshots make the tiny cell text hard to read. Upscale anything
+     * narrower than 2400px (GD, sharp-ish resampling) and send it as PNG.
+     * Falls back to the original bytes if GD can't open the file (e.g. HEIC).
+     *
+     * @return array{mime_type: string, data: string}
+     */
+    private function prepareImage(string $path, string $mime): array
+    {
+        $original = ['mime_type' => $mime, 'data' => base64_encode(file_get_contents($path))];
+
+        if (! function_exists('imagecreatefromstring')) {
+            return $original;
+        }
+
+        $img = @imagecreatefromstring(file_get_contents($path));
+        if (! $img) {
+            return $original;
+        }
+
+        $w = imagesx($img);
+        $h = imagesy($img);
+        $target = 2400;
+
+        if ($w >= $target) {
+            imagedestroy($img);
+
+            return $original;
+        }
+
+        $scale = $target / $w;
+        $big = imagescale($img, $target, (int) round($h * $scale), IMG_BICUBIC);
+        imagedestroy($img);
+        if (! $big) {
+            return $original;
+        }
+
+        ob_start();
+        imagepng($big, null, 6);
+        $png = ob_get_clean();
+        imagedestroy($big);
+
+        return ['mime_type' => 'image/png', 'data' => base64_encode($png)];
+    }
+
+    /**
+     * Convert the AI's position-by-position grid into flat cells.
+     *
+     * @return array{0: array<int, array<int, ?string>>, 1: array<int, string>} [cells, days whose column count looked wrong]
+     */
+    private function gridToCells(array $rows, array $headers): array
+    {
+        $cells = [];
+        $shaky = [];
+        $n = count($headers);
+
+        foreach ($rows as $dayLabel => $entries) {
+            $day = $this->parseDay($dayLabel);
+            if (! $day || ! is_array($entries)) {
+                continue;
+            }
+            if ($n > 0 && count($entries) !== $n) {
+                $shaky[] = $day;
+                Log::warning('Timetable AI grid: column count mismatch', ['day' => $day, 'expected' => $n, 'got' => count($entries)]);
+            }
+
+            foreach (array_values($entries) as $i => $entry) {
+                if ($entry === null || trim((string) (is_array($entry) ? implode('|', $entry) : $entry)) === '' || ! isset($headers[$i])) {
+                    continue;
+                }
+                $parts = is_array($entry)
+                    ? array_values($entry)
+                    : array_map('trim', explode('|', (string) $entry));
+
+                $header = (array) $headers[$i];
+                $cells[] = [
+                    $dayLabel,
+                    $header[0] ?? null,
+                    $header[1] ?? null,
+                    $parts[0] ?? '',  // "CODE(TYPE)" - type is split out by the caller
+                    '',
+                    $parts[1] ?? null,
+                    $parts[2] ?? null,
+                ];
+            }
+        }
+
+        return [$cells, array_values(array_unique($shaky))];
     }
 
     /**
@@ -356,8 +466,8 @@ class ClassScheduleController extends Controller
             'contents' => [[
                 'role' => 'user',
                 'parts' => [
-                    ['inline_data' => ['mime_type' => $mime, 'data' => base64_encode(file_get_contents($path))]],
-                    ['text' => 'Transcribe every occupied cell and the legend from this timetable.'],
+                    ['inline_data' => $this->prepareImage($path, $mime)],
+                    ['text' => 'Transcribe this timetable following the steps exactly.'],
                 ],
             ]],
             'generationConfig' => [
@@ -433,7 +543,7 @@ class ClassScheduleController extends Controller
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => [
-                    ['type' => 'text', 'text' => 'Transcribe every occupied cell and the legend from this timetable.'],
+                    ['type' => 'text', 'text' => 'Transcribe this timetable following the steps exactly.'],
                     ['type' => 'image_url', 'image_url' => ['url' => $dataUri]],
                 ]],
             ],
