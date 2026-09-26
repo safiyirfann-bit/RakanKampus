@@ -677,7 +677,7 @@ const micBtn = document.getElementById('micBtn');
 // (Browsers end a recognition session on their own after a pause, so we
 // quietly restart it and carry the text so far over.)
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-const VOICE_SILENCE_MS = 8000;
+const VOICE_SILENCE_MS = 3000;
 let recognition = null;
 let isListening = false;    // what the student wants: mic on/off
 let voiceBaseText = '';     // text in the box before the current recognition session
