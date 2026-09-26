@@ -100,22 +100,50 @@ class ReminderController extends Controller
             return response()->json(['success' => false, 'error' => $error], 422);
         }
 
+        // Models don't always follow the exact shape: accept {"items":[...]}, a bare
+        // [...] list, other wrapper names, or a single object.
         $parsed = $this->extractJson($raw) ?? [];
-        $rows = $parsed['items'] ?? (isset($parsed['subject']) ? [$parsed] : []); // tolerate the old single-object shape
+        if (array_is_list($parsed)) {
+            $rows = $parsed;
+        } else {
+            $rows = $parsed['items'] ?? $parsed['reminders'] ?? $parsed['events'] ?? $parsed['data'] ?? null;
+            if (! is_array($rows)) {
+                $rows = isset($parsed['subject']) || isset($parsed['due_date']) || isset($parsed['date']) ? [$parsed] : [];
+            }
+        }
+
+        Log::info('Reminder AI capture parsed', ['count' => count($rows), 'raw' => Str::limit((string) $raw, 1500)]);
 
         $items = [];
         $seen = [];
         foreach (array_slice((array) $rows, 0, 40) as $row) {
-            if (! is_array($row) || empty($row['due_date'])) {
+            if (! is_array($row)) {
                 continue;
+            }
+            // Alternative key names the model sometimes uses.
+            $row['due_date'] = $row['due_date'] ?? $row['date'] ?? $row['dueDate'] ?? null;
+            $row['due_time'] = $row['due_time'] ?? $row['time'] ?? $row['dueTime'] ?? null;
+            $row['subject'] = $row['subject'] ?? $row['title'] ?? $row['name'] ?? null;
+            if (empty($row['due_date'])) {
+                continue;
+            }
+            // Normalise dates like 2/12/2026 or 02-12-2026 (day first, Malaysian style) to Y-m-d.
+            if (preg_match('#^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})$#', trim($row['due_date']), $dm)) {
+                $row['due_date'] = sprintf('%04d-%02d-%02d', $dm[3], $dm[2], $dm[1]);
             }
 
             $type = in_array($row['type'] ?? null, ['Exam', 'Assignment', 'Quiz', 'Other'], true) ? $row['type'] : 'Other';
             $warnings = [];
 
-            $time = is_string($row['due_time'] ?? null) && preg_match('/^([01]?\d|2[0-3]):[0-5]\d$/', trim($row['due_time']))
-                ? str_pad(trim($row['due_time']), 5, '0', STR_PAD_LEFT)
-                : null;
+            // Accept "8:30", "08.30", "8:30 PM", "2.00pm".
+            $time = null;
+            if (is_string($row['due_time'] ?? null) && preg_match('/(\d{1,2})[:.](\d{2})\s*([ap]\.?m\.?)?/i', $row['due_time'], $tm)) {
+                $h = (int) $tm[1];
+                $ampm = strtolower(str_replace('.', '', $tm[3] ?? ''));
+                if ($ampm === 'pm' && $h < 12) $h += 12;
+                if ($ampm === 'am' && $h === 12) $h = 0;
+                if ($h <= 23 && (int) $tm[2] <= 59) $time = sprintf('%02d:%02d', $h, (int) $tm[2]);
+            }
             if ($time === null) {
                 $time = in_array($type, ['Exam', 'Quiz'], true) ? '09:00' : '23:59';
                 $warnings[] = __('No time was shown — check the time.');
@@ -299,7 +327,7 @@ class ReminderController extends Controller
         }
 
         // AI kadang bungkus JSON dalam code fence atau ada text tambahan sebelum/lepas
-        if (preg_match('/\{.*\}/s', $raw, $m)) {
+        if (preg_match('/\[.*\]|\{.*\}/s', $raw, $m)) {
             $decoded = json_decode($m[0], true);
             if (is_array($decoded)) {
                 return $decoded;
