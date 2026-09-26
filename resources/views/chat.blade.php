@@ -671,10 +671,40 @@ const micBtn = document.getElementById('micBtn');
 // Voice-to-text: fills the message input from speech instead of typing.
 // Uses the browser's built-in Web Speech API — only Chrome/Edge/Safari
 // support it, so the mic button stays hidden everywhere else.
+//
+// Keeps listening through short pauses: the mic stays on until the student
+// taps it again, sends the message, or stays silent for VOICE_SILENCE_MS.
+// (Browsers end a recognition session on their own after a pause, so we
+// quietly restart it and carry the text so far over.)
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+const VOICE_SILENCE_MS = 8000;
 let recognition = null;
-let isListening = false;
-let voiceBaseText = ''; // whatever was already typed before the mic was pressed
+let isListening = false;    // what the student wants: mic on/off
+let voiceBaseText = '';     // text in the box before the current recognition session
+let voiceSilenceTimer = null;
+
+function resetVoiceSilenceTimer() {
+  clearTimeout(voiceSilenceTimer);
+  voiceSilenceTimer = setTimeout(stopVoice, VOICE_SILENCE_MS);
+}
+
+function startVoice() {
+  isListening = true;
+  micBtn.classList.add('listening');
+  messageInput.classList.add('voice-live');
+  resetVoiceSilenceTimer();
+  try { recognition.start(); } catch (e) { /* already running */ }
+}
+
+function stopVoice() {
+  if (!isListening) return;
+  isListening = false;
+  clearTimeout(voiceSilenceTimer);
+  micBtn.classList.remove('listening');
+  messageInput.classList.remove('voice-live');
+  try { recognition.stop(); } catch (e) {}
+  messageInput.focus();
+}
 
 if (SpeechRecognitionAPI && micBtn) {
   micBtn.classList.remove('hidden');
@@ -682,37 +712,20 @@ if (SpeechRecognitionAPI && micBtn) {
   recognition = new SpeechRecognitionAPI();
   // Speech language follows the chosen UI language (Malay by default, since most students speak Malay).
   recognition.lang = ({ zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'ms-MY';
-  // Live transcription: interim results show the words in the input box
-  // WHILE the student is still talking, instead of only after they stop.
-  recognition.interimResults = true;
+  recognition.interimResults = true;  // words appear while still talking
+  recognition.continuous = true;      // don't stop at the first pause
   recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
-    isListening = true;
+    // Each (re)started session appends to whatever is already in the box.
     voiceBaseText = messageInput.value.trim();
-    micBtn.classList.add('listening');
-    messageInput.classList.add('voice-live');
-  };
-
-  recognition.onend = () => {
-    isListening = false;
-    micBtn.classList.remove('listening');
-    messageInput.classList.remove('voice-live');
-    messageInput.focus();
-  };
-
-  recognition.onerror = (event) => {
-    isListening = false;
-    micBtn.classList.remove('listening');
-    messageInput.classList.remove('voice-live');
-    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      alert(t('Please allow microphone access to use voice input.'));
-    }
   };
 
   recognition.onresult = (event) => {
-    // Rebuild the full sentence every time: finished chunks + the part still
-    // being spoken (interim), so the text grows word by word as you talk.
+    if (!isListening) return; // late result after the student stopped/sent — ignore
+    resetVoiceSilenceTimer();
+    // Rebuild this session's sentence every time: finished chunks + the part
+    // still being spoken, so the text grows word by word as you talk.
     let spoken = '';
     for (let i = 0; i < event.results.length; i++) {
       spoken += event.results[i][0].transcript;
@@ -722,16 +735,28 @@ if (SpeechRecognitionAPI && micBtn) {
     messageInput.scrollLeft = messageInput.scrollWidth; // keep the newest words visible
   };
 
-  micBtn.addEventListener('click', () => {
+  recognition.onerror = (event) => {
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      alert(t('Please allow microphone access to use voice input.'));
+      stopVoice();
+    }
+    // 'no-speech' / 'aborted' / 'network': onend fires next and restarts if still wanted.
+  };
+
+  recognition.onend = () => {
     if (isListening) {
-      recognition.stop();
-      return;
+      // Browser ended the session by itself (pause, timeout) — keep going.
+      setTimeout(() => {
+        if (isListening) {
+          try { recognition.start(); } catch (e) {}
+        }
+      }, 150);
     }
-    try {
-      recognition.start();
-    } catch (e) {
-      // start() throws if already started; ignore.
-    }
+  };
+
+  micBtn.addEventListener('click', () => {
+    if (isListening) stopVoice();
+    else startVoice();
   });
 }
 
@@ -792,6 +817,8 @@ function addMessage(text, sender){
 function sendMessage(){
   const text = messageInput.value.trim();
   if(text === '') return;
+
+  if (recognition) stopVoice(); // sending ends voice input, so the mic doesn't keep typing into the next message
 
   addMessage(text, 'user');
   messageInput.value = '';
