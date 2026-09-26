@@ -16,7 +16,6 @@ return [
 
     'groq' => [
     'key' => env('GROQ_API_KEY'),
-    'whisper_model' => env('GROQ_WHISPER_MODEL', 'whisper-large-v3'),
 ],
 
     'gemini' => [

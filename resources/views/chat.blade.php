@@ -351,8 +351,6 @@
 
   .mic-btn.listening svg { stroke: #fff; }
   #messageInput.voice-live { color: #0d9488; }
-  #messageInput.voice-fixing { color: #94a3b8; font-style: italic; }
-  .mic-btn:disabled { opacity: 0.5; cursor: wait; }
 
   .mic-btn.hidden { display: none; }
 
@@ -670,205 +668,70 @@ const stopBtn = document.getElementById('stopBtn');
 let currentController = null;
 const micBtn = document.getElementById('micBtn');
 
-// Voice-to-text for the chat box, in two layers:
-//  1. LIVE: the browser's Web Speech API (Chrome/Edge/Safari) shows the words
-//     in the input WHILE the student is talking.
-//  2. ACCURATE: the same speech is recorded at the same time and, when the
-//     student stops, sent to Whisper (Groq) which is much better at Malay /
-//     bahasa pasar / Manglish ("MPP tu apa" instead of "mpp to apa"). Its
-//     result replaces the live text. If Whisper fails, the live text stays.
-// Browsers without Web Speech (e.g. Firefox) still get layer 2 on its own.
+// Voice-to-text: fills the message input from speech instead of typing.
+// Uses the browser's built-in Web Speech API — only Chrome/Edge/Safari
+// support it, so the mic button stays hidden everywhere else.
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
-const canRecord = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder);
-const INPUT_PLACEHOLDER = messageInput.placeholder;
-const MAX_RECORD_MS = 60000;
-
 let recognition = null;
 let isListening = false;
-let voiceBaseText = '';      // whatever was already typed before the mic was pressed
-let recognitionActive = false;
-let recognitionFailed = false;
-let mediaRecorder = null;
-let micStream = null;
-let audioChunks = [];
-let recordTimer = null;
+let voiceBaseText = ''; // whatever was already typed before the mic was pressed
 
-if ((SpeechRecognitionAPI || canRecord) && micBtn) {
+if (SpeechRecognitionAPI && micBtn) {
   micBtn.classList.remove('hidden');
 
-  if (SpeechRecognitionAPI) {
-    recognition = new SpeechRecognitionAPI();
-    recognition.lang = 'ms-MY';
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
+  recognition = new SpeechRecognitionAPI();
+  recognition.lang = 'ms-MY';
+  // Live transcription: interim results show the words in the input box
+  // WHILE the student is still talking, instead of only after they stop.
+  recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event) => {
-      // Rebuild the full sentence every time: finished chunks + the part still
-      // being spoken, so the text grows word by word as you talk.
-      let spoken = '';
-      for (let i = 0; i < event.results.length; i++) {
-        spoken += event.results[i][0].transcript;
-      }
-      spoken = spoken.trim();
-      messageInput.value = voiceBaseText ? `${voiceBaseText} ${spoken}` : spoken;
-      messageInput.scrollLeft = messageInput.scrollWidth;
-    };
+  recognition.onstart = () => {
+    isListening = true;
+    voiceBaseText = messageInput.value.trim();
+    micBtn.classList.add('listening');
+    messageInput.classList.add('voice-live');
+  };
 
-    recognition.onerror = (event) => {
-      recognitionFailed = true;
-      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-        alert('Please allow microphone access to use voice input.');
-        stopVoice();
-        return;
-      }
-      // Some phones can't run live recognition while also recording — carry on
-      // with the recording only; the student taps the mic again to finish.
-      if (isRecording()) {
-        messageInput.placeholder = 'Merakam suara... tekan mic sekali lagi untuk berhenti';
-      }
-    };
+  recognition.onend = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    messageInput.classList.remove('voice-live');
+    messageInput.focus();
+  };
 
-    recognition.onend = () => {
-      recognitionActive = false;
-      // Live recognition stops by itself when the student pauses — treat that
-      // as "done talking" and finish the recording too (same feel as before).
-      if (!recognitionFailed && isRecording()) {
-        mediaRecorder.stop();
-      } else if (!isRecording()) {
-        finishVoiceUi();
-      }
-    };
-  }
+  recognition.onerror = (event) => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    messageInput.classList.remove('voice-live');
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      alert('Please allow microphone access to use voice input.');
+    }
+  };
+
+  recognition.onresult = (event) => {
+    // Rebuild the full sentence every time: finished chunks + the part still
+    // being spoken (interim), so the text grows word by word as you talk.
+    let spoken = '';
+    for (let i = 0; i < event.results.length; i++) {
+      spoken += event.results[i][0].transcript;
+    }
+    spoken = spoken.trim();
+    messageInput.value = voiceBaseText ? `${voiceBaseText} ${spoken}` : spoken;
+    messageInput.scrollLeft = messageInput.scrollWidth; // keep the newest words visible
+  };
 
   micBtn.addEventListener('click', () => {
-    if (micBtn.disabled) return;
     if (isListening) {
-      stopVoice();
-    } else {
-      startVoice();
+      recognition.stop();
+      return;
     }
-  });
-}
-
-function isRecording() {
-  return !!(mediaRecorder && mediaRecorder.state === 'recording');
-}
-
-async function startVoice() {
-  isListening = true;
-  recognitionFailed = false;
-  voiceBaseText = messageInput.value.trim();
-  micBtn.classList.add('listening');
-  messageInput.classList.add('voice-live');
-
-  if (canRecord) {
-    try {
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioChunks = [];
-      mediaRecorder = new MediaRecorder(micStream);
-      mediaRecorder.ondataavailable = (e) => { if (e.data && e.data.size) audioChunks.push(e.data); };
-      mediaRecorder.onstop = handleRecordingStopped;
-      mediaRecorder.start();
-      recordTimer = setTimeout(() => { if (isRecording()) stopVoice(); }, MAX_RECORD_MS);
-    } catch (e) {
-      mediaRecorder = null;
-      if (e && e.name === 'NotAllowedError') {
-        alert('Please allow microphone access to use voice input.');
-        finishVoiceUi();
-        return;
-      }
-    }
-  }
-
-  if (recognition) {
     try {
       recognition.start();
-      recognitionActive = true;
     } catch (e) {
-      recognitionFailed = true;
+      // start() throws if already started; ignore.
     }
-  }
-
-  if (!recognitionActive && !isRecording()) {
-    finishVoiceUi();
-  } else if (!recognitionActive) {
-    messageInput.placeholder = 'Merakam suara... tekan mic sekali lagi untuk berhenti';
-  }
-}
-
-function stopVoice() {
-  if (recognitionActive) {
-    recognitionFailed = true; // we're stopping on purpose; onend shouldn't also stop the recorder
-    try { recognition.stop(); } catch (e) {}
-  }
-  if (isRecording()) {
-    mediaRecorder.stop(); // -> handleRecordingStopped()
-  } else {
-    finishVoiceUi();
-  }
-}
-
-function releaseMic() {
-  clearTimeout(recordTimer);
-  if (micStream) {
-    micStream.getTracks().forEach((t) => t.stop());
-    micStream = null;
-  }
-}
-
-function finishVoiceUi() {
-  isListening = false;
-  releaseMic();
-  micBtn.classList.remove('listening');
-  micBtn.disabled = false;
-  messageInput.classList.remove('voice-live', 'voice-fixing');
-  messageInput.placeholder = INPUT_PLACEHOLDER;
-  messageInput.focus();
-}
-
-function handleRecordingStopped() {
-  releaseMic();
-  const type = (mediaRecorder && mediaRecorder.mimeType) || 'audio/webm';
-  const blob = new Blob(audioChunks, { type });
-  audioChunks = [];
-
-  if (blob.size < 2000) { // basically silence / an accidental tap
-    finishVoiceUi();
-    return;
-  }
-
-  // Show that the text is being polished, and don't let the mic be restarted mid-request.
-  isListening = false;
-  micBtn.classList.remove('listening');
-  micBtn.disabled = true;
-  messageInput.classList.remove('voice-live');
-  messageInput.classList.add('voice-fixing');
-  if (!messageInput.value.trim()) messageInput.placeholder = 'Menukar suara ke teks...';
-  const valueWhenStopped = messageInput.value;
-  const baseWhenStopped = voiceBaseText;
-
-  const ext = type.includes('mp4') ? 'mp4' : type.includes('ogg') ? 'ogg' : 'webm';
-  const form = new FormData();
-  form.append('audio', blob, `voice.${ext}`);
-
-  fetch('{{ route('chatbot.transcribe') }}', {
-    method: 'POST',
-    headers: {
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      'Accept': 'application/json',
-    },
-    body: form,
-  })
-    .then((res) => res.json().catch(() => null))
-    .then((data) => {
-      const text = data && data.success ? (data.text || '').trim() : '';
-      // Only replace if the student hasn't edited the box in the meantime.
-      if (text && messageInput.value === valueWhenStopped) {
-        messageInput.value = baseWhenStopped ? `${baseWhenStopped} ${text}` : text;
-      }
-    })
-    .catch(() => { /* keep the live text */ })
-    .finally(finishVoiceUi);
+  });
 }
 
 menuBtn.addEventListener('click', () => {
