@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 @include('partials.pwa-head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>RakanKampus - History</title>
+<title>{{ __('RakanKampus - History') }}</title>
 <style>
   * { box-sizing: border-box; }
 
@@ -344,36 +344,36 @@
 <div class="container" id="pageContainer">
   <a href="{{ route('student.reminders') }}" class="back-link-desktop">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"></path><path d="m11 18-6-6 6-6"></path></svg>
-    Back to Reminders
+    {{ __('Back to Reminders') }}
   </a>
   <div class="header">
-    <a href="{{ route('student.reminders') }}" class="back-btn" aria-label="Back">
+    <a href="{{ route('student.reminders') }}" class="back-btn" aria-label="{{ __('Back') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
     </a>
     <div>
-      <p class="header-title">History</p>
-      <p class="header-sub">Past exams, assignments &amp; deadlines</p>
+      <p class="header-title">{{ __('History') }}</p>
+      <p class="header-sub">{{ __('Past exams, assignments & deadlines') }}</p>
     </div>
   </div>
 
   <div class="search-stats-toolbar-wrap">
   <div class="search-row">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-    <input type="text" id="searchInput" placeholder="Search history..." oninput="onSearchChange()">
+    <input type="text" id="searchInput" placeholder="{{ __('Search history...') }}" oninput="onSearchChange()">
   </div>
 
   <div class="stats-row">
     <button type="button" class="stat-card" id="statAll" onclick="setStatusFilter('all')">
       <p class="stat-num" id="totalCount">0</p>
-      <p class="stat-label">Total Reminders</p>
+      <p class="stat-label">{{ __('Total Reminders') }}</p>
     </button>
     <button type="button" class="stat-card" id="statCompleted" onclick="setStatusFilter('completed')">
       <p class="stat-num" id="completedCount">0</p>
-      <p class="stat-label">Completed</p>
+      <p class="stat-label">{{ __('Completed') }}</p>
     </button>
     <button type="button" class="stat-card" id="statDeleted" onclick="setStatusFilter('deleted')">
       <p class="stat-num" id="deletedCount">0</p>
-      <p class="stat-label">Deleted</p>
+      <p class="stat-label">{{ __('Deleted') }}</p>
     </button>
   </div>
 
@@ -381,33 +381,33 @@
     <div class="filter-wrap">
       <button type="button" class="filter-btn" onclick="toggleFilterOpen()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-        <span id="filterDaysLabel">30 Days</span>
+        <span id="filterDaysLabel">{{ __(':count Days', ['count' => 30]) }}</span>
       </button>
       <div class="filter-dropdown" id="filterDropdown">
         @foreach([90, 30, 14, 7] as $d)
-          <button type="button" class="filter-opt" data-days="{{ $d }}" onclick="setFilterDays({{ $d }})">{{ $d }} Days</button>
+          <button type="button" class="filter-opt" data-days="{{ $d }}" onclick="setFilterDays({{ $d }})">{{ __(':count Days', ['count' => $d]) }}</button>
         @endforeach
       </div>
     </div>
     <button type="button" class="select-btn" id="selectModeBtn" onclick="toggleSelectMode()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 3 3 5-6"></path></svg>
-      <span id="selectModeLabel">Select</span>
+      <span id="selectModeLabel">{{ __('Select') }}</span>
     </button>
   </div>
   </div>
 
   <button type="button" class="select-all-row" id="selectAllRow" onclick="toggleSelectAll()">
     <input type="checkbox" id="selectAllCheckbox" style="pointer-events: none;">
-    <span>Select All</span>
+    <span>{{ __('Select All') }}</span>
   </button>
 
   <div class="history-list" id="historyList"></div>
-  <div class="empty-state" id="emptyState" style="display:none;">Tiada sejarah reminder lagi.</div>
+  <div class="empty-state" id="emptyState" style="display:none;">{{ __('No reminder history yet.') }}</div>
 </div>
 
 <button type="button" class="bulk-delete-btn" id="bulkDeleteBtn" onclick="deleteSelected()">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-  Delete · <span id="selectedCount">0</span>
+  {{ __('Delete ·') }} <span id="selectedCount">0</span>
 </button>
 
 <script>
@@ -429,12 +429,12 @@ function typeStyle(type) {
 
 function daysAgoLabel(dueMs) {
   const days = Math.max(1, Math.round((Date.now() - dueMs) / (24 * 3600 * 1000)));
-  return days === 1 ? '1 day ago' : days + ' days ago';
+  return days === 1 ? t('1 day ago') : t(':count days ago', {count: days});
 }
 
 function formatWhen(dueMs) {
   const d = new Date(dueMs);
-  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  return d.toLocaleDateString(({ ms: 'ms-MY', zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'en-GB', { day: 'numeric', month: 'short' });
 }
 
 function escapeHtml(s) {
@@ -471,7 +471,7 @@ function render() {
     const iconBg = isCompleted ? '#dcfce7' : '#fee2e2';
     const iconStroke = isCompleted ? '#16a34a' : '#dc2626';
     const statusColor = isCompleted ? '#16a34a' : '#dc2626';
-    const statusText = isCompleted ? 'Completed' : 'Deleted';
+    const statusText = isCompleted ? t('Completed') : t('Deleted');
     const icon = isCompleted
       ? `<svg viewBox="0 0 24 24" fill="none" stroke="${iconStroke}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>`
       : `<svg viewBox="0 0 24 24" fill="none" stroke="${iconStroke}" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
@@ -480,7 +480,7 @@ function render() {
         <input type="checkbox" class="history-select ${selectMode ? 'open' : ''}" ${isSelected ? 'checked' : ''} onchange="toggleSelect(${it.id})">
         <div class="history-icon" style="background: ${iconBg};">${icon}</div>
         <div class="history-body">
-          <span class="history-type" style="color: ${ts.color}; background: ${ts.bg};">${escapeHtml(it.type)}</span>
+          <span class="history-type" style="color: ${ts.color}; background: ${ts.bg};">${escapeHtml(t(it.type))}</span>
           <p class="history-subject">${escapeHtml(it.subject)}</p>
           <p class="history-when">${formatWhen(dueMs)} · ${daysAgoLabel(dueMs)}</p>
         </div>
@@ -514,7 +514,7 @@ function toggleFilterOpen() {
 
 function setFilterDays(days) {
   filterDays = days;
-  document.getElementById('filterDaysLabel').textContent = days + ' Days';
+  document.getElementById('filterDaysLabel').textContent = t(':count Days', {count: days});
   document.querySelectorAll('.filter-opt').forEach(b => b.classList.toggle('active', parseInt(b.dataset.days) === days));
   document.getElementById('filterDropdown').classList.remove('open');
   render();
@@ -524,7 +524,7 @@ function toggleSelectMode() {
   selectMode = !selectMode;
   if (!selectMode) selectedIds = [];
   document.getElementById('selectModeBtn').classList.toggle('active', selectMode);
-  document.getElementById('selectModeLabel').textContent = selectMode ? 'Cancel' : 'Select';
+  document.getElementById('selectModeLabel').textContent = selectMode ? t('Cancel') : t('Select');
   render();
 }
 
@@ -547,7 +547,7 @@ function toggleSelectAll() {
 function deleteSelected() {
   const ids = selectedIds.slice();
   if (ids.length === 0) return;
-  if (!confirm('Permanently delete ' + ids.length + ' record(s)?')) return;
+  if (!confirm(t('Permanently delete :count record(s)?', {count: ids.length}))) return;
   fetch('/reminders/history/bulk-delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },

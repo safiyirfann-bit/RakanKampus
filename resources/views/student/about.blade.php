@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>About RakanKampus</title>
+    <title>{{ __('About RakanKampus') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,15 +111,15 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
         <div>
-            <h1>About RakanKampus</h1>
-            <p>Learn more about this application</p>
+            <h1>{{ __('About RakanKampus') }}</h1>
+            <p>{{ __('Learn more about this application') }}</p>
         </div>
 
     </div>
@@ -135,11 +135,11 @@
 
             <h2 class="text-2xl font-bold text-slate-900">RakanKampus</h2>
 
-            <p class="text-slate-500 mt-1">Campus AI Assistant for Students</p>
+            <p class="text-slate-500 mt-1">{{ __('Campus AI Assistant for Students') }}</p>
 
             <span class="inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full bg-indigo-50 text-indigo-700 text-sm font-semibold">
                 <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
-                Version 1.0.0
+                {{ __('Version') }} 1.0.0
             </span>
 
         </div>
@@ -159,14 +159,14 @@
                 </div>
 
                 <div>
-                    <h3 class="font-bold text-slate-900">About</h3>
-                    <p class="text-sm text-slate-500">Purpose of the application</p>
+                    <h3 class="font-bold text-slate-900">{{ __('About') }}</h3>
+                    <p class="text-sm text-slate-500">{{ __('Purpose of the application') }}</p>
                 </div>
 
             </div>
 
             <p class="text-sm leading-7 text-slate-600">
-                RakanKampus is a student support application developed to help students access campus information quickly and efficiently. The system combines an AI-powered chatbot with a structured knowledge base to provide accurate answers related to campus services, academic matters, and student activities.
+                {{ __('RakanKampus is a student support application developed to help students access campus information quickly and efficiently. The system combines an AI-powered chatbot with a structured knowledge base to provide accurate answers related to campus services, academic matters, and student activities.') }}
             </p>
 
         </div>
@@ -175,7 +175,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">Main features</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">{{ __('Main features') }}</p>
             </div>
 
             <div class="divide-y divide-slate-100">
@@ -192,8 +192,8 @@
                     </div>
 
                     <div>
-                        <p class="font-semibold text-slate-900">AI Chatbot</p>
-                        <p class="text-sm text-slate-500">Ask campus-related questions anytime</p>
+                        <p class="font-semibold text-slate-900">{{ __('AI Chatbot') }}</p>
+                        <p class="text-sm text-slate-500">{{ __('Ask campus-related questions anytime') }}</p>
                     </div>
 
                 </div>
@@ -210,8 +210,8 @@
                     </div>
 
                     <div>
-                        <p class="font-semibold text-slate-900">Knowledge Base</p>
-                        <p class="text-sm text-slate-500">Accurate information from campus sources</p>
+                        <p class="font-semibold text-slate-900">{{ __('Knowledge Base') }}</p>
+                        <p class="text-sm text-slate-500">{{ __('Accurate information from campus sources') }}</p>
                     </div>
 
                 </div>
@@ -228,8 +228,8 @@
                     </div>
 
                     <div>
-                        <p class="font-semibold text-slate-900">Privacy & Security</p>
-                        <p class="text-sm text-slate-500">Control your data and account safety</p>
+                        <p class="font-semibold text-slate-900">{{ __('Privacy & Security') }}</p>
+                        <p class="text-sm text-slate-500">{{ __('Control your data and account safety') }}</p>
                     </div>
 
                 </div>
@@ -242,28 +242,28 @@
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">Project information</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">{{ __('Project information') }}</p>
             </div>
 
             <div class="divide-y divide-slate-100">
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Developed by</span>
-                    <span class="font-medium text-slate-900">Final Year Project Team</span>
+                    <span class="text-slate-600">{{ __('Developed by') }}</span>
+                    <span class="font-medium text-slate-900">{{ __('Final Year Project Team') }}</span>
                 </div>
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Department</span>
+                    <span class="text-slate-600">{{ __('Department') }}</span>
                     <span class="font-medium text-slate-900">JTMK</span>
                 </div>
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Platform</span>
+                    <span class="text-slate-600">{{ __('Platform') }}</span>
                     <span class="font-medium text-slate-900">Laravel Web Application</span>
                 </div>
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Release</span>
+                    <span class="text-slate-600">{{ __('Release') }}</span>
                     <span class="font-medium text-slate-900">2026</span>
                 </div>
 
@@ -273,7 +273,7 @@
 
         <!-- Footer -->
         <div class="text-center py-2">
-            <p class="text-sm font-medium text-slate-700">Made for students</p>
+            <p class="text-sm font-medium text-slate-700">{{ __('Made for students') }}</p>
             <p class="text-xs text-slate-400 mt-1">© 2026 RakanKampus</p>
         </div>
 

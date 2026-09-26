@@ -21,6 +21,8 @@ class SetLocale
 
         if ($user && $user->language && in_array($user->language, self::SUPPORTED, true)) {
             App::setLocale($user->language);
+            // Relative times like "2 hours ago" (diffForHumans) follow the same language.
+            \Carbon\Carbon::setLocale($user->language);
         }
 
         return $next($request);

@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 @include('partials.pwa-head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>RakanKampus - New Conversation</title>
+<title>{{ __('RakanKampus - New Conversation') }}</title>
 <style>
 
   :root {
@@ -549,7 +549,7 @@
     <!-- Sidebar -->
     <aside class="sidebar">
       <div class="sidebar-header">
-        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="{{ __('Close sidebar') }}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
         </button>
         <div class="sidebar-logo">
@@ -561,7 +561,7 @@
       <a href="{{ route('student.profile') }}" class="sidebar-user" style="text-decoration:none; color:inherit; cursor:pointer;">
         <div class="user-avatar">
           @if($user->photo_data)
-            <img src="{{ $user->photo_data }}" alt="Profile photo" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
+            <img src="{{ $user->photo_data }}" alt="{{ __('Profile photo') }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
           @else
             {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
           @endif
@@ -574,13 +574,13 @@
 
       <button class="new-chat-btn" id="newChatBtn">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        New Chat
+        {{ __('New Chat') }}
       </button>
 
-      <p class="recent-label">RECENT</p>
+      <p class="recent-label">{{ __('RECENT') }}</p>
 
       <div style="padding: 0 20px 10px;">
-   <input type="text" id="recentSearchInput" placeholder="Search conversation..."
+   <input type="text" id="recentSearchInput" placeholder="{{ __('Search conversation...') }}"
     style="width:100%; padding:8px 12px; border-radius:10px; border:none; background:rgba(0,0,0,0.15); color:#fff; font-size:13px; outline:none;">
 </div>
 
@@ -592,12 +592,12 @@
     <!-- Main -->
     <div class="main">
       <div class="topbar">
-        <button class="menu-btn" id="menuBtn" aria-label="Toggle sidebar">
+        <button class="menu-btn" id="menuBtn" aria-label="{{ __('Toggle sidebar') }}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
         </button>
         <div>
-          <p class="topbar-title">New Conversation</p>
-          <p class="topbar-subtitle">RakanKampus AI · Politeknik Assistant</p>
+          <p class="topbar-title">{{ __('New Conversation') }}</p>
+          <p class="topbar-subtitle">{{ __('RakanKampus AI · Politeknik Assistant') }}</p>
         </div>
       </div>
 
@@ -611,27 +611,27 @@
               <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
             </svg>
           </div>
-          <h2>How can I help you today?</h2>
-          <p>Ask me anything about courses, campus services, fees, library resources, and more.</p>
+          <h2>{{ __('How can I help you today?') }}</h2>
+          <p>{{ __('Ask me anything about courses, campus services, fees, library resources, and more.') }}</p>
         </div>
       </div>
 
       <div class="input-bar">
         <div class="input-row">
-          <input type="text" id="messageInput" placeholder="Ask me anything about Politeknik...">
-          <button type="button" class="mic-btn hidden" id="micBtn" aria-label="Voice input">
+          <input type="text" id="messageInput" placeholder="{{ __('Ask me anything about Politeknik...') }}">
+          <button type="button" class="mic-btn hidden" id="micBtn" aria-label="{{ __('Voice input') }}">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
               <path d="M19 11a7 7 0 0 1-14 0"></path>
               <line x1="12" y1="18" x2="12" y2="22"></line>
             </svg>
           </button>
-          <button class="send-btn" id="sendBtn" aria-label="Send">
+          <button class="send-btn" id="sendBtn" aria-label="{{ __('Send') }}">
             <svg viewBox="0 0 24 24">
               <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
             </svg>
           </button>
-          <button class="send-btn stop-btn hidden" id="stopBtn" aria-label="Stop">
+          <button class="send-btn stop-btn hidden" id="stopBtn" aria-label="{{ __('Stop') }}">
             <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
               <rect x="7" y="7" width="10" height="10" rx="2"></rect>
             </svg>
@@ -680,7 +680,8 @@ if (SpeechRecognitionAPI && micBtn) {
   micBtn.classList.remove('hidden');
 
   recognition = new SpeechRecognitionAPI();
-  recognition.lang = 'ms-MY';
+  // Speech language follows the chosen UI language (Malay by default, since most students speak Malay).
+  recognition.lang = ({ zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'ms-MY';
   // Live transcription: interim results show the words in the input box
   // WHILE the student is still talking, instead of only after they stop.
   recognition.interimResults = true;
@@ -705,7 +706,7 @@ if (SpeechRecognitionAPI && micBtn) {
     micBtn.classList.remove('listening');
     messageInput.classList.remove('voice-live');
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      alert('Please allow microphone access to use voice input.');
+      alert(t('Please allow microphone access to use voice input.'));
     }
   };
 
@@ -758,8 +759,8 @@ function showEmptyState(){
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
         </svg>
       </div>
-      <h2>How can I help you today?</h2>
-      <p>Ask me anything about courses, campus services, fees, library resources, and more.</p>
+      <h2>${t('How can I help you today?')}</h2>
+      <p>${t('Ask me anything about courses, campus services, fees, library resources, and more.')}</p>
     </div>`;
   emptyState = document.getElementById('emptyState');
 }
@@ -795,7 +796,7 @@ function sendMessage(){
   addMessage(text, 'user');
   messageInput.value = '';
 
-  const typingMsg = addMessage('Typing...', 'bot');
+  const typingMsg = addMessage(t('Typing...'), 'bot');
   typingMsg.id = 'typingIndicator';
 
   currentController = new AbortController();
@@ -820,15 +821,15 @@ function sendMessage(){
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
-        addMessage('Sorry, there was a problem getting a response. Please try again.', 'bot');
+        addMessage(t('Sorry, there was a problem getting a response. Please try again.'), 'bot');
       }
     })
     .catch((error) => {
       document.getElementById('typingIndicator')?.remove();
       if (error.name === 'AbortError') {
-        addMessage('(Stopped)', 'bot');
+        addMessage('(' + t('Stopped') + ')', 'bot');
       } else {
-        addMessage('Sorry, unable to connect to the server. Please try again.', 'bot');
+        addMessage(t('Sorry, unable to connect to the server. Please try again.'), 'bot');
       }
     })
     .finally(() => {
@@ -863,10 +864,10 @@ function renderRecentList(conversations) {
                 <p class="recent-preview">${escapeHtml(conv.preview)}</p>
             </div>
             <div class="recent-actions">
-                <button class="recent-action-btn" type="button" data-action="edit" aria-label="Edit">
+                <button class="recent-action-btn" type="button" data-action="edit" aria-label="${t('Edit')}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
                 </button>
-                <button class="recent-action-btn" type="button" data-action="delete" aria-label="Delete">
+                <button class="recent-action-btn" type="button" data-action="delete" aria-label="${t('Delete')}">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                 </button>
             </div>
@@ -889,7 +890,7 @@ function renderRecentList(conversations) {
 }
 
 function renameConversation(id, currentTitle) {
-   const newTitle = prompt('Rename conversation:', currentTitle);
+   const newTitle = prompt(t('Rename conversation:'), currentTitle);
     if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
 
     fetch(`/chatbot/${id}/rename`, {
@@ -906,7 +907,7 @@ function renameConversation(id, currentTitle) {
 }
 
 function deleteConversation(id) {
-    if (!confirm('Delete this conversation?')) return;
+    if (!confirm(t('Delete this conversation?'))) return;
 
     fetch(`/chatbot/${id}`, {
         method: 'DELETE',

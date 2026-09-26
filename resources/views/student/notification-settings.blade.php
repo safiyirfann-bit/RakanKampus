@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Notification Settings</title>
+    <title>{{ __('Notification Settings') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,15 +111,15 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
         <div>
-            <h1>Notification Settings</h1>
-            <p>Manage how RakanKampus keeps you informed</p>
+            <h1>{{ __('Notification Settings') }}</h1>
+            <p>{{ __('Manage how RakanKampus keeps you informed') }}</p>
         </div>
 
     </div>
@@ -140,7 +140,7 @@
             <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
 
                 <div class="px-5 pt-5 pb-3">
-                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Academic</p>
+                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Academic') }}</p>
                 </div>
 
                 <div class="divide-y divide-indigo-50">
@@ -159,8 +159,8 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-indigo-900">Course Announcements</p>
-                                <p class="text-sm text-indigo-400">Receive lecturer and course updates</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Course Announcements') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('Receive lecturer and course updates') }}</p>
                             </div>
 
                         </div>
@@ -191,8 +191,8 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-indigo-900">Exam Alerts</p>
-                                <p class="text-sm text-indigo-400">Timetable and reminder notifications</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Exam Alerts') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('Timetable and reminder notifications') }}</p>
                             </div>
 
                         </div>
@@ -223,8 +223,8 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-indigo-900">Fee Payment Reminders</p>
-                                <p class="text-sm text-indigo-400">Get reminded before payment deadlines</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Fee Payment Reminders') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('Get reminded before payment deadlines') }}</p>
                             </div>
 
                         </div>
@@ -268,8 +268,8 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-indigo-900">Chatbot Replies</p>
-                                <p class="text-sm text-indigo-400">Notify when new AI responses arrive</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Chatbot Replies') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('Notify when new AI responses arrive') }}</p>
                             </div>
 
                         </div>
@@ -300,8 +300,8 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-indigo-900">System Updates</p>
-                                <p class="text-sm text-indigo-400">New features and maintenance alerts</p>
+                                <p class="font-semibold text-indigo-900">{{ __('System Updates') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('New features and maintenance alerts') }}</p>
                             </div>
 
                         </div>
@@ -332,8 +332,8 @@
                             </div>
 
                             <div>
-                                <p class="font-semibold text-indigo-900">Events & Promotions</p>
-                                <p class="text-sm text-indigo-400">Campus activities and special announcements</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Events & Promotions') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('Campus activities and special announcements') }}</p>
                             </div>
 
                         </div>
@@ -358,25 +358,25 @@
             <div class="bg-white rounded-3xl border border-indigo-100 p-5 shadow-sm">
 
                 <div class="mb-4">
-                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Delivery</p>
+                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Delivery') }}</p>
                 </div>
 
                 <div class="space-y-5">
 
                     <div>
-                        <label class="block text-sm font-semibold text-indigo-900 mb-2">Preferred Method</label>
+                        <label class="block text-sm font-semibold text-indigo-900 mb-2">{{ __('Preferred Method') }}</label>
 
                         <select name="preferred_method" class="w-full rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400">
 
-                            <option value="Push notifications" {{ $settings['preferred_method'] === 'Push notifications' ? 'selected' : '' }}>Push notifications</option>
-                            <option value="Email only" {{ $settings['preferred_method'] === 'Email only' ? 'selected' : '' }}>Email only</option>
-                            <option value="Push + Email" {{ $settings['preferred_method'] === 'Push + Email' ? 'selected' : '' }}>Push + Email</option>
+                            <option value="Push notifications" {{ $settings['preferred_method'] === 'Push notifications' ? 'selected' : '' }}>{{ __('Push notifications') }}</option>
+                            <option value="Email only" {{ $settings['preferred_method'] === 'Email only' ? 'selected' : '' }}>{{ __('Email only') }}</option>
+                            <option value="Push + Email" {{ $settings['preferred_method'] === 'Push + Email' ? 'selected' : '' }}>{{ __('Push + Email') }}</option>
 
                         </select>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-semibold text-indigo-900 mb-2">Do Not Disturb Until</label>
+                        <label class="block text-sm font-semibold text-indigo-900 mb-2">{{ __('Do Not Disturb Until') }}</label>
 
                         <input type="datetime-local" name="dnd_until" value="{{ $settings['dnd_until'] }}"
                                class="w-full rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400">
@@ -389,7 +389,7 @@
             <!-- Save -->
             <button type="submit" class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
 
-                Save Notification Settings
+                {{ __('Save Notification Settings') }}
 
             </button>
 

@@ -131,7 +131,7 @@ class ProfileController extends Controller
         $user->phone       = $request->phone;
         $user->save();
 
-        return redirect()->route('student.profile.edit')->with('success', 'Profile updated successfully!');
+        return redirect()->route('student.profile.edit')->with('success', __('Profile updated successfully!'));
     }
 
     public function updatePassword(Request $request): RedirectResponse
@@ -156,7 +156,7 @@ class ProfileController extends Controller
         $user->password = $request->password;
         $user->save();
 
-        return redirect()->route('student.profile.password')->with('success', 'Password updated successfully!');
+        return redirect()->route('student.profile.password')->with('success', __('Password updated successfully!'));
     }
 
     public function notificationSettings(Request $request): View
@@ -199,7 +199,7 @@ class ProfileController extends Controller
 
         $request->user()->update(['notification_settings' => $settings]);
 
-        return redirect()->route('student.profile.notifications')->with('success', 'Notification settings updated!');
+        return redirect()->route('student.profile.notifications')->with('success', __('Notification settings updated!'));
     }
 
     public function language(Request $request): View

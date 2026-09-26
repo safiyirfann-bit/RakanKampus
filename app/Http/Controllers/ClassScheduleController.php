@@ -97,8 +97,8 @@ class ClassScheduleController extends Controller
         $request->validate([
             'photo' => 'required|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,pdf|max:6144', // 6MB
         ], [
-            'photo.mimes' => 'Fail mesti gambar (JPG/PNG) atau PDF jadual.',
-            'photo.max' => 'Fail terlalu besar (maksimum 6MB).',
+            'photo.mimes' => __('The file must be an image (JPG/PNG) or a timetable PDF.'),
+            'photo.max' => __('The file is too large (maximum 6MB).'),
         ]);
 
         $file = $request->file('photo');
@@ -109,7 +109,7 @@ class ClassScheduleController extends Controller
             if (! TimetablePdfParser::isAvailable()) {
                 return response()->json([
                     'success' => false,
-                    'error' => 'Server belum boleh baca PDF (pdftotext tiada). Upload gambar/screenshot jadual buat masa ni.',
+                    'error' => __('The server cannot read PDFs yet. Please upload a photo/screenshot of your timetable for now.'),
                 ], 422);
             }
 
@@ -143,7 +143,7 @@ class ClassScheduleController extends Controller
 
                 return response()->json([
                     'success' => false,
-                    'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
+                    'error' => __('AI could not process that image right now. Please try again shortly.'),
                 ], 422);
             }
 
@@ -222,7 +222,7 @@ class ClassScheduleController extends Controller
         if (count($cells) === 0) {
             return response()->json([
                 'success' => false,
-                'error' => 'Tak dapat kesan jadual kelas dalam gambar tu. Cuba gambar yang lebih jelas, atau isi manual.',
+                'error' => __('No class timetable was detected in that image. Try a clearer picture, or fill it in manually.'),
             ], 422);
         }
 
@@ -251,9 +251,9 @@ class ClassScheduleController extends Controller
 
             $warnings = [];
             if (! $name) {
-                $warnings[] = "Nama kursus untuk kod {$c['code']} tak jumpa — sila taip nama subjek.";
+                $warnings[] = __('Course name for code :code was not found — please type the subject name.', ['code' => $c['code']]);
             } elseif (! empty($c['code_fixed'])) {
-                $warnings[] = "AI baca kod kurang jelas, dipadankan ke {$c['code']} — pastikan subjek betul.";
+                $warnings[] = __('AI could not read the code clearly and matched it to :code — make sure the subject is correct.', ['code' => $c['code']]);
             }
             $c['warnings'] = $warnings;
             unset($c['code'], $c['type'], $c['code_fixed']);
@@ -267,7 +267,7 @@ class ClassScheduleController extends Controller
         // the preview anyway).
         foreach ($classes as &$c) {
             if ($this->toMinutes($c['end_time']) - $this->toMinutes($c['start_time']) > self::MAX_PLAUSIBLE_CLASS_MINUTES) {
-                $c['warnings'][] = 'Kelas ni panjang luar biasa (lebih 4 jam) — semak masa tamat.';
+                $c['warnings'][] = __('This class is unusually long (over 4 hours) — check the end time.');
             }
         }
         unset($c);
@@ -275,7 +275,7 @@ class ClassScheduleController extends Controller
         // Overlapping classes on the same day = the model misread the grid somewhere.
         // Flag both sides instead of rejecting everything, since the student reviews anyway.
         foreach ($this->overlappingIndexes($classes) as $i) {
-            $classes[$i]['warnings'][] = 'Bertindih masa dengan kelas lain — semak masa.';
+            $classes[$i]['warnings'][] = __('Overlaps with another class — check the times.');
         }
 
         return response()->json(['success' => true, 'classes' => array_values($classes)]);
@@ -397,14 +397,14 @@ class ClassScheduleController extends Controller
             ]);
 
             $reason = match (true) {
-                $status === 400 || $status === 403 => 'API key Gemini tak sah — semak GEMINI_API_KEY kat Render.',
-                $status === 429 => 'Had penggunaan AI percuma dah penuh. Cuba lagi selepas seminit.',
-                $status === 404 => 'Model Gemini tak dijumpai — set GEMINI_MODEL kat Render.',
-                $status === 500 || $status === 503 => 'Server AI Google tengah sibuk. Cuba lagi dalam seminit.',
-                default => 'AI tak dapat proses gambar tu sekarang (ralat ' . ($status ?? '?') . ').',
+                $status === 400 || $status === 403 => __('The AI service key is invalid.'),
+                $status === 429 => __('The free AI usage limit has been reached. Please try again in a minute.'),
+                $status === 404 => __('The AI model could not be found.'),
+                $status === 500 || $status === 503 => __('The AI server is busy right now. Please try again in a minute.'),
+                default => __('AI could not process that image right now (error :status).', ['status' => $status ?? '?']),
             };
 
-            return [null, $reason . ' Atau upload PDF jadual.'];
+            return [null, $reason . ' ' . __('Or upload the timetable PDF.')];
         }
 
         $text = collect($response->json('candidates.0.content.parts') ?? [])
@@ -418,7 +418,7 @@ class ClassScheduleController extends Controller
 
         return $text !== ''
             ? [$text, null]
-            : [null, 'AI tak pulangkan apa-apa untuk gambar tu. Cuba gambar lain atau upload PDF jadual.'];
+            : [null, __('AI returned nothing for that image. Try another picture or upload the timetable PDF.')];
     }
 
     /**

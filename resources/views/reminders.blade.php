@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 @include('partials.pwa-head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>RakanKampus - Reminders</title>
+<title>{{ __('RakanKampus - Reminders') }}</title>
 <style>
   * { box-sizing: border-box; }
 
@@ -698,76 +698,76 @@
 
 <div class="container" id="pageContainer">
   <div class="header">
-    <a href="{{ route('student.home') }}" class="back-btn" aria-label="Back">
+    <a href="{{ route('student.home') }}" class="back-btn" aria-label="{{ __('Back') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
     </a>
     <div>
-      <p class="header-title">Reminders</p>
-      <p class="header-sub">For exams, assignments &amp; deadlines</p>
+      <p class="header-title">{{ __('Reminders') }}</p>
+      <p class="header-sub">{{ __('For exams, assignments & deadlines') }}</p>
     </div>
   </div>
 
   <div class="notify-banner" id="notifyBanner">
-    <span>Turn on notifications to get alerted before your deadlines.</span>
-    <button type="button" onclick="enableNotifications()">Enable</button>
+    <span>{{ __('Turn on notifications to get alerted before your deadlines.') }}</span>
+    <button type="button" onclick="enableNotifications()">{{ __('Enable') }}</button>
   </div>
 
   <button type="button" class="add-btn" onclick="openAddModal()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    Add Reminder
+    {{ __('Add Reminder') }}
   </button>
 
   <div class="search-toolbar-wrap">
   <div class="search-row">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-    <input type="text" id="searchInput" placeholder="Search reminders..." oninput="onSearchChange()">
+    <input type="text" id="searchInput" placeholder="{{ __('Search reminders...') }}" oninput="onSearchChange()">
   </div>
 
   <div class="toolbar-row">
     <div class="filter-wrap">
       <button type="button" class="filter-btn" onclick="toggleFilterOpen()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>
-        <span id="filterDaysLabel">30 Days</span>
+        <span id="filterDaysLabel">{{ __(':count Days', ['count' => 30]) }}</span>
       </button>
       <div class="filter-dropdown" id="filterDropdown">
         @foreach([90, 30, 14, 7] as $d)
-          <button type="button" class="filter-opt" data-days="{{ $d }}" onclick="setFilterDays({{ $d }})">{{ $d }} Days</button>
+          <button type="button" class="filter-opt" data-days="{{ $d }}" onclick="setFilterDays({{ $d }})">{{ __(':count Days', ['count' => $d]) }}</button>
         @endforeach
       </div>
     </div>
     <button type="button" class="select-btn" id="selectModeBtn" onclick="toggleSelectMode()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 3 3 5-6"></path></svg>
-      <span id="selectModeLabel">Select</span>
+      <span id="selectModeLabel">{{ __('Select') }}</span>
     </button>
   </div>
   </div>
 
   <div class="section-row">
-    <p class="section-label" id="countLabel">UPCOMING (0)</p>
+    <p class="section-label" id="countLabel">{{ __('UPCOMING (:count)', ['count' => 0]) }}</p>
     <a href="{{ route('student.reminders.history') }}" class="history-link">
-      History ({{ $historyCount }})
+      {{ __('History') }} ({{ $historyCount }})
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
     </a>
   </div>
 
   <button type="button" class="select-all-row" id="selectAllRow" onclick="toggleSelectAll()">
     <input type="checkbox" id="selectAllCheckbox" style="pointer-events: none;">
-    <span>Select All</span>
+    <span>{{ __('Select All') }}</span>
   </button>
 
   <div class="reminder-list" id="reminderList"></div>
-  <div class="empty-state" id="emptyState" style="display:none;">No reminders yet — tap "Add Reminder" to add your first exam, assignment or deadline.</div>
+  <div class="empty-state" id="emptyState" style="display:none;">{{ __('No reminders yet — tap "Add Reminder" to add your first exam, assignment or deadline.') }}</div>
 </div>
 
 <button type="button" class="bulk-delete-btn" id="bulkDeleteBtn" onclick="deleteSelected()">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-  Delete · <span id="selectedCount">0</span>
+  {{ __('Delete ·') }} <span id="selectedCount">0</span>
 </button>
 
-<button type="button" class="ai-fab" aria-label="AI Assistant" onclick="openAiModal()">
+<button type="button" class="ai-fab" aria-label="{{ __('AI Assistant') }}" onclick="openAiModal()">
   <span class="ai-fab-inner">
     <svg viewBox="0 0 24 24" fill="#0d9488" stroke="none"><path d="M12 2.5l1.7 5.3 5.3 1.7-5.3 1.7L12 16.5l-1.7-5.3-5.3-1.7 5.3-1.7L12 2.5z"></path><path d="M19.5 14l0.9 2.6 2.6 0.9-2.6 0.9-0.9 2.6-0.9-2.6-2.6-0.9 2.6-0.9z"></path></svg>
-    <span>AI Assistant</span>
+    <span>{{ __('AI Assistant') }}</span>
   </span>
 </button>
 
@@ -779,68 +779,68 @@
       <div class="modal-icon">
         <svg viewBox="0 0 24 24" fill="#ffffff" stroke="none"><path d="M12 2.5l1.7 5.3 5.3 1.7-5.3 1.7L12 16.5l-1.7-5.3-5.3-1.7 5.3-1.7L12 2.5z"></path></svg>
       </div>
-      <p class="modal-title">AI Assistant</p>
+      <p class="modal-title">{{ __('AI Assistant') }}</p>
     </div>
-    <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
+    <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
-  <p class="ai-desc">Upload a photo of your exam slip, timetable or assignment brief — AI will read it and add the reminder automatically.</p>
+  <p class="ai-desc">{{ __('Upload a photo of your exam slip, timetable or assignment brief — AI will read it and add the reminder automatically.') }}</p>
   <label class="ai-upload-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-    Upload Photo
+    {{ __('Upload Photo') }}
     <input type="file" accept="image/*" onchange="handlePhotoSelected(event)">
   </label>
-  <p class="ai-scanning" id="aiScanning">🔎 Reading image and detecting details...</p>
+  <p class="ai-scanning" id="aiScanning">{{ __('🔎 Reading image and detecting details...') }}</p>
   <div class="ai-success" id="aiSuccess">
     <p id="aiSuccessMsg"></p>
-    <button type="button" aria-label="Dismiss" onclick="dismissAiMsg()">×</button>
+    <button type="button" aria-label="{{ __('Dismiss') }}" onclick="dismissAiMsg()">×</button>
   </div>
   <div class="ai-error" id="aiError">
     <p id="aiErrorMsg"></p>
-    <button type="button" aria-label="Dismiss" onclick="dismissAiError()">×</button>
+    <button type="button" aria-label="{{ __('Dismiss') }}" onclick="dismissAiError()">×</button>
   </div>
 </div>
 
 <div class="modal" id="modal">
   <div class="modal-head">
-    <p class="modal-title" id="modalTitle">Add Reminder</p>
-    <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
+    <p class="modal-title" id="modalTitle">{{ __('Add Reminder') }}</p>
+    <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
   <input type="hidden" id="reminderId">
-  <input type="text" id="subjectInput" placeholder="e.g. Software Engineering Assignment 2">
-  <p class="field-label">Type</p>
+  <input type="text" id="subjectInput" placeholder="{{ __('e.g. Software Engineering Assignment 2') }}">
+  <p class="field-label">{{ __('Type') }}</p>
   <div class="type-row" id="typeRow">
     @foreach(['Exam' => '#6366f1', 'Assignment' => '#0d9488', 'Quiz' => '#7c3aed', 'Other' => '#64748b'] as $t => $color)
-      <button type="button" class="type-opt" data-type="{{ $t }}" data-color="{{ $color }}" onclick="selectType('{{ $t }}')">{{ $t }}</button>
+      <button type="button" class="type-opt" data-type="{{ $t }}" data-color="{{ $color }}" onclick="selectType('{{ $t }}')">{{ __($t) }}</button>
     @endforeach
   </div>
   <div class="date-time-row">
     <input type="date" id="dateInput">
     <input type="time" id="timeInput">
   </div>
-  <p class="field-label">Notify me how many hours before?</p>
+  <p class="field-label">{{ __('Notify me how many hours before?') }}</p>
   <input type="number" id="leadInput" min="0" step="0.5" value="1">
-  <p class="hint">Type any number of hours — use 0.5 for 30 minutes.</p>
+  <p class="hint">{{ __('Type any number of hours — use 0.5 for 30 minutes.') }}</p>
 
   <div class="repeat-toggle-row">
     <label class="repeat-toggle-label">
       <input type="checkbox" id="repeatToggle" onchange="toggleRepeatOptions()">
-      Remind me more than once
+      {{ __('Remind me more than once') }}
     </label>
   </div>
   <div class="repeat-options-wrap hidden" id="repeatOptionsWrap">
-    <p class="field-label">Also remind me at (pick as many as you like)</p>
+    <p class="field-label">{{ __('Also remind me at (pick as many as you like)') }}</p>
     <div class="repeat-chip-row" id="repeatChipRow">
-      <button type="button" class="repeat-chip" data-hours="72" onclick="toggleRepeatChip(this)">3 days before</button>
-      <button type="button" class="repeat-chip" data-hours="24" onclick="toggleRepeatChip(this)">1 day before</button>
-      <button type="button" class="repeat-chip" data-hours="3" onclick="toggleRepeatChip(this)">3 hours before</button>
-      <button type="button" class="repeat-chip" data-hours="1" onclick="toggleRepeatChip(this)">1 hour before</button>
-      <button type="button" class="repeat-chip" data-hours="0.5" onclick="toggleRepeatChip(this)">30 min before</button>
+      <button type="button" class="repeat-chip" data-hours="72" onclick="toggleRepeatChip(this)">{{ __('3 days before') }}</button>
+      <button type="button" class="repeat-chip" data-hours="24" onclick="toggleRepeatChip(this)">{{ __('1 day before') }}</button>
+      <button type="button" class="repeat-chip" data-hours="3" onclick="toggleRepeatChip(this)">{{ __('3 hours before') }}</button>
+      <button type="button" class="repeat-chip" data-hours="1" onclick="toggleRepeatChip(this)">{{ __('1 hour before') }}</button>
+      <button type="button" class="repeat-chip" data-hours="0.5" onclick="toggleRepeatChip(this)">{{ __('30 min before') }}</button>
     </div>
-    <p class="hint">On top of the main notification above.</p>
+    <p class="hint">{{ __('On top of the main notification above.') }}</p>
   </div>
 
-  <p id="formError" style="color:#e11d48; font-size: 11.5px; display:none; margin: -6px 0 10px;">Please fill in a subject and date.</p>
-  <button type="button" class="modal-save" onclick="saveReminder()">Save Reminder</button>
+  <p id="formError" style="color:#e11d48; font-size: 11.5px; display:none; margin: -6px 0 10px;">{{ __('Please fill in a subject and date.') }}</p>
+  <button type="button" class="modal-save" onclick="saveReminder()">{{ __('Save Reminder') }}</button>
 </div>
 
 <script>
@@ -870,25 +870,26 @@ function computeStatus(dueMs, leadHours) {
   const now = Date.now();
   const diffMs = dueMs - now;
   const diffHours = diffMs / 3600000;
-  if (diffMs <= 0) return { text: 'Passed', color: '#94a3b8', dotBg: '#e2e8f0', dotStroke: '#94a3b8' };
+  if (diffMs <= 0) return { text: t('Passed'), color: '#94a3b8', dotBg: '#e2e8f0', dotStroke: '#94a3b8' };
   if (diffHours <= leadHours) {
     const h = Math.floor(diffHours);
     const m = Math.floor((diffHours - h) * 60);
-    return { text: 'Notified · ' + h + 'h ' + m + 'm left', color: '#ea580c', dotBg: '#ffedd5', dotStroke: '#ea580c' };
+    return { text: t('Notified') + ' · ' + t(':h h :m m left', {h, m}), color: '#ea580c', dotBg: '#ffedd5', dotStroke: '#ea580c' };
   }
-  if (diffHours <= 24) return { text: 'Upcoming · in ' + Math.floor(diffHours) + 'h', color: '#2563eb', dotBg: '#dbeafe', dotStroke: '#2563eb' };
-  return { text: 'Upcoming · in ' + Math.floor(diffHours / 24) + 'd', color: '#0d9488', dotBg: '#ccfbf1', dotStroke: '#0d9488' };
+  if (diffHours <= 24) return { text: t('Upcoming') + ' · ' + t('in :count h', {count: Math.floor(diffHours)}), color: '#2563eb', dotBg: '#dbeafe', dotStroke: '#2563eb' };
+  return { text: t('Upcoming') + ' · ' + t('in :count d', {count: Math.floor(diffHours / 24)}), color: '#0d9488', dotBg: '#ccfbf1', dotStroke: '#0d9488' };
 }
 
 function leadLabel(hours) {
-  if (hours < 1) return Math.round(hours * 60) + ' min';
-  if (hours === 1) return '1 hour';
-  return (Math.round(hours * 10) / 10) + ' hours';
+  if (hours < 1) return Math.round(hours * 60) + ' ' + t('min');
+  if (hours === 1) return t('1 hour');
+  return t(':count hours', {count: Math.round(hours * 10) / 10});
 }
 
 function formatWhen(dueMs) {
   const d = new Date(dueMs);
-  return d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' · ' + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  const loc = ({ ms: 'ms-MY', zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'en-GB';
+  return d.toLocaleDateString(loc, { day: 'numeric', month: 'short' }) + ' · ' + d.toLocaleTimeString(loc, { hour: '2-digit', minute: '2-digit' });
 }
 
 function pad(n) { return n < 10 ? '0' + n : '' + n; }
@@ -908,7 +909,7 @@ function render() {
     .filter(r => new Date(r.due_at).getTime() <= cutoff)
     .sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
 
-  document.getElementById('countLabel').textContent = 'UPCOMING (' + visible.length + ')';
+  document.getElementById('countLabel').textContent = t('UPCOMING (:count)', {count: visible.length});
   document.getElementById('emptyState').style.display = visible.length === 0 ? 'block' : 'none';
 
   const list = document.getElementById('reminderList');
@@ -920,9 +921,9 @@ function render() {
     const offset = dragId === r.id ? dragOffset : 0;
     return `
       <div class="swipe-wrap">
-        <button type="button" class="swipe-delete-panel" onclick="removeReminder(${r.id})" aria-label="Delete">
+        <button type="button" class="swipe-delete-panel" onclick="removeReminder(${r.id})" aria-label="${t('Delete')}">
           <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-          <span>Delete</span>
+          <span>${t('Delete')}</span>
         </button>
         <div class="reminder-card ${isSelected ? 'selected' : ''}" data-id="${r.id}"
              style="transform: translateX(${offset}px);"
@@ -932,17 +933,17 @@ function render() {
             <svg viewBox="0 0 24 24" fill="none" stroke="${status.dotStroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
           </div>
           <div class="reminder-body">
-            <span class="reminder-type" style="color: ${ts.color}; background: ${ts.bg};">${escapeHtml(r.type)}</span>
+            <span class="reminder-type" style="color: ${ts.color}; background: ${ts.bg};">${escapeHtml(t(r.type))}</span>
             <p class="reminder-subject">${escapeHtml(r.subject)}</p>
-            <p class="reminder-when">${formatWhen(dueMs)} · notify ${leadLabel(r.lead_hours)} before</p>
+            <p class="reminder-when">${formatWhen(dueMs)} · ${t('notify :time before', {time: leadLabel(r.lead_hours)})}</p>
             <p class="reminder-status" style="color: ${status.color};">${status.text}</p>
           </div>
           ${!selectMode ? `
           <div class="reminder-actions">
-            <button type="button" class="reminder-action-btn" aria-label="Edit" onclick="event.stopPropagation(); openEditModal(${r.id})">
+            <button type="button" class="reminder-action-btn" aria-label="${t('Edit')}" onclick="event.stopPropagation(); openEditModal(${r.id})">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
             </button>
-            <button type="button" class="reminder-action-btn" aria-label="Delete" onclick="event.stopPropagation(); removeReminder(${r.id})">
+            <button type="button" class="reminder-action-btn" aria-label="${t('Delete')}" onclick="event.stopPropagation(); removeReminder(${r.id})">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
           </div>` : ''}
@@ -971,7 +972,7 @@ function toggleFilterOpen() {
 
 function setFilterDays(days) {
   filterDays = days;
-  document.getElementById('filterDaysLabel').textContent = days + ' Days';
+  document.getElementById('filterDaysLabel').textContent = t(':count Days', {count: days});
   document.querySelectorAll('.filter-opt').forEach(b => b.classList.toggle('active', parseInt(b.dataset.days) === days));
   document.getElementById('filterDropdown').classList.remove('open');
   render();
@@ -981,7 +982,7 @@ function toggleSelectMode() {
   selectMode = !selectMode;
   if (!selectMode) selectedIds = [];
   document.getElementById('selectModeBtn').classList.toggle('active', selectMode);
-  document.getElementById('selectModeLabel').textContent = selectMode ? 'Cancel' : 'Select';
+  document.getElementById('selectModeLabel').textContent = selectMode ? t('Cancel') : t('Select');
   render();
 }
 
@@ -1113,7 +1114,7 @@ function resetRepeatOptions(presetHours) {
 }
 
 function openAddModal() {
-  document.getElementById('modalTitle').textContent = 'Add Reminder';
+  document.getElementById('modalTitle').textContent = t('Add Reminder');
   document.getElementById('reminderId').value = '';
   document.getElementById('subjectInput').value = '';
   document.getElementById('dateInput').value = '';
@@ -1128,7 +1129,7 @@ function openEditModal(id) {
   const r = reminders.find(x => x.id === id);
   if (!r) return;
   const dueMs = new Date(r.due_at).getTime();
-  document.getElementById('modalTitle').textContent = 'Edit Reminder';
+  document.getElementById('modalTitle').textContent = t('Edit Reminder');
   document.getElementById('reminderId').value = r.id;
   document.getElementById('subjectInput').value = r.subject;
   document.getElementById('dateInput').value = toDateStr(dueMs);
@@ -1241,20 +1242,20 @@ function handlePhotoSelected(e) {
       e.target.value = '';
 
       if (!ok || !data.success) {
-        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Could not process that image. Please try again.');
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || t('Could not process that image. Please try again.'));
         document.getElementById('aiError').classList.add('open');
         return;
       }
 
       reminders.push(data.reminder);
-      document.getElementById('aiSuccessMsg').textContent = '✅ Detected "' + data.reminder.subject + '" — reminder added automatically!';
+      document.getElementById('aiSuccessMsg').textContent = '✅ ' + t('Detected ":subject" — reminder added automatically!', {subject: data.reminder.subject});
       document.getElementById('aiSuccess').classList.add('open');
       render();
     })
     .catch(err => {
       console.error('AI capture failed', err);
       document.getElementById('aiScanning').classList.remove('open');
-      document.getElementById('aiErrorMsg').textContent = '⚠️ Ada masalah sambungan. Cuba lagi.';
+      document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Connection problem. Please try again.');
       document.getElementById('aiError').classList.add('open');
       e.target.value = '';
     });
@@ -1337,8 +1338,8 @@ function checkDueReminders() {
     if (getNotified()[key]) return;
     markNotified(key);
     const mins = Math.max(1, Math.round((dueMs - now) / 60000));
-    const left = mins >= 60 ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : mins + ' min';
-    new Notification(r.type + ' due in ' + left, {
+    const left = mins >= 60 ? Math.floor(mins / 60) + 'h ' + (mins % 60) + 'm' : mins + ' ' + t('min');
+    new Notification(t(':type due in :time', {type: t(r.type), time: left}), {
       body: r.subject + ' · ' + formatWhen(dueMs),
       tag: 'reminder-' + r.id,
     });

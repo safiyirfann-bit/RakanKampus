@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 @include('partials.pwa-head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>RakanKampus - Timetable</title>
+<title>{{ __('RakanKampus - Timetable') }}</title>
 <style>
   * { box-sizing: border-box; }
 
@@ -422,38 +422,38 @@
 
 <div class="container" id="pageContainer">
   <div class="header">
-    <a href="{{ route('student.home') }}" class="back-btn" aria-label="Back">
+    <a href="{{ route('student.home') }}" class="back-btn" aria-label="{{ __('Back') }}">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
     </a>
     <div>
-      <p class="header-title">Timetable</p>
-      <p class="header-sub">Your weekly class schedule</p>
+      <p class="header-title">{{ __('Timetable') }}</p>
+      <p class="header-sub">{{ __('Your weekly class schedule') }}</p>
     </div>
   </div>
 
   <div class="action-row">
     <button type="button" class="add-btn" onclick="openAddModal()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      Add Class
+      {{ __('Add Class') }}
     </button>
     <button type="button" class="delete-all-btn hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-      Delete All
+      {{ __('Delete All') }}
     </button>
     <button type="button" class="select-toggle-btn hidden" id="selectToggleBtn" onclick="toggleSelectMode()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 2 2 4-4"></path><path d="M11 7h10"></path><path d="m3 17 2 2 4-4"></path><path d="M11 17h10"></path></svg>
-      Select
+      {{ __('Select') }}
     </button>
   </div>
 
   <div class="select-bar hidden" id="selectBar">
     <label class="select-all-label">
       <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)">
-      Select all
+      {{ __('Select all') }}
     </label>
     <div class="select-bar-actions">
-      <button type="button" class="select-cancel-btn" onclick="toggleSelectMode()">Cancel</button>
-      <button type="button" class="select-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()" disabled>Delete</button>
+      <button type="button" class="select-cancel-btn" onclick="toggleSelectMode()">{{ __('Cancel') }}</button>
+      <button type="button" class="select-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()" disabled>{{ __('Delete') }}</button>
     </div>
   </div>
 
@@ -475,10 +475,10 @@
   </div>
 </div>
 
-<button type="button" class="ai-fab" aria-label="AI Assistant" onclick="openAiModal()">
+<button type="button" class="ai-fab" aria-label="{{ __('AI Assistant') }}" onclick="openAiModal()">
   <span style="display:flex;align-items:center;gap:7px;">
     <svg viewBox="0 0 24 24" fill="#0d9488" stroke="none"><path d="M12 2.5l1.7 5.3 5.3 1.7-5.3 1.7L12 16.5l-1.7-5.3-5.3-1.7 5.3-1.7L12 2.5z"></path><path d="M19.5 14l0.9 2.6 2.6 0.9-2.6 0.9-0.9 2.6-0.9-2.6-2.6-0.9 2.6-0.9z"></path></svg>
-    <span>AI Assistant</span>
+    <span>{{ __('AI Assistant') }}</span>
   </span>
 </button>
 
@@ -490,72 +490,72 @@
       <div class="modal-icon">
         <svg viewBox="0 0 24 24" fill="#ffffff" stroke="none"><path d="M12 2.5l1.7 5.3 5.3 1.7-5.3 1.7L12 16.5l-1.7-5.3-5.3-1.7 5.3-1.7L12 2.5z"></path></svg>
       </div>
-      <p class="modal-title">AI Assistant</p>
+      <p class="modal-title">{{ __('AI Assistant') }}</p>
     </div>
-    <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
+    <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
-  <p class="ai-desc">Upload your class timetable and we'll fill in your classes for you.</p>
+  <p class="ai-desc">{{ __('Upload your class timetable and we\'ll fill in your classes for you.') }}</p>
   <ul class="ai-tips">
-    <li><b>PDF (recommended)</b> — the official timetable PDF is read exactly, 100% accurate.</li>
-    <li><b>Photo / screenshot</b> — read by AI, so a few details may need fixing.</li>
-    <li>You'll get a preview to check and edit before anything is saved.</li>
+    <li><b>{{ __('PDF (recommended)') }}</b> {{ __('— the official timetable PDF is read exactly, 100% accurate.') }}</li>
+    <li><b>{{ __('Photo / screenshot') }}</b> {{ __('— read by AI, so a few details may need fixing.') }}</li>
+    <li>{{ __('You\'ll get a preview to check and edit before anything is saved.') }}</li>
   </ul>
   <label class="ai-upload-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-    Upload PDF / Photo
+    {{ __('Upload PDF / Photo') }}
     <input type="file" accept="application/pdf,.pdf,image/*" onchange="handlePhotoSelected(event)">
   </label>
-  <p class="ai-scanning" id="aiScanning">🔎 Reading timetable and detecting classes...</p>
+  <p class="ai-scanning" id="aiScanning">{{ __('🔎 Reading timetable and detecting classes...') }}</p>
   <div class="ai-success" id="aiSuccess">
     <p id="aiSuccessMsg"></p>
-    <button type="button" aria-label="Dismiss" onclick="dismissAiMsg()">×</button>
+    <button type="button" aria-label="{{ __('Dismiss') }}" onclick="dismissAiMsg()">×</button>
   </div>
   <div class="ai-error" id="aiError">
     <p id="aiErrorMsg"></p>
-    <button type="button" aria-label="Dismiss" onclick="dismissAiError()">×</button>
+    <button type="button" aria-label="{{ __('Dismiss') }}" onclick="dismissAiError()">×</button>
   </div>
   <div class="ai-preview" id="aiPreview">
-    <p class="ai-preview-note">Semak senarai kelas di bawah. Betulkan apa-apa yang salah, buang yang tak perlu, kemudian tekan Simpan. Kad <b>kuning</b> = perlu disemak.</p>
+    <p class="ai-preview-note">{{ __('Check the classes below. Fix anything that is wrong, remove what you don\'t need, then press Save.') }} <b>{{ __('Yellow cards need checking.') }}</b></p>
     <div id="aiPreviewList"></div>
-    <button type="button" class="ai-pv-add" onclick="addAiPreview()">+ Tambah kelas</button>
+    <button type="button" class="ai-pv-add" onclick="addAiPreview()">{{ __('+ Add class') }}</button>
     <div class="ai-pv-actions">
-      <button type="button" class="ai-pv-cancel" onclick="cancelAiPreview()">Batal</button>
-      <button type="button" class="ai-pv-save" id="aiPreviewSaveBtn" onclick="saveAiPreview()">Simpan</button>
+      <button type="button" class="ai-pv-cancel" onclick="cancelAiPreview()">{{ __('Cancel') }}</button>
+      <button type="button" class="ai-pv-save" id="aiPreviewSaveBtn" onclick="saveAiPreview()">{{ __('Save') }}</button>
     </div>
   </div>
 </div>
 
 <div class="modal" id="modal">
   <div class="modal-head">
-    <p class="modal-title" id="modalTitle">Add Class</p>
-    <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
+    <p class="modal-title" id="modalTitle">{{ __('Add Class') }}</p>
+    <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
   <input type="hidden" id="scheduleId">
-  <input type="text" id="subjectInput" placeholder="e.g. Database Systems">
+  <input type="text" id="subjectInput" placeholder="{{ __('e.g. Database Systems') }}">
 
-  <p class="field-label">Day</p>
+  <p class="field-label">{{ __('Day') }}</p>
   <select id="dayInput">
     @foreach($days as $d)
-      <option value="{{ $d }}">{{ $d }}</option>
+      <option value="{{ $d }}">{{ __($d) }}</option>
     @endforeach
   </select>
 
-  <p class="field-label">Time</p>
+  <p class="field-label">{{ __('Time') }}</p>
   <div class="time-row">
     <div><input type="time" id="startInput"></div>
     <div><input type="time" id="endInput"></div>
   </div>
 
-  <p class="field-label">Room (optional)</p>
-  <input type="text" id="roomInput" placeholder="e.g. Bilik Kuliah 3">
+  <p class="field-label">{{ __('Room (optional)') }}</p>
+  <input type="text" id="roomInput" placeholder="{{ __('e.g. Bilik Kuliah 3') }}">
 
-  <p class="field-label">Lecturer (optional)</p>
-  <input type="text" id="lecturerInput" placeholder="e.g. En. Ahmad">
+  <p class="field-label">{{ __('Lecturer (optional)') }}</p>
+  <input type="text" id="lecturerInput" placeholder="{{ __('e.g. En. Ahmad') }}">
 
-  <p class="form-error" id="formError">Please fill in subject, day and time.</p>
+  <p class="form-error" id="formError">{{ __('Please fill in subject, day and time.') }}</p>
 
-  <button type="button" class="save-btn" onclick="saveSchedule()">Save</button>
-  <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">Delete Class</button>
+  <button type="button" class="save-btn" onclick="saveSchedule()">{{ __('Save') }}</button>
+  <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">{{ __('Delete Class') }}</button>
 </div>
 
 <script>
@@ -589,10 +589,10 @@ function toMinutes(hhmm) {
 }
 
 function formatDuration(mins) {
-  if (mins < 60) return mins + ' min';
+  if (mins < 60) return mins + ' ' + t('min');
   const h = Math.floor(mins / 60);
   const m = mins % 60;
-  return h + 'h' + (m > 0 ? ' ' + m + 'min' : '');
+  return h + t('h') + (m > 0 ? ' ' + m + t('min') : '');
 }
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -615,8 +615,8 @@ function renderTodayHeading() {
   const titleLine = document.getElementById('todayTitleLine');
   if (!dateLine || !titleLine) return;
   const d = weekDates[DAYS.indexOf(selectedDay)];
-  dateLine.textContent = d.getDate() + ' ' + MONTH_NAMES[d.getMonth()];
-  titleLine.textContent = selectedDay === todayName ? 'Today' : selectedDay;
+  dateLine.textContent = d.getDate() + ' ' + t(MONTH_NAMES[d.getMonth()]);
+  titleLine.textContent = selectedDay === todayName ? t('Today') : t(selectedDay);
 }
 
 function renderDayPicker() {
@@ -625,7 +625,7 @@ function renderDayPicker() {
   picker.innerHTML = DAYS.map((day, i) => {
     const d = weekDates[i];
     return `<button type="button" class="day-picker-item ${day === selectedDay ? 'active' : ''}" onclick="selectDay('${day}')">
-        <span class="dp-label">${day.slice(0, 3)}</span>
+        <span class="dp-label">${t(day.slice(0, 3))}</span>
         <span class="dp-date">${d.getDate()}</span>
       </button>`;
   }).join('');
@@ -669,7 +669,7 @@ function renderMobileTimeline() {
     .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
   if (items.length === 0) {
-    list.innerHTML = `<p class="empty-day">No classes ${selectedDay === todayName ? 'today' : 'on ' + selectedDay}</p>`;
+    list.innerHTML = `<p class="empty-day">${selectedDay === todayName ? t('No classes today') : t('No classes on :day', {day: t(selectedDay)})}</p>`;
     return;
   }
 
@@ -678,7 +678,7 @@ function renderMobileTimeline() {
     if (idx > 0) {
       const gap = toMinutes(s.start_time) - toMinutes(items[idx - 1].end_time);
       if (gap > 0) {
-        html += `<div class="break-pill"><span>Break · ${formatDuration(gap)}</span></div>`;
+        html += `<div class="break-pill"><span>${t('Break')} · ${formatDuration(gap)}</span></div>`;
       }
     }
 
@@ -701,10 +701,10 @@ function renderMobileTimeline() {
           </div>
           ${!selectMode ? `
           <div class="timeline-menu-wrap">
-            <button type="button" class="timeline-menu-btn" aria-label="More options" onclick="toggleTimelineMenu(event, ${s.id})">⋮</button>
+            <button type="button" class="timeline-menu-btn" aria-label="${t('More options')}" onclick="toggleTimelineMenu(event, ${s.id})">⋮</button>
             <div class="timeline-menu" id="timelineMenu-${s.id}">
-              <button type="button" onclick="closeTimelineMenus(); openEditModal(${s.id})">Edit</button>
-              <button type="button" class="danger" onclick="closeTimelineMenus(); removeSchedule(${s.id})">Delete</button>
+              <button type="button" onclick="closeTimelineMenus(); openEditModal(${s.id})">${t('Edit')}</button>
+              <button type="button" class="danger" onclick="closeTimelineMenus(); removeSchedule(${s.id})">${t('Delete')}</button>
             </div>
           </div>` : ''}
         </div>
@@ -735,7 +735,7 @@ function renderDesktopGrid() {
   const totalMinutes = Math.max(maxEnd - minStart, 60);
   const totalHeight = (totalMinutes / 60) * GRID_HOUR_HEIGHT;
 
-  headerRow.innerHTML = '<div></div>' + DAYS.map(d => `<div class="grid-day-head">${d.slice(0, 3)}</div>`).join('');
+  headerRow.innerHTML = '<div></div>' + DAYS.map(d => `<div class="grid-day-head">${t(d.slice(0, 3))}</div>`).join('');
 
   gutter.style.height = totalHeight + 'px';
   let hourLabels = '';
@@ -839,7 +839,7 @@ function updateSelectBar() {
 
   selectAllCheckbox.checked = dayIds.length > 0 && selectedOnDay.length === dayIds.length;
   deleteBtn.disabled = selectedOnDay.length === 0;
-  deleteBtn.textContent = selectedOnDay.length > 0 ? `Delete (${selectedOnDay.length})` : 'Delete';
+  deleteBtn.textContent = selectedOnDay.length > 0 ? `${t('Delete')} (${selectedOnDay.length})` : t('Delete');
 }
 
 function showModal(id) {
@@ -855,7 +855,7 @@ function closeModals() {
 }
 
 function openAddModal() {
-  document.getElementById('modalTitle').textContent = 'Add Class';
+  document.getElementById('modalTitle').textContent = t('Add Class');
   document.getElementById('scheduleId').value = '';
   document.getElementById('subjectInput').value = '';
   document.getElementById('dayInput').value = selectedDay;
@@ -870,7 +870,7 @@ function openAddModal() {
 function openEditModal(id) {
   const s = schedules.find(x => x.id === id);
   if (!s) return;
-  document.getElementById('modalTitle').textContent = 'Edit Class';
+  document.getElementById('modalTitle').textContent = t('Edit Class');
   document.getElementById('scheduleId').value = s.id;
   document.getElementById('subjectInput').value = s.subject;
   document.getElementById('dayInput').value = s.day_of_week;
@@ -885,7 +885,7 @@ function openEditModal(id) {
 function confirmDeleteFromModal() {
   const id = parseInt(document.getElementById('scheduleId').value, 10);
   if (!id) return;
-  if (!confirm('Delete this class?')) return;
+  if (!confirm(t('Delete this class?'))) return;
   closeModals();
   removeSchedule(id);
 }
@@ -929,7 +929,7 @@ function saveSchedule() {
     .then(({ ok, status, data }) => {
       if (!ok || !data || !data.success) {
         if (status === 419) {
-          alert('Your session has expired. Please refresh the page and try again.');
+          alert(t('Your session has expired. Please refresh the page and try again.'));
         } else {
           document.getElementById('formError').style.display = 'block';
         }
@@ -965,20 +965,20 @@ function removeSchedule(id) {
         return;
       }
       if (status === 419) {
-        alert('Your session has expired. Please refresh the page and try again.');
+        alert(t('Your session has expired. Please refresh the page and try again.'));
       } else {
-        alert('Could not delete this class right now. Please try again.');
+        alert(t('Could not delete this class right now. Please try again.'));
       }
     })
     .catch((err) => {
       console.error('Delete failed', err);
-      alert('Ada masalah sambungan. Cuba lagi.');
+      alert(t('Connection problem. Please try again.'));
     });
 }
 
 function deleteAllSchedules() {
   if (schedules.length === 0) return;
-  if (!confirm(`Delete all ${schedules.length} class(es) from your timetable? This cannot be undone.`)) return;
+  if (!confirm(t('Delete all :count class(es) from your timetable? This cannot be undone.', {count: schedules.length}))) return;
 
   fetch('{{ route('timetable.destroyAll') }}', {
     method: 'POST',
@@ -992,21 +992,21 @@ function deleteAllSchedules() {
         return;
       }
       if (status === 419) {
-        alert('Your session has expired. Please refresh the page and try again.');
+        alert(t('Your session has expired. Please refresh the page and try again.'));
       } else {
-        alert('Could not delete your classes right now. Please try again.');
+        alert(t('Could not delete your classes right now. Please try again.'));
       }
     })
     .catch((err) => {
       console.error('Delete all failed', err);
-      alert('Ada masalah sambungan. Cuba lagi.');
+      alert(t('Connection problem. Please try again.'));
     });
 }
 
 function deleteSelectedSchedules() {
   const ids = Array.from(selectedIds);
   if (ids.length === 0) return;
-  if (!confirm(`Delete ${ids.length} selected class(es)? This cannot be undone.`)) return;
+  if (!confirm(t('Delete :count selected class(es)? This cannot be undone.', {count: ids.length}))) return;
 
   fetch('{{ route('timetable.bulkDestroy') }}', {
     method: 'POST',
@@ -1024,14 +1024,14 @@ function deleteSelectedSchedules() {
         return;
       }
       if (status === 419) {
-        alert('Your session has expired. Please refresh the page and try again.');
+        alert(t('Your session has expired. Please refresh the page and try again.'));
       } else {
-        alert('Could not delete the selected classes right now. Please try again.');
+        alert(t('Could not delete the selected classes right now. Please try again.'));
       }
     })
     .catch((err) => {
       console.error('Bulk delete failed', err);
-      alert('Ada masalah sambungan. Cuba lagi.');
+      alert(t('Connection problem. Please try again.'));
     });
 }
 
@@ -1074,9 +1074,9 @@ function handlePhotoSelected(e) {
 
       if (!ok || !data || !data.success) {
         const msg = (data && (data.error || data.message))
-          || (status === 419 ? 'Sesi dah tamat. Refresh page dan cuba lagi.'
-          : status === 413 ? 'Fail terlalu besar.'
-          : 'Tak dapat proses fail tu (ralat ' + status + '). Cuba lagi.');
+          || (status === 419 ? t('Your session has expired. Please refresh the page and try again.')
+          : status === 413 ? t('File is too large.')
+          : t('Could not process that file (error :status). Please try again.', {status}));
         document.getElementById('aiErrorMsg').textContent = '⚠️ ' + msg;
         document.getElementById('aiError').classList.add('open');
         return;
@@ -1096,7 +1096,7 @@ function handlePhotoSelected(e) {
     .catch(err => {
       console.error('AI capture failed', err);
       document.getElementById('aiScanning').classList.remove('open');
-      document.getElementById('aiErrorMsg').textContent = '⚠️ Ada masalah sambungan. Cuba lagi.';
+      document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Connection problem. Please try again.');
       document.getElementById('aiError').classList.add('open');
       e.target.value = '';
     });
@@ -1126,30 +1126,30 @@ function renderAiPreview() {
   order.forEach(i => {
     const c = aiPreview[i];
     if (c.day_of_week !== lastDay) {
-      html += `<p class="ai-preview-day">${escapeHtml(c.day_of_week)}</p>`;
+      html += `<p class="ai-preview-day">${escapeHtml(t(c.day_of_week))}</p>`;
       lastDay = c.day_of_week;
     }
     const warn = c.warnings && c.warnings.length > 0;
     html += `<div class="ai-pv-card${warn ? ' warn' : ''}${c.isNew ? ' new' : ''}" data-idx="${i}">
-      <button type="button" class="ai-pv-remove" aria-label="Remove" onclick="removeAiPreview(${i})">×</button>
+      <button type="button" class="ai-pv-remove" aria-label="${t('Remove')}" onclick="removeAiPreview(${i})">×</button>
       ${warn ? c.warnings.map(w => `<p class="ai-pv-warn">⚠️ ${escapeHtml(w)}</p>`).join('') : ''}
       <div class="ai-pv-grid">
-        <input class="full" type="text" value="${escapeHtml(c.subject)}" placeholder="Subject" oninput="editAiPreview(${i}, 'subject', this.value)">
+        <input class="full" type="text" value="${escapeHtml(c.subject)}" placeholder="${t('Subject')}" oninput="editAiPreview(${i}, 'subject', this.value)">
         <select onchange="editAiPreview(${i}, 'day_of_week', this.value); renderAiPreview();">
-          ${DAYS.map(d => `<option value="${d}"${d === c.day_of_week ? ' selected' : ''}>${d}</option>`).join('')}
+          ${DAYS.map(d => `<option value="${d}"${d === c.day_of_week ? ' selected' : ''}>${t(d)}</option>`).join('')}
         </select>
         <div style="display:flex; gap:6px;">
           <input type="time" value="${escapeHtml(c.start_time)}" onchange="editAiPreview(${i}, 'start_time', this.value)">
           <input type="time" value="${escapeHtml(c.end_time)}" onchange="editAiPreview(${i}, 'end_time', this.value)">
         </div>
-        <input type="text" value="${escapeHtml(c.room)}" placeholder="Room" oninput="editAiPreview(${i}, 'room', this.value)">
-        <input type="text" value="${escapeHtml(c.lecturer)}" placeholder="Lecturer" oninput="editAiPreview(${i}, 'lecturer', this.value)">
+        <input type="text" value="${escapeHtml(c.room)}" placeholder="${t('Room')}" oninput="editAiPreview(${i}, 'room', this.value)">
+        <input type="text" value="${escapeHtml(c.lecturer)}" placeholder="${t('Lecturer')}" oninput="editAiPreview(${i}, 'lecturer', this.value)">
       </div>
     </div>`;
   });
 
   list.innerHTML = html;
-  saveBtn.textContent = `Simpan ${aiPreview.length} kelas`;
+  saveBtn.textContent = t('Save :count classes', {count: aiPreview.length});
   saveBtn.disabled = false;
   wrap.classList.add('open');
 }
@@ -1184,14 +1184,14 @@ function cancelAiPreview() {
 function saveAiPreview() {
   const bad = aiPreview.find(c => !c.subject.trim() || !c.start_time || !c.end_time || c.end_time <= c.start_time);
   if (bad) {
-    document.getElementById('aiErrorMsg').textContent = '⚠️ Ada kelas yang subjek kosong atau masa tamat tak lepas masa mula. Betulkan dulu.';
+    document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Some classes have no subject or end before they start. Please fix them first.');
     document.getElementById('aiError').classList.add('open');
     return;
   }
 
   const saveBtn = document.getElementById('aiPreviewSaveBtn');
   saveBtn.disabled = true;
-  saveBtn.textContent = 'Menyimpan...';
+  saveBtn.textContent = t('Saving...');
 
   const payload = aiPreview.map(c => ({
     subject: c.subject.trim(),
@@ -1211,25 +1211,25 @@ function saveAiPreview() {
     .then(({ ok, status, data }) => {
       if (!ok || !data || !data.success) {
         saveBtn.disabled = false;
-        saveBtn.textContent = `Simpan ${aiPreview.length} kelas`;
+        saveBtn.textContent = t('Save :count classes', {count: aiPreview.length});
         document.getElementById('aiErrorMsg').textContent = status === 419
-          ? '⚠️ Sesi dah tamat. Refresh page dan cuba lagi.'
-          : '⚠️ Tak dapat simpan. Semak semua medan dan cuba lagi.';
+          ? '⚠️ ' + t('Your session has expired. Please refresh the page and try again.')
+          : '⚠️ ' + t('Could not save. Check all fields and try again.');
         document.getElementById('aiError').classList.add('open');
         return;
       }
       schedules = schedules.concat(data.schedules);
       aiPreview = [];
       renderAiPreview();
-      document.getElementById('aiSuccessMsg').textContent = '✅ ' + data.schedules.length + ' kelas disimpan ke jadual anda!';
+      document.getElementById('aiSuccessMsg').textContent = '✅ ' + t(':count classes saved to your timetable!', {count: data.schedules.length});
       document.getElementById('aiSuccess').classList.add('open');
       render();
     })
     .catch(err => {
       console.error('AI preview save failed', err);
       saveBtn.disabled = false;
-      saveBtn.textContent = `Simpan ${aiPreview.length} kelas`;
-      document.getElementById('aiErrorMsg').textContent = '⚠️ Ada masalah sambungan. Cuba lagi.';
+      saveBtn.textContent = t('Save :count classes', {count: aiPreview.length});
+      document.getElementById('aiErrorMsg').textContent = '⚠️ ' + t('Connection problem. Please try again.');
       document.getElementById('aiError').classList.add('open');
     });
 }

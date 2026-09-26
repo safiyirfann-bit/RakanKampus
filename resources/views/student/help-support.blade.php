@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Help & Support</title>
+    <title>{{ __('Help & Support') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,15 +111,15 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
         <div>
-            <h1>Help & Support</h1>
-            <p>Get help and report issues</p>
+            <h1>{{ __('Help & Support') }}</h1>
+            <p>{{ __('Get help and report issues') }}</p>
         </div>
 
     </div>
@@ -130,48 +130,48 @@
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">Frequently asked questions</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">{{ __('Frequently asked questions') }}</p>
             </div>
 
             <div class="divide-y divide-slate-100">
 
                 <details class="group px-5 py-4">
                     <summary class="flex items-center justify-between cursor-pointer list-none">
-                        <span class="font-medium text-slate-900">How do I use the AI chatbot?</span>
+                        <span class="font-medium text-slate-900">{{ __('How do I use the AI chatbot?') }}</span>
                         <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
                     </summary>
                     <p class="mt-3 text-sm leading-6 text-slate-500">
-                        Open the chat page, type your question, and the chatbot will answer based on campus information provided by the system.
+                        {{ __('Open the chat page, type your question, and the chatbot will answer based on campus information provided by the system.') }}
                     </p>
                 </details>
 
                 <details class="group px-5 py-4">
                     <summary class="flex items-center justify-between cursor-pointer list-none">
-                        <span class="font-medium text-slate-900">How can I change my password?</span>
+                        <span class="font-medium text-slate-900">{{ __('How can I change my password?') }}</span>
                         <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
                     </summary>
                     <p class="mt-3 text-sm leading-6 text-slate-500">
-                        Go to Profile & Settings → Change Password and enter your current and new password.
+                        {{ __('Go to Profile & Settings → Change Password and enter your current and new password.') }}
                     </p>
                 </details>
 
                 <details class="group px-5 py-4">
                     <summary class="flex items-center justify-between cursor-pointer list-none">
-                        <span class="font-medium text-slate-900">How do I clear chat history?</span>
+                        <span class="font-medium text-slate-900">{{ __('How do I clear chat history?') }}</span>
                         <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
                     </summary>
                     <p class="mt-3 text-sm leading-6 text-slate-500">
-                        Open Privacy Settings and choose “Clear chat history” to remove saved conversations.
+                        {{ __('Open Privacy Settings and choose “Clear chat history” to remove saved conversations.') }}
                     </p>
                 </details>
 
                 <details class="group px-5 py-4">
                     <summary class="flex items-center justify-between cursor-pointer list-none">
-                        <span class="font-medium text-slate-900">Where does the chatbot get information?</span>
+                        <span class="font-medium text-slate-900">{{ __('Where does the chatbot get information?') }}</span>
                         <span class="text-slate-400 group-open:rotate-180 transition">⌄</span>
                     </summary>
                     <p class="mt-3 text-sm leading-6 text-slate-500">
-                        The chatbot uses information stored in the RakanKampus knowledge base and campus guideline dataset.
+                        {{ __('The chatbot uses information stored in the RakanKampus knowledge base and campus guideline dataset.') }}
                     </p>
                 </details>
 
@@ -183,32 +183,32 @@
         <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm space-y-4">
 
             <div>
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600 mb-1">Report a problem</p>
-                <h3 class="font-semibold text-slate-900">Tell us what happened</h3>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600 mb-1">{{ __('Report a problem') }}</p>
+                <h3 class="font-semibold text-slate-900">{{ __('Tell us what happened') }}</h3>
                 <p class="text-sm text-slate-500 mt-1">
-                    Submit a technical issue or feedback about the system.
+                    {{ __('Submit a technical issue or feedback about the system.') }}
                 </p>
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-medium text-slate-700">Issue type</label>
+                <label class="text-sm font-medium text-slate-700">{{ __('Issue type') }}</label>
                 <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
-                    <option>Chatbot issue</option>
-                    <option>Login problem</option>
-                    <option>Profile problem</option>
-                    <option>Other</option>
+                    <option>{{ __('Chatbot issue') }}</option>
+                    <option>{{ __('Login problem') }}</option>
+                    <option>{{ __('Profile problem') }}</option>
+                    <option>{{ __('Other') }}</option>
                 </select>
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-medium text-slate-700">Describe the issue</label>
+                <label class="text-sm font-medium text-slate-700">{{ __('Describe the issue') }}</label>
                 <textarea rows="5"
                           class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none"
-                          placeholder="Explain what happened and when it occurred..."></textarea>
+                          placeholder="{{ __('Explain what happened and when it occurred...') }}"></textarea>
             </div>
 
             <button class="w-full rounded-2xl bg-indigo-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
-                Submit Report
+                {{ __('Submit Report') }}
             </button>
 
         </div>
@@ -217,28 +217,28 @@
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">Application information</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600">{{ __('Application information') }}</p>
             </div>
 
             <div class="divide-y divide-slate-100">
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Version</span>
+                    <span class="text-slate-600">{{ __('Version') }}</span>
                     <span class="font-medium text-slate-900">1.0.0</span>
                 </div>
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Developed by</span>
-                    <span class="font-medium text-slate-900">Final Year Project Team</span>
+                    <span class="text-slate-600">{{ __('Developed by') }}</span>
+                    <span class="font-medium text-slate-900">{{ __('Final Year Project Team') }}</span>
                 </div>
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Department</span>
+                    <span class="text-slate-600">{{ __('Department') }}</span>
                     <span class="font-medium text-slate-900">JTMK</span>
                 </div>
 
                 <div class="flex items-center justify-between px-5 py-4">
-                    <span class="text-slate-600">Platform</span>
+                    <span class="text-slate-600">{{ __('Platform') }}</span>
                     <span class="font-medium text-slate-900">Laravel Web App</span>
                 </div>
 

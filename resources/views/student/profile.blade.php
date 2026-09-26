@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Profile & Settings</title>
+    <title>{{ __('Profile & Settings') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -116,7 +116,7 @@
     <!-- Header -->
 <div class="profile-header">
 
-    <a href="{{ route('student.home') }}" class="back-btn" aria-label="Back">
+    <a href="{{ route('student.home') }}" class="back-btn" aria-label="{{ __('Back') }}">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 19l-7-7 7-7"/>
         </svg>
@@ -136,7 +136,7 @@
 
     <div class="w-14 h-14 rounded-full text-white flex items-center justify-center font-bold text-lg overflow-hidden" style="background: linear-gradient(135deg, #14213d, #2ec4c6);">
         @if($user->photo_data)
-            <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="Profile photo">
+            <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="{{ __('Profile photo') }}">
         @else
             {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
         @endif

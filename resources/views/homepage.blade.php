@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 @include('partials.pwa-head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>RakanKampus - Home</title>
+<title>{{ __('RakanKampus - Home') }}</title>
 <style>
   :root {
     --blue-primary: #0d9488;
@@ -589,7 +589,7 @@
       <div class="greeting-top">
         <div class="greeting-avatar">
             @if($user->photo_data)
-                <img src="{{ $user->photo_data }}" alt="Profile photo">
+                <img src="{{ $user->photo_data }}" alt="{{ __('Profile photo') }}">
             @else
                 {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
             @endif
@@ -617,8 +617,8 @@
               $greeting = 'Good evening';
           }
       @endphp
-      <p class="greeting-hello"><span id="greetingHello">{{ $greeting }}</span>!</p>
-      <p class="greeting-question">How can I help you today?</p>
+      <p class="greeting-hello"><span id="greetingHello">{{ __($greeting) }}</span>!</p>
+      <p class="greeting-question">{{ __('How can I help you today?') }}</p>
     </div>
 
     <a href="{{ route('student.reminders') }}" class="reminders-banner">
@@ -626,8 +626,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
       </div>
       <div class="reminders-banner-body">
-        <p class="reminders-banner-title">Reminders</p>
-        <p class="reminders-banner-sub">For exams, assignments &amp; deadlines</p>
+        <p class="reminders-banner-title">{{ __('Reminders') }}</p>
+        <p class="reminders-banner-sub">{{ __('For exams, assignments & deadlines') }}</p>
       </div>
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
     </a>
@@ -636,9 +636,9 @@
       <div class="today-classes-head">
         <div class="today-classes-title-row">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18"></path><path d="M8 3v4"></path><path d="M16 3v4"></path></svg>
-          <p class="today-classes-title" id="todayClassesTitle">Today's Classes</p>
+          <p class="today-classes-title" id="todayClassesTitle">{{ __('Today\'s Classes') }}</p>
         </div>
-        <a href="{{ route('student.timetable') }}" class="today-classes-link">View all &rarr;</a>
+        <a href="{{ route('student.timetable') }}" class="today-classes-link">{{ __('View all →') }}</a>
       </div>
 
       <div class="today-classes-body" id="todayClassesBody"
@@ -647,10 +647,10 @@
     </div>
 
     <div class="quick-grid">
-  <a href="{{ route('student.chat') }}?q={{ urlencode('How do I register for courses?') }}" class="quick-chip">How do I register for courses?</a>
-  <a href="{{ route('student.chat') }}?q={{ urlencode('When is the fee payment deadline?') }}" class="quick-chip">When is the fee payment deadline?</a>
-  <a href="{{ route('student.chat') }}?q={{ urlencode('How do I access library resources?') }}" class="quick-chip">How do I access library resources?</a>
-  <a href="{{ route('student.chat') }}?q={{ urlencode("What's the exam timetable?") }}" class="quick-chip">What's the exam timetable?</a>
+  <a href="{{ route('student.chat') }}?q={{ urlencode('How do I register for courses?') }}" class="quick-chip">{{ __('How do I register for courses?') }}</a>
+  <a href="{{ route('student.chat') }}?q={{ urlencode('When is the fee payment deadline?') }}" class="quick-chip">{{ __('When is the fee payment deadline?') }}</a>
+  <a href="{{ route('student.chat') }}?q={{ urlencode('How do I access library resources?') }}" class="quick-chip">{{ __('How do I access library resources?') }}</a>
+  <a href="{{ route('student.chat') }}?q={{ urlencode("What's the exam timetable?") }}" class="quick-chip">{{ __('What\'s the exam timetable?') }}</a>
 </div>
 
     <a href="{{ route('student.chat') }}" class="start-chat-btn">
@@ -660,20 +660,20 @@
         <line x1="5" y1="12" x2="19" y2="12"></line>
     </svg>
 
-    Start New Chat
+    {{ __('Start New Chat') }}
 
 </a>
 
-    <p class="section-label">RECENT CONVERSATIONS</p>
+    <p class="section-label">{{ __('RECENT CONVERSATIONS') }}</p>
 
     <div class="conversation-list">
 
     @forelse($conversations as $conv)
 
         <div class="conv-swipe-wrap">
-            <button type="button" class="conv-swipe-delete" aria-label="Delete" onclick="deleteHomeConversationDirect({{ $conv['id'] }})">
+            <button type="button" class="conv-swipe-delete" aria-label="{{ __('Delete') }}" onclick="deleteHomeConversationDirect({{ $conv['id'] }})">
                 <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                <span>Delete</span>
+                <span>{{ __('Delete') }}</span>
             </button>
             <div class="conv-card" data-conv-id="{{ $conv['id'] }}" data-conv-title="{{ $conv['title'] }}" data-chat-url="{{ route('student.chat') }}?conversation={{ $conv['id'] }}"
                  onpointerdown="startConvDrag(event, {{ $conv['id'] }})" onpointermove="moveConvDrag(event)" onpointerup="endConvDrag(event, {{ $conv['id'] }})" onpointerleave="endConvDrag(event, {{ $conv['id'] }})">
@@ -690,10 +690,10 @@
                     <span class="conv-time">{{ $conv['time'] }}</span>
                 </div>
                 <div class="conv-actions">
-                    <button type="button" class="conv-action-btn" aria-label="Edit" onclick="event.stopPropagation(); renameHomeConversation({{ $conv['id'] }}, {{ Js::from($conv['title']) }})">
+                    <button type="button" class="conv-action-btn" aria-label="{{ __('Edit') }}" onclick="event.stopPropagation(); renameHomeConversation({{ $conv['id'] }}, {{ Js::from($conv['title']) }})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
                     </button>
-                    <button type="button" class="conv-action-btn" aria-label="Delete" onclick="event.stopPropagation(); deleteHomeConversation({{ $conv['id'] }})">
+                    <button type="button" class="conv-action-btn" aria-label="{{ __('Delete') }}" onclick="event.stopPropagation(); deleteHomeConversation({{ $conv['id'] }})">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                 </div>
@@ -703,7 +703,7 @@
     @empty
 
         <p style="text-align:center; color: var(--text-muted); padding: 24px 0; grid-column: 1/-1;">
-            No conversations yet. Start your first chat! 💬
+            {{ __('No conversations yet. Start your first chat! 💬') }}
         </p>
 
     @endforelse
@@ -743,10 +743,10 @@ function renderTodayClasses() {
     const viewedDate = getViewedDate();
     const dayName = CLASS_DAYS[(viewedDate.getDay() + 6) % 7]; // JS Sunday-first -> Monday-first index
 
-    if (dayOffset === 0) titleEl.textContent = "Today's Classes";
-    else if (dayOffset === 1) titleEl.textContent = "Tomorrow's Classes";
-    else if (dayOffset === -1) titleEl.textContent = "Yesterday's Classes";
-    else titleEl.textContent = dayName + "'s Classes";
+    if (dayOffset === 0) titleEl.textContent = t("Today's Classes");
+    else if (dayOffset === 1) titleEl.textContent = t("Tomorrow's Classes");
+    else if (dayOffset === -1) titleEl.textContent = t("Yesterday's Classes");
+    else titleEl.textContent = t(':day\'s Classes', {day: t(dayName)});
 
     const isActualToday = dayOffset === 0;
     const now = new Date();
@@ -756,7 +756,7 @@ function renderTodayClasses() {
         .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
     if (items.length === 0) {
-        bodyEl.innerHTML = `<p class="today-classes-empty">${isActualToday ? 'No classes today 🎉' : 'No classes'}</p>`;
+        bodyEl.innerHTML = `<p class="today-classes-empty">${isActualToday ? t('No classes today') + ' 🎉' : t('No classes')}</p>`;
         return;
     }
 
@@ -770,7 +770,7 @@ function renderTodayClasses() {
             status = now < start ? 'upcoming' : (now < end ? 'ongoing' : 'past');
         }
         const meta = [s.room, s.lecturer].filter(Boolean).map(escapeHtmlHome).join(' · ')
-            || (status === 'ongoing' ? 'Ongoing now' : '');
+            || (status === 'ongoing' ? t('Ongoing now') : '');
 
         return `<div class="today-class-row ${status === 'past' ? 'is-past' : ''} ${status === 'ongoing' ? 'is-ongoing' : ''}">
             <div class="today-class-time">${formatClassTime(s.start_time)}</div>
@@ -857,10 +857,10 @@ function updateGreeting() {
 
     const hour = new Date().getHours();
     let greeting;
-    if (hour < 5 || hour >= 22) greeting = 'Good night';
-    else if (hour < 12) greeting = 'Good morning';
-    else if (hour < 18) greeting = 'Good afternoon';
-    else greeting = 'Good evening';
+    if (hour < 5 || hour >= 22) greeting = t('Good night');
+    else if (hour < 12) greeting = t('Good morning');
+    else if (hour < 18) greeting = t('Good afternoon');
+    else greeting = t('Good evening');
 
     if (el.textContent !== greeting) el.textContent = greeting;
 }
@@ -927,7 +927,7 @@ function deleteHomeConversationDirect(id) {
 }
 
 function renameHomeConversation(id, currentTitle) {
-    const newTitle = prompt('Rename conversation:', currentTitle);
+    const newTitle = prompt(t('Rename conversation:'), currentTitle);
     if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
 
     fetch(`/chatbot/${id}/rename`, {
@@ -947,7 +947,7 @@ function renameHomeConversation(id, currentTitle) {
 }
 
 function deleteHomeConversation(id) {
-    if (!confirm('Delete this conversation?')) return;
+    if (!confirm(t('Delete this conversation?'))) return;
 
     fetch(`/chatbot/${id}`, {
         method: 'DELETE',

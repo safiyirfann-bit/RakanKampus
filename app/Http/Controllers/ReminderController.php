@@ -100,7 +100,7 @@ class ReminderController extends Controller
 
             return response()->json([
                 'success' => false,
-                'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
+                'error' => __('AI could not process that image right now. Please try again shortly.'),
             ], 422);
         }
 
@@ -109,7 +109,7 @@ class ReminderController extends Controller
         if (! $parsed || empty($parsed['detected']) || empty($parsed['due_date'])) {
             return response()->json([
                 'success' => false,
-                'error' => 'Tak dapat kesan tarikh/subjek dalam gambar tu. Cuba gambar yang lebih jelas, atau isi manual.',
+                'error' => __('Could not detect a date/subject in that image. Try a clearer picture, or fill it in manually.'),
             ], 422);
         }
 
@@ -127,7 +127,7 @@ class ReminderController extends Controller
         } catch (\Throwable $e) {
             return response()->json([
                 'success' => false,
-                'error' => 'Tarikh dalam gambar tu tak jelas. Cuba isi manual ye.',
+                'error' => __('The date in that image is not clear. Please fill it in manually.'),
             ], 422);
         }
 

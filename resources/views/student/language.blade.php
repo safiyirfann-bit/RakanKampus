@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Language</title>
+    <title>{{ __('Language') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,7 +111,7 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>

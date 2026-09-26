@@ -43,7 +43,7 @@ class TimetablePdfParser
     {
         $words = $this->words($pdfPath);
         if (count($words) === 0) {
-            throw new RuntimeException('PDF ni tak ada teks (mungkin hasil scan). Upload gambar/screenshot jadual sebagai ganti.');
+            throw new RuntimeException(__('This PDF has no text (it may be a scan). Upload a photo/screenshot of the timetable instead.'));
         }
 
         // --- Rows: day labels in the left column ---------------------------------
@@ -56,7 +56,7 @@ class TimetablePdfParser
         }
         usort($days, fn ($a, $b) => $a['y'] <=> $b['y']);
         if (count($days) === 0) {
-            throw new RuntimeException('Tak jumpa label hari (ISNIN, SELASA, ...) dalam PDF ni.');
+            throw new RuntimeException(__('Could not find the day labels (ISNIN, SELASA, ...) in this PDF.'));
         }
         $gridTop = $days[0]['y'];
         $labelRight = max(array_column($days, 'xMax'));
@@ -65,7 +65,7 @@ class TimetablePdfParser
         $times = array_values(array_filter($words, fn ($w) => preg_match(self::TIME_RE, $w['text']) && $w['cy'] < $gridTop && $w['xMin'] > $labelRight));
         $timeRows = $this->clusterByY($times, 4);
         if (count($timeRows) < 1) {
-            throw new RuntimeException('Tak jumpa baris masa (8:00, 9:00, ...) dalam PDF ni.');
+            throw new RuntimeException(__('Could not find the time row (8:00, 9:00, ...) in this PDF.'));
         }
         $starts = $timeRows[0];
         $ends = $timeRows[1] ?? [];
@@ -197,7 +197,7 @@ class TimetablePdfParser
         $cmd = 'pdftotext -f 1 -l 1 -bbox ' . escapeshellarg($pdfPath) . ' - 2>/dev/null';
         $html = shell_exec($cmd);
         if (! is_string($html) || $html === '') {
-            throw new RuntimeException('Tak dapat baca PDF tu.');
+            throw new RuntimeException(__('Could not read that PDF.'));
         }
 
         preg_match_all('/<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)<\/word>/s', $html, $m, PREG_SET_ORDER);

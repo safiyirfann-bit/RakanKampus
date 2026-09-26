@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Edit Profile</title>
+    <title>{{ __('Edit Profile') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,13 +111,13 @@
 <!-- Header -->
 <div class="page-header">
 
-    <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+    <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M15 19l-7-7 7-7"/>
         </svg>
     </a>
 
-    <h1>Edit Profile</h1>
+    <h1>{{ __('Edit Profile') }}</h1>
 
 </div>
 
@@ -130,7 +130,7 @@
 
             <div class="w-24 h-24 rounded-full bg-indigo-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg overflow-hidden" id="avatarWrapper">
                 @if($user->photo_data)
-                    <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="Profile photo">
+                    <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="{{ __('Profile photo') }}">
                 @else
                     {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
                 @endif
@@ -164,7 +164,7 @@
 
             <div>
                 <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    First Name
+                    {{ __('First Name') }}
                 </label>
 
                 <input type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}"
@@ -176,7 +176,7 @@
 
             <div>
                 <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    Last Name
+                    {{ __('Last Name') }}
                 </label>
 
                 <input type="text" name="last_name" value="{{ old('last_name', $user->last_name) }}"
@@ -191,7 +191,7 @@
         <!-- Email -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                Email
+                {{ __('Email') }}
             </label>
 
             <input type="email" name="email" value="{{ old('email', $user->email) }}"
@@ -204,7 +204,7 @@
         <!-- Registration Number -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                Registration Number
+                {{ __('Registration Number') }}
             </label>
 
             <input type="text" name="student_id" value="{{ old('student_id', $user->student_id) }}"
@@ -217,7 +217,7 @@
         <!-- Faculty -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                Faculty
+                {{ __('Faculty') }}
             </label>
 
             <input type="text" name="faculty" value="{{ old('faculty', $user->faculty) }}"
@@ -230,7 +230,7 @@
         <!-- Phone -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                Phone Number
+                {{ __('Phone Number') }}
             </label>
 
             <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
@@ -244,7 +244,7 @@
         <button type="submit"
                 class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
 
-            Save Changes
+            {{ __('Save Changes') }}
 
         </button>
 
@@ -261,8 +261,8 @@
         <div class="flex items-center justify-between p-6 border-b border-indigo-100">
 
             <div>
-                <h2 class="text-2xl font-bold text-indigo-900">Profile photo</h2>
-                <p class="text-sm text-indigo-400 mt-1">Choose a photo for your account.</p>
+                <h2 class="text-2xl font-bold text-indigo-900">{{ __('Profile photo') }}</h2>
+                <p class="text-sm text-indigo-400 mt-1">{{ __('Choose a photo for your account.') }}</p>
             </div>
 
             <button onclick="closePhotoModal()"
@@ -277,13 +277,13 @@
 
             <div class="w-36 h-36 rounded-full bg-indigo-50 border border-indigo-100 flex flex-col items-center justify-center text-indigo-300 overflow-hidden" id="previewWrapper">
 
-                <img id="previewImg" class="w-full h-full object-cover hidden" alt="Preview">
+                <img id="previewImg" class="w-full h-full object-cover hidden" alt="{{ __('Preview') }}">
 
                 <svg id="noPhotoIcon" xmlns="http://www.w3.org/2000/svg" class="w-10 h-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7a2 2 0 012-2h2l1-1h4l1 1h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V7zm9 3a4 4 0 100 8 4 4 0 000-8z"/>
                 </svg>
 
-                <span id="noPhotoText" class="text-sm">No photo</span>
+                <span id="noPhotoText" class="text-sm">{{ __('No photo') }}</span>
 
             </div>
 
@@ -298,11 +298,11 @@
             <div class="grid grid-cols-2 gap-4 w-full mt-4">
                 <button type="button" onclick="cancelCamera()"
                     class="rounded-2xl border border-indigo-100 bg-indigo-50/50 py-3 font-medium text-indigo-700 hover:bg-indigo-100 transition">
-                    Cancel
+                    {{ __('Cancel') }}
                 </button>
                 <button type="button" onclick="snapPhoto()"
                     class="rounded-2xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 transition">
-                    Snap photo
+                    {{ __('Snap photo') }}
                 </button>
             </div>
 
@@ -318,7 +318,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14m-6 4h6a2 2 0 002-2V8a2 2 0 00-2-2H9a2 2 0 00-2 2v8a2 2 0 002 2z"/>
                 </svg>
 
-                <span class="font-medium text-indigo-700">Take selfie</span>
+                <span class="font-medium text-indigo-700">{{ __('Take selfie') }}</span>
 
                 <input type="file" accept="image/*" capture="user" class="hidden" id="selfieInput">
 
@@ -330,7 +330,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4-4a3 3 0 014.243 0L16 16m-2-2l1-1a3 3 0 014.243 0L20 14m-6 6H6a2 2 0 01-2-2V6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2z"/>
                 </svg>
 
-                <span class="font-medium text-indigo-700">Choose photo</span>
+                <span class="font-medium text-indigo-700">{{ __('Choose photo') }}</span>
 
                 <input type="file" accept="image/*" class="hidden" id="photoInput">
 
@@ -343,7 +343,7 @@
 
             <button type="button" id="uploadBtn" onclick="uploadPhoto()"
                 class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-semibold text-white hover:bg-indigo-700 transition shadow-lg shadow-indigo-200">
-                Upload photo
+                {{ __('Upload photo') }}
             </button>
 
         </div>
@@ -360,7 +360,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
             </svg>
         </div>
-        <h2 id="alertTitle" class="text-lg font-bold text-indigo-900 mb-1">Notice</h2>
+        <h2 id="alertTitle" class="text-lg font-bold text-indigo-900 mb-1">{{ __('Notice') }}</h2>
         <p id="alertMessage" class="text-sm text-indigo-400 mb-6">&nbsp;</p>
         <button type="button" onclick="closeAlertModal()"
             class="w-full rounded-2xl bg-indigo-600 py-3 font-semibold text-white hover:bg-indigo-700 transition">
@@ -452,7 +452,7 @@ async function openCamera() {
         document.getElementById('cameraView').classList.add('flex');
     } catch (err) {
         console.error(err);
-        showAlert('error', 'Camera unavailable', 'Unable to access the camera. Please allow camera permission, or use Choose photo instead.');
+        showAlert('error', t('Camera unavailable'), t('Unable to access the camera. Please allow camera permission, or use Choose photo instead.'));
     }
 }
 
@@ -537,7 +537,7 @@ document.getElementById('alertModal').addEventListener('click', function(e) {
 
 function uploadPhoto() {
     if (!selectedFile) {
-        showAlert('warning', 'Notice', 'Please choose an image first.');
+        showAlert('warning', t('Notice'), t('Please choose an image first.'));
         return;
     }
 
@@ -565,18 +565,18 @@ function uploadPhoto() {
         .then(({ ok, data }) => {
             if (ok && data && data.success) {
                 document.getElementById('avatarWrapper').innerHTML =
-                    `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="Profile photo">`;
+                    `<img src="${data.photoUrl}" class="w-full h-full object-cover" alt="${t('Profile photo')}">`;
                 currentPhotoUrl = data.photoUrl;
                 closePhotoModal();
                 return;
             }
 
             const validationMsg = data && data.errors && data.errors.photo && data.errors.photo[0];
-            showAlert('error', 'Failed', validationMsg || (data && data.message) || 'Failed to upload image.');
+            showAlert('error', t('Failed'), validationMsg || (data && data.message) || t('Failed to upload image.'));
         })
         .catch(err => {
             console.error(err);
-            showAlert('error', 'Error', 'An error occurred during upload.');
+            showAlert('error', t('Error'), t('An error occurred during upload.'));
         });
 }
 </script>

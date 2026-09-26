@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Change Password</title>
+    <title>{{ __('Change Password') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,13 +111,13 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
-        <h1>Change Password</h1>
+        <h1>{{ __('Change Password') }}</h1>
 
     </div>
 
@@ -153,8 +153,8 @@
                 </div>
 
                 <div>
-                    <h2 class="text-lg font-bold text-indigo-900">Update Your Password</h2>
-                    <p class="text-sm text-indigo-400">Choose a strong password to keep your account secure.</p>
+                    <h2 class="text-lg font-bold text-indigo-900">{{ __('Update Your Password') }}</h2>
+                    <p class="text-sm text-indigo-400">{{ __('Choose a strong password to keep your account secure.') }}</p>
                 </div>
 
             </div>
@@ -163,7 +163,7 @@
             <div class="mt-4">
 
                 <div class="flex items-center justify-between text-sm mb-2">
-                    <span class="text-indigo-500 font-medium">Password Strength</span>
+                    <span class="text-indigo-500 font-medium">{{ __('Password Strength') }}</span>
                     <span class="font-semibold" id="strengthLabel" style="color:#94a3b8;">-</span>
                 </div>
 
@@ -184,12 +184,12 @@
             <div>
 
                 <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    Current Password
+                    {{ __('Current Password') }}
                 </label>
 
                 <div class="relative">
 
-                    <input type="password" name="current_password" id="current_password" placeholder="Enter current password"
+                    <input type="password" name="current_password" id="current_password" placeholder="{{ __('Enter current password') }}"
                            class="password-field w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 pr-14 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
 
                     <button type="button" onclick="toggleVisibility('current_password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400 hover:text-indigo-600">
@@ -209,12 +209,12 @@
             <div>
 
                 <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    New Password
+                    {{ __('New Password') }}
                 </label>
 
                 <div class="relative">
 
-                    <input type="password" name="password" id="password" placeholder="Enter new password" oninput="checkPassword()"
+                    <input type="password" name="password" id="password" placeholder="{{ __('Enter new password') }}" oninput="checkPassword()"
                            class="password-field w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 pr-14 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
 
                     <button type="button" onclick="toggleVisibility('password', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400 hover:text-indigo-600">
@@ -233,17 +233,17 @@
 
                     <div class="flex items-center gap-2 req-item" id="req-length">
                         <span class="req-icon">✗</span>
-                        <span>At least 6 characters</span>
+                        <span>{{ __('At least 6 characters') }}</span>
                     </div>
 
                     <div class="flex items-center gap-2 req-item" id="req-case">
                         <span class="req-icon">✗</span>
-                        <span>Contains uppercase and lowercase letters</span>
+                        <span>{{ __('Contains uppercase and lowercase letters') }}</span>
                     </div>
 
                     <div class="flex items-center gap-2 req-item" id="req-numsym">
                         <span class="req-icon">✗</span>
-                        <span>Includes a number and special character</span>
+                        <span>{{ __('Includes a number and special character') }}</span>
                     </div>
 
                 </div>
@@ -256,12 +256,12 @@
             <div>
 
                 <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    Confirm New Password
+                    {{ __('Confirm New Password') }}
                 </label>
 
                 <div class="relative">
 
-                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Re-enter new password" oninput="clearError()"
+                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="{{ __('Re-enter new password') }}" oninput="clearError()"
                            class="password-field w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 pr-14 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
 
                     <button type="button" onclick="toggleVisibility('password_confirmation', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-400 hover:text-indigo-600">
@@ -281,7 +281,7 @@
             <button type="submit"
                     class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
 
-                Update Password
+                {{ __('Update Password') }}
 
             </button>
 
@@ -329,13 +329,13 @@
             if (password.length === 0) {
                 percent = 0; text = '-'; color = '#94a3b8';
             } else if (score === 1) {
-                percent = 33; text = 'Weak'; color = '#ef4444';
+                percent = 33; text = t('Weak'); color = '#ef4444';
             } else if (score === 2) {
-                percent = 66; text = 'Fair'; color = '#f59e0b';
+                percent = 66; text = t('Fair'); color = '#f59e0b';
             } else if (score === 3) {
-                percent = 100; text = 'Strong'; color = '#22c55e';
+                percent = 100; text = t('Strong'); color = '#22c55e';
             } else {
-                percent = 15; text = 'Weak'; color = '#ef4444';
+                percent = 15; text = t('Weak'); color = '#ef4444';
             }
 
             bar.style.width = percent + '%';
@@ -380,7 +380,7 @@
 
             if (!allValid) {
                 e.preventDefault();
-                errorEl.textContent = 'Please fulfill all password requirements above.';
+                errorEl.textContent = t('Please fulfill all password requirements above.');
                 errorEl.classList.remove('hidden');
                 document.getElementById('password').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;
@@ -388,7 +388,7 @@
 
             if (password !== confirmPassword) {
                 e.preventDefault();
-                errorEl.textContent = 'Passwords do not match.';
+                errorEl.textContent = t('Passwords do not match.');
                 errorEl.classList.remove('hidden');
                 document.getElementById('password_confirmation').scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return;

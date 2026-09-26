@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Privacy Settings</title>
+    <title>{{ __('Privacy Settings') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,15 +111,15 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
         <div>
-            <h1>Privacy Settings</h1>
-            <p>Control your data and visibility</p>
+            <h1>{{ __('Privacy Settings') }}</h1>
+            <p>{{ __('Control your data and visibility') }}</p>
         </div>
 
     </div>
@@ -141,8 +141,8 @@
                 </div>
 
                 <div class="flex-1">
-                    <h2 class="font-bold text-indigo-900">Privacy Protected</h2>
-                    <p class="text-sm text-indigo-400">You are in control of your personal data</p>
+                    <h2 class="font-bold text-indigo-900">{{ __('Privacy Protected') }}</h2>
+                    <p class="text-sm text-indigo-400">{{ __('You are in control of your personal data') }}</p>
                 </div>
 
             </div>
@@ -152,8 +152,8 @@
             </div>
 
             <div class="flex items-center justify-between mt-3 text-sm">
-                <span class="text-indigo-500">Privacy level</span>
-                <span class="font-semibold text-indigo-700">High</span>
+                <span class="text-indigo-500">{{ __('Privacy level') }}</span>
+                <span class="font-semibold text-indigo-700">{{ __('High') }}</span>
             </div>
 
         </div>
@@ -162,7 +162,7 @@
         <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Profile visibility</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Profile visibility') }}</p>
             </div>
 
             <div class="divide-y divide-indigo-50">
@@ -183,8 +183,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Show my profile</p>
-                            <p class="text-sm text-indigo-400">Allow other students to find your profile</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Show my profile') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Allow other students to find your profile') }}</p>
                         </div>
 
                     </div>
@@ -209,8 +209,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Show faculty and course</p>
-                            <p class="text-sm text-indigo-400">Display academic information publicly</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Show faculty and course') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Display academic information publicly') }}</p>
                         </div>
 
                     </div>
@@ -229,7 +229,7 @@
         <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">AI &amp; chat privacy</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('AI & chat privacy') }}</p>
             </div>
 
             <div class="divide-y divide-indigo-50">
@@ -248,8 +248,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Save chat history</p>
-                            <p class="text-sm text-indigo-400">Keep conversations for future reference</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Save chat history') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Keep conversations for future reference') }}</p>
                         </div>
 
                     </div>
@@ -274,8 +274,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Anonymous analytics</p>
-                            <p class="text-sm text-indigo-400">Help improve chatbot responses</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Anonymous analytics') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Help improve chatbot responses') }}</p>
                         </div>
 
                     </div>
@@ -294,7 +294,7 @@
         <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Data control</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Data control') }}</p>
             </div>
 
             <div class="divide-y divide-indigo-50">
@@ -313,8 +313,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Download my data</p>
-                            <p class="text-sm text-indigo-400">Get a copy of your profile and chats</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Download my data') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Get a copy of your profile and chats') }}</p>
                         </div>
 
                     </div>
@@ -337,8 +337,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-red-600">Clear chat history</p>
-                            <p class="text-sm text-red-400">Remove all saved conversations</p>
+                            <p class="font-semibold text-red-600">{{ __('Clear chat history') }}</p>
+                            <p class="text-sm text-red-400">{{ __('Remove all saved conversations') }}</p>
                         </div>
 
                     </div>
@@ -353,7 +353,7 @@
 
         <!-- Save Button -->
         <button class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
-            Save Privacy Settings
+            {{ __('Save Privacy Settings') }}
         </button>
 
     </div>

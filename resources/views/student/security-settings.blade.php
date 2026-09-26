@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ app()->getLocale() }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
-    <title>Security Settings</title>
+    <title>{{ __('Security Settings') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -111,15 +111,15 @@
     <!-- Header -->
     <div class="page-header">
 
-        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="Back">
+        <a href="{{ route('student.profile') }}" class="back-btn" aria-label="{{ __('Back') }}">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M15 19l-7-7 7-7"/>
             </svg>
         </a>
 
         <div>
-            <h1>Security</h1>
-            <p>Manage your account protection</p>
+            <h1>{{ __('Security') }}</h1>
+            <p>{{ __('Manage your account protection') }}</p>
         </div>
 
     </div>
@@ -143,8 +143,8 @@
                 </div>
 
                 <div class="flex-1">
-                    <h2 class="font-bold text-indigo-900">Account Protected</h2>
-                    <p class="text-sm text-indigo-400">Your security settings are up to date</p>
+                    <h2 class="font-bold text-indigo-900">{{ __('Account Protected') }}</h2>
+                    <p class="text-sm text-indigo-400">{{ __('Your security settings are up to date') }}</p>
                 </div>
 
             </div>
@@ -154,7 +154,7 @@
             </div>
 
             <div class="flex items-center justify-between mt-3 text-sm">
-                <span class="text-indigo-500">Security score</span>
+                <span class="text-indigo-500">{{ __('Security score') }}</span>
                 <span class="font-semibold text-indigo-700">88%</span>
             </div>
 
@@ -164,7 +164,7 @@
         <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
 
             <div class="px-5 pt-4 pb-2">
-                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">Protection</p>
+                <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Protection') }}</p>
             </div>
 
             <div class="divide-y divide-indigo-50">
@@ -184,8 +184,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Two-Factor Authentication</p>
-                            <p class="text-sm text-indigo-400">Extra verification when signing in</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Two-Factor Authentication') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Extra verification when signing in') }}</p>
                         </div>
 
                     </div>
@@ -211,8 +211,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Biometric Login</p>
-                            <p class="text-sm text-indigo-400">Use fingerprint or Face ID</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Biometric Login') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Use fingerprint or Face ID') }}</p>
                         </div>
 
                     </div>
@@ -238,8 +238,8 @@
                         </div>
 
                         <div>
-                            <p class="font-semibold text-indigo-900">Login Alerts</p>
-                            <p class="text-sm text-indigo-400">Get notified about new sign-ins</p>
+                            <p class="font-semibold text-indigo-900">{{ __('Login Alerts') }}</p>
+                            <p class="text-sm text-indigo-400">{{ __('Get notified about new sign-ins') }}</p>
                         </div>
 
                     </div>
@@ -260,11 +260,11 @@
             <div class="flex items-center justify-between mb-4">
 
                 <div>
-                    <h3 class="font-bold text-indigo-900">Active Device</h3>
-                    <p class="text-sm text-indigo-400">This device is currently signed in</p>
+                    <h3 class="font-bold text-indigo-900">{{ __('Active Device') }}</h3>
+                    <p class="text-sm text-indigo-400">{{ __('This device is currently signed in') }}</p>
                 </div>
 
-                <span class="text-xs font-semibold text-green-600 bg-green-50 rounded-full px-3 py-1">Active</span>
+                <span class="text-xs font-semibold text-green-600 bg-green-50 rounded-full px-3 py-1">{{ __('Active') }}</span>
 
             </div>
 
@@ -281,7 +281,7 @@
 
                 <div class="flex-1">
                     <p class="font-semibold text-indigo-900">Windows 11 • Chrome</p>
-                    <p class="text-sm text-indigo-400">Ipoh, Perak • Just now</p>
+                    <p class="text-sm text-indigo-400">{{ __('Ipoh, Perak • Just now') }}</p>
                 </div>
 
             </div>
@@ -292,8 +292,8 @@
         <div class="bg-white rounded-3xl border border-indigo-100 p-5 shadow-sm">
 
             <div class="flex items-center justify-between mb-4">
-                <h3 class="font-bold text-indigo-900">Recent Activity</h3>
-                <button class="text-sm text-indigo-500 font-medium">View all</button>
+                <h3 class="font-bold text-indigo-900">{{ __('Recent Activity') }}</h3>
+                <button class="text-sm text-indigo-500 font-medium">{{ __('View all') }}</button>
             </div>
 
             <div class="space-y-4">
@@ -310,11 +310,11 @@
                     </div>
 
                     <div class="flex-1">
-                        <p class="font-medium text-indigo-900">Successful login</p>
+                        <p class="font-medium text-indigo-900">{{ __('Successful login') }}</p>
                         <p class="text-sm text-indigo-400">Windows 11 • Chrome</p>
                     </div>
 
-                    <span class="text-xs text-indigo-400 mt-1">Now</span>
+                    <span class="text-xs text-indigo-400 mt-1">{{ __('Now') }}</span>
 
                 </div>
 
@@ -330,8 +330,8 @@
                     </div>
 
                     <div class="flex-1">
-                        <p class="font-medium text-indigo-900">Password changed</p>
-                        <p class="text-sm text-indigo-400">Security settings updated</p>
+                        <p class="font-medium text-indigo-900">{{ __('Password changed') }}</p>
+                        <p class="text-sm text-indigo-400">{{ __('Security settings updated') }}</p>
                     </div>
 
                     <span class="text-xs text-indigo-400 mt-1">2d</span>
@@ -357,14 +357,14 @@
                 </div>
 
                 <div>
-                    <h3 class="font-bold text-red-600">Log Out Other Devices</h3>
-                    <p class="text-sm text-red-400">Keep this device signed in</p>
+                    <h3 class="font-bold text-red-600">{{ __('Log Out Other Devices') }}</h3>
+                    <p class="text-sm text-red-400">{{ __('Keep this device signed in') }}</p>
                 </div>
 
             </div>
 
             <button class="w-full rounded-2xl border border-red-200 py-3 font-semibold text-red-600 hover:bg-red-50 transition">
-                Log Out Other Devices
+                {{ __('Log Out Other Devices') }}
             </button>
 
         </div>
