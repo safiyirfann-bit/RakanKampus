@@ -411,5 +411,8 @@
     ":count reminders added!": ":count நினைவூட்டல்கள் சேர்க்கப்பட்டன!",
     "Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You'll get a list to check before anything is saved.": "உங்கள் தேர்வுச் சீட்டு, தேர்வு கால அட்டவணை அல்லது ஒப்படைப்பு விவரத்தின் புகைப்படம் அல்லது PDF ஐப் பதிவேற்றவும் — AI அதிலுள்ள ஒவ்வொரு தேதியையும் கண்டறியும். எதுவும் சேமிக்கப்படும் முன் சரிபார்க்க ஒரு பட்டியல் கிடைக்கும்.",
     "Check the reminders below. Fix anything that is wrong, remove what you don't need, then press Save.": "கீழே உள்ள நினைவூட்டல்களைச் சரிபார்க்கவும். தவறானவற்றைத் திருத்தி, தேவையற்றவற்றை நீக்கி, பின் சேமி அழுத்தவும்.",
-    "+ Add reminder": "+ நினைவூட்டலைச் சேர்"
+    "+ Add reminder": "+ நினைவூட்டலைச் சேர்",
+    "Delete all :count upcoming reminder(s)? They will move to History.": "வரவிருக்கும் அனைத்து :count நினைவூட்டல்(களையும்) நீக்கவா? அவை வரலாற்றுக்கு நகர்த்தப்படும்.",
+    "This looks like a weekly class timetable, which has no dates. Upload it on the Timetable page instead — reminders need an exam, test or assignment with a date.": "இது தேதிகள் இல்லாத வாராந்திர வகுப்பு கால அட்டவணை போல் தெரிகிறது. அதைக் கால அட்டவணைப் பக்கத்தில் பதிவேற்றவும் — நினைவூட்டல்களுக்குத் தேதியுடன் கூடிய தேர்வு, சோதனை அல்லது ஒப்படைப்பு தேவை.",
+    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "அந்தக் கோப்பில் தேதிகள் எதுவும் கிடைக்கவில்லை. நினைவூட்டல்களுக்குத் தேதி காட்டும் தேர்வுச் சீட்டு, தேர்வு கால அட்டவணை அல்லது ஒப்படைப்பு விவரம் தேவை."
 }

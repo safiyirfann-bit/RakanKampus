@@ -90,7 +90,8 @@ class ReminderController extends Controller
             . 'due_date = YYYY-MM-DD. Resolve relative dates (esok, lusa, next Monday) from today. If the year is not shown, use the next occurrence on or after today. '
             . 'due_time = HH:MM in 24-hour time, the START time if a range is shown (e.g. 8:30-10:30 -> 08:30). If no time is shown, use null — do not guess. '
             . 'Reply with ONLY this JSON, no markdown: {"items":[{"subject":string,"type":string,"due_date":string,"due_time":string|null}]}. '
-            . 'If nothing dated is visible, reply {"items":[]}.';
+            . 'If nothing dated is visible, reply {"items":[]}. '
+            . 'If the image is a WEEKLY class timetable (days of the week like Isnin/Monday with time slots, but no calendar dates), reply {"items":[],"kind":"weekly_timetable"}.';
 
         [$raw, $error] = $useGemini
             ? $this->geminiRead($prompt, $file->getRealPath(), $isPdf ? 'application/pdf' : $mime)
@@ -192,9 +193,13 @@ class ReminderController extends Controller
         }
 
         if (count($items) === 0) {
+            $isWeekly = is_array($parsed) && ($parsed['kind'] ?? null) === 'weekly_timetable';
+
             return response()->json([
                 'success' => false,
-                'error' => __('Could not detect a date/subject in that image. Try a clearer picture, or fill it in manually.'),
+                'error' => $isWeekly
+                    ? __('This looks like a weekly class timetable, which has no dates. Upload it on the Timetable page instead — reminders need an exam, test or assignment with a date.')
+                    : __('No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.'),
             ], 422);
         }
 
@@ -367,6 +372,17 @@ class ReminderController extends Controller
 
         $request->user()->reminders()
             ->whereIn('id', $data['ids'])
+            ->get()
+            ->each(fn (Reminder $r) => $r->delete());
+
+        return response()->json(['success' => true]);
+    }
+
+    /** Delete every upcoming reminder (soft delete — they show up in History). */
+    public function destroyAll(Request $request)
+    {
+        $request->user()->reminders()
+            ->where('due_at', '>', now())
             ->get()
             ->each(fn (Reminder $r) => $r->delete());
 

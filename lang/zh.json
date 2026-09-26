@@ -411,5 +411,8 @@
     ":count reminders added!": "已添加 :count 条提醒！",
     "Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You'll get a list to check before anything is saved.": "上传考试单、考试时间表或作业说明的照片或 PDF —— AI 会找出其中的每个日期。保存前您会看到一份清单供检查。",
     "Check the reminders below. Fix anything that is wrong, remove what you don't need, then press Save.": "请检查以下提醒。修正错误、删除不需要的，然后点击保存。",
-    "+ Add reminder": "+ 添加提醒"
+    "+ Add reminder": "+ 添加提醒",
+    "Delete all :count upcoming reminder(s)? They will move to History.": "删除全部 :count 条即将到来的提醒？它们会移到历史记录。",
+    "This looks like a weekly class timetable, which has no dates. Upload it on the Timetable page instead — reminders need an exam, test or assignment with a date.": "这看起来是每周课表，没有具体日期。请到课表页面上传 —— 提醒需要带日期的考试、测验或作业。",
+    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "该文件中未找到日期。提醒需要显示日期的考试单、考试时间表或作业说明。"
 }

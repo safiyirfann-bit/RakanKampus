@@ -127,6 +127,8 @@
   .filter-btn svg, .select-btn svg { width: 11px; height: 11px; }
 
   .select-btn { flex: 1; width: auto; }
+  .select-btn.delete-all-btn { color: #dc2626; border-color: #fecaca; background: #fef2f2; }
+  .select-btn.delete-all-btn.hidden { display: none; }
 
   .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
 
@@ -759,6 +761,10 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 3 3 5-6"></path></svg>
       <span id="selectModeLabel">{{ __('Select') }}</span>
     </button>
+    <button type="button" class="select-btn delete-all-btn" id="deleteAllBtn" onclick="deleteAllReminders()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path></svg>
+      <span>{{ __('Delete All') }}</span>
+    </button>
   </div>
   </div>
 
@@ -930,6 +936,7 @@ function escapeHtml(s) {
 }
 
 function render() {
+  document.getElementById('deleteAllBtn').classList.toggle('hidden', !reminders.some(r => new Date(r.due_at).getTime() > Date.now()));
   const q = searchQuery.trim().toLowerCase();
   const cutoff = Date.now() + filterDays * 24 * 3600 * 1000;
   const visible = reminders
@@ -1215,6 +1222,31 @@ function saveReminder() {
       render();
     })
     .catch(err => console.error('Save failed', err));
+}
+
+// Moves every upcoming reminder to History (soft delete, same as deleting one by one).
+function deleteAllReminders() {
+  const upcoming = reminders.filter(r => new Date(r.due_at).getTime() > Date.now());
+  if (upcoming.length === 0) return;
+  if (!confirm(t('Delete all :count upcoming reminder(s)? They will move to History.', {count: upcoming.length}))) return;
+
+  fetch('{{ route('reminders.destroyAll') }}', {
+    method: 'POST',
+    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+  })
+    .then(res => {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      reminders = reminders.filter(r => new Date(r.due_at).getTime() <= Date.now());
+      selectMode = false;
+      selectedIds = [];
+      document.getElementById('selectModeBtn').classList.remove('active');
+      document.getElementById('selectModeLabel').textContent = t('Select');
+      render();
+    })
+    .catch(err => {
+      console.error('Delete all reminders failed', err);
+      alert(t('Connection problem. Please try again.'));
+    });
 }
 
 function removeReminder(id) {

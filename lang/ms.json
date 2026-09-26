@@ -411,5 +411,8 @@
     ":count reminders added!": ":count peringatan ditambah!",
     "Upload a photo or PDF of your exam slip, exam timetable or assignment brief — AI will find every date in it. You'll get a list to check before anything is saved.": "Muat naik foto atau PDF slip peperiksaan, jadual peperiksaan atau taklimat tugasan anda — AI akan mencari setiap tarikh di dalamnya. Anda akan mendapat senarai untuk disemak sebelum apa-apa disimpan.",
     "Check the reminders below. Fix anything that is wrong, remove what you don't need, then press Save.": "Semak senarai peringatan di bawah. Betulkan apa-apa yang salah, buang yang tidak perlu, kemudian tekan Simpan.",
-    "+ Add reminder": "+ Tambah peringatan"
+    "+ Add reminder": "+ Tambah peringatan",
+    "Delete all :count upcoming reminder(s)? They will move to History.": "Padam kesemua :count peringatan akan datang? Ia akan dipindahkan ke Sejarah.",
+    "This looks like a weekly class timetable, which has no dates. Upload it on the Timetable page instead — reminders need an exam, test or assignment with a date.": "Ini kelihatan seperti jadual kelas mingguan, yang tiada tarikh. Muat naik di halaman Jadual Waktu — peringatan memerlukan peperiksaan, ujian atau tugasan yang ada tarikh.",
+    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "Tiada tarikh dijumpai dalam fail itu. Peringatan memerlukan slip peperiksaan, jadual peperiksaan atau taklimat tugasan yang menunjukkan tarikh."
 }
