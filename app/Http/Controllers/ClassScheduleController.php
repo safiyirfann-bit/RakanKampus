@@ -313,14 +313,28 @@ class ClassScheduleController extends Controller
             // of 1) used up the entire 3000-token budget, leaving zero left for the
             // actual JSON answer. Raised to 5000 to give the visible answer room to
             // exist without changing reasoning_effort — isolating this from the
-            // OTPM fix above, since that one is already confirmed working. If Groq
-            // starts rejecting the request outright again ("Request too large"),
-            // this number is what needs pulling back down; if json_validate_failed
-            // persists even with room to spare, that would instead point at the
-            // schema/prompt itself rather than the token budget.
+            // OTPM fix above, since that one is already confirmed working.
+            //
+            // 5000 wasn't enough either: real logs showed finish_reason=length,
+            // with the (still perfectly valid) JSON cut off after finishing
+            // Monday, Tuesday and just one class into Wednesday — Thursday and
+            // Friday never got generated at all, simply because the budget ran
+            // out partway through, not because anything was misread. Unlike the
+            // json_validate_failed case, this is a clean, unambiguous "needs more
+            // room" signal (valid JSON, explicit finish_reason=length), so raised
+            // again to 8000. The earlier OTPM pre-flight rejection ("Request too
+            // large") was measured on the LONGER 0104 prompt and hasn't actually
+            // been triggered by this shorter prompt at any max_completion_tokens
+            // value tried so far — so there's reasonable headroom to try this
+            // before assuming it'll get rejected outright again. If it does start
+            // reporting "Request too large", that means even this shorter prompt
+            // is now over budget and max_completion_tokens needs to come back
+            // down; if it instead still truncates at 8000, that's evidence this
+            // whole-week-in-one-call approach may need to be split into two
+            // smaller calls instead of just raising this number further.
             'reasoning_effort' => 'low',
             'reasoning_format' => 'hidden',
-            'max_completion_tokens' => 5000,
+            'max_completion_tokens' => 8000,
         ];
     }
 
