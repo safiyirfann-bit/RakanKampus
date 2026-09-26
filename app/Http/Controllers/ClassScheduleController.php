@@ -121,13 +121,10 @@ class ClassScheduleController extends Controller
         } elseif (config('services.gemini.key')) {
             // Photo + Gemini key set: Gemini reads dense tables far better than the
             // small Groq vision model (which kept misreading codes and names).
-            $rawContent = $this->geminiTranscribe($file->getRealPath(), $file->getMimeType());
+            [$rawContent, $geminiError] = $this->geminiTranscribe($file->getRealPath(), $file->getMimeType());
 
             if ($rawContent === null) {
-                return response()->json([
-                    'success' => false,
-                    'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap, atau upload PDF jadual.',
-                ], 422);
+                return response()->json(['success' => false, 'error' => $geminiError], 422);
             }
 
             $parsed = $this->extractJson($rawContent) ?? [];
@@ -339,40 +336,68 @@ class ClassScheduleController extends Controller
     /**
      * Send the timetable photo to Google Gemini and return its raw JSON text,
      * or null on failure. Key: GEMINI_API_KEY (free from aistudio.google.com).
-     * Model: GEMINI_MODEL (default gemini-2.5-flash).
+     * Model: GEMINI_MODEL (optional; defaults to gemini-flash-latest).
+     *
+     * @return array{0: ?string, 1: ?string} [raw JSON text, error message for the user]
      */
-    private function geminiTranscribe(string $path, string $mime): ?string
+    private function geminiTranscribe(string $path, string $mime): array
     {
-        $model = config('services.gemini.model') ?: 'gemini-2.5-flash';
+        // Google retires dated model ids regularly (gemini-2.5-flash is already
+        // deprecated), so default to the "-latest" alias and fall back through a
+        // couple of others if one returns 404.
+        $models = array_values(array_unique(array_filter([
+            config('services.gemini.model'),
+            'gemini-flash-latest',
+            'gemini-flash-lite-latest',
+        ])));
 
-        $response = Http::timeout(110)
-            ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
-            ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", [
-                'systemInstruction' => ['parts' => [['text' => $this->visionPrompt()]]],
-                'contents' => [[
-                    'role' => 'user',
-                    'parts' => [
-                        ['inline_data' => ['mime_type' => $mime, 'data' => base64_encode(file_get_contents($path))]],
-                        ['text' => 'Transcribe every occupied cell and the legend from this timetable.'],
-                    ],
-                ]],
-                'generationConfig' => [
-                    'temperature' => 0,
-                    'responseMimeType' => 'application/json',
-                    'maxOutputTokens' => 8192,
+        $body = [
+            'systemInstruction' => ['parts' => [['text' => $this->visionPrompt()]]],
+            'contents' => [[
+                'role' => 'user',
+                'parts' => [
+                    ['inline_data' => ['mime_type' => $mime, 'data' => base64_encode(file_get_contents($path))]],
+                    ['text' => 'Transcribe every occupied cell and the legend from this timetable.'],
                 ],
-            ]);
+            ]],
+            'generationConfig' => [
+                'temperature' => 0,
+                'responseMimeType' => 'application/json',
+                'maxOutputTokens' => 8192,
+            ],
+        ];
 
-        if ($response->failed()) {
+        $response = null;
+        foreach ($models as $model) {
+            $response = Http::timeout(110)
+                ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
+                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", $body);
+
+            if ($response->status() !== 404) {
+                break;
+            }
+            Log::warning("Gemini model {$model} not found, trying next");
+        }
+
+        if (! $response || $response->failed()) {
+            $status = $response?->status();
             Log::error('Gemini vision API error (timetable)', [
-                'status' => $response->status(),
-                'body' => Str::limit($response->body(), 2000),
+                'status' => $status,
+                'body' => Str::limit((string) $response?->body(), 2000),
             ]);
 
-            return null;
+            $reason = match (true) {
+                $status === 400 || $status === 403 => 'API key Gemini tak sah — semak GEMINI_API_KEY kat Render.',
+                $status === 429 => 'Had penggunaan AI percuma dah penuh. Cuba lagi selepas seminit.',
+                $status === 404 => 'Model Gemini tak dijumpai — set GEMINI_MODEL kat Render.',
+                default => 'AI tak dapat proses gambar tu sekarang (ralat ' . ($status ?? '?') . ').',
+            };
+
+            return [null, $reason . ' Atau upload PDF jadual.'];
         }
 
         $text = collect($response->json('candidates.0.content.parts') ?? [])
+            ->reject(fn ($p) => ! empty($p['thought']))
             ->pluck('text')->filter()->implode('');
 
         Log::info('Gemini vision raw response (timetable)', [
@@ -380,7 +405,9 @@ class ClassScheduleController extends Controller
             'raw' => Str::limit($text, 4000),
         ]);
 
-        return $text !== '' ? $text : null;
+        return $text !== ''
+            ? [$text, null]
+            : [null, 'AI tak pulangkan apa-apa untuk gambar tu. Cuba gambar lain atau upload PDF jadual.'];
     }
 
     /**
