@@ -176,6 +176,52 @@ $reply = trim($reply);;
         return false;
     }
 
+    /**
+     * Voice input: turn the recorded speech into text with Whisper (Groq).
+     * The chat page already shows a live transcript from the browser while the
+     * student talks; this more accurate version replaces it when they stop.
+     * Whisper handles Malay, bahasa pasar and Malay-English mixing far better
+     * than the browser's built-in recognizer.
+     */
+    public function transcribe(Request $request)
+    {
+        $request->validate([
+            'audio' => 'required|file|max:10240', // 10MB ~ several minutes of speech
+        ]);
+
+        $file = $request->file('audio');
+        $ext = strtolower($file->getClientOriginalExtension() ?: 'webm');
+        if (! in_array($ext, ['webm', 'ogg', 'mp4', 'm4a', 'mp3', 'wav', 'mpeg', 'mpga', 'flac'], true)) {
+            $ext = 'webm';
+        }
+
+        $response = Http::withToken(config('services.groq.key'))
+            ->timeout(30)
+            ->attach('file', file_get_contents($file->getRealPath()), "voice.{$ext}")
+            ->post('https://api.groq.com/openai/v1/audio/transcriptions', [
+                'model' => config('services.groq.whisper_model', 'whisper-large-v3'),
+                'temperature' => '0',
+                'response_format' => 'json',
+                // A short sample of how students talk steers Whisper towards the
+                // right spelling of campus terms and casual Malay.
+                'prompt' => 'Soalan pelajar Politeknik Ungku Omar dalam Bahasa Melayu santai dan English. '
+                    . 'Contoh: MPP tu apa? Macam mana nak mohon PTPTN? Bila cuti sem? JTMK, JKM, HEP, kolej kediaman, yuran, kafe.',
+            ]);
+
+        if ($response->failed()) {
+            Log::warning('Groq Whisper transcription failed', [
+                'status' => $response->status(),
+                'body' => Str::limit($response->body(), 1000),
+            ]);
+
+            return response()->json(['success' => false], 422);
+        }
+
+        $text = trim((string) $response->json('text'));
+
+        return response()->json(['success' => $text !== '', 'text' => $text]);
+    }
+
     public function history(Request $request)
     {
         $conversations = $request->user()
