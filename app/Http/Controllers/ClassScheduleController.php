@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassSchedule;
+use App\Services\TimetablePdfParser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -94,41 +95,62 @@ class ClassScheduleController extends Controller
     public function aiCapture(Request $request)
     {
         $request->validate([
-            'photo' => 'required|image|max:6144', // 6MB
+            'photo' => 'required|file|mimes:jpg,jpeg,png,webp,gif,bmp,heic,pdf|max:6144', // 6MB
+        ], [
+            'photo.mimes' => 'Fail mesti gambar (JPG/PNG) atau PDF jadual.',
+            'photo.max' => 'Fail terlalu besar (maksimum 6MB).',
         ]);
 
         $file = $request->file('photo');
-        $dataUri = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+        $isPdf = strtolower($file->getClientOriginalExtension()) === 'pdf' || $file->getMimeType() === 'application/pdf';
 
-        $response = Http::withToken(config('services.groq.key'))
-            ->timeout(110)
-            ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri));
+        if ($isPdf) {
+            // Official PDF timetable: read its text layer directly — exact, no AI.
+            if (! TimetablePdfParser::isAvailable()) {
+                return response()->json([
+                    'success' => false,
+                    'error' => 'Server belum boleh baca PDF (pdftotext tiada). Upload gambar/screenshot jadual buat masa ni.',
+                ], 422);
+            }
 
-        if (! $response || $response->failed()) {
-            Log::error('Groq vision API error (timetable)', [
-                'status' => $response?->status(),
-                'body' => $response?->body(),
+            try {
+                $parsed = (new TimetablePdfParser())->parse($file->getRealPath());
+            } catch (\RuntimeException $e) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()], 422);
+            }
+        } else {
+            $dataUri = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+
+            $response = Http::withToken(config('services.groq.key'))
+                ->timeout(110)
+                ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri));
+
+            if (! $response || $response->failed()) {
+                Log::error('Groq vision API error (timetable)', [
+                    'status' => $response?->status(),
+                    'body' => $response?->body(),
+                ]);
+
+                return response()->json([
+                    'success' => false,
+                    'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
+                ], 422);
+            }
+
+            $rawContent = $response->json('choices.0.message.content');
+            $finishReason = $response->json('choices.0.finish_reason');
+
+            Log::info('Groq vision raw response (timetable)', [
+                'finish_reason' => $finishReason,
+                'raw' => Str::limit((string) $rawContent, 4000),
             ]);
 
-            return response()->json([
-                'success' => false,
-                'error' => 'AI tak dapat proses gambar tu sekarang. Cuba lagi sekejap.',
-            ], 422);
+            if ($finishReason === 'length') {
+                Log::warning('Groq vision response for timetable was cut off by max_completion_tokens');
+            }
+
+            $parsed = $this->extractJson($rawContent) ?? [];
         }
-
-        $rawContent = $response->json('choices.0.message.content');
-        $finishReason = $response->json('choices.0.finish_reason');
-
-        Log::info('Groq vision raw response (timetable)', [
-            'finish_reason' => $finishReason,
-            'raw' => Str::limit((string) $rawContent, 4000),
-        ]);
-
-        if ($finishReason === 'length') {
-            Log::warning('Groq vision response for timetable was cut off by max_completion_tokens');
-        }
-
-        $parsed = $this->extractJson($rawContent) ?? [];
 
         // Legend: course code -> full course name, straight from the KOD/NAMA KURSUS table.
         $legend = [];
@@ -341,7 +363,14 @@ class ClassScheduleController extends Controller
                 ?: $this->toMinutes($a['start_time']) <=> $this->toMinutes($b['start_time']);
         });
 
-        $key = fn (array $c) => implode('|', [$c['day_of_week'], $c['code'], $c['type'], $c['room'], $c['lecturer']]);
+        // Lecturer names are compared order-insensitively ("PUTERI,JAMALIAH" == "JAMALIAH,PUTERI").
+        $lect = function (?string $l) {
+            $names = array_map('trim', explode(',', strtoupper((string) $l)));
+            sort($names);
+
+            return implode(',', $names);
+        };
+        $key = fn (array $c) => implode('|', [$c['day_of_week'], $c['code'], $c['type'], $c['room'], $lect($c['lecturer'])]);
         // code_fixed must survive a merge if any merged cell was corrected.
         $merged = [];
 

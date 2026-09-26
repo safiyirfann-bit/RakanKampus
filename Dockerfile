@@ -26,6 +26,10 @@ RUN docker-php-ext-install bcmath
 # that libwebp.so was never actually present. So: actually install it.
 RUN apk add --no-cache libwebp libwebp-dev
 
+# poppler-utils gives `pdftotext`, used by App\Services\TimetablePdfParser to read
+# the official PDF class timetable exactly (no AI) in the timetable AI capture.
+RUN apk add --no-cache poppler-utils
+
 RUN echo "--- libwebp files on this image ---" \
     && (find / -iname "libwebp*" -o -iname "*webp*.pc" 2>/dev/null | grep -v proc || true) \
     && echo "-----------------------------------"

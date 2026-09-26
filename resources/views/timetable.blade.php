@@ -488,11 +488,11 @@
     </div>
     <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
   </div>
-  <p class="ai-desc">Upload a photo of your class timetable — AI will read it and show you a preview to check before anything is saved.</p>
+  <p class="ai-desc">Upload your class timetable — the <b>official PDF</b> gives the most accurate result (read exactly, no guessing). A photo/screenshot also works but AI may misread some text. You'll see a preview to check before anything is saved.</p>
   <label class="ai-upload-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><circle cx="12" cy="13" r="4"></circle></svg>
-    Upload Photo
-    <input type="file" accept="image/*" onchange="handlePhotoSelected(event)">
+    Upload PDF / Photo
+    <input type="file" accept="application/pdf,.pdf,image/*" onchange="handlePhotoSelected(event)">
   </label>
   <p class="ai-scanning" id="aiScanning">🔎 Reading timetable and detecting classes...</p>
   <div class="ai-success" id="aiSuccess">
@@ -1052,16 +1052,20 @@ function handlePhotoSelected(e) {
 
   fetch('{{ route('timetable.aiCapture') }}', {
     method: 'POST',
-    headers: { 'X-CSRF-TOKEN': csrfToken },
+    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
     body: formData,
   })
-    .then(res => res.json().then(data => ({ ok: res.ok, data })))
-    .then(({ ok, data }) => {
+    .then(safeJson)
+    .then(({ ok, status, data }) => {
       document.getElementById('aiScanning').classList.remove('open');
       e.target.value = '';
 
-      if (!ok || !data.success) {
-        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + (data.error || 'Could not process that image. Please try again.');
+      if (!ok || !data || !data.success) {
+        const msg = (data && (data.error || data.message))
+          || (status === 419 ? 'Sesi dah tamat. Refresh page dan cuba lagi.'
+          : status === 413 ? 'Fail terlalu besar.'
+          : 'Tak dapat proses fail tu (ralat ' + status + '). Cuba lagi.');
+        document.getElementById('aiErrorMsg').textContent = '⚠️ ' + msg;
         document.getElementById('aiError').classList.add('open');
         return;
       }
