@@ -302,6 +302,23 @@
   .ai-error p { font-size: 11.5px; color: #b91c1c; margin: 0; line-height: 1.4; }
   .ai-error button { background: none; border: none; color: #b91c1c; font-size: 14px; cursor: pointer; padding: 0; flex-shrink: 0; }
 
+  .ai-preview { display: none; margin-top: 16px; }
+  .ai-preview.open { display: block; }
+  .ai-preview-note { font-size: 12px; color: #475569; margin: 0 0 10px; line-height: 1.45; }
+  .ai-preview-day { font-size: 11px; font-weight: 800; color: #0d9488; letter-spacing: 0.06em; text-transform: uppercase; margin: 14px 0 6px; }
+  .ai-pv-card { border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 10px; margin-bottom: 8px; position: relative; }
+  .ai-pv-card.warn { border-color: #f59e0b; background: #fffbeb; }
+  .ai-pv-card .ai-pv-remove { position: absolute; top: 8px; right: 8px; width: 24px; height: 24px; border: none; border-radius: 7px; background: #f1f5f9; color: #64748b; cursor: pointer; font-size: 14px; }
+  .ai-pv-warn { font-size: 11px; color: #b45309; margin: 0 30px 6px 0; line-height: 1.35; }
+  .ai-pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ai-pv-grid .full { grid-column: 1 / -1; padding-right: 30px; }
+  .modal .ai-pv-grid input[type="text"], .modal .ai-pv-grid input[type="time"], .modal .ai-pv-grid select { padding: 7px 9px; font-size: 12.5px; border-radius: 8px; }
+  .ai-pv-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .ai-pv-actions button { flex: 1; border: none; border-radius: 12px; padding: 12px; font-size: 13px; font-weight: 800; cursor: pointer; font-family: inherit; }
+  .ai-pv-save { background: linear-gradient(120deg, #14213d, #2ec4c6); color: #fff; }
+  .ai-pv-save:disabled { opacity: 0.5; cursor: default; }
+  .ai-pv-cancel { background: #f1f5f9; color: #475569; }
+
   /* Desktop weekly grid — hidden on mobile, shown instead of the day-list at >=861px */
   .grid-wrap { display: none; }
 
@@ -471,7 +488,7 @@
     </div>
     <button type="button" class="modal-close" aria-label="Close" onclick="closeModals()">×</button>
   </div>
-  <p class="ai-desc">Upload a photo of your class timetable — AI will read it and add every class automatically.</p>
+  <p class="ai-desc">Upload a photo of your class timetable — AI will read it and show you a preview to check before anything is saved.</p>
   <label class="ai-upload-label">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2Z"></path><circle cx="12" cy="13" r="4"></circle></svg>
     Upload Photo
@@ -485,6 +502,14 @@
   <div class="ai-error" id="aiError">
     <p id="aiErrorMsg"></p>
     <button type="button" aria-label="Dismiss" onclick="dismissAiError()">×</button>
+  </div>
+  <div class="ai-preview" id="aiPreview">
+    <p class="ai-preview-note">Semak hasil AI di bawah. Betulkan apa-apa yang salah, buang yang tak perlu, kemudian tekan Simpan. Kad <b>kuning</b> = AI kurang pasti.</p>
+    <div id="aiPreviewList"></div>
+    <div class="ai-pv-actions">
+      <button type="button" class="ai-pv-cancel" onclick="cancelAiPreview()">Batal</button>
+      <button type="button" class="ai-pv-save" id="aiPreviewSaveBtn" onclick="saveAiPreview()">Simpan</button>
+    </div>
   </div>
 </div>
 
@@ -999,6 +1024,7 @@ function deleteSelectedSchedules() {
 }
 
 function openAiModal() {
+  if (aiPreview.length === 0) document.getElementById('aiPreview').classList.remove('open');
   document.getElementById('aiSuccess').classList.remove('open');
   document.getElementById('aiScanning').classList.remove('open');
   document.getElementById('aiError').classList.remove('open');
@@ -1040,10 +1066,16 @@ function handlePhotoSelected(e) {
         return;
       }
 
-      schedules = schedules.concat(data.schedules);
-      document.getElementById('aiSuccessMsg').textContent = '✅ Added ' + data.schedules.length + ' class(es) from your timetable!';
-      document.getElementById('aiSuccess').classList.add('open');
-      render();
+      aiPreview = data.classes.map(c => ({
+        subject: c.subject || '',
+        day_of_week: c.day_of_week,
+        start_time: c.start_time,
+        end_time: c.end_time,
+        room: c.room || '',
+        lecturer: c.lecturer || '',
+        warnings: c.warnings || [],
+      }));
+      renderAiPreview();
     })
     .catch(err => {
       console.error('AI capture failed', err);
@@ -1051,6 +1083,125 @@ function handlePhotoSelected(e) {
       document.getElementById('aiErrorMsg').textContent = '⚠️ Ada masalah sambungan. Cuba lagi.';
       document.getElementById('aiError').classList.add('open');
       e.target.value = '';
+    });
+}
+
+// ---- AI capture preview (nothing is saved until the student confirms) ----
+let aiPreview = [];
+
+function renderAiPreview() {
+  const wrap = document.getElementById('aiPreview');
+  const list = document.getElementById('aiPreviewList');
+  const saveBtn = document.getElementById('aiPreviewSaveBtn');
+
+  if (aiPreview.length === 0) {
+    wrap.classList.remove('open');
+    list.innerHTML = '';
+    return;
+  }
+
+  const order = aiPreview
+    .map((c, i) => i)
+    .sort((a, b) => (DAYS.indexOf(aiPreview[a].day_of_week) - DAYS.indexOf(aiPreview[b].day_of_week))
+      || String(aiPreview[a].start_time).localeCompare(String(aiPreview[b].start_time)));
+
+  let html = '';
+  let lastDay = null;
+  order.forEach(i => {
+    const c = aiPreview[i];
+    if (c.day_of_week !== lastDay) {
+      html += `<p class="ai-preview-day">${escapeHtml(c.day_of_week)}</p>`;
+      lastDay = c.day_of_week;
+    }
+    const warn = c.warnings && c.warnings.length > 0;
+    html += `<div class="ai-pv-card${warn ? ' warn' : ''}">
+      <button type="button" class="ai-pv-remove" aria-label="Remove" onclick="removeAiPreview(${i})">×</button>
+      ${warn ? c.warnings.map(w => `<p class="ai-pv-warn">⚠️ ${escapeHtml(w)}</p>`).join('') : ''}
+      <div class="ai-pv-grid">
+        <input class="full" type="text" value="${escapeHtml(c.subject)}" placeholder="Subject" oninput="editAiPreview(${i}, 'subject', this.value)">
+        <select onchange="editAiPreview(${i}, 'day_of_week', this.value); renderAiPreview();">
+          ${DAYS.map(d => `<option value="${d}"${d === c.day_of_week ? ' selected' : ''}>${d}</option>`).join('')}
+        </select>
+        <div style="display:flex; gap:6px;">
+          <input type="time" value="${escapeHtml(c.start_time)}" onchange="editAiPreview(${i}, 'start_time', this.value)">
+          <input type="time" value="${escapeHtml(c.end_time)}" onchange="editAiPreview(${i}, 'end_time', this.value)">
+        </div>
+        <input type="text" value="${escapeHtml(c.room)}" placeholder="Room" oninput="editAiPreview(${i}, 'room', this.value)">
+        <input type="text" value="${escapeHtml(c.lecturer)}" placeholder="Lecturer" oninput="editAiPreview(${i}, 'lecturer', this.value)">
+      </div>
+    </div>`;
+  });
+
+  list.innerHTML = html;
+  saveBtn.textContent = `Simpan ${aiPreview.length} kelas`;
+  saveBtn.disabled = false;
+  wrap.classList.add('open');
+}
+
+function editAiPreview(i, field, value) {
+  if (aiPreview[i]) aiPreview[i][field] = value;
+}
+
+function removeAiPreview(i) {
+  aiPreview.splice(i, 1);
+  renderAiPreview();
+}
+
+function cancelAiPreview() {
+  aiPreview = [];
+  renderAiPreview();
+}
+
+function saveAiPreview() {
+  const bad = aiPreview.find(c => !c.subject.trim() || !c.start_time || !c.end_time || c.end_time <= c.start_time);
+  if (bad) {
+    document.getElementById('aiErrorMsg').textContent = '⚠️ Ada kelas yang subjek kosong atau masa tamat tak lepas masa mula. Betulkan dulu.';
+    document.getElementById('aiError').classList.add('open');
+    return;
+  }
+
+  const saveBtn = document.getElementById('aiPreviewSaveBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Menyimpan...';
+
+  const payload = aiPreview.map(c => ({
+    subject: c.subject.trim(),
+    day_of_week: c.day_of_week,
+    start_time: c.start_time,
+    end_time: c.end_time,
+    room: c.room.trim() || null,
+    lecturer: c.lecturer.trim() || null,
+  }));
+
+  fetch('{{ route('timetable.bulkStore') }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+    body: JSON.stringify({ classes: payload }),
+  })
+    .then(safeJson)
+    .then(({ ok, status, data }) => {
+      if (!ok || !data || !data.success) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = `Simpan ${aiPreview.length} kelas`;
+        document.getElementById('aiErrorMsg').textContent = status === 419
+          ? '⚠️ Sesi dah tamat. Refresh page dan cuba lagi.'
+          : '⚠️ Tak dapat simpan. Semak semua medan dan cuba lagi.';
+        document.getElementById('aiError').classList.add('open');
+        return;
+      }
+      schedules = schedules.concat(data.schedules);
+      aiPreview = [];
+      renderAiPreview();
+      document.getElementById('aiSuccessMsg').textContent = '✅ ' + data.schedules.length + ' kelas disimpan ke jadual anda!';
+      document.getElementById('aiSuccess').classList.add('open');
+      render();
+    })
+    .catch(err => {
+      console.error('AI preview save failed', err);
+      saveBtn.disabled = false;
+      saveBtn.textContent = `Simpan ${aiPreview.length} kelas`;
+      document.getElementById('aiErrorMsg').textContent = '⚠️ Ada masalah sambungan. Cuba lagi.';
+      document.getElementById('aiError').classList.add('open');
     });
 }
 
