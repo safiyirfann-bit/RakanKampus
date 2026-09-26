@@ -10,6 +10,9 @@ use Illuminate\Support\Str;
 
 class ClassScheduleController extends Controller
 {
+    /** Longest believable single class block (real timetables max out around 3h). */
+    private const MAX_PLAUSIBLE_CLASS_MINUTES = 240;
+
     public function index(Request $request)
     {
         $schedules = $request->user()->classSchedules()
@@ -201,6 +204,18 @@ class ClassScheduleController extends Controller
             }
             $c['warnings'] = $warnings;
             unset($c['code'], $c['type']);
+        }
+        unset($c);
+
+        // A real polytechnic class is never more than ~4 consecutive hours. A longer
+        // merged block usually means the model repeated one cell's text across
+        // columns that held something else (idea from commit 516750f — flagged for
+        // review here instead of dropping the whole day, since the student checks
+        // the preview anyway).
+        foreach ($classes as &$c) {
+            if ($this->toMinutes($c['end_time']) - $this->toMinutes($c['start_time']) > self::MAX_PLAUSIBLE_CLASS_MINUTES) {
+                $c['warnings'][] = 'Kelas ni panjang luar biasa (lebih 4 jam) — semak masa tamat.';
+            }
         }
         unset($c);
 
