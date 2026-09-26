@@ -367,16 +367,26 @@ class ClassScheduleController extends Controller
             ],
         ];
 
+        // 404 = model id retired -> try the next model.
+        // 500/503 = Google's side is overloaded (common on the free tier) ->
+        // retry once after a short pause, then move on to the next (lighter) model.
         $response = null;
         foreach ($models as $model) {
-            $response = Http::timeout(110)
-                ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
-                ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", $body);
+            for ($attempt = 1; $attempt <= 2; $attempt++) {
+                $response = Http::timeout(60)
+                    ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
+                    ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", $body);
 
-            if ($response->status() !== 404) {
+                if (! in_array($response->status(), [500, 503], true)) {
+                    break;
+                }
+                Log::warning("Gemini {$model} busy ({$response->status()}), attempt {$attempt}");
+                sleep(2);
+            }
+
+            if (! in_array($response->status(), [404, 500, 503], true)) {
                 break;
             }
-            Log::warning("Gemini model {$model} not found, trying next");
         }
 
         if (! $response || $response->failed()) {
@@ -390,6 +400,7 @@ class ClassScheduleController extends Controller
                 $status === 400 || $status === 403 => 'API key Gemini tak sah — semak GEMINI_API_KEY kat Render.',
                 $status === 429 => 'Had penggunaan AI percuma dah penuh. Cuba lagi selepas seminit.',
                 $status === 404 => 'Model Gemini tak dijumpai — set GEMINI_MODEL kat Render.',
+                $status === 500 || $status === 503 => 'Server AI Google tengah sibuk. Cuba lagi dalam seminit.',
                 default => 'AI tak dapat proses gambar tu sekarang (ralat ' . ($status ?? '?') . ').',
             };
 
