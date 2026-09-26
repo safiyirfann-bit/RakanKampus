@@ -350,6 +350,7 @@
   }
 
   .mic-btn.listening svg { stroke: #fff; }
+  #messageInput.voice-live { color: #0d9488; }
 
   .mic-btn.hidden { display: none; }
 
@@ -673,39 +674,51 @@ const micBtn = document.getElementById('micBtn');
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isListening = false;
+let voiceBaseText = ''; // whatever was already typed before the mic was pressed
 
 if (SpeechRecognitionAPI && micBtn) {
   micBtn.classList.remove('hidden');
 
   recognition = new SpeechRecognitionAPI();
   recognition.lang = 'ms-MY';
-  recognition.interimResults = false;
+  // Live transcription: interim results show the words in the input box
+  // WHILE the student is still talking, instead of only after they stop.
+  recognition.interimResults = true;
   recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
     isListening = true;
+    voiceBaseText = messageInput.value.trim();
     micBtn.classList.add('listening');
+    messageInput.classList.add('voice-live');
   };
 
   recognition.onend = () => {
     isListening = false;
     micBtn.classList.remove('listening');
+    messageInput.classList.remove('voice-live');
+    messageInput.focus();
   };
 
   recognition.onerror = (event) => {
     isListening = false;
     micBtn.classList.remove('listening');
+    messageInput.classList.remove('voice-live');
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
       alert('Please allow microphone access to use voice input.');
     }
   };
 
   recognition.onresult = (event) => {
-    const transcript = event.results[0][0].transcript;
-    messageInput.value = messageInput.value
-      ? `${messageInput.value} ${transcript}`
-      : transcript;
-    messageInput.focus();
+    // Rebuild the full sentence every time: finished chunks + the part still
+    // being spoken (interim), so the text grows word by word as you talk.
+    let spoken = '';
+    for (let i = 0; i < event.results.length; i++) {
+      spoken += event.results[i][0].transcript;
+    }
+    spoken = spoken.trim();
+    messageInput.value = voiceBaseText ? `${voiceBaseText} ${spoken}` : spoken;
+    messageInput.scrollLeft = messageInput.scrollWidth; // keep the newest words visible
   };
 
   micBtn.addEventListener('click', () => {
