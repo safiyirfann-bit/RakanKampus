@@ -414,5 +414,7 @@
     "+ Add reminder": "+ 添加提醒",
     "Delete all :count upcoming reminder(s)? They will move to History.": "删除全部 :count 条即将到来的提醒？它们会移到历史记录。",
     "This looks like a weekly class timetable, which has no dates. Upload it on the Timetable page instead — reminders need an exam, test or assignment with a date.": "这看起来是每周课表，没有具体日期。请到课表页面上传 —— 提醒需要带日期的考试、测验或作业。",
-    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "该文件中未找到日期。提醒需要显示日期的考试单、考试时间表或作业说明。"
+    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "该文件中未找到日期。提醒需要显示日期的考试单、考试时间表或作业说明。",
+    "Popular": "热门",
+    "No messages yet": "暂无消息"
 }

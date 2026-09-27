@@ -64,8 +64,8 @@ Route::middleware('auth')->group(function () {
 
             return [
                 'id' => $conversation->id,
-                'title' => $conversation->title ?: 'New Conversation',
-                'preview' => $lastMessage ? \Illuminate\Support\Str::limit($lastMessage->message, 50) : 'Belum ada mesej',
+                'title' => $conversation->title ?: __('New Conversation'),
+                'preview' => $lastMessage ? \Illuminate\Support\Str::limit($lastMessage->message, 50) : __('No messages yet'),
                 'time' => $conversation->updated_at->diffForHumans(),
             ];
         });
@@ -93,6 +93,7 @@ Route::middleware('auth')->group(function () {
         'conversations' => $conversations,
         'classSchedules' => $classSchedules,
         'classDays' => \App\Models\ClassSchedule::DAYS,
+        'quickQuestions' => \App\Services\PopularQuestions::top(4),
     ]);
 })->name('student.home');
 

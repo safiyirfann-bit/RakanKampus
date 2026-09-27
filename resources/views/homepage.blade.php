@@ -346,6 +346,7 @@
   .quick-grid a:nth-child(3) { animation-delay: 0.24s; }
   .quick-grid a:nth-child(4) { animation-delay: 0.31s; }
 
+  .quick-chip-tag { display: block; font-size: 10px; font-weight: 800; color: #ea580c; margin-bottom: 3px; letter-spacing: 0.02em; }
   .quick-chip:hover {
     box-shadow: 0 6px 16px rgba(20, 33, 61, 0.16);
     transform: translateY(-2px) scale(1.02);
@@ -646,12 +647,17 @@
            onpointerup="endClassesDrag(event)" onpointerleave="endClassesDrag(event)"></div>
     </div>
 
+    {{-- Quick questions: the most asked questions from students (see App\Services\PopularQuestions),
+         topped up with default ones. Popular chips show a small "Popular" tag. --}}
     <div class="quick-grid">
-  <a href="{{ route('student.chat') }}?q={{ urlencode('How do I register for courses?') }}" class="quick-chip">{{ __('How do I register for courses?') }}</a>
-  <a href="{{ route('student.chat') }}?q={{ urlencode('When is the fee payment deadline?') }}" class="quick-chip">{{ __('When is the fee payment deadline?') }}</a>
-  <a href="{{ route('student.chat') }}?q={{ urlencode('How do I access library resources?') }}" class="quick-chip">{{ __('How do I access library resources?') }}</a>
-  <a href="{{ route('student.chat') }}?q={{ urlencode("What's the exam timetable?") }}" class="quick-chip">{{ __('What\'s the exam timetable?') }}</a>
-</div>
+      @foreach($quickQuestions as $q)
+        @php($label = $q['popular'] ? $q['text'] : __($q['text']))
+        <a href="{{ route('student.chat') }}?q={{ urlencode($label) }}" class="quick-chip">
+          @if($q['popular'])<span class="quick-chip-tag">🔥 {{ __('Popular') }}</span>@endif
+          {{ $label }}
+        </a>
+      @endforeach
+    </div>
 
     <a href="{{ route('student.chat') }}" class="start-chat-btn">
 

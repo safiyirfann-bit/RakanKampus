@@ -414,5 +414,7 @@
     "+ Add reminder": "+ நினைவூட்டலைச் சேர்",
     "Delete all :count upcoming reminder(s)? They will move to History.": "வரவிருக்கும் அனைத்து :count நினைவூட்டல்(களையும்) நீக்கவா? அவை வரலாற்றுக்கு நகர்த்தப்படும்.",
     "This looks like a weekly class timetable, which has no dates. Upload it on the Timetable page instead — reminders need an exam, test or assignment with a date.": "இது தேதிகள் இல்லாத வாராந்திர வகுப்பு கால அட்டவணை போல் தெரிகிறது. அதைக் கால அட்டவணைப் பக்கத்தில் பதிவேற்றவும் — நினைவூட்டல்களுக்குத் தேதியுடன் கூடிய தேர்வு, சோதனை அல்லது ஒப்படைப்பு தேவை.",
-    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "அந்தக் கோப்பில் தேதிகள் எதுவும் கிடைக்கவில்லை. நினைவூட்டல்களுக்குத் தேதி காட்டும் தேர்வுச் சீட்டு, தேர்வு கால அட்டவணை அல்லது ஒப்படைப்பு விவரம் தேவை."
+    "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "அந்தக் கோப்பில் தேதிகள் எதுவும் கிடைக்கவில்லை. நினைவூட்டல்களுக்குத் தேதி காட்டும் தேர்வுச் சீட்டு, தேர்வு கால அட்டவணை அல்லது ஒப்படைப்பு விவரம் தேவை.",
+    "Popular": "பிரபலம்",
+    "No messages yet": "இன்னும் செய்திகள் இல்லை"
 }
