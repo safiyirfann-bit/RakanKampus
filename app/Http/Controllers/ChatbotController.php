@@ -60,7 +60,7 @@ class ChatbotController extends Controller
             'message' => $message,
         ]);
 
-        $entries = $this->searchKnowledgeBase($message);
+        $entries = $this->searchKnowledgeBase($message, 5, $conversation);
 
 
         if ($entries->isEmpty()) {
@@ -230,39 +230,93 @@ public function destroy(Request $request, ChatConversation $conversation)
     return response()->json(['success' => true]);
 }
 
-    private function searchKnowledgeBase(string $message, int $limit = 5)
+    /**
+     * Find the knowledge-base entries that best match the student's message.
+     *
+     * - Case-insensitive, and question words ("mana", "apakah", "tu"...) are
+     *   ignored so they don't drown out the real topic words.
+     * - Scores every entry (the table is only a few hundred rows) instead of
+     *   taking the first 50 SQL matches — previously a common word like "mana"
+     *   filled those 50 slots and the right answer (e.g. "Dewan Kuliah JKA")
+     *   never got looked at.
+     * - A match in `keywords` counts most, then `question`, then `answer`;
+     *   two-word phrases ("dewan kuliah", "kampus b") get a bonus.
+     * - Follow-up questions with no topic words of their own ("kat mana tu?")
+     *   borrow the words from the student's previous message.
+     */
+    private function searchKnowledgeBase(string $message, int $limit = 5, ?ChatConversation $conversation = null)
     {
-        $keywords = collect(preg_split('/\s+/', strtolower($message)))
-            ->map(fn ($w) => trim($w, ".,?!"))
-            ->filter(fn ($w) => strlen($w) > 2 && ! in_array($w, $this->stopwords))
-            ->unique()
-            ->values();
+        $words = $this->topicWords($message);
 
-        if ($keywords->isEmpty()) {
+        if ($words->count() < 2 && $conversation) {
+            $previous = $conversation->messages()
+                ->where('sender', 'user')
+                ->latest('id')
+                ->skip(1) // skip the message we just saved
+                ->take(2)
+                ->pluck('message')
+                ->implode(' ');
+            $words = $words->merge($this->topicWords($previous))->unique()->values();
+        }
+
+        if ($words->isEmpty()) {
             return collect();
         }
 
-        $candidates = KnowledgeBase::query()
-            ->where(function ($q) use ($keywords) {
-                foreach ($keywords as $word) {
-                    $q->orWhere('question', 'like', "%{$word}%")
-                      ->orWhere('answer', 'like', "%{$word}%")
-                      ->orWhere('keywords', 'like', "%{$word}%")
-                      ->orWhere('category', 'like', "%{$word}%");
-                }
-            })
-            ->limit(50)
-            ->get();
+        $tokens = $words->all();
+        $phrases = [];
+        for ($i = 0; $i < count($tokens) - 1; $i++) {
+            $phrases[] = $tokens[$i] . ' ' . $tokens[$i + 1];
+        }
 
-        return $candidates
-            ->map(function ($entry) use ($keywords) {
-                $haystack = strtolower($entry->question . ' ' . $entry->answer . ' ' . $entry->keywords . ' ' . $entry->category);
-                $entry->relevance = $keywords->filter(fn ($word) => str_contains($haystack, $word))->count();
+        return KnowledgeBase::query()
+            ->get(['id', 'information_id', 'intent', 'question', 'answer', 'category', 'keywords'])
+            ->map(function ($entry) use ($tokens, $phrases) {
+                $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
+                $q = mb_strtolower((string) $entry->question);
+                $ans = mb_strtolower((string) $entry->answer);
+
+                $score = 0;
+                $hits = 0;
+                foreach ($tokens as $w) {
+                    $hit = false;
+                    if (str_contains($kw, $w)) { $score += 3; $hit = true; }
+                    if (str_contains($q, $w)) { $score += 2; $hit = true; }
+                    if (str_contains($ans, $w)) { $score += 1; $hit = true; }
+                    $hits += $hit ? 1 : 0;
+                }
+                foreach ($phrases as $ph) {
+                    if (str_contains($kw, $ph) || str_contains($q, $ph)) {
+                        $score += 4;
+                    }
+                }
+                // Reward entries that cover more of the student's words.
+                $entry->relevance = $score + $hits * 2;
+
                 return $entry;
             })
-            ->filter(fn ($entry) => $entry->relevance > 0)
+            ->filter(fn ($entry) => $entry->relevance >= 5)
             ->sortByDesc('relevance')
             ->take($limit)
+            ->values();
+    }
+
+    /** Lower-cased topic words from a message, without question/filler words. */
+    private function topicWords(string $text)
+    {
+        $filler = array_merge($this->stopwords, [
+            'mana', 'manakah', 'dimana', 'dmana', 'kat', 'kt', 'dekat', 'dkt', 'kan', 'ke', 'tu', 'ni', 'nak', 'tak', 'x',
+            'apakah', 'siapa', 'siapakah', 'bila', 'bilakah', 'berapa', 'berapakah', 'bagaimana', 'bagaimanakah', 'camne', 'camana',
+            'boleh', 'ada', 'adakah', 'ialah', 'itu', 'ini', 'pun', 'je', 'ja', 'la', 'lah', 'ye', 'ya', 'eh', 'ne', 'tau', 'tahu',
+            'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg',
+            'where', 'who', 'when', 'which', 'why', 'does', 'did', 'about', 'tell', 'me', 'you', 'your', 'there', 'this', 'that', 'and', 'with', 'in', 'on', 'at',
+        ]);
+
+        return collect(preg_split('/\s+/u', mb_strtolower($text)))
+            ->map(fn ($w) => trim($w, " \t\n\r\0\x0B.,?!:;\"'()[]"))
+            // single letters are kept only for "Kampus A/B", "Kantin C" etc.
+            ->filter(fn ($w) => (mb_strlen($w) >= 2 || in_array($w, ['a', 'b', 'c'], true)) && ! in_array($w, $filler, true))
+            ->unique()
             ->values();
     }
 }
