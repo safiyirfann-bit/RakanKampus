@@ -17,6 +17,29 @@ class ChatbotController extends Controller
         'the', 'is', 'are', 'a', 'an', 'to', 'for', 'of', 'what', 'how', 'can', 'i',
     ];
 
+    /** English campus words -> the Malay words used in the knowledge base. */
+    private const ENGLISH_TO_MALAY = [
+        'register' => ['daftar', 'pendaftaran'], 'registration' => ['pendaftaran', 'daftar'], 'enrol' => ['daftar'], 'enroll' => ['daftar'],
+        'course' => ['kursus', 'program'], 'subject' => ['subjek', 'kursus'], 'programme' => ['program'],
+        'fee' => ['yuran', 'bayaran'], 'pay' => ['bayar', 'bayaran'], 'payment' => ['bayaran', 'bayar'], 'tuition' => ['yuran', 'pengajian'],
+        'exam' => ['peperiksaan'], 'examination' => ['peperiksaan'], 'result' => ['keputusan'], 'timetable' => ['jadual'], 'schedule' => ['jadual'],
+        'hostel' => ['asrama', 'kamsis'], 'dorm' => ['asrama', 'kamsis'], 'college' => ['kolej'],
+        'library' => ['perpustakaan'], 'club' => ['kelab'], 'society' => ['persatuan'], 'sport' => ['sukan'],
+        'password' => ['kata laluan'], 'login' => ['log masuk'], 'forgot' => ['lupa', 'terlupa'], 'account' => ['akaun'],
+        'canteen' => ['kantin'], 'cafe' => ['kantin', 'cafe'], 'food' => ['makan', 'kantin'], 'prayer' => ['surau', 'solat'], 'mosque' => ['surau', 'pusat islam'],
+        'lecture' => ['kuliah'], 'hall' => ['dewan'], 'location' => ['lokasi'], 'building' => ['bangunan'],
+        'director' => ['pengarah'], 'deputy' => ['timbalan'], 'head' => ['ketua'], 'department' => ['jabatan'], 'faculty' => ['fakulti'],
+        'counselling' => ['kaunseling'], 'counseling' => ['kaunseling'], 'counsellor' => ['kaunselor'],
+        'internship' => ['latihan industri'], 'industrial' => ['industri'], 'training' => ['latihan'],
+        'advisor' => ['penasihat akademik'], 'adviser' => ['penasihat akademik'], 'co-curriculum' => ['kokurikulum'], 'cocurriculum' => ['kokurikulum'],
+        'apply' => ['mohon', 'permohonan'], 'application' => ['permohonan'], 'deadline' => ['tarikh akhir'], 'form' => ['borang'],
+        'uniform' => ['pakaian', 'beruniform'], 'dress' => ['pakaian'], 'parking' => ['meletak kenderaan', 'parkir'], 'vehicle' => ['kenderaan'],
+        'defer' => ['penangguhan', 'tangguh'], 'postpone' => ['penangguhan'], 'quit' => ['berhenti'], 'withdraw' => ['berhenti'],
+        'change' => ['tukar', 'pertukaran'], 'transfer' => ['pertukaran'], 'history' => ['sejarah'], 'established' => ['ditubuhkan'],
+        'abbreviation' => ['singkatan'], 'meaning' => ['maksud'], 'degree' => ['ijazah'],
+        'student' => ['pelajar'], 'lecturer' => ['pensyarah'], 'campus' => ['kampus'], 'election' => ['pilihan raya'],
+    ];
+
     protected array $unsafeKeywords = [
         'posisi69', 'seks', 'seksual', 'lucah', 'bogel', 'ngentot',
         'jimak', 'senggama', 'porno', 'sex', 'gay', 'lesbian',
@@ -310,13 +333,32 @@ public function destroy(Request $request, ChatConversation $conversation)
             'boleh', 'ada', 'adakah', 'ialah', 'itu', 'ini', 'pun', 'je', 'ja', 'la', 'lah', 'ye', 'ya', 'eh', 'ne', 'tau', 'tahu',
             'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg',
             'where', 'who', 'when', 'which', 'why', 'does', 'did', 'about', 'tell', 'me', 'you', 'your', 'there', 'this', 'that', 'and', 'with', 'in', 'on', 'at',
+            'do', 'my', 'get', 'is', 'it', 'be', 'if', 'or', 'we', 'us', 'any', 'have', 'has', 'need', 'should', 'will', 'would', 'could', 'from', 'into', 'our', 'am', 'was', 'were', 'go', 'know',
         ]);
 
-        return collect(preg_split('/\s+/u', mb_strtolower($text)))
+        $words = collect(preg_split('/\s+/u', mb_strtolower($text)))
             ->map(fn ($w) => trim($w, " \t\n\r\0\x0B.,?!:;\"'()[]"))
             // single letters are kept only for "Kampus A/B", "Kantin C" etc.
             ->filter(fn ($w) => (mb_strlen($w) >= 2 || in_array($w, ['a', 'b', 'c'], true)) && ! in_array($w, $filler, true))
-            ->unique()
             ->values();
+
+        // The knowledge base is written in Malay, so English questions
+        // ("How do I register for courses?") also search with the Malay words
+        // ("daftar", "kursus"). Plurals are reduced first (courses -> course).
+        $expanded = [];
+        foreach ($words as $w) {
+            $expanded[] = $w;
+            $base = (mb_strlen($w) > 4 && str_ends_with($w, 's')) ? mb_substr($w, 0, -1) : $w;
+            if ($base !== $w) {
+                $expanded[] = $base;
+            }
+            foreach ([$w, $base] as $k) {
+                foreach (self::ENGLISH_TO_MALAY[$k] ?? [] as $malay) {
+                    $expanded[] = $malay;
+                }
+            }
+        }
+
+        return collect($expanded)->unique()->values();
     }
 }
