@@ -410,6 +410,10 @@
     font-size:14px;
     white-space: pre-line;
     min-width: 0;
+    /* Break very long words/links (e.g. "sccccccc...") onto the next line
+       instead of pushing the bubble off the screen. */
+    overflow-wrap: anywhere;
+    word-break: break-word;
 }
 
   .message.user{
