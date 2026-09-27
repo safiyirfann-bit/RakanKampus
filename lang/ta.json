@@ -420,5 +420,11 @@
     "FREQUENTLY ASKED QUESTIONS": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
     "Please enter a valid PUO matric number (e.g. 01DIT24F1128).": "சரியான PUO மெட்ரிக் எண்ணை உள்ளிடவும் (எ.கா. 01DIT24F1128).",
     "optional": "விருப்பத்தேர்வு",
-    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "PUO மெட்ரிக் எண்: 12 எழுத்துகள், எ.கா. 01DIT24F1128"
+    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "PUO மெட்ரிக் எண்: 12 எழுத்துகள், எ.கா. 01DIT24F1128",
+    "12 characters, e.g. 01DKA23F0456": "12 எழுத்துகள், எ.கா. 01DKA23F0456",
+    "Please enter your matric number.": "உங்கள் மெட்ரிக் எண்ணை உள்ளிடவும்.",
+    "Matric number must be 12 characters, e.g. 01DKA23F0456.": "மெட்ரிக் எண் 12 எழுத்துகளாக இருக்க வேண்டும், எ.கா. 01DKA23F0456.",
+    "Only PUO matric numbers (starting with 01) are accepted.": "PUO மெட்ரிக் எண்கள் (01 இல் தொடங்குபவை) மட்டுமே ஏற்கப்படும்.",
+    "\":code\" is not a PUO programme code.": "\":code\" ஒரு PUO பாடத்திட்டக் குறியீடு அல்ல.",
+    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "சரியான PUO மெட்ரிக் எண்ணை உள்ளிடவும் (எ.கா. 01DKA23F0456)."
 }

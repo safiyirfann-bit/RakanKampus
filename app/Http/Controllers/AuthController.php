@@ -79,7 +79,7 @@ class AuthController extends Controller
                 'required', 'string', 'max:20', 'unique:users,student_id',
                 function ($attribute, $value, $fail) {
                     if (! \App\Support\MatricNumber::isValid($value)) {
-                        $fail('Please enter a valid PUO matric number (e.g. 01DIT24F1128). The programme code (e.g. DIT, DEE, DKA) must be a PUO programme.');
+                        $fail('Please enter a valid PUO matric number (e.g. 01DKA23F0456). The programme code (e.g. DIT, DEE, DKA) must be a PUO programme.');
                     }
                 },
             ],

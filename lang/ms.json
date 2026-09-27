@@ -420,5 +420,11 @@
     "FREQUENTLY ASKED QUESTIONS": "SOALAN LAZIM",
     "Please enter a valid PUO matric number (e.g. 01DIT24F1128).": "Sila masukkan nombor matrik PUO yang sah (cth. 01DIT24F1128).",
     "optional": "pilihan",
-    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "Nombor matrik PUO: 12 aksara, cth. 01DIT24F1128"
+    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "Nombor matrik PUO: 12 aksara, cth. 01DIT24F1128",
+    "12 characters, e.g. 01DKA23F0456": "12 aksara, cth. 01DKA23F0456",
+    "Please enter your matric number.": "Sila masukkan nombor matrik anda.",
+    "Matric number must be 12 characters, e.g. 01DKA23F0456.": "Nombor matrik mesti 12 aksara, cth. 01DKA23F0456.",
+    "Only PUO matric numbers (starting with 01) are accepted.": "Hanya nombor matrik PUO (bermula dengan 01) diterima.",
+    "\":code\" is not a PUO programme code.": "\":code\" bukan kod program PUO.",
+    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "Sila masukkan nombor matrik PUO yang sah (cth. 01DKA23F0456)."
 }

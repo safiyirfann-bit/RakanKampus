@@ -124,7 +124,7 @@ class ProfileController extends Controller
                 'required', 'string', 'max:20', 'unique:users,student_id,' . $request->user()->id,
                 function ($attribute, $value, $fail) {
                     if ($value && ! \App\Support\MatricNumber::isValid($value)) {
-                        $fail(__('Please enter a valid PUO matric number (e.g. 01DIT24F1128).'));
+                        $fail(__('Please enter a valid PUO matric number (e.g. 01DKA23F0456).'));
                     }
                 },
             ],

@@ -420,5 +420,11 @@
     "FREQUENTLY ASKED QUESTIONS": "常见问题",
     "Please enter a valid PUO matric number (e.g. 01DIT24F1128).": "请输入有效的 PUO 学号（例如 01DIT24F1128）。",
     "optional": "可选",
-    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "PUO 学号：12 个字符，例如 01DIT24F1128"
+    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "PUO 学号：12 个字符，例如 01DIT24F1128",
+    "12 characters, e.g. 01DKA23F0456": "12 个字符，例如 01DKA23F0456",
+    "Please enter your matric number.": "请输入您的学号。",
+    "Matric number must be 12 characters, e.g. 01DKA23F0456.": "学号必须为 12 个字符，例如 01DKA23F0456。",
+    "Only PUO matric numbers (starting with 01) are accepted.": "仅接受 PUO 学号（以 01 开头）。",
+    "\":code\" is not a PUO programme code.": "\":code\" 不是 PUO 课程代码。",
+    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "请输入有效的 PUO 学号（例如 01DKA23F0456）。"
 }

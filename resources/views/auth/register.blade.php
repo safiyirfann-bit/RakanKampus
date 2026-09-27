@@ -388,6 +388,14 @@ body{
     100% { background-position: 0% 50%; }
   }
 </style>
+<style>
+    .matric-msg { font-size: 13px; margin: 8px 4px 0; line-height: 1.4; display: flex; align-items: flex-start; gap: 6px; }
+    .matric-hint { color: #94a3b8; }
+    .matric-ok { color: #0f766e; font-weight: 600; }
+    .matric-err { color: #b91c1c; background: #fef2f2; border: 1px solid #fecaca; border-radius: 10px; padding: 8px 12px; font-weight: 500; }
+    .matric-input-err { border-color: #f87171 !important; box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18) !important; }
+    .matric-input-ok { border-color: #2dd4bf !important; }
+</style>
 </head>
 
 <body>
@@ -499,9 +507,9 @@ body{
 
       <div class="input-group">
         <label class="field-label">Matric Number (PUO)</label>
-        <input class="input" type="text" name="student_id" placeholder="e.g. 01DIT24F1000" value="{{ old('student_id') }}"
-               pattern="\s*[0-9]{2}[A-Za-z]{3}[0-9]{2}[A-Za-z][0-9]{4}\s*" title="PUO matric number: 12 characters, e.g. 01DIT24F1000" maxlength="16" required
-               oninput="this.value = this.value.toUpperCase()">
+        <input class="input" type="text" name="student_id" id="matricInput" placeholder="e.g. 01DKA23F0456" value="{{ old('student_id') }}"
+               maxlength="16" autocomplete="off">
+        <p id="matricMsg" class="matric-msg"></p>
       </div>
 
       <div class="footer-row">
@@ -616,6 +624,66 @@ document.querySelector('form').addEventListener('submit', function(e) {
 
   errorEl.style.display = 'none';
 });
+</script>
+@php
+    $matricText = [
+    'hint' => __('12 characters, e.g. 01DKA23F0456'),
+    'empty' => __('Please enter your matric number.'),
+    'format' => __('Matric number must be 12 characters, e.g. 01DKA23F0456.'),
+    'puo' => __('Only PUO matric numbers (starting with 01) are accepted.'),
+    'code' => __('":code" is not a PUO programme code.'),
+];
+    $matricCodes = config('programs.codes');
+@endphp
+<script>
+// Friendly inline check for the matric number (replaces the browser's plain
+// "Please match the requested format" bubble). Same rules as the server:
+// 12 characters, starts with 01 (PUO), and a real PUO programme code.
+(function () {
+    const input = document.getElementById('matricInput');
+    const msg = document.getElementById('matricMsg');
+    if (!input || !msg) return;
+    const PROGRAMMES = @json($matricCodes);
+    const T = @json($matricText);
+    let touched = input.value.trim() !== '';
+
+    function check() {
+        const v = input.value.replace(/[\s-]/g, '').toUpperCase();
+        if (v === '') return { ok: false, text: T.empty };
+        const m = v.match(/^(\d{2})([A-Z]{3})(\d{2})([A-Z])(\d{4})$/);
+        if (!m) return { ok: false, text: T.format };
+        if (m[1] !== '01') return { ok: false, text: T.puo };
+        if (!PROGRAMMES[m[2]]) return { ok: false, text: T.code.replace(':code', m[2]) };
+        return { ok: true, text: '✓ ' + PROGRAMMES[m[2]] };
+    }
+
+    function show(force) {
+        const r = check();
+        msg.classList.remove('matric-ok', 'matric-err', 'matric-hint');
+        input.classList.remove('matric-input-err', 'matric-input-ok');
+        if (r.ok) {
+            msg.textContent = r.text;
+            msg.classList.add('matric-ok');
+            input.classList.add('matric-input-ok');
+        } else if (touched || force) {
+            msg.textContent = '⚠️ ' + r.text;
+            msg.classList.add('matric-err');
+            input.classList.add('matric-input-err');
+        } else {
+            msg.textContent = T.hint;
+            msg.classList.add('matric-hint');
+        }
+        return r.ok;
+    }
+
+    input.addEventListener('input', () => { input.value = input.value.toUpperCase(); show(false); });
+    input.addEventListener('blur', () => { touched = true; show(false); });
+    input.form.addEventListener('submit', (e) => {
+        touched = true;
+        if (!show(true)) { e.preventDefault(); input.focus(); }
+    });
+    show(false);
+})();
 </script>
 </body>
 </html>
