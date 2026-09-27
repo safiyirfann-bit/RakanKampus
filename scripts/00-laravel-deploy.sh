@@ -9,6 +9,9 @@ php artisan route:clear
 echo "Running migrations..."
 php artisan migrate --force
 
+echo "Importing campus datasets into the knowledge base..."
+php artisan db:seed --class=CampusDatasetSeeder --force
+
 echo "Linking storage..."
 php artisan storage:link
 
