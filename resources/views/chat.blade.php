@@ -199,6 +199,10 @@
     color: #fff;
     text-shadow: 0 1px 3px rgba(0,0,0,0.35);
     margin: 0 0 2px;
+    /* one line with "..." so a long title never runs under the edit/delete icons */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
   .recent-preview {
@@ -486,6 +490,7 @@
 .recent-info {
     flex: 1;
     min-width: 0; /* penting supaya text truncate still work */
+    overflow: hidden;
 }
 
 .recent-actions {

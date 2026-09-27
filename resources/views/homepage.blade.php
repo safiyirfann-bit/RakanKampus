@@ -504,6 +504,9 @@
     font-weight: 700;
     color: var(--blue-dark);
     margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .conv-preview {
