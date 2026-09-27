@@ -26,12 +26,17 @@ class MatricNumber
         return ['institution' => $m[1], 'code' => $m[2], 'year' => $m[3], 'session' => $m[4], 'number' => $m[5]];
     }
 
-    /** True when it looks like a matric number from this institution (01 = PUO). */
+    /**
+     * True when it's a matric number from this institution (01 = PUO) AND its
+     * programme code is one of the official codes in config/programs.php.
+     */
     public static function isValid(?string $matric): bool
     {
         $p = self::parse($matric);
 
-        return $p !== null && $p['institution'] === config('programs.institution_code', '01');
+        return $p !== null
+            && $p['institution'] === config('programs.institution_code', '01')
+            && array_key_exists($p['code'], config('programs.codes', []));
     }
 
     /** Full programme name for the matric number, or null if the code isn't in the list. */
