@@ -129,7 +129,6 @@ class ProfileController extends Controller
                 },
             ],
             'email'       => 'required|email|max:255',
-            'faculty'     => 'nullable|string|max:255',
             'phone'       => 'nullable|string|max:20',
         ]);
 
@@ -140,7 +139,7 @@ class ProfileController extends Controller
         $user->student_id  = $request->student_id;
         $user->email       = $request->email;
         // Programme follows the matric number (01DIT... -> Diploma Teknologi Maklumat).
-        $user->faculty     = \App\Support\MatricNumber::programme($request->student_id) ?? $request->faculty;
+        $user->faculty     = \App\Support\MatricNumber::programme($request->student_id) ?? $user->faculty;
         $user->phone       = $request->phone;
         $user->save();
 

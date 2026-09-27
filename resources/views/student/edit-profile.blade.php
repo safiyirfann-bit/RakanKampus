@@ -97,6 +97,12 @@
     .page-header p { color: #64748b; }
   }
 </style>
+<style>
+    .save-profile-btn { background: #4f46e5; color: #fff; box-shadow: 0 10px 15px -3px rgba(199, 210, 254, 0.9); cursor: pointer; }
+    .save-profile-btn:hover { background: #4338ca; }
+    .save-profile-btn:disabled { background: #e0e7ff; color: #a5b4fc; box-shadow: none; cursor: default; }
+    .save-profile-btn:disabled:hover { background: #e0e7ff; }
+</style>
 </head>
 
 <body class="min-h-screen">
@@ -155,7 +161,7 @@
     @endif
 
     <!-- Form -->
-    <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6">
+    <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6" id="editProfileForm">
         @csrf
         @method('PUT')
 
@@ -214,19 +220,6 @@
             @enderror
         </div>
 
-        <!-- Faculty -->
-        <div>
-            <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                {{ __('Faculty') }}
-            </label>
-
-            <input type="text" name="faculty" value="{{ old('faculty', $user->faculty) }}"
-                   class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
-            @error('faculty')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-            @enderror
-        </div>
-
         <!-- Phone -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
@@ -241,8 +234,9 @@
         </div>
 
         <!-- Save Button -->
-        <button type="submit"
-                class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
+        {{-- Only lights up (and can be pressed) once something in the form has changed. --}}
+        <button type="submit" id="saveProfileBtn" @if(! $errors->any()) disabled @endif
+                class="save-profile-btn w-full rounded-2xl py-4 text-lg font-bold transition duration-200">
 
             {{ __('Save Changes') }}
 
@@ -579,6 +573,23 @@ function uploadPhoto() {
             showAlert('error', t('Error'), t('An error occurred during upload.'));
         });
 }
+</script>
+<script>
+// Save Changes stays greyed out until the student actually changes a field
+// (and greys out again if they change it back to what it was).
+(function () {
+    const form = document.getElementById('editProfileForm');
+    const btn = document.getElementById('saveProfileBtn');
+    if (!form || !btn) return;
+    const fields = Array.from(form.querySelectorAll('input:not([type=hidden]), select, textarea'));
+    const initial = fields.map(f => f.value);
+    const hadErrors = !btn.disabled;
+    function check() {
+        const changed = fields.some((f, i) => f.value !== initial[i]);
+        btn.disabled = !(changed || hadErrors);
+    }
+    fields.forEach(f => { f.addEventListener('input', check); f.addEventListener('change', check); });
+})();
 </script>
 </body>
 </html>
