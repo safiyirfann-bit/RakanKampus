@@ -149,9 +149,9 @@
     @endif
     <div class="text-xs text-indigo-400">{{ $user->email }}</div>
 
-    @if($user->faculty)
+    @if($user->programme)
         <span class="inline-block mt-2 text-[11px] font-semibold text-indigo-600 bg-indigo-50 rounded-full px-3 py-1">
-            {{ $user->faculty }}
+            {{ $user->programme }}
         </span>
     @endif
 </div>

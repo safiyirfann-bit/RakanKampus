@@ -498,8 +498,10 @@ body{
       </div>
 
       <div class="input-group">
-        <label class="field-label">Student ID</label>
-        <input class="input" type="text" name="student_id" placeholder="e.g. 01DIT24F1000" value="{{ old('student_id') }}">
+        <label class="field-label">Matric Number (PUO)</label>
+        <input class="input" type="text" name="student_id" placeholder="e.g. 01DIT24F1000" value="{{ old('student_id') }}"
+               pattern="\s*[0-9]{2}[A-Za-z]{3}[0-9]{2}[A-Za-z][0-9]{3,5}\s*" title="PUO matric number, e.g. 01DIT24F1000" required
+               oninput="this.value = this.value.toUpperCase()">
       </div>
 
       <div class="footer-row">

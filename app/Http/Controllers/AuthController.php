@@ -67,10 +67,22 @@ class AuthController extends Controller
      */
     public function register(Request $request)
     {
+        // Matric numbers are stored in one format (upper case, no spaces/dashes),
+        // so "01dit24f1128" and "01DIT24F1128" can't register twice.
+        $request->merge(['student_id' => \App\Support\MatricNumber::normalise($request->student_id)]);
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name'  => 'required|string|max:255',
-            'student_id' => 'required|string|max:255|unique:users,student_id',
+            // Only PUO students: the matric number must look like 01DIT24F1128.
+            'student_id' => [
+                'required', 'string', 'max:20', 'unique:users,student_id',
+                function ($attribute, $value, $fail) {
+                    if (! \App\Support\MatricNumber::isValid($value)) {
+                        $fail('Please enter a valid PUO matric number (e.g. 01DIT24F1128).');
+                    }
+                },
+            ],
             'email'      => 'required|email|unique:users,email',
             'faculty'    => 'nullable|string|max:255',
             'password'   => 'required|min:6|confirmed',
@@ -82,7 +94,8 @@ class AuthController extends Controller
             'last_name'  => $request->last_name,
             'student_id' => $request->student_id,
             'email'      => $request->email,
-            'faculty'    => $request->faculty,
+            // Programme comes from the matric number (e.g. DIT -> Diploma Teknologi Maklumat).
+            'faculty'    => \App\Support\MatricNumber::programme($request->student_id) ?? $request->faculty,
             'password'   => $request->password, // auto hashed by User model
             'role'       => 'student',
         ]);

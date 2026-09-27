@@ -214,6 +214,14 @@
     margin: 0;
   }
 
+  .greeting-programme {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e6fbfb;
+    margin: 2px 0 1px;
+    line-height: 1.35;
+  }
+
   .greeting-meta {
     font-size: 12.5px;
     color: #bfe9ea;
@@ -616,11 +624,12 @@
         </div>
         <div>
           <p class="greeting-name">{{ $user->first_name }} {{ $user->last_name }}</p>
-          <p class="greeting-meta">
-              @if($user->student_id){{ $user->student_id }}@endif
-              @if($user->student_id && $user->faculty) &middot; @endif
-              {{ $user->faculty }}
-          </p>
+          @if($user->programme)
+            <p class="greeting-programme">{{ $user->programme }}</p>
+          @endif
+          @if($user->student_id)
+            <p class="greeting-meta">{{ $user->student_id }}</p>
+          @endif
         </div>
       </div>
       @php

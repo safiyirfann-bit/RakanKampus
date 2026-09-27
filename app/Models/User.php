@@ -42,6 +42,16 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Programme shown under the student's name: the saved faculty/programme, or
+     * worked out from the matric number (01DIT... -> Diploma Teknologi Maklumat)
+     * for accounts made before that was saved automatically.
+     */
+    public function getProgrammeAttribute(): ?string
+    {
+        return $this->faculty ?: \App\Support\MatricNumber::programme($this->student_id);
+    }
+
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
