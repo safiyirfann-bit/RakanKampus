@@ -129,7 +129,16 @@ class ProfileController extends Controller
                 },
             ],
             'email'       => 'required|email|max:255|unique:users,email,' . $request->user()->id,
-            'phone'       => 'nullable|string|max:20',
+            'phone'       => ['nullable', 'string', 'max:20', 'regex:/^\+?[0-9][0-9\s-]{7,14}$/'],
+        ], [
+            'first_name.required' => __('This field is required.'),
+            'last_name.required' => __('This field is required.'),
+            'email.required' => __('This field is required.'),
+            'email.email' => __('Please enter a valid email address, e.g. name@example.com.'),
+            'email.unique' => __('This email is already used by another account.'),
+            'student_id.required' => __('Please enter your matric number.'),
+            'student_id.unique' => __('This matric number is already registered to another account.'),
+            'phone.regex' => __('Please enter a valid phone number, e.g. 012-3456789.'),
         ]);
 
         $user = $request->user();

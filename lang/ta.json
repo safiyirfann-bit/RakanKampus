@@ -426,5 +426,10 @@
     "Matric number must be 12 characters, e.g. 01DKA23F0456.": "மெட்ரிக் எண் 12 எழுத்துகளாக இருக்க வேண்டும், எ.கா. 01DKA23F0456.",
     "Only PUO matric numbers (starting with 01) are accepted.": "PUO மெட்ரிக் எண்கள் (01 இல் தொடங்குபவை) மட்டுமே ஏற்கப்படும்.",
     "\":code\" is not a PUO programme code.": "\":code\" ஒரு PUO பாடத்திட்டக் குறியீடு அல்ல.",
-    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "சரியான PUO மெட்ரிக் எண்ணை உள்ளிடவும் (எ.கா. 01DKA23F0456)."
+    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "சரியான PUO மெட்ரிக் எண்ணை உள்ளிடவும் (எ.கா. 01DKA23F0456).",
+    "This field is required.": "இந்தப் புலம் கட்டாயமானது.",
+    "Please enter a valid email address, e.g. name@example.com.": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும், எ.கா. name@example.com.",
+    "Please enter a valid phone number, e.g. 012-3456789.": "சரியான தொலைபேசி எண்ணை உள்ளிடவும், எ.கா. 012-3456789.",
+    "This email is already used by another account.": "இந்த மின்னஞ்சல் ஏற்கனவே மற்றொரு கணக்கால் பயன்படுத்தப்படுகிறது.",
+    "This matric number is already registered to another account.": "இந்த மெட்ரிக் எண் ஏற்கனவே மற்றொரு கணக்கில் பதிவு செய்யப்பட்டுள்ளது."
 }

@@ -98,6 +98,7 @@
   }
 </style>
 <style>
+    .matric-msg:empty { display: none; }
     .matric-msg { font-size: 13px; margin: 8px 4px 0; line-height: 1.4; display: flex; align-items: flex-start; gap: 6px; }
     .matric-hint { color: #94a3b8; }
     .matric-ok { color: #0f766e; font-weight: 600; }
@@ -163,7 +164,7 @@
     @endif
 
     <!-- Form -->
-    <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6" id="editProfileForm">
+    <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6" id="editProfileForm" novalidate>
         @csrf
         @method('PUT')
 
@@ -175,11 +176,12 @@
                     {{ __('First Name') }}
                 </label>
 
-                <input type="text" name="first_name" required value="{{ old('first_name', $user->first_name) }}"
+                <input type="text" name="first_name" id="field_first_name" value="{{ old('first_name', $user->first_name) }}"
                        class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+                <p class="matric-msg" data-msg-for="first_name"></p>
                 @error('first_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
+                <p class="matric-msg matric-err" data-server-error="first_name">⚠️ {{ $message }}</p>
+            @enderror
             </div>
 
             <div>
@@ -187,11 +189,12 @@
                     {{ __('Last Name') }}
                 </label>
 
-                <input type="text" name="last_name" required value="{{ old('last_name', $user->last_name) }}"
+                <input type="text" name="last_name" id="field_last_name" value="{{ old('last_name', $user->last_name) }}"
                        class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+                <p class="matric-msg" data-msg-for="last_name"></p>
                 @error('last_name')
-                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
-                @enderror
+                <p class="matric-msg matric-err" data-server-error="last_name">⚠️ {{ $message }}</p>
+            @enderror
             </div>
 
         </div>
@@ -202,10 +205,11 @@
                 {{ __('Email') }}
             </label>
 
-            <input type="email" name="email" required value="{{ old('email', $user->email) }}"
+            <input type="email" name="email" id="field_email" value="{{ old('email', $user->email) }}"
                    class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            <p class="matric-msg" data-msg-for="email"></p>
             @error('email')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="matric-msg matric-err" data-server-error="email">⚠️ {{ $message }}</p>
             @enderror
         </div>
 
@@ -220,7 +224,7 @@
                    class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
             <p id="matricMsg" class="matric-msg"></p>
             @error('student_id')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="matric-msg matric-err" data-server-error="student_id">⚠️ {{ $message }}</p>
             @enderror
         </div>
 
@@ -230,10 +234,11 @@
                 {{ __('Phone Number') }} <span class="normal-case font-medium text-indigo-300">({{ __('optional') }})</span>
             </label>
 
-            <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"
+            <input type="tel" name="phone" id="field_phone" placeholder="012-3456789" value="{{ old('phone', $user->phone) }}"
                    class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            <p class="matric-msg" data-msg-for="phone"></p>
             @error('phone')
-                <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                <p class="matric-msg matric-err" data-server-error="phone">⚠️ {{ $message }}</p>
             @enderror
         </div>
 
@@ -597,63 +602,90 @@ function uploadPhoto() {
 })();
 </script>
 @php
-    $matricText = [
-    'hint' => __('12 characters, e.g. 01DKA23F0456'),
-    'empty' => __('Please enter your matric number.'),
-    'format' => __('Matric number must be 12 characters, e.g. 01DKA23F0456.'),
-    'puo' => __('Only PUO matric numbers (starting with 01) are accepted.'),
-    'code' => __('":code" is not a PUO programme code.'),
-];
+    $formText = [
+        'required' => __('This field is required.'),
+        'email' => __('Please enter a valid email address, e.g. name@example.com.'),
+        'phone' => __('Please enter a valid phone number, e.g. 012-3456789.'),
+        'hint' => __('12 characters, e.g. 01DKA23F0456'),
+        'empty' => __('Please enter your matric number.'),
+        'format' => __('Matric number must be 12 characters, e.g. 01DKA23F0456.'),
+        'puo' => __('Only PUO matric numbers (starting with 01) are accepted.'),
+        'code' => __('":code" is not a PUO programme code.'),
+    ];
     $matricCodes = config('programs.codes');
 @endphp
 <script>
-// Friendly inline check for the matric number (replaces the browser's plain
-// "Please match the requested format" bubble). Same rules as the server:
-// 12 characters, starts with 01 (PUO), and a real PUO programme code.
+// Friendly inline validation for every field on Edit Profile (replaces the
+// browser's plain bubbles). Same rules as the server. Messages appear under
+// each box once the student has touched it, or when they press Save.
 (function () {
-    const input = document.getElementById('matricInput');
-    const msg = document.getElementById('matricMsg');
-    if (!input || !msg) return;
+    const form = document.getElementById('editProfileForm');
+    if (!form) return;
+    const T = @json($formText);
     const PROGRAMMES = @json($matricCodes);
-    const T = @json($matricText);
-    let touched = input.value.trim() !== '';
 
-    function check() {
-        const v = input.value.replace(/[\s-]/g, '').toUpperCase();
-        if (v === '') return { ok: false, text: T.empty };
-        const m = v.match(/^(\d{2})([A-Z]{3})(\d{2})([A-Z])(\d{4})$/);
-        if (!m) return { ok: false, text: T.format };
-        if (m[1] !== '01') return { ok: false, text: T.puo };
-        if (!PROGRAMMES[m[2]]) return { ok: false, text: T.code.replace(':code', m[2]) };
-        return { ok: true, text: '✓ ' + PROGRAMMES[m[2]] };
-    }
+    const rules = {
+        first_name: v => v.trim() ? null : T.required,
+        last_name: v => v.trim() ? null : T.required,
+        email: v => !v.trim() ? T.required : (/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim()) ? null : T.email),
+        phone: v => !v.trim() ? null : (/^\+?[0-9][0-9\s-]{7,14}$/.test(v.trim()) ? null : T.phone),
+        student_id: v => {
+            v = v.replace(/[\s-]/g, '').toUpperCase();
+            if (v === '') return T.empty;
+            const m = v.match(/^(\d{2})([A-Z]{3})(\d{2})([A-Z])(\d{4})$/);
+            if (!m) return T.format;
+            if (m[1] !== '01') return T.puo;
+            if (!PROGRAMMES[m[2]]) return T.code.replace(':code', m[2]);
+            return null;
+        },
+    };
 
-    function show(force) {
-        const r = check();
-        msg.classList.remove('matric-ok', 'matric-err', 'matric-hint');
-        input.classList.remove('matric-input-err', 'matric-input-ok');
-        if (r.ok) {
-            msg.textContent = r.text;
-            msg.classList.add('matric-ok');
-            input.classList.add('matric-input-ok');
-        } else if (touched || force) {
-            msg.textContent = '⚠️ ' + r.text;
-            msg.classList.add('matric-err');
-            input.classList.add('matric-input-err');
-        } else {
-            msg.textContent = T.hint;
-            msg.classList.add('matric-hint');
+    const fields = Object.keys(rules).map(name => {
+        const input = form.querySelector(`[name="${name}"]`);
+        const msg = name === 'student_id' ? document.getElementById('matricMsg') : form.querySelector(`[data-msg-for="${name}"]`);
+        return input && msg ? { name, input, msg, touched: input.value.trim() !== '' } : null;
+    }).filter(Boolean);
+
+    function show(f, force) {
+        const error = rules[f.name](f.input.value);
+        f.msg.className = 'matric-msg';
+        f.input.classList.remove('matric-input-err', 'matric-input-ok');
+        f.msg.textContent = '';
+
+        if (error && (f.touched || force)) {
+            f.msg.textContent = '⚠️ ' + error;
+            f.msg.classList.add('matric-err');
+            f.input.classList.add('matric-input-err');
+        } else if (f.name === 'student_id') {
+            const code = f.input.value.replace(/[\s-]/g, '').toUpperCase().slice(2, 5);
+            if (!error) {
+                f.msg.textContent = '✓ ' + PROGRAMMES[code];
+                f.msg.classList.add('matric-ok');
+                f.input.classList.add('matric-input-ok');
+            } else {
+                f.msg.textContent = T.hint;
+                f.msg.classList.add('matric-hint');
+            }
         }
-        return r.ok;
+        return !error;
     }
 
-    input.addEventListener('input', () => { input.value = input.value.toUpperCase(); show(false); });
-    input.addEventListener('blur', () => { touched = true; show(false); });
-    input.form.addEventListener('submit', (e) => {
-        touched = true;
-        if (!show(true)) { e.preventDefault(); input.focus(); }
+    fields.forEach(f => {
+        f.input.addEventListener('input', () => {
+            if (f.name === 'student_id') f.input.value = f.input.value.toUpperCase();
+            // hide the server's message for this field once the student edits it
+            form.querySelectorAll(`[data-server-error="${f.name}"]`).forEach(el => el.remove());
+            show(f, false);
+        });
+        f.input.addEventListener('blur', () => { f.touched = true; show(f, false); });
+        show(f, false);
     });
-    show(false);
+
+    form.addEventListener('submit', (e) => {
+        let firstBad = null;
+        fields.forEach(f => { f.touched = true; if (!show(f, true) && !firstBad) firstBad = f; });
+        if (firstBad) { e.preventDefault(); firstBad.input.focus(); }
+    });
 })();
 </script>
 </body>

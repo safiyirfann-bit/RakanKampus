@@ -426,5 +426,10 @@
     "Matric number must be 12 characters, e.g. 01DKA23F0456.": "Nombor matrik mesti 12 aksara, cth. 01DKA23F0456.",
     "Only PUO matric numbers (starting with 01) are accepted.": "Hanya nombor matrik PUO (bermula dengan 01) diterima.",
     "\":code\" is not a PUO programme code.": "\":code\" bukan kod program PUO.",
-    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "Sila masukkan nombor matrik PUO yang sah (cth. 01DKA23F0456)."
+    "Please enter a valid PUO matric number (e.g. 01DKA23F0456).": "Sila masukkan nombor matrik PUO yang sah (cth. 01DKA23F0456).",
+    "This field is required.": "Medan ini wajib diisi.",
+    "Please enter a valid email address, e.g. name@example.com.": "Sila masukkan alamat e-mel yang sah, cth. nama@example.com.",
+    "Please enter a valid phone number, e.g. 012-3456789.": "Sila masukkan nombor telefon yang sah, cth. 012-3456789.",
+    "This email is already used by another account.": "E-mel ini sudah digunakan oleh akaun lain.",
+    "This matric number is already registered to another account.": "Nombor matrik ini sudah didaftarkan oleh akaun lain."
 }
