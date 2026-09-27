@@ -208,6 +208,8 @@
             </label>
 
             <input type="text" name="student_id" required value="{{ old('student_id', $user->student_id) }}"
+                   pattern="\s*[0-9]{2}[A-Za-z]{3}[0-9]{2}[A-Za-z][0-9]{4}\s*" title="{{ __('PUO matric number: 12 characters, e.g. 01DIT24F1128') }}"
+                   oninput="this.value = this.value.toUpperCase()"
                    class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
             @error('student_id')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>

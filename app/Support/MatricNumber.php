@@ -8,8 +8,8 @@ namespace App\Support;
  */
 class MatricNumber
 {
-    /** 2-digit institution, 3-letter programme, 2-digit year, 1 letter session, 3-5 digit number */
-    public const PATTERN = '/^(\d{2})([A-Z]{3})(\d{2})([A-Z])(\d{3,5})$/';
+    /** Exactly: 2-digit institution, 3-letter programme, 2-digit year, 1-letter session, 4-digit number (12 characters) */
+    public const PATTERN = '/^(\d{2})([A-Z]{3})(\d{2})([A-Z])(\d{4})$/';
 
     public static function normalise(?string $matric): string
     {

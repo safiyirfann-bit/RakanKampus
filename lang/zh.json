@@ -419,5 +419,6 @@
     "No messages yet": "暂无消息",
     "FREQUENTLY ASKED QUESTIONS": "常见问题",
     "Please enter a valid PUO matric number (e.g. 01DIT24F1128).": "请输入有效的 PUO 学号（例如 01DIT24F1128）。",
-    "optional": "可选"
+    "optional": "可选",
+    "PUO matric number: 12 characters, e.g. 01DIT24F1128": "PUO 学号：12 个字符，例如 01DIT24F1128"
 }
