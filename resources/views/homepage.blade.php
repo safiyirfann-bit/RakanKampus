@@ -341,10 +341,10 @@
     animation: fadeInUp 0.5s ease both;
 }
 
-  .quick-grid a:nth-child(1) { animation-delay: 0.10s; }
-  .quick-grid a:nth-child(2) { animation-delay: 0.17s; }
-  .quick-grid a:nth-child(3) { animation-delay: 0.24s; }
-  .quick-grid a:nth-child(4) { animation-delay: 0.31s; }
+  .quick-grid a:nth-of-type(1) { animation-delay: 0.10s; }
+  .quick-grid a:nth-of-type(2) { animation-delay: 0.17s; }
+  .quick-grid a:nth-of-type(3) { animation-delay: 0.24s; }
+  .quick-grid a:nth-of-type(4) { animation-delay: 0.31s; }
 
   .quick-chip-tag { display: block; font-size: 10px; font-weight: 800; color: #ea580c; margin-bottom: 3px; letter-spacing: 0.02em; }
   .quick-chip:hover {
@@ -382,6 +382,22 @@
   .start-chat-btn svg {
     width: 18px;
     height: 18px;
+  }
+
+  /* Heading above the quick-question chips — same look as "RECENT CONVERSATIONS". */
+  .faq-label {
+    grid-column: 1 / -1;
+    justify-self: start;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--blue-primary);
+    margin: 0 0 4px 4px;
+    animation: fadeInUp 0.5s ease 0.05s both;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(6px);
+    padding: 6px 14px;
+    border-radius: 999px;
   }
 
   .section-label {
@@ -650,6 +666,7 @@
     {{-- Quick questions: the most asked questions from students (see App\Services\PopularQuestions),
          topped up with default ones. Popular chips show a small "Popular" tag. --}}
     <div class="quick-grid">
+      <p class="faq-label">{{ __('FREQUENTLY ASKED QUESTIONS') }}</p>
       @foreach($quickQuestions as $q)
         @php($label = $q['popular'] ? $q['text'] : __($q['text']))
         <a href="{{ route('student.chat') }}?q={{ urlencode($label) }}" class="quick-chip">
