@@ -112,10 +112,22 @@ class ProfileController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        if ($request->filled('student_id')) {
+            $request->merge(['student_id' => \App\Support\MatricNumber::normalise($request->student_id)]);
+        }
+
         $request->validate([
             'first_name'  => 'required|string|max:255',
             'last_name'   => 'required|string|max:255',
-            'student_id'  => 'nullable|string|max:255|unique:users,student_id,' . $request->user()->id,
+            // Same rule as registration: a PUO matric number with an official programme code.
+            'student_id'  => [
+                'nullable', 'string', 'max:20', 'unique:users,student_id,' . $request->user()->id,
+                function ($attribute, $value, $fail) {
+                    if ($value && ! \App\Support\MatricNumber::isValid($value)) {
+                        $fail(__('Please enter a valid PUO matric number (e.g. 01DIT24F1128).'));
+                    }
+                },
+            ],
             'email'       => 'required|email|max:255',
             'faculty'     => 'nullable|string|max:255',
             'phone'       => 'nullable|string|max:20',
@@ -127,7 +139,8 @@ class ProfileController extends Controller
         $user->name        = $request->first_name . ' ' . $request->last_name;
         $user->student_id  = $request->student_id;
         $user->email       = $request->email;
-        $user->faculty     = $request->faculty;
+        // Programme follows the matric number (01DIT... -> Diploma Teknologi Maklumat).
+        $user->faculty     = \App\Support\MatricNumber::programme($request->student_id) ?? $request->faculty;
         $user->phone       = $request->phone;
         $user->save();
 

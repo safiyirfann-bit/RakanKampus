@@ -417,5 +417,6 @@
     "No dates were found in that file. Reminders need an exam slip, exam timetable or assignment brief that shows a date.": "该文件中未找到日期。提醒需要显示日期的考试单、考试时间表或作业说明。",
     "Popular": "热门",
     "No messages yet": "暂无消息",
-    "FREQUENTLY ASKED QUESTIONS": "常见问题"
+    "FREQUENTLY ASKED QUESTIONS": "常见问题",
+    "Please enter a valid PUO matric number (e.g. 01DIT24F1128).": "请输入有效的 PUO 学号（例如 01DIT24F1128）。"
 }
