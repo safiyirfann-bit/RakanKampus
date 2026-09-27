@@ -293,24 +293,33 @@
 
   .input-row {
     display: flex;
-    align-items: center;
+    align-items: flex-end; /* buttons stay at the bottom when the text box grows */
     background: var(--input-bg);
-    border-radius: 999px;
+    border-radius: 24px;
     padding: 6px 8px 6px 20px;
     gap: 10px;
   }
 
-  .input-row input {
+  /* Message box: a textarea that grows with the text (up to ~5 lines, then scrolls). */
+  .input-row textarea {
     flex: 1;
     border: none;
     outline: none;
     background: transparent;
     font-size: 14.5px;
+    font-family: inherit;
+    line-height: 1.45;
     color: var(--blue-dark);
-    padding: 10px 0;
+    padding: 9px 0;
+    margin: 0;
+    resize: none;
+    height: 39px;
+    max-height: 132px;
+    overflow-y: hidden;
+    overflow-wrap: anywhere;
   }
 
-  .input-row input::placeholder { color: var(--input-placeholder); }
+  .input-row textarea::placeholder { color: var(--input-placeholder); }
 
   .send-btn {
     width: 38px;
@@ -618,7 +627,7 @@
 
       <div class="input-bar">
         <div class="input-row">
-          <input type="text" id="messageInput" placeholder="{{ __('Ask me anything about Politeknik...') }}">
+          <textarea id="messageInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
           <button type="button" class="mic-btn hidden" id="micBtn" aria-label="{{ __('Voice input') }}">
             <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
@@ -659,6 +668,17 @@ setSidebarOpen(false);
 const menuBtn = document.getElementById('menuBtn');
 const sendBtn = document.getElementById('sendBtn');
 const messageInput = document.getElementById('messageInput');
+
+// Grow the message box with its text: one line by default, up to ~5 lines,
+// then it scrolls inside. Called whenever the text changes (typing, voice, send).
+function autoResizeInput() {
+  messageInput.style.height = 'auto';
+  const max = parseFloat(getComputedStyle(messageInput).maxHeight) || 132;
+  const h = Math.min(messageInput.scrollHeight, max);
+  messageInput.style.height = h + 'px';
+  messageInput.style.overflowY = messageInput.scrollHeight > max ? 'auto' : 'hidden';
+}
+messageInput.addEventListener('input', autoResizeInput);
 const chatArea = document.getElementById('chatArea');
 const newChatBtn = document.getElementById('newChatBtn');
 const recentList = document.getElementById('recentList');
@@ -732,7 +752,8 @@ if (SpeechRecognitionAPI && micBtn) {
     }
     spoken = spoken.trim();
     messageInput.value = voiceBaseText ? `${voiceBaseText} ${spoken}` : spoken;
-    messageInput.scrollLeft = messageInput.scrollWidth; // keep the newest words visible
+    autoResizeInput();
+    messageInput.scrollTop = messageInput.scrollHeight; // keep the newest words visible
   };
 
   recognition.onerror = (event) => {
@@ -822,6 +843,7 @@ function sendMessage(){
 
   addMessage(text, 'user');
   messageInput.value = '';
+  autoResizeInput();
 
   const typingMsg = addMessage(t('Typing...'), 'bot');
   typingMsg.id = 'typingIndicator';
@@ -976,8 +998,11 @@ stopBtn.addEventListener('click', () => {
   if (currentController) currentController.abort();
 });
 
-messageInput.addEventListener('keypress', function(e){
-  if(e.key === 'Enter'){
+// Enter sends; Shift+Enter adds a new line. (isComposing: don't send while an
+// IME, e.g. Chinese input, is still picking characters.)
+messageInput.addEventListener('keydown', function(e){
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
+    e.preventDefault();
     sendMessage();
   }
 });
