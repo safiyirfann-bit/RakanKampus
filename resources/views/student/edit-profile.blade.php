@@ -97,12 +97,6 @@
     .page-header p { color: #64748b; }
   }
 </style>
-<style>
-    .save-profile-btn { background: #4f46e5; color: #fff; box-shadow: 0 10px 15px -3px rgba(199, 210, 254, 0.9); cursor: pointer; }
-    .save-profile-btn:hover { background: #4338ca; }
-    .save-profile-btn:disabled { background: #e0e7ff; color: #a5b4fc; box-shadow: none; cursor: default; }
-    .save-profile-btn:disabled:hover { background: #e0e7ff; }
-</style>
 </head>
 
 <body class="min-h-screen">
@@ -236,7 +230,8 @@
         <!-- Save Button -->
         {{-- Only lights up (and can be pressed) once something in the form has changed. --}}
         <button type="submit" id="saveProfileBtn" @if(! $errors->any()) disabled @endif
-                class="save-profile-btn w-full rounded-2xl py-4 text-lg font-bold transition duration-200">
+                class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200
+                       disabled:bg-indigo-100 disabled:text-indigo-300 disabled:shadow-none disabled:cursor-default disabled:hover:bg-indigo-100">
 
             {{ __('Save Changes') }}
 
