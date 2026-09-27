@@ -167,7 +167,7 @@
                     {{ __('First Name') }}
                 </label>
 
-                <input type="text" name="first_name" value="{{ old('first_name', $user->first_name) }}"
+                <input type="text" name="first_name" required value="{{ old('first_name', $user->first_name) }}"
                        class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
                 @error('first_name')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -179,7 +179,7 @@
                     {{ __('Last Name') }}
                 </label>
 
-                <input type="text" name="last_name" value="{{ old('last_name', $user->last_name) }}"
+                <input type="text" name="last_name" required value="{{ old('last_name', $user->last_name) }}"
                        class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
                 @error('last_name')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -194,7 +194,7 @@
                 {{ __('Email') }}
             </label>
 
-            <input type="email" name="email" value="{{ old('email', $user->email) }}"
+            <input type="email" name="email" required value="{{ old('email', $user->email) }}"
                    class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
             @error('email')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -207,7 +207,7 @@
                 {{ __('Registration Number') }}
             </label>
 
-            <input type="text" name="student_id" value="{{ old('student_id', $user->student_id) }}"
+            <input type="text" name="student_id" required value="{{ old('student_id', $user->student_id) }}"
                    class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
             @error('student_id')
                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -217,7 +217,7 @@
         <!-- Phone -->
         <div>
             <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                {{ __('Phone Number') }}
+                {{ __('Phone Number') }} <span class="normal-case font-medium text-indigo-300">({{ __('optional') }})</span>
             </label>
 
             <input type="tel" name="phone" value="{{ old('phone', $user->phone) }}"

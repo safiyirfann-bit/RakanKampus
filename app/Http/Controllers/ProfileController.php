@@ -121,14 +121,14 @@ class ProfileController extends Controller
             'last_name'   => 'required|string|max:255',
             // Same rule as registration: a PUO matric number with an official programme code.
             'student_id'  => [
-                'nullable', 'string', 'max:20', 'unique:users,student_id,' . $request->user()->id,
+                'required', 'string', 'max:20', 'unique:users,student_id,' . $request->user()->id,
                 function ($attribute, $value, $fail) {
                     if ($value && ! \App\Support\MatricNumber::isValid($value)) {
                         $fail(__('Please enter a valid PUO matric number (e.g. 01DIT24F1128).'));
                     }
                 },
             ],
-            'email'       => 'required|email|max:255',
+            'email'       => 'required|email|max:255|unique:users,email,' . $request->user()->id,
             'phone'       => 'nullable|string|max:20',
         ]);
 
