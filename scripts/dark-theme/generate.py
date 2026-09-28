@@ -412,7 +412,7 @@ def main():
             new = clean.replace('</head>', block + '</head>', 1)
         else:  # partial without <head>: put it right after its own style block
             idx = clean.rfind('</style>')
-            new = clean[:idx + 8] + '\n' + block + clean[idx + 8:]
+            new = clean[:idx + 8] + '\n' + block + '\n' + clean[idx + 8:].lstrip('\n')
         open(path, 'w', encoding='utf-8').write(new)
         print('%-45s %4d rules' % (rel, len(rules)))
 

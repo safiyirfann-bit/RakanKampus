@@ -119,12 +119,6 @@ html[data-theme="dark"] .rk-tab-link.active .rk-tab-avatar { box-shadow: 0 0 0 2
 html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0, 0, 0.81); }
 </style>
 
-
-
-
-
-
-
 <nav class="rk-sidebar">
   <div class="rk-sidebar-brand">
     <x-brand-logo size="30" />
