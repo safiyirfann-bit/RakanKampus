@@ -29,6 +29,10 @@ html[data-theme="dark"] .rkp-d.sel,
 html[data-theme="dark"] .rkp-ampm button.on,
 html[data-theme="dark"] .rkp-days button.on { background: #2ec4c6 !important; color: #07202a !important; }
 
+/* Profile menu icon tiles: tint each tile from its own icon colour, keep chevrons quiet */
+html[data-theme="dark"] .menu-icon { background: color-mix(in srgb, currentColor 18%, transparent) !important; }
+html[data-theme="dark"] .menu-chevron { color: #475569 !important; }
+
 /* Autofilled inputs keep Chrome's light yellow otherwise */
 html[data-theme="dark"] input:-webkit-autofill {
   -webkit-text-fill-color: #e2e8f0;
