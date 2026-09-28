@@ -41,60 +41,46 @@
   .header-title { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
   .header-sub { font-size: 12.5px; color: #bfe9ea; margin: 2px 0 0; }
 
-  .action-row { display: flex; gap: 10px; margin-bottom: 20px; }
-
+  /* Same layout as the Reminders page: big "Add Class" button, then a small
+     toolbar with the Select toggle (it turns into a red Cancel while selecting). */
   .add-btn {
-    flex: 1; box-sizing: border-box;
+    width: 100%; box-sizing: border-box;
     background: linear-gradient(120deg, #14213d, #2ec4c6);
     color: #fff; border: none; border-radius: 12px; padding: 14px;
     font-size: 14px; font-weight: 800;
     display: flex; align-items: center; justify-content: center; gap: 8px;
-    cursor: pointer;
+    cursor: pointer; margin-bottom: 18px;
     box-shadow: 0 10px 22px rgba(0,0,0,0.22);
   }
   .add-btn svg { width: 16px; height: 16px; }
 
-  .delete-all-btn {
-    flex-shrink: 0; box-sizing: border-box;
-    background: rgba(254,242,242,0.95); color: #dc2626; border: 1.5px solid rgba(254,202,202,0.9);
-    border-radius: 12px; padding: 14px 16px;
-    font-size: 13px; font-weight: 800;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    cursor: pointer;
+  .heading-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .heading-row .today-heading { margin-bottom: 0; }
+  .heading-row .select-btn { margin-left: auto; flex-shrink: 0; }
+  .select-btn {
+    display: flex; align-items: center; justify-content: center; gap: 5px;
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #bfe9ea;
+    border-radius: 8px; padding: 9px 14px; font-size: 11.5px; font-weight: 700; cursor: pointer;
   }
-  .delete-all-btn svg { width: 15px; height: 15px; }
-  .delete-all-btn:hover { background: #fee2e2; }
-  .delete-all-btn.hidden { display: none; }
+  .select-btn svg { width: 11px; height: 11px; }
+  .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
+  .select-btn.hidden { display: none; }
 
-  .select-toggle-btn {
-    flex-shrink: 0; box-sizing: border-box;
-    background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.28);
-    border-radius: 12px; padding: 14px 16px;
-    font-size: 13px; font-weight: 800;
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    cursor: pointer;
-  }
-  .select-toggle-btn svg { width: 15px; height: 15px; }
-  .select-toggle-btn:hover { background: rgba(255,255,255,0.2); }
-  .select-toggle-btn.hidden { display: none; }
-
-  /* Bulk-select bar — shown instead of the day-picker while picking classes
-     to delete, so "select all" only ever applies to what's on screen. */
+  /* Shown while selecting: select-all for the day on screen, delete selected,
+     and (tucked away here instead of a big red button) delete the whole timetable. */
   .select-bar {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    background: rgba(255,255,255,0.1); border-radius: 14px; padding: 11px 14px; margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
   }
   .select-bar.hidden { display: none; }
-  .select-all-label { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; color: #fff; cursor: pointer; }
-  .select-all-label input { width: 16px; height: 16px; accent-color: #2ec4c6; cursor: pointer; }
-  .select-bar-actions { display: flex; gap: 8px; }
-  .select-cancel-btn {
-    background: none; border: 1.5px solid rgba(255,255,255,0.32); color: #fff;
-    border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
-  }
+  .select-all-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #bfe9ea; cursor: pointer; }
+  .select-all-label input { width: 16px; height: 16px; accent-color: #dc2626; cursor: pointer; }
+  .select-bar-actions { display: flex; align-items: center; gap: 12px; }
+  .delete-week-link { background: none; border: none; padding: 0; font-size: 11.5px; font-weight: 700; color: #fca5a5; text-decoration: underline; cursor: pointer; }
+  .delete-week-link.hidden { display: none; }
   .select-delete-btn {
     background: #dc2626; color: #fff; border: none;
-    border-radius: 10px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer;
   }
   .select-delete-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -382,14 +368,12 @@
     .back-btn { display: none; }
     .header-title { color: #14213d; }
     .header-sub { color: #64748b; }
-    .action-row { justify-content: flex-start; }
-    .add-btn { flex: 0 0 auto; width: auto; padding: 12px 22px; }
-    .delete-all-btn { padding: 12px 18px; }
-    .select-toggle-btn { padding: 12px 18px; background: #eef2f5; color: #14213d; border-color: transparent; }
-    .select-toggle-btn:hover { background: #e2e8f0; }
-    .select-bar { background: #eef2f5; }
-    .select-all-label { color: #14213d; }
-    .select-cancel-btn { color: #14213d; border-color: rgba(20,33,61,0.2); }
+    .add-btn { width: auto; padding: 12px 22px; }
+    .select-btn { background: #ffffff; border: 1px solid #dbeeee; color: #0d9488; }
+    .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
+    .select-bar { background: #ffffff; border: 1px solid #dbeeee; }
+    .select-all-label { color: #0d9488; }
+    .delete-week-link { color: #dc2626; }
     .day-label { color: #64748b; }
     .class-card { background: #ffffff; border: 1.5px solid #dbeeee; }
     .class-meta { color: #64748b; }
@@ -420,10 +404,7 @@
    Hand-made fixes go in resources/views/partials/dark-fixes.blade.php */
 html[data-theme="dark"] body { background-image: linear-gradient(160deg, #0c1320, #112031 55%, #1d6869); }
 html[data-theme="dark"] .add-btn { box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45); }
-html[data-theme="dark"] .delete-all-btn { background: rgba(55, 26, 26, 0.95); color: #eb8484; border: 1.5px solid rgba(72, 40, 40, 0.9); }
-html[data-theme="dark"] .delete-all-btn:hover { background: #3d1d1d; }
-html[data-theme="dark"] .select-toggle-btn { border: 1.5px solid rgba(42, 51, 65, 0.28); }
-html[data-theme="dark"] .select-cancel-btn { border: 1.5px solid rgba(42, 51, 65, 0.32); }
+html[data-theme="dark"] .select-btn { border: 1px solid rgba(42, 51, 65, 0.25); }
 html[data-theme="dark"] .class-card { background: #39231b; }
 html[data-theme="dark"] .class-time { color: #cfd4e0; background: #17202d; }
 html[data-theme="dark"] .class-subject { color: #cfd4e0; }
@@ -483,11 +464,10 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   html[data-theme="dark"] body { background: #10161f; }
   html[data-theme="dark"] .header-title { color: #cfd4e0; }
   html[data-theme="dark"] .header-sub { color: #979faa; }
-  html[data-theme="dark"] .select-toggle-btn { background: #1d2f3c; color: #cfd4e0; }
-  html[data-theme="dark"] .select-toggle-btn:hover { background: #202f43; }
-  html[data-theme="dark"] .select-bar { background: #1d2f3c; }
-  html[data-theme="dark"] .select-all-label { color: #cfd4e0; }
-  html[data-theme="dark"] .select-cancel-btn { color: #cfd4e0; }
+  html[data-theme="dark"] .select-btn { background: #17202d; border: 1px solid #284848; color: #2feddc; }
+  html[data-theme="dark"] .select-bar { background: #17202d; border: 1px solid #284848; }
+  html[data-theme="dark"] .select-all-label { color: #2feddc; }
+  html[data-theme="dark"] .delete-week-link { color: #eb8484; }
   html[data-theme="dark"] .day-label { color: #979faa; }
   html[data-theme="dark"] .class-card { background: #17202d; border: 1.5px solid #284848; }
   html[data-theme="dark"] .class-meta { color: #979faa; }
@@ -518,18 +498,19 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
     </div>
   </div>
 
-  <div class="action-row">
-    <button type="button" class="add-btn" onclick="openAddModal()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-      {{ __('Add Class') }}
-    </button>
-    <button type="button" class="delete-all-btn hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-      {{ __('Delete All') }}
-    </button>
-    <button type="button" class="select-toggle-btn hidden" id="selectToggleBtn" onclick="toggleSelectMode()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 7 2 2 4-4"></path><path d="M11 7h10"></path><path d="m3 17 2 2 4-4"></path><path d="M11 17h10"></path></svg>
-      {{ __('Select') }}
+  <button type="button" class="add-btn" onclick="openAddModal()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    {{ __('Add Class') }}
+  </button>
+
+  <div class="heading-row">
+    <div class="today-heading" id="todayHeading">
+      <p class="today-date" id="todayDateLine"></p>
+      <p class="today-title" id="todayTitleLine"></p>
+    </div>
+    <button type="button" class="select-btn hidden" id="selectToggleBtn" onclick="toggleSelectMode()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="m8 12 3 3 5-6"></path></svg>
+      <span id="selectToggleLabel">{{ __('Select') }}</span>
     </button>
   </div>
 
@@ -539,15 +520,11 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
       {{ __('Select all') }}
     </label>
     <div class="select-bar-actions">
-      <button type="button" class="select-cancel-btn" onclick="toggleSelectMode()">{{ __('Cancel') }}</button>
+      <button type="button" class="delete-week-link hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">{{ __('Delete whole timetable') }}</button>
       <button type="button" class="select-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()" disabled>{{ __('Delete') }}</button>
     </div>
   </div>
 
-  <div class="today-heading" id="todayHeading">
-    <p class="today-date" id="todayDateLine"></p>
-    <p class="today-title" id="todayTitleLine"></p>
-  </div>
 
   <div class="day-picker" id="dayPicker"></div>
 
@@ -916,7 +893,14 @@ function toggleSelectAll(checked) {
   updateSelectBar();
 }
 
+function syncSelectButton() {
+  const btn = document.getElementById('selectToggleBtn');
+  btn.classList.toggle('active', selectMode);
+  document.getElementById('selectToggleLabel').textContent = selectMode ? t('Cancel') : t('Select');
+}
+
 function updateSelectBar() {
+  syncSelectButton();
   const selectAllCheckbox = document.getElementById('selectAllCheckbox');
   const deleteBtn = document.getElementById('selectDeleteBtn');
   if (!selectAllCheckbox || !deleteBtn) return;
