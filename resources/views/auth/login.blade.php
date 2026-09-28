@@ -2,6 +2,11 @@
 
 @section('content')
 
+{{-- Intro animation (once a day, skippable) — not after a failed login or a redirect with a message --}}
+@if (! $errors->any() && ! session('success') && ! session('status'))
+    @include('partials.intro-splash')
+@endif
+
 <style>
   :root {
     --purple: #a78bfa;
