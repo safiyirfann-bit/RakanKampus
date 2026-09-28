@@ -632,5 +632,9 @@
     "Do Not Disturb is off": "Jangan Ganggu dimatikan",
     "Notifications will come through again": "Notifikasi akan diterima semula",
     "Pick a time in the future.": "Pilih masa pada masa hadapan.",
-    "No notifications are sent until this time.": "Tiada notifikasi dihantar sehingga masa ini."
+    "No notifications are sent until this time.": "Tiada notifikasi dihantar sehingga masa ini.",
+    "Hour": "Jam",
+    "Minutes": "Minit",
+    "Type the hour, or tap / drag the clock": "Taip jam, atau ketik / seret pada jam",
+    "Type the minutes, or tap / drag the clock": "Taip minit, atau ketik / seret pada jam"
 }

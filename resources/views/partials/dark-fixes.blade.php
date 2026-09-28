@@ -28,6 +28,8 @@ html[data-theme="dark"] .rkp-d.out, html[data-theme="dark"] .rkp-d.past { color:
 html[data-theme="dark"] .rkp-d.sel,
 html[data-theme="dark"] .rkp-ampm button.on,
 html[data-theme="dark"] .rkp-days button.on { background: #2ec4c6 !important; color: #07202a !important; }
+html[data-theme="dark"] .rkp-num.on { box-shadow: inset 0 0 0 2px #2ec4c6 !important; }   /* typed-in time box: teal ring, not black */
+html[data-theme="dark"] .rkp-num.bad { box-shadow: inset 0 0 0 2px #f87171 !important; color: #fca5a5 !important; }
 
 /* Profile menu icon tiles: tint each tile from its own icon colour, keep chevrons quiet */
 html[data-theme="dark"] .menu-icon { background: color-mix(in srgb, currentColor 18%, transparent) !important; }

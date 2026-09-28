@@ -58,7 +58,9 @@
   .rkp-d.mark::after { content: ''; position: absolute; bottom: 4px; left: 50%; margin-left: -2.5px; width: 5px; height: 5px; border-radius: 50%; background: #f59e0b; }
 
   .rkp-big { display: flex; align-items: center; justify-content: center; gap: 6px; margin: 4px 0 14px; }
-  .rkp-num { font-size: 42px; font-weight: 800; padding: 2px 14px; min-width: 84px; text-align: center; border-radius: 14px; color: #14213d; background: #f1f5f9; border: none; cursor: pointer; font-family: inherit; line-height: 1.2; }
+  .rkp-num { font-size: 42px; font-weight: 800; padding: 2px 10px; width: 88px; box-sizing: border-box; text-align: center; border-radius: 14px; color: #14213d; background: #f1f5f9; border: none; cursor: text; font-family: inherit; line-height: 1.2; outline: none; caret-color: #2ec4c6; -webkit-appearance: none; appearance: none; }
+  .rkp-num.bad { box-shadow: inset 0 0 0 2px #f87171 !important; color: #dc2626; }
+  .rkp-num::selection { background: rgba(46,196,198,.3); }
   .rkp-num.on { background: #e6fbfa; color: #0f766e; box-shadow: inset 0 0 0 2px #2ec4c6; }
   .rkp-colon { font-size: 36px; font-weight: 800; color: #94a3b8; }
   .rkp-ampm { display: flex; flex-direction: column; margin-left: 8px; border: 1.5px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
@@ -299,10 +301,11 @@ window.RKPicker = (function () {
     if (!p) { p = key === 'end' && parseTime(st.start) ? { h: Math.min(23, parseTime(st.start).h + 1), m: parseTime(st.start).m } : { h: 9, m: 0 }; st[key] = `${pad(p.h)}:${pad(p.m)}`; }
     const pm = p.h >= 12, h12 = p.h % 12 === 0 ? 12 : p.h % 12;
     const mode = st.dialMode || 'h';
+    const ty = st.typed;   // what the student is typing right now (kept as typed, e.g. "4" before "45")
 
     let html = `<div class="rkp-big">
-      <button type="button" class="rkp-num ${mode === 'h' ? 'on' : ''}" data-mode="h">${h12}</button><span class="rkp-colon">:</span>
-      <button type="button" class="rkp-num ${mode === 'm' ? 'on' : ''}" data-mode="m">${pad(p.m)}</button>
+      <input type="text" class="rkp-num ${mode === 'h' ? 'on' : ''} ${ty && ty.mode === 'h' && ty.bad ? 'bad' : ''}" data-mode="h" value="${ty && ty.mode === 'h' ? ty.v : h12}" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="${tt('Hour')}"><span class="rkp-colon">:</span>
+      <input type="text" class="rkp-num ${mode === 'm' ? 'on' : ''} ${ty && ty.mode === 'm' && ty.bad ? 'bad' : ''}" data-mode="m" value="${ty && ty.mode === 'm' ? ty.v : pad(p.m)}" inputmode="numeric" maxlength="2" autocomplete="off" aria-label="${tt('Minutes')}">
       <div class="rkp-ampm"><button type="button" class="${!pm ? 'on' : ''}" data-ap="am">AM</button><button type="button" class="${pm ? 'on' : ''}" data-ap="pm">PM</button></div>
     </div>`;
     const R = 96, C = 120;
@@ -315,10 +318,50 @@ window.RKPicker = (function () {
       const on = mode === 'h' ? i === h12 : (i % 12) * 5 === p.m;
       html += `<div class="n ${on ? 'on' : ''}" style="left:${C + R * Math.cos(a)}px;top:${C + R * Math.sin(a)}px">${label}</div>`;
     }
-    html += `</div><p class="rkp-hint">${mode === 'h' ? tt('Tap or drag to pick the hour') : tt('Tap or drag to pick the minutes')}</p>`;
+    html += `</div><p class="rkp-hint">${mode === 'h' ? tt('Type the hour, or tap / drag the clock') : tt('Type the minutes, or tap / drag the clock')}</p>`;
     $('rkpBody').innerHTML = html;
 
-    $('rkpBody').querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { st.dialMode = b.dataset.mode; render(); });
+    // The big hour / minute boxes can be typed into (numbers only); the clock follows along.
+    const focusNum = (mode) => { const el = $('rkpBody').querySelector(`.rkp-num[data-mode="${mode}"]`); if (el) { el.focus(); el.select(); } };
+    $('rkpBody').querySelectorAll('.rkp-num').forEach(inp => {
+      const mode = inp.dataset.mode;
+      inp.addEventListener('focus', () => {
+        if (st.keepCaret) { st.keepCaret = false; return; }
+        if ((st.dialMode || 'h') !== mode) { st.typed = null; st.dialMode = mode; render(); focusNum(mode); return; }
+        setTimeout(() => inp.select(), 0);
+      });
+      inp.addEventListener('mouseup', (e) => { e.preventDefault(); inp.select(); });   // tap selects the number so typing replaces it
+      inp.addEventListener('input', () => {
+        const v = inp.value.replace(/\D/g, '').slice(0, 2); inp.value = v;
+        const n = parseInt(v, 10), q = parseTime(st[key]);
+        const ok = v !== '' && (mode === 'h' ? n >= 1 && n <= 12 : n >= 0 && n <= 59);
+        if (ok) {
+          if (mode === 'h') st[key] = `${pad((n % 12) + (q.h >= 12 ? 12 : 0))}:${pad(q.m)}`;
+          else st[key] = `${pad(q.h)}:${pad(n)}`;
+        }
+        // hour done (2 digits, or 2–9 typed) → jump to the minutes
+        if (ok && mode === 'h' && (v.length === 2 || n > 1)) { st.typed = null; st.dialMode = 'm'; render(); focusNum('m'); return; }
+        // re-draw (clock hand, tab label, summary) but keep the digits and caret as typed
+        st.typed = { mode, v, bad: v !== '' && !ok };
+        render();
+        const el = $('rkpBody').querySelector(`.rkp-num[data-mode="${mode}"]`);
+        if (el) { st.keepCaret = true; el.focus(); el.setSelectionRange(v.length, v.length); }
+      });
+      inp.addEventListener('keydown', (e) => {
+        const q = parseTime(st[key]);
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+          e.preventDefault(); const d = e.key === 'ArrowUp' ? 1 : -1;
+          if (mode === 'h') st[key] = `${pad((q.h + d + 24) % 24)}:${pad(q.m)}`; else st[key] = `${pad(q.h)}:${pad((q.m + d + 60) % 60)}`;
+          render(); focusNum(mode);
+        } else if (e.key === 'Enter') { e.preventDefault(); inp.blur(); }
+        else if (e.key === 'Backspace' && mode === 'm' && inp.value === '') { st.dialMode = 'h'; render(); focusNum('h'); }
+      });
+      inp.addEventListener('blur', () => {
+        st.typed = null; st.keepCaret = false;
+        const q = parseTime(st[key]); inp.classList.remove('bad');
+        inp.value = mode === 'h' ? (q.h % 12 === 0 ? 12 : q.h % 12) : pad(q.m);
+      });
+    });
     $('rkpBody').querySelectorAll('[data-ap]').forEach(b => b.onclick = () => {
       const q = parseTime(st[key]); let h = q.h % 12; if (b.dataset.ap === 'pm') h += 12;
       st[key] = `${pad(h)}:${pad(q.m)}`; render();
@@ -345,8 +388,8 @@ window.RKPicker = (function () {
       const ang = (st.dialMode || 'h') === 'h' ? ((nv.h % 12) * 30 - 90) : (nv.m * 6 - 90);
       dial.querySelector('.rkp-hand').style.transform = `rotate(${ang}deg)`;
       const nums = $('rkpBody').querySelectorAll('.rkp-num');
-      nums[0].textContent = nv.h % 12 === 0 ? 12 : nv.h % 12;
-      nums[1].textContent = pad(nv.m);
+      nums[0].value = nv.h % 12 === 0 ? 12 : nv.h % 12;
+      nums[1].value = pad(nv.m);
     };
     dial.addEventListener('pointerdown', (e) => { dragging = true; try { dial.setPointerCapture(e.pointerId); } catch (_) {} update(e, true); });
     dial.addEventListener('pointermove', (e) => { if (dragging) update(e, false); });
