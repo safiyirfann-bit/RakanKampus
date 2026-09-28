@@ -1,0 +1,219 @@
+@php
+  $fmtHour = function ($h) {
+      $suffix = $h < 12 ? 'AM' : 'PM';
+      $h12 = $h % 12 === 0 ? 12 : $h % 12;
+      return $h12.' '.$suffix;
+  };
+  $peakLabel = $peakHour === null ? '—' : $fmtHour($peakHour).' – '.$fmtHour(($peakHour + 1) % 24);
+  $days = [1 => 'Mon', 2 => 'Tue', 3 => 'Wed', 4 => 'Thu', 5 => 'Fri', 6 => 'Sat', 7 => 'Sun'];
+  $fmtDate = fn ($v) => $v ? \Illuminate\Support\Carbon::parse($v)->format('Y-m-d H:i') : '—';
+@endphp
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #F3FAF1; color: #1f2937; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        .page-header { padding: 26px 32px; background: #fff; border-bottom: 1px solid #e3ece2; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+        .page-header h1 { margin: 0; font-size: 22px; font-weight: 800; }
+        .page-header p { margin: 4px 0 0; color: #64748b; font-size: 14px; }
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .filters select, .filters a { border: 1px solid #cfdccf; border-radius: 10px; padding: 8px 12px; background: #fff; font-size: 13px; color: #334155; text-decoration: none; font-family: inherit; cursor: pointer; }
+        .page { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+        .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
+        .card { background: #fff; border: 1px solid #e1eadf; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+        .kpis .card { margin-bottom: 0; }
+        .kpi-label { font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: #64748b; }
+        .kpi-value { font-size: 30px; font-weight: 800; color: #2f6b4a; margin-top: 6px; display: flex; align-items: center; gap: 8px; }
+        .kpi-sub { font-size: 12px; color: #2a9d6f; margin-top: 4px; }
+        .dot { width: 10px; height: 10px; background: #22c55e; border-radius: 50%; box-shadow: 0 0 0 4px rgba(34,197,94,.18); }
+        .card h3 { margin: 0; font-size: 16px; }
+        .card .sub { font-size: 12.5px; color: #6b7a86; margin: 3px 0 14px; }
+        .chart-box { position: relative; height: 260px; }
+        .empty { color: #8a98a3; font-size: 13px; padding: 30px 0; text-align: center; }
+        .heat { display: grid; grid-template-columns: 40px repeat(24, minmax(0, 1fr)); gap: 3px; align-items: center; }
+        .heat .d { font-size: 11.5px; color: #7a8a95; }
+        .heat .c { height: 24px; border-radius: 4px; }
+        .heat .h { font-size: 10px; color: #7a8a95; text-align: left; }
+        .heat-legend { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #7a8a95; margin-top: 10px; justify-content: flex-end; }
+        .heat-legend span { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eef3ee; white-space: nowrap; }
+        th { color: #64748b; font-weight: 600; font-size: 12px; }
+        td.num { font-variant-numeric: tabular-nums; }
+        @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+        @media (max-width: 640px) {
+            .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .page, .page-header { padding: 16px; }
+            .heat { grid-template-columns: 30px repeat(24, minmax(0, 1fr)); gap: 2px; } .heat .c { height: 14px; border-radius: 2px; } .heat .h { font-size: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+@include('partials.admin-nav', ['active' => 'analytics', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
+
+<div class="page-header">
+    <div>
+        <h1>Analytics</h1>
+        <p>Users, online activity &amp; data entries across the app</p>
+    </div>
+    <form class="filters" method="GET" action="{{ route('admin.analytics') }}">
+        <select name="range" onchange="this.form.submit()" aria-label="Date range">
+            @foreach($ranges as $r)
+                <option value="{{ $r }}" @selected($r === $range)>Last {{ $r }} days</option>
+            @endforeach
+        </select>
+        <select name="table" onchange="this.form.submit()" aria-label="Table">
+            <option value="all" @selected($tableFilter === 'all')>Table: All</option>
+            @foreach($tables as $t)
+                <option value="{{ $t }}" @selected($tableFilter === $t)>{{ $t }}</option>
+            @endforeach
+        </select>
+        <a href="{{ request()->fullUrl() }}">⟳ Refresh</a>
+    </form>
+</div>
+
+<div class="page">
+
+    <div class="kpis">
+        <div class="card">
+            <div class="kpi-label">Total users</div>
+            <div class="kpi-value">{{ number_format($totalUsers) }}</div>
+            <div class="kpi-sub">▲ {{ $newThisWeek }} new this week</div>
+        </div>
+        <div class="card">
+            <div class="kpi-label">Online now</div>
+            <div class="kpi-value"><span class="dot"></span>{{ $onlineNow }}</div>
+            <div class="kpi-sub">active in the last 5 min</div>
+        </div>
+        <div class="card">
+            <div class="kpi-label">Peak hour</div>
+            <div class="kpi-value" style="font-size:24px">{{ $peakLabel }}</div>
+            <div class="kpi-sub">most users online</div>
+        </div>
+        <div class="card">
+            <div class="kpi-label">Total records</div>
+            <div class="kpi-value">{{ number_format($totalRecords) }}</div>
+            <div class="kpi-sub">across {{ $tableCount }} tables</div>
+        </div>
+        <div class="card">
+            <div class="kpi-label">Updated today</div>
+            <div class="kpi-value">{{ number_format($updatedToday) }}</div>
+            <div class="kpi-sub">records edited</div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Users online by hour of day</h3>
+        <div class="sub">How many users were active at each hour — last {{ $range }} days</div>
+        @if(array_sum($byHour) === 0)
+            <div class="empty">No activity recorded yet for this range.</div>
+        @else
+            <div class="chart-box"><canvas id="hourChart"></canvas></div>
+        @endif
+    </div>
+
+    <div class="card">
+        <h3>Activity heatmap</h3>
+        <div class="sub">Day of week × hour — darker = more users online</div>
+        <div class="heat">
+            @foreach($days as $d => $label)
+                <div class="d">{{ $label }}</div>
+                @for($h = 0; $h < 24; $h++)
+                    @php $v = $heatmap[$d][$h]; $a = $heatMax > 0 ? 0.07 + 0.93 * ($v / $heatMax) : 0.07; @endphp
+                    <div class="c" style="background: rgba(47,107,74,{{ number_format($a, 2) }})"
+                         title="{{ $label }} {{ sprintf('%02d:00', $h) }} — {{ $v }} {{ $v === 1 ? 'user' : 'users' }}"></div>
+                @endfor
+            @endforeach
+            <div></div>
+            @for($h = 0; $h < 24; $h++)
+                <div class="h">{{ $h % 6 === 0 ? sprintf('%02d:00', $h) : '' }}</div>
+            @endfor
+        </div>
+        <div class="heat-legend">Less
+            <span style="background:rgba(47,107,74,.07)"></span>
+            <span style="background:rgba(47,107,74,.35)"></span>
+            <span style="background:rgba(47,107,74,.65)"></span>
+            <span style="background:rgba(47,107,74,1)"></span> More
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Table summary</h3>
+        <div class="sub">Rows, first entry, last created &amp; last updated for every table</div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Table</th>
+                        <th>Rows</th>
+                        <th>First entry</th>
+                        <th>Last created</th>
+                        <th>Last updated</th>
+                        <th>Added ({{ $range }} days)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($summary as $row)
+                        <tr>
+                            <td>{{ $row['table'] }}</td>
+                            <td class="num">{{ number_format($row['rows']) }}</td>
+                            <td class="num">{{ $row['first'] ? \Illuminate\Support\Carbon::parse($row['first'])->format('Y-m-d') : '—' }}</td>
+                            <td class="num">{{ $fmtDate($row['last_created']) }}</td>
+                            <td class="num">{{ $fmtDate($row['last_updated']) }}</td>
+                            <td class="num">{{ $row['added'] === null ? '—' : number_format($row['added']) }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+@if(array_sum($byHour) > 0)
+<script>
+(function () {
+    const data = @json(array_values($byHour));
+    const peak = @json($peakHour);
+    const labels = data.map((_, h) => {
+        const s = h < 12 ? 'AM' : 'PM';
+        const h12 = h % 12 === 0 ? 12 : h % 12;
+        return h12 + ' ' + s;
+    });
+    new Chart(document.getElementById('hourChart'), {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                data,
+                backgroundColor: data.map((_, h) => h === peak ? '#2f6b4a' : '#5c9f78'),
+                borderRadius: 4,
+                maxBarThickness: 36,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: (c) => c.parsed.y + (c.parsed.y === 1 ? ' user' : ' users') } }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#7a8a95', maxRotation: 0, autoSkip: true, maxTicksLimit: 12 } },
+                y: { beginAtZero: true, ticks: { precision: 0, color: '#7a8a95' }, grid: { color: '#e8efe8' } }
+            }
+        }
+    });
+})();
+</script>
+@endif
+
+</body>
+</html>

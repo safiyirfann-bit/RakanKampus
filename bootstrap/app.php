@@ -27,6 +27,7 @@ return Application::configure(
         // pages render in the right language without needing to opt in.
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\LogUserActivity::class,
         ]);
 
     })

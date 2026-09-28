@@ -10,6 +10,7 @@ use App\Http\Controllers\ClassScheduleController;
 use App\Http\Controllers\Admin\KnowledgeBaseController;
 use App\Http\Controllers\Admin\UnansweredQuestionController;
 use App\Http\Controllers\Admin\DatabaseViewerController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\FeedbackController;
 
 /*
@@ -249,6 +250,10 @@ Route::delete('/unanswered/{unansweredQuestion}', [UnansweredQuestionController:
 
 Route::post('/unanswered/bulk-delete', [UnansweredQuestionController::class, 'bulkDestroy'])
     ->name('unanswered.bulkDestroy');
+
+        // Analytics (users online by hour, heatmap, table summary)
+        Route::get('/analytics', [AnalyticsController::class, 'index'])
+            ->name('analytics');
 
         // Database viewer (read-only + guarded row delete)
         Route::get('/database', [DatabaseViewerController::class, 'index'])
