@@ -45,6 +45,7 @@ class ReminderController extends Controller
         return view('reminders-history', [
             'user' => $user,
             'items' => $items,
+            'upcomingCount' => $user->reminders()->where('due_at', '>', now())->count(),
         ]);
     }
 

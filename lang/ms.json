@@ -613,5 +613,11 @@
     "Turn off": "Matikan",
     "Keep on": "Kekalkan",
     "Saved": "Disimpan",
-    "Could not save your settings. Please try again.": "Tidak dapat simpan tetapan anda. Sila cuba lagi."
+    "Could not save your settings. Please try again.": "Tidak dapat simpan tetapan anda. Sila cuba lagi.",
+    "HISTORY (:count)": "SEJARAH (:count)",
+    "All": "Semua",
+    "Restore": "Pulihkan",
+    "Back in your Reminders": "Kembali dalam Peringatan anda",
+    "Moved to Completed": "Dipindahkan ke Selesai",
+    "was due in :count d": "tarikh akhir dalam :count h"
 }
