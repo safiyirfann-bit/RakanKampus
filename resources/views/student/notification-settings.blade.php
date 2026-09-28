@@ -54,6 +54,44 @@
             from { opacity: 0; transform: translateY(14px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        /* ---- Quiet time card ---- */
+        .dnd-badge { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 99px; background: #f1f5f9; color: #64748b; }
+        .dnd-card.on .dnd-badge { background: #312e81; color: #fde68a; }
+        .dnd-hero { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 18px; margin-bottom: 14px;
+            background: linear-gradient(135deg, #f0fdfa, #eef2ff); color: #eef2ff; transition: background .4s ease; }
+        .dnd-card.on .dnd-hero { background: linear-gradient(135deg, #1e1b4b, #312e81 60%, #4338ca); color: #312e81; }
+        .dnd-bot { width: 86px; height: 64px; flex-shrink: 0; overflow: visible; }
+        .dnd-bot * { transform-box: fill-box; }
+        .dnd-moon, .dnd-moon-cut, .dnd-stars, .dnd-zz, .dnd-eyes-shut { opacity: 0; transition: opacity .4s; }
+        .dnd-card.on .dnd-moon, .dnd-card.on .dnd-moon-cut, .dnd-card.on .dnd-stars, .dnd-card.on .dnd-eyes-shut { opacity: 1; }
+        .dnd-card.on .dnd-eyes-open { opacity: 0; }
+        .dnd-body { animation: dndBob 2.6s ease-in-out infinite; }
+        .dnd-card.on .dnd-body { animation: dndBreathe 3.2s ease-in-out infinite; transform-origin: 50% 100%; }
+        .dnd-card.on .dnd-zz { animation: dndZz 2.4s ease-in-out infinite; }
+        .dnd-card.on .dnd-stars { animation: dndTwinkle 1.6s ease-in-out infinite alternate; }
+        .dnd-card.on .dnd-light { fill: #6366f1; }
+        @keyframes dndBob { 50% { transform: translateY(-3px); } }
+        @keyframes dndBreathe { 50% { transform: scale(1.03, .97) translateY(1px); } }
+        @keyframes dndZz { 0% { opacity: 0; transform: translate(0, 6px); } 40%, 70% { opacity: 1; transform: translate(2px, 0); } 100% { opacity: 0; transform: translate(5px, -6px); } }
+        @keyframes dndTwinkle { from { opacity: .35; } to { opacity: 1; } }
+        .dnd-title { font-weight: 800; color: #14213d; font-size: 15px; margin: 0; }
+        .dnd-sub { font-size: 13px; color: #64748b; margin: 2px 0 0; }
+        .dnd-card.on .dnd-title { color: #fff; }
+        .dnd-card.on .dnd-sub { color: #c7d2fe; }
+        .dnd-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+        .dnd-chip { border: 1.5px solid #c9ece7; background: #f0fdfa; color: #0f766e; font-weight: 700; font-size: 13px; padding: 7px 13px; border-radius: 99px; cursor: pointer; transition: transform .1s, background .15s; }
+        .dnd-chip:hover { background: #ccfbf1; } .dnd-chip:active { transform: scale(.96); }
+        .dnd-clear { width: 52px; flex-shrink: 0; border-radius: 14px; border: 1.5px solid #fecaca; background: #fef2f2; color: #dc2626; display: none; align-items: center; justify-content: center; cursor: pointer; }
+        .dnd-clear svg { width: 18px; height: 18px; }
+        .dnd-card.on .dnd-clear { display: flex; }
+        html[data-theme="dark"] .dnd-badge { background: #1e293b; color: #94a3b8; }
+        html[data-theme="dark"] .dnd-hero { background: linear-gradient(135deg, #10232a, #161c33); color: #161c33; }
+        html[data-theme="dark"] .dnd-title { color: #e2e8f0; } html[data-theme="dark"] .dnd-sub { color: #94a3b8; }
+        html[data-theme="dark"] .dnd-bot .dnd-body rect[fill="#fff"] { fill: #f1f5f9; }
+        html[data-theme="dark"] .dnd-bot { filter: drop-shadow(0 0 .6px #cbd5e1) drop-shadow(0 0 .6px #cbd5e1); }
+        html[data-theme="dark"] .dnd-chip { background: #10232a; border-color: #1f4a44; color: #5eead4; }
+        html[data-theme="dark"] .dnd-clear { background: #2a1616; border-color: #5b2323; color: #f87171; }
+        @media (prefers-reduced-motion: reduce) { .dnd-bot * { animation: none !important; } }
         body > div:not(.bg-blob) { animation: fadeInUp 0.45s ease both; }
 
         .page-header {
@@ -194,15 +232,50 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                 </div>
             </div>
 
-            <!-- Quiet time -->
-            <div class="bg-white rounded-3xl border border-indigo-100 p-5 shadow-sm">
-                <div class="mb-4">
+            <!-- Quiet time (Do Not Disturb): quick presets + the RakanKampus date/time picker; saves straight away -->
+            <div class="bg-white rounded-3xl border border-indigo-100 p-5 shadow-sm dnd-card" id="dndCard">
+                <div class="flex items-center justify-between mb-3">
                     <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Quiet time') }}</p>
+                    <span class="dnd-badge" id="dndBadge">{{ __('Off') }}</span>
                 </div>
-                <label for="dnd_until" class="block text-sm font-semibold text-indigo-900 mb-2">{{ __('Do Not Disturb Until') }}</label>
-                <input type="datetime-local" id="dnd_until" name="dnd_until" value="{{ $settings['dnd_until'] }}"
-                       class="w-full rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                <p class="text-xs text-indigo-400 mt-2">{{ __('No notifications are sent until this time. Leave empty to turn it off.') }}</p>
+
+                <div class="dnd-hero">
+                    <svg class="dnd-bot" viewBox="0 0 120 90" aria-hidden="true">
+                        <circle class="dnd-moon" cx="98" cy="20" r="11" fill="#fde68a"/><circle cx="104" cy="16" r="10" fill="currentColor" class="dnd-moon-cut"/>
+                        <g class="dnd-stars" fill="#fde68a"><circle cx="18" cy="14" r="1.8"/><circle cx="34" cy="6" r="1.3"/><circle cx="80" cy="42" r="1.4"/></g>
+                        <g class="dnd-body">
+                            <line x1="52" y1="18" x2="52" y2="26" stroke="#14213d" stroke-width="3" stroke-linecap="round"/><circle class="dnd-light" cx="52" cy="16" r="4" fill="#2ec4c6"/>
+                            <rect x="30" y="26" width="44" height="32" rx="12" fill="#14213d"/><circle cx="29" cy="41" r="7" fill="#2ec4c6"/><circle cx="75" cy="41" r="7" fill="#2ec4c6"/>
+                            <rect x="38" y="33" width="28" height="18" rx="7" fill="#fff"/>
+                            <g class="dnd-eyes-open"><circle cx="46" cy="42" r="3" fill="#14213d"/><circle cx="58" cy="42" r="3" fill="#14213d"/></g>
+                            <g class="dnd-eyes-shut"><path d="M42 42 q4 3 8 0 M54 42 q4 3 8 0" stroke="#14213d" stroke-width="2.2" fill="none" stroke-linecap="round"/></g>
+                            <rect x="32" y="60" width="40" height="24" rx="11" fill="#fff" stroke="#14213d" stroke-width="2.5"/><circle cx="52" cy="72" r="3.5" fill="#2ec4c6"/>
+                        </g>
+                        <g class="dnd-zz" fill="#94a3b8" font-family="Segoe UI,Arial,sans-serif" font-weight="800"><text x="76" y="34" font-size="11">z</text><text x="84" y="26" font-size="9">z</text></g>
+                    </svg>
+                    <div class="min-w-0">
+                        <p class="dnd-title" id="dndTitle">{{ __('Notifications are on') }}</p>
+                        <p class="dnd-sub" id="dndSub">{{ __('Need a break? Pause all notifications for a while.') }}</p>
+                    </div>
+                </div>
+
+                <div class="dnd-chips">
+                    <button type="button" class="dnd-chip" data-preset="1h">{{ __('1 hour') }}</button>
+                    <button type="button" class="dnd-chip" data-preset="3h">{{ __('3 hours') }}</button>
+                    <button type="button" class="dnd-chip" data-preset="tomorrow">🌙 {{ __('Until 7 AM') }}</button>
+                </div>
+
+                <input type="hidden" id="dnd_until" name="dnd_until" value="{{ $settings['dnd_until'] }}">
+                <div class="flex gap-2 items-stretch">
+                    <button type="button" class="rkp-field empty" id="dndField">
+                        <span><small>{{ __('Do Not Disturb Until') }}</small><b id="dndFieldText">{{ __('Pick date & time') }}</b></span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg>
+                    </button>
+                    <button type="button" class="dnd-clear" id="dndClear" aria-label="{{ __('Turn off') }}" title="{{ __('Turn off') }}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+                    </button>
+                </div>
+                <p class="text-xs text-indigo-400 mt-2">{{ __('No notifications are sent until this time.') }}</p>
             </div>
 
             <!-- Save -->
@@ -216,6 +289,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
 
     </div>
 
+@include('partials.rk-picker')
 <script>
 // Turning a notification off asks first with a RakanKampus popup (the robot mutes a ringing bell),
 // then saves straight away; a toast confirms it with UNDO. Turning one on just saves + toast.
@@ -269,6 +343,70 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
         }
         save(cb, info);
     }));
+})();
+</script>
+
+<script>
+// Quiet time: presets / picker set "Do Not Disturb until", saved straight away with a toast.
+(function () {
+    const form = document.getElementById('notifForm');
+    const card = document.getElementById('dndCard'), input = document.getElementById('dnd_until');
+    const T = {
+        on: @js(__('Notifications are on')), onSub: @js(__('Need a break? Pause all notifications for a while.')),
+        paused: @js(__('Shh… notifications paused')), until: @js(__('Until :time')), off: @js(__('Off')),
+        pick: @js(__('Pick date & time')), title: @js(__('Do Not Disturb until')),
+        setToast: @js(__('Do Not Disturb is on')), offToast: @js(__('Do Not Disturb is off')), offSub: @js(__('Notifications will come through again')),
+        past: @js(__('Pick a time in the future.')), oops: @js(__('Oops!')), failed: @js(__('Could not save your settings. Please try again.')),
+    };
+    const pad = (n) => String(n).padStart(2, '0');
+    const toLocal = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const parse = (v) => { if (!v) return null; const d = new Date(String(v).replace(' ', 'T').slice(0, 16)); return isNaN(d) ? null : d; };
+    const label = (d) => `${RKPicker.formatDate(toLocal(d).slice(0, 10))} · ${RKPicker.formatTime(toLocal(d).slice(11, 16))}`;
+
+    function paint() {
+        const d = parse(input.value), active = d && d > new Date();
+        card.classList.toggle('on', !!active);
+        document.getElementById('dndBadge').textContent = active ? '🌙 ' + RKPicker.formatTime(toLocal(d).slice(11, 16)) : T.off;
+        document.getElementById('dndTitle').textContent = active ? T.paused : T.on;
+        document.getElementById('dndSub').textContent = active ? T.until.replace(':time', label(d)) : T.onSub;
+        const f = document.getElementById('dndField');
+        f.classList.toggle('empty', !active);
+        document.getElementById('dndFieldText').textContent = active ? label(d) : T.pick;
+    }
+    async function save(value) {
+        const before = input.value;
+        input.value = value;
+        try {
+            const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!res.ok) throw new Error(res.status);
+        } catch (e) {
+            input.value = before; paint();
+            RKDialog.alert({ scene: 'oops', title: T.oops, message: T.failed });
+            return;
+        }
+        paint();
+        const d = parse(value);
+        if (d) RKToast.show({ text: T.setToast, sub: T.until.replace(':time', label(d)), undo: () => save(before) });
+        else RKToast.show({ text: T.offToast, sub: T.offSub });
+    }
+    function set(d) { if (d <= new Date()) { RKDialog.alert({ scene: 'oops', title: T.oops, message: T.past }); return; } save(toLocal(d)); }
+
+    document.querySelectorAll('.dnd-chip').forEach(b => b.addEventListener('click', () => {
+        const now = new Date(), d = new Date(now);
+        if (b.dataset.preset === '1h') d.setHours(d.getHours() + 1);
+        if (b.dataset.preset === '3h') d.setHours(d.getHours() + 3);
+        if (b.dataset.preset === 'tomorrow') { if (now.getHours() >= 7) d.setDate(d.getDate() + 1); d.setHours(7, 0, 0, 0); }
+        set(d);
+    }));
+    document.getElementById('dndField').addEventListener('click', () => {
+        const cur = parse(input.value) && parse(input.value) > new Date() ? parse(input.value) : new Date(Date.now() + 3600e3);
+        RKPicker.dateTime({
+            title: T.title, date: toLocal(cur).slice(0, 10), time: toLocal(cur).slice(11, 16),
+            onDone(date, time) { set(new Date(`${date}T${time}`)); },
+        });
+    });
+    document.getElementById('dndClear').addEventListener('click', () => save(''));
+    paint();
 })();
 </script>
 

@@ -619,5 +619,18 @@
     "Restore": "Pulihkan",
     "Back in your Reminders": "Kembali dalam Peringatan anda",
     "Moved to Completed": "Dipindahkan ke Selesai",
-    "was due in :count d": "tarikh akhir dalam :count h"
+    "was due in :count d": "tarikh akhir dalam :count h",
+    "Off": "Tutup",
+    "Notifications are on": "Notifikasi aktif",
+    "Need a break? Pause all notifications for a while.": "Nak rehat? Hentikan semua notifikasi buat seketika.",
+    "3 hours": "3 jam",
+    "Until 7 AM": "Hingga 7 pagi",
+    "Shh… notifications paused": "Shh… notifikasi dihentikan",
+    "Until :time": "Hingga :time",
+    "Do Not Disturb until": "Jangan Ganggu hingga",
+    "Do Not Disturb is on": "Jangan Ganggu dihidupkan",
+    "Do Not Disturb is off": "Jangan Ganggu dimatikan",
+    "Notifications will come through again": "Notifikasi akan diterima semula",
+    "Pick a time in the future.": "Pilih masa pada masa hadapan.",
+    "No notifications are sent until this time.": "Tiada notifikasi dihantar sehingga masa ini."
 }
