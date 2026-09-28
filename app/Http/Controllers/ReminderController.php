@@ -378,17 +378,6 @@ class ReminderController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /** Delete every upcoming reminder (soft delete — they show up in History). */
-    public function destroyAll(Request $request)
-    {
-        $request->user()->reminders()
-            ->where('due_at', '>', now())
-            ->get()
-            ->each(fn (Reminder $r) => $r->delete());
-
-        return response()->json(['success' => true]);
-    }
-
     public function historyBulkDestroy(Request $request)
     {
         $data = $request->validate([
