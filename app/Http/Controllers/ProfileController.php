@@ -241,6 +241,26 @@ class ProfileController extends Controller
         return redirect()->route('student.profile.language')->with('success', __('Language updated!'));
     }
 
+    public const THEMES = ['light', 'dark', 'system'];
+
+    public function appearance(Request $request): View
+    {
+        return view('student.appearance', [
+            'currentTheme' => $request->user()->theme ?? 'system',
+        ]);
+    }
+
+    public function updateAppearance(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'theme' => 'required|string|in:' . implode(',', self::THEMES),
+        ]);
+
+        $request->user()->update(['theme' => $request->theme]);
+
+        return redirect()->route('student.profile.appearance')->with('success', __('Appearance updated!'));
+    }
+
     public function destroy(Request $request): RedirectResponse
     {
         $request->user()->delete();

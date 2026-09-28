@@ -17,3 +17,25 @@ function t(key, params) {
   return s;
 }
 </script>
+{{-- Colour theme. Students choose Light / Dark / Use device setting in Profile → Appearance
+     (users.theme, default "system"). Set before the page paints so there's no white flash.
+     Guests and admins always get light — only student pages have dark styles. --}}
+@php($__themePref = (auth()->check() && ! auth()->user()->isAdmin()) ? (auth()->user()->theme ?? 'system') : 'light')
+<script>
+(function () {
+  var pref = @json($__themePref);
+  var mq = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function apply(p) {
+    if (p) pref = p;
+    var dark = pref === 'dark' || (pref === 'system' && mq && mq.matches);
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', dark ? '#070d16' : '#0f2747');
+  }
+  apply();
+  if (mq && mq.addEventListener) mq.addEventListener('change', function () { apply(); });
+  window.rkApplyTheme = apply;
+})();
+</script>
+@include('partials.dark-tailwind')
+@include('partials.dark-fixes')

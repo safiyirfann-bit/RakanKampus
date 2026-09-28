@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ __('Language') }}</title>
+    <title>{{ __('Appearance') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -82,6 +82,15 @@
     100% { background-position: 0% 50%; }
   }
 
+        .theme-preview { width: 64px; height: 44px; border-radius: 10px; overflow: hidden; display: flex; flex-shrink: 0; border: 1px solid rgba(15,29,46,.12); }
+        .theme-preview .side { width: 16px; }
+        .theme-preview .main { flex: 1; padding: 6px; display: flex; flex-direction: column; gap: 4px; }
+        .theme-preview .bar { height: 5px; border-radius: 3px; }
+        .tp-light .side { background: #14213d; } .tp-light .main { background: #f8fafc; } .tp-light .bar { background: #cbd5e1; } .tp-light .bar.acc { background: #2ec4c6; width: 60%; }
+        .tp-dark .side { background: #070d16; } .tp-dark .main { background: #111a27; } .tp-dark .bar { background: #334155; } .tp-dark .bar.acc { background: #2ec4c6; width: 60%; }
+        .tp-system .main { background: linear-gradient(135deg, #f8fafc 50%, #111a27 50%); } .tp-system .side { background: linear-gradient(180deg, #14213d 50%, #070d16 50%); }
+        .tp-system .bar { background: #94a3b8; } .tp-system .bar.acc { background: #2ec4c6; width: 60%; }
+
   @media (min-width: 861px) {
     body {
         background: #f0fafa;
@@ -131,8 +140,8 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
         </a>
 
         <div>
-            <h1>{{ __('Language') }}</h1>
-            <p>{{ __('Choose the language used across RakanKampus') }}</p>
+            <h1>{{ __('Appearance') }}</h1>
+            <p>{{ __('Choose light or dark mode for RakanKampus') }}</p>
         </div>
 
     </div>
@@ -145,66 +154,40 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
             </div>
         @endif
 
-        <!-- Current language status -->
-        <div class="bg-white rounded-3xl border border-indigo-100 p-5 flex items-center gap-4 shadow-sm">
-
-            <div class="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1 13l-2 2m0 0l-2-2m2 2V9m11-4h-4m2-2v4"/>
-                </svg>
-            </div>
-
-            <div class="flex-1">
-                <p class="font-bold text-indigo-900">{{ __('Current language') }}</p>
-                <p class="text-sm text-indigo-400">
-                    @switch($currentLanguage)
-                        @case('ms') Bahasa Melayu @break
-                        @case('zh') 中文 (Mandarin) @break
-                        @case('ta') தமிழ் (Tamil) @break
-                        @default English
-                    @endswitch
-                </p>
-            </div>
-
-        </div>
-
-        <!-- Language options -->
-        <form method="POST" action="{{ route('student.profile.language.update') }}">
+        <form method="POST" action="{{ route('student.profile.appearance.update') }}">
             @csrf
             @method('PUT')
 
             <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
 
                 <div class="px-5 pt-4 pb-2">
-                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Available languages') }}</p>
+                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Theme') }}</p>
                 </div>
 
                 <div class="divide-y divide-indigo-50">
 
                     @foreach ([
-                        'en' => ['English', null],
-                        'ms' => ['Bahasa Melayu', null],
-                        'zh' => ['中文', 'Mandarin'],
-                        'ta' => ['தமிழ்', 'Tamil'],
-                    ] as $code => [$native, $english])
-                        <label class="flex items-center justify-between px-5 py-4 cursor-pointer hover:bg-indigo-50 transition">
+                        'light' => [__('Light'), __('Bright background, best in daylight')],
+                        'dark' => [__('Dark'), __('Easier on the eyes at night')],
+                        'system' => [__('Use device setting'), __('Follows your phone or computer automatically')],
+                    ] as $value => [$label, $hint])
+                        <label class="flex items-center justify-between gap-4 px-5 py-4 cursor-pointer hover:bg-indigo-50 transition">
 
                             <div class="flex items-center gap-4">
-                                <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center font-bold text-indigo-600 text-xs">
-                                    {{ strtoupper($code) }}
+                                <div class="theme-preview tp-{{ $value }}" aria-hidden="true">
+                                    <div class="side"></div>
+                                    <div class="main"><div class="bar acc"></div><div class="bar"></div><div class="bar" style="width:75%"></div></div>
                                 </div>
                                 <div>
-                                    <p class="font-semibold text-indigo-900">{{ $native }}</p>
-                                    @if($english)
-                                        <p class="text-sm text-indigo-400">{{ $english }}</p>
-                                    @endif
+                                    <p class="font-semibold text-indigo-900">{{ $label }}</p>
+                                    <p class="text-sm text-indigo-400">{{ $hint }}</p>
                                 </div>
                             </div>
 
-                            <input type="radio" name="language" value="{{ $code }}"
-                                   class="w-5 h-5 accent-indigo-600"
-                                   {{ $currentLanguage === $code ? 'checked' : '' }}
-                                   onchange="this.form.submit()">
+                            <input type="radio" name="theme" value="{{ $value }}"
+                                   class="w-5 h-5 accent-indigo-600 shrink-0"
+                                   {{ $currentTheme === $value ? 'checked' : '' }}
+                                   onchange="window.rkApplyTheme && window.rkApplyTheme(this.value); this.form.submit()">
 
                         </label>
                     @endforeach
@@ -216,7 +199,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
         </form>
 
         <p class="text-xs text-indigo-300 text-center px-4">
-            {{ __('Changing your language updates all RakanKampus pages the next time they load.') }}
+            {{ __('Your choice is saved to your account, so it follows you to every device you sign in on.') }}
         </p>
 
     </div>
