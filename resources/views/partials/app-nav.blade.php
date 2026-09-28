@@ -142,7 +142,8 @@ html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0
       </a>
     @endforeach
   </div>
-  <form method="POST" action="{{ route('logout') }}">
+  <form method="POST" action="{{ route('logout') }}"
+        onsubmit="return RKDialog.confirmForm(event, { scene: 'signout', title: @js(__('Log out?')), message: @js(__('Are you sure you want to sign out of your RakanKampus account?')), confirmText: @js(__('Log Out')) })">
     @csrf
     <button type="submit" class="rk-sidebar-logout">
       <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>

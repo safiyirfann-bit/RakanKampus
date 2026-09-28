@@ -357,71 +357,18 @@ html[data-theme="dark"] .mi-logout { color: #eb8484; background: #391c1c; }
 
 </div>
 
-<!-- Logout Confirmation Modal -->
-<div id="logoutModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-50 p-4">
-
-    <div class="bg-white w-full max-w-sm rounded-3xl border border-indigo-100 shadow-2xl animate-scale-in p-6">
-
-        <div class="flex justify-center mb-4">
-
-            <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center">
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M17 16l4-4m0 0l-4-4m4 4H9m4 4v1a2 2 0 01-2 2H6a2 2 0 01-2-2V7a2 2 0 012-2h5a2 2 0 012 2v1" />
-                </svg>
-
-            </div>
-
-        </div>
-
-        <h2 class="text-xl font-bold text-center text-indigo-900 mb-2">
-            {{ __('Log out?') }}
-        </h2>
-
-        <p class="text-sm text-indigo-400 text-center mb-6">
-            {{ __('Are you sure you want to sign out of your RakanKampus account?') }}
-        </p>
-
-        <div class="flex gap-3">
-
-            <button onclick="closeLogoutModal()"
-                    class="flex-1 rounded-2xl border border-indigo-200 py-3 font-medium text-indigo-600 hover:bg-indigo-50 transition">
-                {{ __('Cancel') }}
-            </button>
-
-            <form method="POST" action="{{ route('logout') }}" class="flex-1">
-                @csrf
-                <button type="submit"
-                        class="w-full rounded-2xl bg-red-500 py-3 font-semibold text-white hover:bg-red-600 transition">
-                    {{ __('Log Out') }}
-                </button>
-            </form>
-
-        </div>
-
-    </div>
-
-</div>
-
+<!-- Log out: RakanKampus popup (partials/rk-dialog) — the robot waves goodbye and the phone locks -->
+<form id="logoutForm" method="POST" action="{{ route('logout') }}" class="hidden">@csrf</form>
 <script>
-function openLogoutModal() {
-    const modal = document.getElementById('logoutModal');
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
+async function openLogoutModal() {
+    const ok = await RKDialog.confirm({
+        scene: 'signout',
+        title: @js(__('Log out?')),
+        message: @js(__('Are you sure you want to sign out of your RakanKampus account?')),
+        confirmText: @js(__('Log Out')),
+    });
+    if (ok) document.getElementById('logoutForm').submit();
 }
-
-function closeLogoutModal() {
-    const modal = document.getElementById('logoutModal');
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-}
-
-document.getElementById('logoutModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeLogoutModal();
-    }
-});
 </script>
 
 <!-- Feedback Modal -->
