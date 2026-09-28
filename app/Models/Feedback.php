@@ -12,6 +12,9 @@ class Feedback extends Model
         'user_name',
         'feedback',
         'feature_request',
+        'student_id',
+        'issue_type',
+        'issue_report',
         'is_read',
     ];
 }

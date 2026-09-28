@@ -488,5 +488,16 @@
     "No other devices were signed in.": "Tiada peranti lain yang log masuk.",
     "Signed out :count other device(s).": ":count peranti lain telah dilog keluar.",
     "Your chat history has been cleared.": "Sejarah sembang anda telah dipadam.",
-    "Unknown device": "Peranti tidak diketahui"
+    "Unknown device": "Peranti tidak diketahui",
+    "Reminder notifications": "Notifikasi peringatan",
+    "Exams, assignments & quizzes before they're due": "Peperiksaan, tugasan & kuiz sebelum tarikh akhir",
+    "Class starting soon": "Kelas akan bermula",
+    "A heads-up before each class in your timetable": "Makluman sebelum setiap kelas dalam jadual anda",
+    "Quiet time": "Waktu senyap",
+    "No notifications are sent until this time. Leave empty to turn it off.": "Tiada notifikasi dihantar sehingga masa ini. Biarkan kosong untuk matikan.",
+    "Reminders or timetable": "Peringatan atau jadual",
+    "Sent together with your name, so the admin team can follow up.": "Dihantar bersama nama anda supaya pihak admin boleh susuli.",
+    "Thanks! Your report has been sent to the admin team.": "Terima kasih! Laporan anda telah dihantar kepada pihak admin.",
+    "Please describe the problem.": "Sila terangkan masalah tersebut.",
+    "Please add a little more detail.": "Sila tambah sedikit lagi butiran."
 }

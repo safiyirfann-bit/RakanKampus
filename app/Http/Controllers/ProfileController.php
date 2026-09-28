@@ -183,13 +183,8 @@ class ProfileController extends Controller
     public function notificationSettings(Request $request): View
     {
         $defaults = [
-            'course_announcements' => true,
-            'exam_alerts' => true,
-            'fee_reminders' => true,
-            'chatbot_replies' => true,
-            'system_updates' => false,
-            'events_promotions' => false,
-            'preferred_method' => 'Push notifications',
+            'reminder_notifications' => true,
+            'class_notifications' => true,
             'dnd_until' => null,
         ];
 
@@ -203,18 +198,12 @@ class ProfileController extends Controller
     public function updateNotificationSettings(Request $request): RedirectResponse
     {
         $request->validate([
-            'preferred_method' => 'required|string',
             'dnd_until' => 'nullable|date',
         ]);
 
         $settings = [
-            'course_announcements' => $request->boolean('course_announcements'),
-            'exam_alerts' => $request->boolean('exam_alerts'),
-            'fee_reminders' => $request->boolean('fee_reminders'),
-            'chatbot_replies' => $request->boolean('chatbot_replies'),
-            'system_updates' => $request->boolean('system_updates'),
-            'events_promotions' => $request->boolean('events_promotions'),
-            'preferred_method' => $request->preferred_method,
+            'reminder_notifications' => $request->boolean('reminder_notifications'),
+            'class_notifications' => $request->boolean('class_notifications'),
             'dnd_until' => $request->dnd_until,
         ];
 

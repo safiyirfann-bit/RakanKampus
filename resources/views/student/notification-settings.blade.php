@@ -149,254 +149,60 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
             @csrf
             @method('PUT')
 
-            <!-- Academic -->
+            <!-- Push notifications (read by reminders:send-due and the class "starting soon" job) -->
             <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
-
                 <div class="px-5 pt-5 pb-3">
-                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Academic') }}</p>
+                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Push notifications') }}</p>
                 </div>
-
                 <div class="divide-y divide-indigo-50">
-
-                    <!-- Course Announcements -->
-                    <div class="flex items-center justify-between px-5 py-4">
-
+                    <div class="flex items-center justify-between gap-4 px-5 py-4">
                         <div class="flex items-center gap-4">
-
-                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center">
-
+                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 13V7a2 2 0 00-2-2h-1V3H8v2H7a2 2 0 00-2 2v6l-2 2v1h18v-1l-2-2z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3M12 3a9 9 0 100 18 9 9 0 000-18z"/>
                                 </svg>
-
                             </div>
-
                             <div>
-                                <p class="font-semibold text-indigo-900">{{ __('Course Announcements') }}</p>
-                                <p class="text-sm text-indigo-400">{{ __('Receive lecturer and course updates') }}</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Reminder notifications') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __("Exams, assignments & quizzes before they're due") }}</p>
                             </div>
-
                         </div>
-
-                        <label class="relative inline-flex items-center cursor-pointer">
-
-                            <input type="checkbox" name="course_announcements" value="1" {{ $settings['course_announcements'] ? 'checked' : '' }} class="sr-only peer">
-
-                            <div class="w-11 h-6 bg-indigo-200 peer-focus:outline-none rounded-full peer peer-checked:bg-indigo-600 transition"></div>
-
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" name="reminder_notifications" value="1" {{ $settings['reminder_notifications'] ? 'checked' : '' }} class="sr-only peer">
+                            <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
                             <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-
                         </label>
-
                     </div>
-
-                    <!-- Exam Alerts -->
-                    <div class="flex items-center justify-between px-5 py-4">
-
+                    <div class="flex items-center justify-between gap-4 px-5 py-4">
                         <div class="flex items-center gap-4">
-
-                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center">
-
+                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"/>
                                 </svg>
-
                             </div>
-
                             <div>
-                                <p class="font-semibold text-indigo-900">{{ __('Exam Alerts') }}</p>
-                                <p class="text-sm text-indigo-400">{{ __('Timetable and reminder notifications') }}</p>
+                                <p class="font-semibold text-indigo-900">{{ __('Class starting soon') }}</p>
+                                <p class="text-sm text-indigo-400">{{ __('A heads-up before each class in your timetable') }}</p>
                             </div>
-
                         </div>
-
-                        <label class="relative inline-flex items-center cursor-pointer">
-
-                            <input type="checkbox" name="exam_alerts" value="1" {{ $settings['exam_alerts'] ? 'checked' : '' }} class="sr-only peer">
-
+                        <label class="relative inline-flex items-center cursor-pointer shrink-0">
+                            <input type="checkbox" name="class_notifications" value="1" {{ $settings['class_notifications'] ? 'checked' : '' }} class="sr-only peer">
                             <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
-
                             <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-
                         </label>
-
                     </div>
-
-                    <!-- Fee Reminders -->
-                    <div class="flex items-center justify-between px-5 py-4">
-
-                        <div class="flex items-center gap-4">
-
-                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.2 0-4 1.3-4 3s1.8 3 4 3 4 1.3 4 3-1.8 3-4 3m0-12V6m0 2v12"/>
-                                </svg>
-
-                            </div>
-
-                            <div>
-                                <p class="font-semibold text-indigo-900">{{ __('Fee Payment Reminders') }}</p>
-                                <p class="text-sm text-indigo-400">{{ __('Get reminded before payment deadlines') }}</p>
-                            </div>
-
-                        </div>
-
-                        <label class="relative inline-flex items-center cursor-pointer">
-
-                            <input type="checkbox" name="fee_reminders" value="1" {{ $settings['fee_reminders'] ? 'checked' : '' }} class="sr-only peer">
-
-                            <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
-
-                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-
-                        </label>
-
-                    </div>
-
                 </div>
-
             </div>
 
-            <!-- RakanKampus -->
-            <div class="bg-white rounded-3xl border border-indigo-100 overflow-hidden shadow-sm">
-
-                <div class="px-5 pt-5 pb-3">
-                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">RakanKampus</p>
-                </div>
-
-                <div class="divide-y divide-indigo-50">
-
-                    <!-- Chatbot Replies -->
-                    <div class="flex items-center justify-between px-5 py-4">
-
-                        <div class="flex items-center gap-4">
-
-                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4-.8L3 20l1.1-3.3A7.938 7.938 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                                </svg>
-
-                            </div>
-
-                            <div>
-                                <p class="font-semibold text-indigo-900">{{ __('Chatbot Replies') }}</p>
-                                <p class="text-sm text-indigo-400">{{ __('Notify when new AI responses arrive') }}</p>
-                            </div>
-
-                        </div>
-
-                        <label class="relative inline-flex items-center cursor-pointer">
-
-                            <input type="checkbox" name="chatbot_replies" value="1" {{ $settings['chatbot_replies'] ? 'checked' : '' }} class="sr-only peer">
-
-                            <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
-
-                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-
-                        </label>
-
-                    </div>
-
-                    <!-- System Updates -->
-                    <div class="flex items-center justify-between px-5 py-4">
-
-                        <div class="flex items-center gap-4">
-
-                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
-                                </svg>
-
-                            </div>
-
-                            <div>
-                                <p class="font-semibold text-indigo-900">{{ __('System Updates') }}</p>
-                                <p class="text-sm text-indigo-400">{{ __('New features and maintenance alerts') }}</p>
-                            </div>
-
-                        </div>
-
-                        <label class="relative inline-flex items-center cursor-pointer">
-
-                            <input type="checkbox" name="system_updates" value="1" {{ $settings['system_updates'] ? 'checked' : '' }} class="sr-only peer">
-
-                            <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
-
-                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-
-                        </label>
-
-                    </div>
-
-                    <!-- Events -->
-                    <div class="flex items-center justify-between px-5 py-4">
-
-                        <div class="flex items-center gap-4">
-
-                            <div class="w-11 h-11 rounded-2xl bg-indigo-50 flex items-center justify-center">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H6a2 2 0 00-2 2v11a2 2 0 002 2z"/>
-                                </svg>
-
-                            </div>
-
-                            <div>
-                                <p class="font-semibold text-indigo-900">{{ __('Events & Promotions') }}</p>
-                                <p class="text-sm text-indigo-400">{{ __('Campus activities and special announcements') }}</p>
-                            </div>
-
-                        </div>
-
-                        <label class="relative inline-flex items-center cursor-pointer">
-
-                            <input type="checkbox" name="events_promotions" value="1" {{ $settings['events_promotions'] ? 'checked' : '' }} class="sr-only peer">
-
-                            <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
-
-                            <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
-
-                        </label>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- Delivery -->
+            <!-- Quiet time -->
             <div class="bg-white rounded-3xl border border-indigo-100 p-5 shadow-sm">
-
                 <div class="mb-4">
-                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Delivery') }}</p>
+                    <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-500">{{ __('Quiet time') }}</p>
                 </div>
-
-                <div class="space-y-5">
-
-                    <div>
-                        <label class="block text-sm font-semibold text-indigo-900 mb-2">{{ __('Preferred Method') }}</label>
-
-                        <select name="preferred_method" class="w-full rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-
-                            <option value="Push notifications" {{ $settings['preferred_method'] === 'Push notifications' ? 'selected' : '' }}>{{ __('Push notifications') }}</option>
-                            <option value="Email only" {{ $settings['preferred_method'] === 'Email only' ? 'selected' : '' }}>{{ __('Email only') }}</option>
-                            <option value="Push + Email" {{ $settings['preferred_method'] === 'Push + Email' ? 'selected' : '' }}>{{ __('Push + Email') }}</option>
-
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold text-indigo-900 mb-2">{{ __('Do Not Disturb Until') }}</label>
-
-                        <input type="datetime-local" name="dnd_until" value="{{ $settings['dnd_until'] }}"
-                               class="w-full rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                    </div>
-
-                </div>
-
+                <label for="dnd_until" class="block text-sm font-semibold text-indigo-900 mb-2">{{ __('Do Not Disturb Until') }}</label>
+                <input type="datetime-local" id="dnd_until" name="dnd_until" value="{{ $settings['dnd_until'] }}"
+                       class="w-full rounded-2xl border border-indigo-200 bg-white px-4 py-3 text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                <p class="text-xs text-indigo-400 mt-2">{{ __('No notifications are sent until this time. Leave empty to turn it off.') }}</p>
             </div>
 
             <!-- Save -->

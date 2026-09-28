@@ -47,6 +47,11 @@ class SendUpcomingClassNotifications extends Command
                     return;
                 }
 
+                // Profile → Notification Settings → "Class starting soon"
+                if (! ($schedule->user->notification_settings['class_notifications'] ?? true)) {
+                    return;
+                }
+
                 $dnd = $schedule->user->notification_settings['dnd_until'] ?? null;
                 if ($dnd && now()->lt($dnd)) {
                     return;

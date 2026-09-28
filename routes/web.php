@@ -201,6 +201,10 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     // Feedback submit route
     Route::post('/student/feedback', [FeedbackController::class, 'store'])
         ->name('student.feedback.store');
+
+    Route::post('/student/help/report', [FeedbackController::class, 'reportIssue'])
+        ->middleware('throttle:10,1')
+        ->name('student.help.report');
 });
 
 /*

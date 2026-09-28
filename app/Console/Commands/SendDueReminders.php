@@ -99,6 +99,11 @@ class SendDueReminders extends Command
 
     private function canNotify(\App\Models\User $user): bool
     {
+        // Profile → Notification Settings → "Reminder notifications"
+        if (! ($user->notification_settings['reminder_notifications'] ?? true)) {
+            return false;
+        }
+
         $dnd = $user->notification_settings['dnd_until'] ?? null;
         if ($dnd && now()->lt($dnd)) {
             return false;

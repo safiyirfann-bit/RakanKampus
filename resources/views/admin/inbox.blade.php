@@ -173,6 +173,11 @@
             color:#3b82f6;
         }
 
+        .type-icon.issue{
+            background:rgba(239,68,68,.12);
+            color:#dc2626;
+        }
+
         .type-icon.feature{
             background:rgba(168,85,247,.12);
             color:#9333ea;
@@ -343,6 +348,33 @@
 
                             <p class="preview">
                                 {{ $item->feature_request }}
+                            </p>
+
+                        </div>
+
+                        <button type="button" class="item-delete-btn" aria-label="Delete" onclick="deleteFeedbackItem({{ $item->id }})">
+                            <i class="ti ti-trash" aria-hidden="true"></i>
+                        </button>
+
+                    </div>
+                @endif
+
+                @if($item->issue_report)
+                    <div class="item {{ !$item->is_read ? 'unread' : '' }}" data-type="issue" data-feedback-id="{{ $item->id }}">
+
+                        <div class="type-icon issue">
+                            <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+                        </div>
+
+                        <div class="body">
+
+                            <div class="row-top">
+                                <div class="title">{{ $item->issue_type ?: 'Issue report' }} <span>· {{ $item->user_name }}@if($item->student_id) · {{ $item->student_id }}@endif</span></div>
+                                <div class="time">{{ $item->created_at->diffForHumans() }}</div>
+                            </div>
+
+                            <p class="preview">
+                                {{ $item->issue_report }}
                             </p>
 
                         </div>

@@ -192,8 +192,10 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
 
         </div>
 
-        <!-- Report a Problem -->
-        <div class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm space-y-4">
+        <!-- Report a Problem (goes to Admin → Inbox → Report issue) -->
+        <form id="report" method="POST" action="{{ route('student.help.report') }}#report"
+              class="bg-white rounded-3xl border border-slate-200 p-5 shadow-sm space-y-4 scroll-mt-24">
+            @csrf
 
             <div>
                 <p class="text-[11px] font-bold tracking-wider uppercase text-indigo-600 mb-1">{{ __('Report a problem') }}</p>
@@ -203,28 +205,37 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                 </p>
             </div>
 
+            @if(session('report_sent'))
+                <div class="rounded-xl bg-green-50 text-green-700 px-4 py-3 text-sm font-medium text-center">
+                    ✓ {{ session('report_sent') }}
+                </div>
+            @endif
+
             <div class="space-y-2">
-                <label class="text-sm font-medium text-slate-700">{{ __('Issue type') }}</label>
-                <select class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
-                    <option>{{ __('Chatbot issue') }}</option>
-                    <option>{{ __('Login problem') }}</option>
-                    <option>{{ __('Profile problem') }}</option>
-                    <option>{{ __('Other') }}</option>
+                <label for="issue_type" class="text-sm font-medium text-slate-700">{{ __('Issue type') }}</label>
+                <select id="issue_type" name="issue_type" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+                    @foreach(\App\Http\Controllers\FeedbackController::ISSUE_TYPES as $type)
+                        <option value="{{ $type }}" @selected(old('issue_type') === $type)>{{ __($type) }}</option>
+                    @endforeach
                 </select>
             </div>
 
             <div class="space-y-2">
-                <label class="text-sm font-medium text-slate-700">{{ __('Describe the issue') }}</label>
-                <textarea rows="5"
-                          class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none"
-                          placeholder="{{ __('Explain what happened and when it occurred...') }}"></textarea>
+                <label for="issue_report" class="text-sm font-medium text-slate-700">{{ __('Describe the issue') }}</label>
+                <textarea id="issue_report" name="issue_report" rows="5" maxlength="2000" required
+                          class="w-full rounded-2xl border {{ $errors->has('issue_report') ? 'border-red-400' : 'border-slate-200' }} bg-white px-4 py-3 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none resize-none"
+                          placeholder="{{ __('Explain what happened and when it occurred...') }}">{{ old('issue_report') }}</textarea>
+                @error('issue_report')
+                    <p class="text-sm text-red-600">{{ $message }}</p>
+                @enderror
+                <p class="text-xs text-slate-400">{{ __('Sent together with your name, so the admin team can follow up.') }}</p>
             </div>
 
-            <button class="w-full rounded-2xl bg-indigo-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
+            <button type="submit" class="w-full rounded-2xl bg-indigo-600 py-3.5 text-base font-semibold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200">
                 {{ __('Submit Report') }}
             </button>
 
-        </div>
+        </form>
 
         <!-- App Information -->
         <div class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
