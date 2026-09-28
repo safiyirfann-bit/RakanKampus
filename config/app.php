@@ -16,6 +16,15 @@ return [
     'name' => env('APP_NAME', 'Laravel'),
 
     /*
+    | Hidden database viewer. Not linked anywhere in the admin UI.
+    | Set DB_VIEWER_PATH on Render to your own secret path, and
+    | DB_VIEWER_EMAILS (comma-separated) to limit who can open it.
+    */
+    'db_viewer_path' => env('DB_VIEWER_PATH', 'dbv-2154eb726f16d539952b65f4'),
+    'db_viewer_emails' => array_filter(array_map('trim', explode(',', (string) env('DB_VIEWER_EMAILS', '')))),
+
+
+    /*
     |--------------------------------------------------------------------------
     | Application Environment
     |--------------------------------------------------------------------------

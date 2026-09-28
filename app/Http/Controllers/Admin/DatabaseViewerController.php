@@ -39,8 +39,21 @@ class DatabaseViewerController extends Controller
     /** How recent a session's last_activity has to be to count as "online now". */
     private const ONLINE_WINDOW_SECONDS = 300;
 
+    /**
+     * Only the emails in DB_VIEWER_EMAILS may open the viewer (when set).
+     * Anyone else gets a plain 404 so the page looks like it doesn't exist.
+     */
+    private function guard(): void
+    {
+        $allowed = array_map('strtolower', config('app.db_viewer_emails', []));
+        if ($allowed && ! in_array(strtolower((string) Auth::user()?->email), $allowed, true)) {
+            abort(404);
+        }
+    }
+
     public function index(Request $request)
     {
+        $this->guard();
         $table = $request->query('table', 'users');
 
         if (! in_array($table, self::TABLES, true) || ! Schema::hasTable($table)) {
@@ -109,6 +122,7 @@ class DatabaseViewerController extends Controller
      */
     public function destroy(Request $request, string $table, int $id)
     {
+        $this->guard();
         if (! in_array($table, self::TABLES, true) || ! Schema::hasTable($table)) {
             abort(404);
         }
