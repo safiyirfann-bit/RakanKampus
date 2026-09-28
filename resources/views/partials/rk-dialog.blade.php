@@ -10,10 +10,12 @@
     RKDialog.confirmForm(event, opts)   // for <form onsubmit="return RKDialog.confirmForm(event, {...})">
     RKToast.show({ text, sub, undo: () => {}, duration })
 
-  Scenes: timetable, reminder, trash, chat, signout, write, oops, happy
+  Scenes: timetable, reminder, trash, chat, signout, mute (prop: 'clock'|'cal'), write, oops, happy
   Included from partials/pwa-head, so every student page has it.
 --}}
 <style>
+  /* some pages animate every `body > div` on load; that animation would pin these at their start transform */
+  body > .rkd, body > .rkd-overlay, body > .rkt { animation: none !important; }
   .rkd-overlay { position: fixed; inset: 0; z-index: 300; background: rgba(10, 18, 32, .55); backdrop-filter: blur(2px);
     opacity: 0; pointer-events: none; transition: opacity .2s ease; }
   .rkd-overlay.open { opacity: 1; pointer-events: auto; }
@@ -109,6 +111,20 @@
   @keyframes rkdScratch { 50% { transform: rotate(-12deg); } }
   @keyframes rkdTilt { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(6deg); } }
   @keyframes rkdQ { 0%, 100% { opacity: 0; transform: translateY(6px) scale(.6); } 40%, 70% { opacity: 1; transform: translateY(0) scale(1); } }
+  /* mute: the bell rings, the robot taps it, a "muted" slash appears and it all goes quiet */
+  .mute .waveArm { animation: rkdPat 3.4s ease-in-out infinite; transform-origin: 0% 100%; }
+  .mute .bell { animation: rkdBell 3.4s linear infinite; transform-origin: 50% 8%; }
+  .mute .waves { animation: rkdWaves 3.4s ease-in-out infinite; }
+  .mute .slash { animation: rkdSlash 3.4s ease-out infinite; transform-origin: center; }
+  .mute .zz { animation: rkdMuteZz 3.4s ease-in-out infinite; }
+  .mute .badge { animation: rkdBadge 3.4s ease-in-out infinite; transform-origin: center; }
+  @keyframes rkdPat { 0%, 30% { transform: rotate(0); } 40% { transform: rotate(48deg); } 48% { transform: rotate(40deg); } 58%, 100% { transform: rotate(0); } }
+  @keyframes rkdBell { 0% { transform: rotate(0); } 4% { transform: rotate(16deg); } 8% { transform: rotate(-16deg); } 12% { transform: rotate(14deg); } 16% { transform: rotate(-14deg); }
+    20% { transform: rotate(12deg); } 24% { transform: rotate(-12deg); } 28% { transform: rotate(10deg); } 32% { transform: rotate(-8deg); } 36% { transform: rotate(4deg); } 40%, 100% { transform: rotate(0); } }
+  @keyframes rkdWaves { 0%, 34% { opacity: 1; } 42%, 100% { opacity: 0; } }
+  @keyframes rkdSlash { 0%, 42% { opacity: 0; transform: scale(.3); } 50% { opacity: 1; transform: scale(1.15); } 56%, 92% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1); } }
+  @keyframes rkdMuteZz { 0%, 58% { opacity: 0; transform: translateY(8px); } 72%, 90% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-4px); } }
+  @keyframes rkdBadge { 0%, 40% { opacity: 1; } 50%, 92% { opacity: .35; } 100% { opacity: 1; } }
   /* happy (toast) */
   .happy .bob { animation: rkdHop .7s ease-in-out infinite; }
   .happy .waveArm { animation: rkdWave .6s ease-in-out infinite; transform-origin: 0% 100%; }
@@ -193,6 +209,22 @@
       '<g transform="translate(205 20)"><rect x="0" y="0" width="58" height="100" rx="12" fill="#14213d"/><rect class="scr" x="5" y="10" width="48" height="80" rx="6" fill="#2ec4c6"/>' +
       '<g transform="translate(29 52)"><g class="lock"><rect x="-12" y="-4" width="24" height="18" rx="4" fill="#fff"/><path d="M-7 -4 v-6 a7 7 0 0 1 14 0 v6" stroke="#fff" stroke-width="4" fill="none"/></g></g></g>' +
       '<g class="zz" font-family="Segoe UI,Arial,sans-serif" font-weight="800" fill="#94a3b8"><text x="268" y="30" font-size="14">z</text><text x="280" y="18" font-size="11">z</text></g></svg>',
+    // mute: pass { prop: 'clock' } (reminders) or { prop: 'cal' } (classes) for the little badge on the bell
+    mute: (o) => {
+      const badge = (o && o.prop) === 'cal'
+        ? '<rect x="-12" y="-11" width="24" height="22" rx="5" fill="#fff" stroke="#14213d" stroke-width="2.5"/><rect x="-12" y="-11" width="24" height="7" rx="3" fill="#2ec4c6"/><g fill="#94a3b8"><rect x="-7" y="0" width="5" height="4" rx="1"/><rect x="2" y="0" width="5" height="4" rx="1"/></g>'
+        : '<circle r="12" fill="#fff" stroke="#14213d" stroke-width="2.5"/><path d="M0 -6 V0 L4 3" stroke="#6366f1" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+      return '<svg class="rkd-scene mute" viewBox="0 0 320 140" aria-hidden="true"><ellipse cx="160" cy="132" rx="150" ry="4" fill="#0f172a" opacity=".06"/>' +
+        '<g transform="translate(58 30) scale(.45)">' + robot('down', 'focus') + '</g>' +
+        '<g transform="translate(212 62)">' +
+          '<g class="waves" fill="none" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"><path d="M-40 -22 q-10 14 0 30"/><path d="M-52 -30 q-14 22 0 46"/><path d="M40 -22 q10 14 0 30"/><path d="M52 -30 q14 22 0 46"/></g>' +
+          '<g class="bell"><path d="M-26 20 Q-26 -28 0 -28 Q26 -28 26 20 L32 28 H-32 Z" fill="#fde047" stroke="#14213d" stroke-width="3.5" stroke-linejoin="round"/>' +
+            '<circle cx="0" cy="-32" r="5" fill="#14213d"/><circle cx="0" cy="34" r="7" fill="#14213d"/><path d="M-14 -12 q-4 10 -2 22" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" opacity=".7"/></g>' +
+          '<g class="badge" transform="translate(30 30)">' + badge + '</g>' +
+          '<g class="slash"><circle r="44" fill="none" stroke="#dc2626" stroke-width="7"/><path d="M-31 -31 L31 31" stroke="#dc2626" stroke-width="7" stroke-linecap="round"/></g>' +
+        '</g>' +
+        '<g class="zz" font-family="Segoe UI,Arial,sans-serif" font-weight="800" fill="#94a3b8"><text x="270" y="30" font-size="15">z</text><text x="283" y="17" font-size="12">z</text><text x="293" y="7" font-size="9">z</text></g></svg>';
+    },
     write: () => '<svg class="rkd-scene write" viewBox="0 0 320 140" aria-hidden="true"><g transform="translate(70 30) scale(.44)">' + robot('write', 'focus') + '</g>' +
       '<g transform="translate(170 64)"><rect x="0" y="0" width="84" height="58" rx="8" fill="#fff" stroke="#14213d" stroke-width="3"/><rect x="12" y="14" width="56" height="5" rx="2.5" fill="#cbd5e1"/><rect class="line2" x="12" y="28" width="44" height="5" rx="2.5" fill="#2ec4c6"/><rect x="12" y="42" width="30" height="5" rx="2.5" fill="#cbd5e1"/>' +
       '<g class="pencil"><g transform="translate(14 8) rotate(40)"><rect x="0" y="-4" width="34" height="9" rx="2" fill="#f59e0b"/><path d="M34 -4 L44 0.5 L34 5 Z" fill="#fde68a"/><rect x="-6" y="-4" width="7" height="9" rx="2" fill="#fb7185"/></g></g></g></svg>',
@@ -229,7 +261,7 @@
     if (resolver) finish(false);
     mode = kind;
     const tone = opts.tone || (kind === 'confirm' ? 'danger' : 'primary');
-    const scene = SCENES[opts.scene] ? SCENES[opts.scene]() : '';
+    const scene = SCENES[opts.scene] ? SCENES[opts.scene](opts) : '';
     const list = (opts.list || []).length
       ? '<div class="rkd-list">' + opts.list.map(i => '<div><span>' + esc(i.label) + '</span>' + (i.meta ? '<small>' + esc(i.meta) + '</small>' : '') + '</div>').join('') + '</div>' : '';
     box.classList.toggle('sheet', !!opts.sheet || (opts.list || []).length > 0);

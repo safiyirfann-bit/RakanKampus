@@ -145,7 +145,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
             </div>
         @endif
 
-        <form method="POST" action="{{ route('student.profile.notifications.update') }}" class="space-y-6">
+        <form id="notifForm" method="POST" action="{{ route('student.profile.notifications.update') }}" class="space-y-6">
             @csrf
             @method('PUT')
 
@@ -168,7 +168,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                            <input type="checkbox" name="reminder_notifications" value="1" {{ $settings['reminder_notifications'] ? 'checked' : '' }} class="sr-only peer">
+                            <input type="checkbox" name="reminder_notifications" data-notif value="1" {{ $settings['reminder_notifications'] ? 'checked' : '' }} class="sr-only peer">
                             <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
                             <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
                         </label>
@@ -186,7 +186,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                             </div>
                         </div>
                         <label class="relative inline-flex items-center cursor-pointer shrink-0">
-                            <input type="checkbox" name="class_notifications" value="1" {{ $settings['class_notifications'] ? 'checked' : '' }} class="sr-only peer">
+                            <input type="checkbox" name="class_notifications" data-notif value="1" {{ $settings['class_notifications'] ? 'checked' : '' }} class="sr-only peer">
                             <div class="w-11 h-6 bg-indigo-200 rounded-full peer peer-checked:bg-indigo-600 transition"></div>
                             <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition peer-checked:translate-x-5"></div>
                         </label>
@@ -215,6 +215,62 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
         </form>
 
     </div>
+
+<script>
+// Turning a notification off asks first with a RakanKampus popup (the robot mutes a ringing bell),
+// then saves straight away; a toast confirms it with UNDO. Turning one on just saves + toast.
+(function () {
+    const form = document.getElementById('notifForm');
+    const INFO = {
+        reminder_notifications: {
+            prop: 'clock',
+            title: @js(__('Turn off reminder notifications?')),
+            message: @js(__("You won't get alerts before your exams, assignments and quizzes are due. You can turn it back on anytime.")),
+            offText: @js(__('Reminder notifications off')), onText: @js(__('Reminder notifications on')),
+            onSub: @js(__("We'll remind you before things are due")),
+        },
+        class_notifications: {
+            prop: 'cal',
+            title: @js(__('Turn off class alerts?')),
+            message: @js(__("You won't get a heads-up before your classes start. You can turn it back on anytime.")),
+            offText: @js(__('Class alerts off')), onText: @js(__('Class alerts on')),
+            onSub: @js(__("We'll let you know before each class")),
+        },
+    };
+    const T = { turnOff: @js(__('Turn off')), keepOn: @js(__('Keep on')), saved: @js(__('Saved')), oops: @js(__('Oops!')), failed: @js(__('Could not save your settings. Please try again.')) };
+
+    async function save(cb, info) {
+        try {
+            const res = await fetch(form.action, { method: 'POST', body: new FormData(form), headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+            if (!res.ok) throw new Error(res.status);
+        } catch (e) {
+            cb.checked = !cb.checked;                     // put the switch back the way it was
+            RKDialog.alert({ scene: 'oops', title: T.oops, message: T.failed });
+            return;
+        }
+        const on = cb.checked;
+        RKToast.show({
+            text: on ? info.onText : info.offText,
+            sub: on ? info.onSub : T.saved,
+            undo: on ? null : () => { cb.checked = true; save(cb, info); },
+        });
+    }
+
+    document.querySelectorAll('input[data-notif]').forEach(cb => cb.addEventListener('change', async () => {
+        const info = INFO[cb.name];
+        if (!cb.checked) {
+            cb.checked = true;                            // stays on until they confirm
+            const ok = await RKDialog.confirm({
+                scene: 'mute', prop: info.prop, title: info.title, message: info.message,
+                confirmText: T.turnOff, cancelText: T.keepOn,
+            });
+            if (!ok) return;
+            cb.checked = false;
+        }
+        save(cb, info);
+    }));
+})();
+</script>
 
 </body>
 </html>

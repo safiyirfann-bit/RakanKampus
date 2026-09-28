@@ -9,6 +9,7 @@
                          onDone(start, end) })
 --}}
 <style>
+  body > .rkp-overlay, body > .rkp-sheet { animation: none !important; }
   .rkp-overlay { position: fixed; inset: 0; background: rgba(10, 18, 32, 0.5); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .2s ease; }
   .rkp-overlay.open { opacity: 1; pointer-events: auto; }
   .rkp-sheet {
