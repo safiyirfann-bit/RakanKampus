@@ -129,11 +129,6 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
     <!-- Header -->
 <div class="profile-header">
 
-    <a href="{{ route('student.home') }}" class="back-btn" aria-label="{{ __('Back') }}">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 19l-7-7 7-7"/>
-        </svg>
-    </a>
 
     <div>
         <h1>{{ __('Profile & Settings') }}</h1>
