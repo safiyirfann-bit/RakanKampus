@@ -46,6 +46,17 @@
         th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eef3ee; white-space: nowrap; }
         th { color: #64748b; font-weight: 600; font-size: 12px; }
         td.num { font-variant-numeric: tabular-nums; }
+        .topics { columns: 2; column-gap: 28px; }
+        .topics .topic-btn { break-inside: avoid; }
+        .topic-btn { display: block; padding: 8px 4px; color: inherit; }
+        .topic-row { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; margin-bottom: 5px; }
+        .topic-row b { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .topic-row span { color: #64748b; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+        .bar { height: 8px; background: #edf3ec; border-radius: 99px; overflow: hidden; }
+        .bar i { display: block; height: 100%; background: #5c9f78; border-radius: 99px; }
+        .topic-btn.muted .bar i { background: #e0a100; }
+        a.topic-btn.muted:hover b { text-decoration: underline; }
+        @media (max-width: 860px) { .topics { columns: 1; } }
         @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
         @media (max-width: 640px) {
             .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -116,6 +127,30 @@
             <div class="empty">No activity recorded yet for this range.</div>
         @else
             <div class="chart-box"><canvas id="hourChart"></canvas></div>
+        @endif
+    </div>
+
+    <div class="card">
+        <h3>Most asked topics</h3>
+        <div class="sub">What students ask the chatbot about — last {{ $range }} days</div>
+        @if(count($topics) === 0)
+            <div class="empty">No chatbot questions matched to a topic yet for this range.</div>
+        @else
+            @php $topicMax = max(array_column($topics, 'count')); @endphp
+            <div class="topics">
+                    @foreach($topics as $i => $t)
+                        <div class="topic-btn">
+                            <div class="topic-row"><b>{{ $t['name'] }}</b><span>{{ $t['count'] }} {{ $t['count'] === 1 ? 'question' : 'questions' }}</span></div>
+                            <div class="bar"><i style="width: {{ round($t['count'] / $topicMax * 100) }}%"></i></div>
+                        </div>
+                    @endforeach
+                    @if($unansweredAsked > 0)
+                        <a class="topic-btn muted" href="{{ route('admin.unanswered.index') }}" style="text-decoration:none">
+                            <div class="topic-row"><b>Not answered by chatbot</b><span>{{ $unansweredAsked }} &rarr;</span></div>
+                            <div class="bar"><i style="width: {{ min(100, round($unansweredAsked / $topicMax * 100)) }}%"></i></div>
+                        </a>
+                    @endif
+            </div>
         @endif
     </div>
 
@@ -214,6 +249,7 @@
 })();
 </script>
 @endif
+
 
 </body>
 </html>

@@ -112,6 +112,27 @@ class AnalyticsController extends Controller
                 });
         }
 
+        // ---- Most asked topics --------------------------------------------
+        $topics = [];
+        if (Schema::hasColumn('chat_messages', 'knowledge_base_id')) {
+            $topics = DB::table('chat_messages')
+                ->join('knowledge_bases', 'knowledge_bases.id', '=', 'chat_messages.knowledge_base_id')
+                ->leftJoin('information', 'information.id', '=', 'knowledge_bases.information_id')
+                ->where('chat_messages.sender', 'user')
+                ->where('chat_messages.created_at', '>=', $since)
+                ->groupBy('information.main_topic')
+                ->selectRaw('information.main_topic as name, COUNT(*) as count')
+                ->orderByDesc('count')
+                ->limit(10)
+                ->get()
+                ->map(fn ($r) => ['name' => $r->name ?: 'Other', 'count' => (int) $r->count])
+                ->all();
+        }
+
+        $unansweredAsked = Schema::hasTable('unanswered_questions')
+            ? (int) DB::table('unanswered_questions')->where('updated_at', '>=', $since)->sum('asked_count')
+            : 0;
+
         $peakHour = max($byHour) > 0 ? array_search(max($byHour), $byHour, true) : null;
         $heatMax = max(array_map('max', $heatmap));
 
@@ -131,6 +152,8 @@ class AnalyticsController extends Controller
             'peakHour' => $peakHour,
             'heatmap' => $heatmap,
             'heatMax' => $heatMax,
+            'topics' => $topics,
+            'unansweredAsked' => $unansweredAsked,
             'unansweredCount' => UnansweredQuestion::where('status', 'pending')->count(),
             'unreadFeedbackCount' => Feedback::where('is_read', false)->count(),
         ]);

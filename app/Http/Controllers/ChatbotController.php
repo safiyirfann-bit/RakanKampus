@@ -78,12 +78,17 @@ class ChatbotController extends Controller
             ]);
         }
 
-        $conversation->messages()->create([
+        $userMessage = $conversation->messages()->create([
             'sender' => 'user',
             'message' => $message,
         ]);
 
         $entries = $this->searchKnowledgeBase($message, 5, $conversation);
+
+        // Remember which topic this question was about (admin Analytics).
+        if ($entries->isNotEmpty()) {
+            $userMessage->forceFill(['knowledge_base_id' => $entries->first()->id])->saveQuietly();
+        }
 
 
         if ($entries->isEmpty()) {
@@ -267,7 +272,7 @@ public function destroy(Request $request, ChatConversation $conversation)
      * - Follow-up questions with no topic words of their own ("kat mana tu?")
      *   borrow the words from the student's previous message.
      */
-    private function searchKnowledgeBase(string $message, int $limit = 5, ?ChatConversation $conversation = null)
+    public function searchKnowledgeBase(string $message, int $limit = 5, ?ChatConversation $conversation = null)
     {
         $words = $this->topicWords($message);
 
