@@ -594,17 +594,24 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   <input type="text" id="subjectInput" placeholder="{{ __('e.g. Database Systems') }}">
 
   <p class="field-label">{{ __('Day') }}</p>
-  <select id="dayInput">
+  <select id="dayInput" hidden>
     @foreach($days as $d)
       <option value="{{ $d }}">{{ __($d) }}</option>
     @endforeach
   </select>
+  <div class="rkp-days" id="dayChips" style="margin-bottom:12px">
+    @foreach($days as $d)
+      <button type="button" data-day="{{ $d }}" onclick="pickDay('{{ $d }}')">{{ __(substr($d, 0, 3)) }}</button>
+    @endforeach
+  </div>
 
   <p class="field-label">{{ __('Time') }}</p>
-  <div class="time-row">
-    <div><input type="time" id="startInput"></div>
-    <div><input type="time" id="endInput"></div>
-  </div>
+  <input type="hidden" id="startInput">
+  <input type="hidden" id="endInput">
+  <button type="button" class="rkp-field empty" id="timeField" onclick="openClassTimePicker()" style="margin-bottom:12px">
+    <span><small>{{ __('Start – End') }}</small><b id="timeFieldText">{{ __('Pick class time') }}</b></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+  </button>
 
   <p class="field-label">{{ __('Room (optional)') }}</p>
   <input type="text" id="roomInput" placeholder="{{ __('e.g. Bilik Kuliah 3') }}">
@@ -618,6 +625,8 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">{{ __('Delete Class') }}</button>
 </div>
 
+
+@include('partials.rk-picker')
 
 <script>
 let schedules = @json($schedules);
@@ -932,6 +941,7 @@ function openAddModal() {
   document.getElementById('roomInput').value = '';
   document.getElementById('lecturerInput').value = '';
   document.getElementById('deleteScheduleBtn').classList.remove('open');
+  syncClassFields();
   showModal('modal');
 }
 
@@ -947,7 +957,38 @@ function openEditModal(id) {
   document.getElementById('roomInput').value = s.room || '';
   document.getElementById('lecturerInput').value = s.lecturer || '';
   document.getElementById('deleteScheduleBtn').classList.add('open');
+  syncClassFields();
   showModal('modal');
+}
+
+// Day chips + "Start – End" field → clock picker (partials/rk-picker)
+function pickDay(day) {
+  document.getElementById('dayInput').value = day;
+  syncClassFields();
+}
+
+function syncClassFields() {
+  const day = document.getElementById('dayInput').value;
+  document.querySelectorAll('#dayChips [data-day]').forEach(b => b.classList.toggle('on', b.dataset.day === day));
+  const a = document.getElementById('startInput').value, b = document.getElementById('endInput').value;
+  document.getElementById('timeField').classList.toggle('empty', !(a && b));
+  document.getElementById('timeFieldText').textContent = (a && b)
+    ? `${RKPicker.formatTime(a)} – ${RKPicker.formatTime(b)}`
+    : t('Pick class time');
+}
+
+function openClassTimePicker() {
+  RKPicker.timeRange({
+    title: t('Class time'),
+    subtitle: [document.getElementById('subjectInput').value.trim(), t(document.getElementById('dayInput').value)].filter(Boolean).join(' · '),
+    start: document.getElementById('startInput').value,
+    end: document.getElementById('endInput').value,
+    onDone(start, end) {
+      document.getElementById('startInput').value = start;
+      document.getElementById('endInput').value = end;
+      syncClassFields();
+    },
+  });
 }
 
 function confirmDeleteFromModal() {

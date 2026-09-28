@@ -873,10 +873,13 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #c0c6cd; }
       <button type="button" class="type-opt" data-type="{{ $t }}" data-color="{{ $color }}" onclick="selectType('{{ $t }}')">{{ __($t) }}</button>
     @endforeach
   </div>
-  <div class="date-time-row">
-    <input type="date" id="dateInput">
-    <input type="time" id="timeInput">
-  </div>
+  <p class="field-label">{{ __('Due date & time') }}</p>
+  <input type="hidden" id="dateInput">
+  <input type="hidden" id="timeInput">
+  <button type="button" class="rkp-field empty" id="dueField" onclick="openDuePicker()" style="margin-bottom:12px">
+    <span><small>{{ __('Due') }}</small><b id="dueFieldText">{{ __('Pick date & time') }}</b></span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg>
+  </button>
   <p class="field-label">{{ __('Notify me how many hours before?') }}</p>
   <input type="number" id="leadInput" min="0" step="0.5" value="1">
   <p class="hint">{{ __('Type any number of hours — use 0.5 for 30 minutes.') }}</p>
@@ -902,6 +905,8 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #c0c6cd; }
   <p id="formError" style="color:#e11d48; font-size: 11.5px; display:none; margin: -6px 0 10px;">{{ __('Please fill in a subject and date.') }}</p>
   <button type="button" class="modal-save" onclick="saveReminder()">{{ __('Save Reminder') }}</button>
 </div>
+
+@include('partials.rk-picker')
 
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -1182,6 +1187,7 @@ function openAddModal() {
   document.getElementById('leadInput').value = '1';
   selectType('Exam');
   resetRepeatOptions([]);
+  syncDueField();
   showModal('modal');
 }
 
@@ -1197,7 +1203,35 @@ function openEditModal(id) {
   document.getElementById('leadInput').value = r.lead_hours;
   selectType(r.type);
   resetRepeatOptions(r.repeat_lead_hours || []);
+  syncDueField();
   showModal('modal');
+}
+
+// Due date & time field → calendar + clock picker (partials/rk-picker)
+function syncDueField() {
+  const d = document.getElementById('dateInput').value;
+  const tm = document.getElementById('timeInput').value;
+  const field = document.getElementById('dueField');
+  field.classList.toggle('empty', !d);
+  document.getElementById('dueFieldText').textContent = d
+    ? `${RKPicker.formatDate(d, true)} · ${RKPicker.formatTime(tm || '09:00')}`
+    : t('Pick date & time');
+}
+
+function openDuePicker() {
+  const marks = reminders.map(r => toDateStr(new Date(r.due_at).getTime()));
+  RKPicker.dateTime({
+    title: t('Due date & time'),
+    subtitle: document.getElementById('subjectInput').value.trim(),
+    date: document.getElementById('dateInput').value,
+    time: document.getElementById('timeInput').value || '09:00',
+    marks,
+    onDone(date, time) {
+      document.getElementById('dateInput').value = date;
+      document.getElementById('timeInput').value = time;
+      syncDueField();
+    },
+  });
 }
 
 function showModal(id) {

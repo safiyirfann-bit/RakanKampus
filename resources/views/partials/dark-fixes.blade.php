@@ -23,6 +23,12 @@ html[data-theme="dark"] .reminder-card:not(.selected) { background: #172233 !imp
 
 html[data-theme="dark"] .timeline-card:has(input[type=checkbox]:checked) { background: #3a1d22 !important; border-color: #7f1d1d !important; }
 
+/* Date & time picker (partials/rk-picker): navy "selected" states become teal so they stand out on a dark sheet */
+html[data-theme="dark"] .rkp-d.out, html[data-theme="dark"] .rkp-d.past { color: #475569 !important; }
+html[data-theme="dark"] .rkp-d.sel,
+html[data-theme="dark"] .rkp-ampm button.on,
+html[data-theme="dark"] .rkp-days button.on { background: #2ec4c6 !important; color: #07202a !important; }
+
 /* Autofilled inputs keep Chrome's light yellow otherwise */
 html[data-theme="dark"] input:-webkit-autofill {
   -webkit-text-fill-color: #e2e8f0;

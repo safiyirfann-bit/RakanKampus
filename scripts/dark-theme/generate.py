@@ -33,6 +33,7 @@ VIEWS = os.path.join(ROOT, 'resources', 'views')
 
 PAGES = [
     'partials/app-nav.blade.php',
+    'partials/rk-picker.blade.php',
     'homepage.blade.php',
     'chat.blade.php',
     'timetable.blade.php',
