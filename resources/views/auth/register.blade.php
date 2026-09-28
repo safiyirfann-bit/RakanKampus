@@ -76,13 +76,22 @@ label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-t
 .eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;background:none;color:rgba(255,255,255,.85);cursor:pointer;border-radius:8px;display:grid;place-items:center}
 .eye svg{width:19px;height:19px}.eye .off{display:none}.eye.on .on{display:none}.eye.on .off{display:block}
 
-/* password strength: 4-part bar + 5 small rule tags */
-.meter{display:flex;gap:4px;margin:8px 0 7px}
-.meter i{flex:1;height:5px;border-radius:9px;background:rgba(255,255,255,.3);transition:background .2s}
-.rules{display:flex;flex-wrap:wrap;gap:5px;list-style:none}
-.rules li{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.18);color:#fff;transition:background .2s,color .2s}
-.rules li.valid{background:#bbf7d0;color:#166534}
-.strength{float:right;font-size:11px;font-weight:800;letter-spacing:.04em;text-transform:uppercase}
+/* password strength box: header + bar + the 5 requirements with ✕ / ✓ */
+.pw-box{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:16px;padding:12px 16px 12px;margin:2px 0 14px}
+.pw-head{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.strength{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;transition:color .2s}
+.bar-track{height:6px;border-radius:9px;background:rgba(255,255,255,.28);margin:9px 0 10px;overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:9px;transition:width .25s ease,background .25s ease}
+.req-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
+.req-list li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#fff;transition:color .2s}
+.req-list .icon{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:rgba(254,202,202,.9);color:#dc2626;transition:background .2s,color .2s}
+.req-list .icon svg{width:10px;height:10px}
+.req-list .icon-check{display:none}
+.req-list li.valid .icon{background:#bbf7d0;color:#15803d}
+.req-list li.valid .icon-cross{display:none}
+.req-list li.valid .icon-check{display:block}
+.req-list li.valid span.txt{opacity:.85}
+@media (max-width:760px){.req-list{grid-template-columns:1fr}}
 
 /* matric + inline messages */
 .matric-msg{font-size:12px;margin-top:6px;line-height:1.35}
@@ -223,7 +232,7 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
       <div class="s2">
         <div class="row split">
           <div class="field">
-            <label for="password">{{ __('Password') }} <span class="strength" id="strengthLabel"></span></label>
+            <label for="password">{{ __('Password') }}</label>
             <div class="pw-wrap">
               <input class="input" type="password" name="password" id="password" placeholder="{{ __('Create a password') }}" oninput="checkPassword()" autocomplete="new-password">
               <button type="button" class="eye" onclick="togglePw(this)" aria-label="{{ __('Show password') }}">
@@ -231,14 +240,6 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
                 <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
               </button>
             </div>
-            <div class="meter" id="meter"><i></i><i></i><i></i><i></i></div>
-            <ul class="rules">
-              <li id="req-length">6+ {{ __('characters') }}</li>
-              <li id="req-upper">A-Z</li>
-              <li id="req-lower">a-z</li>
-              <li id="req-number">0-9</li>
-              <li id="req-special">!@#$</li>
-            </ul>
           </div>
           <div class="field">
             <label for="password_confirmation">{{ __('Confirm password') }}</label>
@@ -250,6 +251,17 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
               </button>
             </div>
           </div>
+        </div>
+        <div class="pw-box">
+          <div class="pw-head"><span>{{ __('Password strength') }}</span><span class="strength" id="strengthLabel">-</span></div>
+          <div class="bar-track"><div class="bar-fill" id="strengthBar"></div></div>
+          <ul class="req-list">
+            <li id="req-length"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('At least 6 characters') }}</span></li>
+            <li id="req-upper"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One uppercase letter (A-Z)') }}</span></li>
+            <li id="req-lower"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One lowercase letter (a-z)') }}</span></li>
+            <li id="req-number"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One number (0-9)') }}</span></li>
+            <li id="req-special"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One special character (!@#$%^&*)') }}</span></li>
+          </ul>
         </div>
         <p class="password-error" id="passwordError"></p>
       </div>
@@ -310,12 +322,13 @@ function checkPassword() {
   const c = pwChecks(p);
   Object.keys(c).forEach(k => document.getElementById('req-' + k).classList.toggle('valid', c[k]));
   const score = Object.values(c).filter(Boolean).length;
-  const [bars, text, color] =
-    p.length === 0 ? [0, '', ''] :
-    score <= 2 ? [1, T.weak, '#fca5a5'] :
-    score === 3 ? [2, T.fair, '#fdba74'] :
-    score === 4 ? [3, T.good, '#fde047'] : [4, T.strong, '#86efac'];
-  document.querySelectorAll('#meter i').forEach((el, i) => el.style.background = i < bars ? color : '');
+  const [pct, text, color] =
+    p.length === 0 ? [0, '-', ''] :
+    score <= 2 ? [25, T.weak, '#fca5a5'] :
+    score === 3 ? [50, T.fair, '#fdba74'] :
+    score === 4 ? [75, T.good, '#fde047'] : [100, T.strong, '#86efac'];
+  const bar = document.getElementById('strengthBar');
+  bar.style.width = pct + '%'; bar.style.background = color;
   const label = document.getElementById('strengthLabel');
   label.textContent = text; label.style.color = color;
   clearError();

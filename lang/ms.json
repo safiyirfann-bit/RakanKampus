@@ -584,5 +584,10 @@
     "Already have an account?": "Sudah ada akaun?",
     "Your Politeknik AI Assistant": "Pembantu AI Politeknik anda",
     "Good": "Baik",
-    "Create Account": "Cipta Akaun"
+    "Create Account": "Cipta Akaun",
+    "Password strength": "Kekuatan kata laluan",
+    "One uppercase letter (A-Z)": "Satu huruf besar (A-Z)",
+    "One lowercase letter (a-z)": "Satu huruf kecil (a-z)",
+    "One number (0-9)": "Satu nombor (0-9)",
+    "One special character (!@#$%^&*)": "Satu simbol khas (!@#$%^&*)"
 }
