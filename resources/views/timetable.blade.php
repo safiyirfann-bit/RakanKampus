@@ -30,13 +30,6 @@
 
   .header { display: flex; align-items: center; gap: 12px; padding: 8px 0 18px; }
 
-  .back-btn {
-    width: 38px; height: 38px; min-width: 38px; border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; text-decoration: none;
-  }
-  .back-btn svg { width: 18px; height: 18px; stroke: currentColor; }
 
   .header-title { font-size: 18px; font-weight: 800; color: #fff; margin: 0; }
   .header-sub { font-size: 12.5px; color: #bfe9ea; margin: 2px 0 0; }
@@ -371,7 +364,6 @@
   @media (min-width: 861px) {
     body { background: #f0fafa; }
     .container { max-width: 1080px; margin: 0; padding: 36px 44px 90px; }
-    .back-btn { display: none; }
     .header-title { color: #14213d; }
     .header-sub { color: #64748b; }
     .add-btn { width: auto; padding: 12px 22px; }
@@ -497,9 +489,6 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
 
 <div class="container" id="pageContainer">
   <div class="header">
-    <a href="{{ route('student.home') }}" class="back-btn" aria-label="{{ __('Back') }}">
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>
-    </a>
     <div>
       <p class="header-title">{{ __('Timetable') }}</p>
       <p class="header-sub">{{ __('Your weekly class schedule') }}</p>
