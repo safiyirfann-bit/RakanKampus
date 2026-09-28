@@ -591,7 +591,7 @@
    Hand-made fixes go in resources/views/partials/dark-fixes.blade.php */
 html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320, #112031, #1d6869, #0c1320); }
 html[data-theme="dark"] .topbar { background: rgba(23, 32, 45, 0.92); border-bottom: 1px solid #284848; }
-html[data-theme="dark"] .brand-name { color: #cfd4e0; }
+html[data-theme="dark"] .brand-name { color: #dee1e9; }
 @media (min-width: 861px) {
   html[data-theme="dark"] body { background: #10161f; }
 }
@@ -600,33 +600,33 @@ html[data-theme="dark"] .greeting-avatar { border: 1.5px solid rgba(42, 51, 65, 
 html[data-theme="dark"] .reminders-banner { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5); }
 html[data-theme="dark"] .reminders-banner:hover { box-shadow: 0 14px 32px rgba(0, 0, 0, 0.68); }
 html[data-theme="dark"] .today-classes-card { background: #17202d; border: 1px solid #284848; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
-html[data-theme="dark"] .today-classes-title-row svg { stroke: #2feddc; }
-html[data-theme="dark"] .today-classes-title { color: #cfd4e0; }
-html[data-theme="dark"] .today-classes-link { color: #2feddc; }
+html[data-theme="dark"] .today-classes-title-row svg { stroke: #41eedf; }
+html[data-theme="dark"] .today-classes-title { color: #dee1e9; }
+html[data-theme="dark"] .today-classes-link { color: #41eedf; }
 html[data-theme="dark"] .today-class-row { border-top: 1px solid #284848; }
-html[data-theme="dark"] .today-class-time { color: #cfd4e0; }
-html[data-theme="dark"] .today-class-subject { color: #cfd4e0; }
-html[data-theme="dark"] .today-class-meta { color: #979faa; }
-html[data-theme="dark"] .today-class-row.is-ongoing .today-class-time { color: #4ce785; }
-html[data-theme="dark"] .today-class-row.is-ongoing .today-class-subject { color: #4ce785; }
-html[data-theme="dark"] .today-classes-empty { color: #979faa; }
-html[data-theme="dark"] .quick-chip { background: #17202d; border: 1px solid #284848; color: #2feddc; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
-html[data-theme="dark"] .quick-chip-tag { color: #f8a377; }
+html[data-theme="dark"] .today-class-time { color: #dee1e9; }
+html[data-theme="dark"] .today-class-subject { color: #dee1e9; }
+html[data-theme="dark"] .today-class-meta { color: #b0b6be; }
+html[data-theme="dark"] .today-class-row.is-ongoing .today-class-time { color: #5ee992; }
+html[data-theme="dark"] .today-class-row.is-ongoing .today-class-subject { color: #5ee992; }
+html[data-theme="dark"] .today-classes-empty { color: #b0b6be; }
+html[data-theme="dark"] .quick-chip { background: #17202d; border: 1px solid #284848; color: #41eedf; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+html[data-theme="dark"] .quick-chip-tag { color: #f9b18c; }
 html[data-theme="dark"] .quick-chip:hover { box-shadow: 0 6px 16px rgba(0, 0, 0, 0.34); }
 html[data-theme="dark"] .start-chat-btn { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.59); }
 html[data-theme="dark"] .start-chat-btn:hover { box-shadow: 0 16px 32px rgba(0, 0, 0, 0.81); }
-html[data-theme="dark"] .faq-label { color: #2feddc; background: rgba(23, 32, 45, 0.85); }
-html[data-theme="dark"] .section-label { color: #2feddc; background: rgba(23, 32, 45, 0.85); }
+html[data-theme="dark"] .faq-label { color: #41eedf; background: rgba(23, 32, 45, 0.85); }
+html[data-theme="dark"] .section-label { color: #41eedf; background: rgba(23, 32, 45, 0.85); }
 html[data-theme="dark"] .conv-card { background: #17202d; border: 1px solid #284848; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
 html[data-theme="dark"] .conv-card:hover { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3); border-color: #284848; }
 html[data-theme="dark"] .conv-icon { background: #1d3d3b; }
-html[data-theme="dark"] .conv-icon svg { stroke: #2feddc; }
-html[data-theme="dark"] .conv-title { color: #cfd4e0; }
-html[data-theme="dark"] .conv-preview { color: #2feddc; }
-html[data-theme="dark"] .conv-time { color: #979faa; }
-html[data-theme="dark"] .conv-meta svg { stroke: #b5bbc5; }
-html[data-theme="dark"] .conv-action-btn { color: #b5bbc5; }
-html[data-theme="dark"] .conv-action-btn:hover { color: #2feddc; background: #1c3b39; }
+html[data-theme="dark"] .conv-icon svg { stroke: #41eedf; }
+html[data-theme="dark"] .conv-title { color: #dee1e9; }
+html[data-theme="dark"] .conv-preview { color: #41eedf; }
+html[data-theme="dark"] .conv-time { color: #b0b6be; }
+html[data-theme="dark"] .conv-meta svg { stroke: #ced3d9; }
+html[data-theme="dark"] .conv-action-btn { color: #ced3d9; }
+html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c3b39; }
 </style>
 </head>
 <body>

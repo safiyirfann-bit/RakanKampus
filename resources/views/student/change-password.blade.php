@@ -104,13 +104,13 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
 @media (min-width: 861px) {
   html[data-theme="dark"] body { background: #10161f; }
   html[data-theme="dark"] .page-header { background: rgba(23, 32, 45, 0.9); border-bottom: 1px solid #284848; }
-  html[data-theme="dark"] .page-header .back-btn { color: #2feddc; }
+  html[data-theme="dark"] .page-header .back-btn { color: #41eedf; }
   html[data-theme="dark"] .page-header .back-btn:hover { background: #1c3b39; }
-  html[data-theme="dark"] .page-header h1 { color: #cfd4e0; }
-  html[data-theme="dark"] .page-header p { color: #979faa; }
+  html[data-theme="dark"] .page-header h1 { color: #dee1e9; }
+  html[data-theme="dark"] .page-header p { color: #b0b6be; }
 }
-html[data-theme="dark"] .req-item { color: #b5bbc5; }
-html[data-theme="dark"] .req-item.valid { color: #75b1fb; }
+html[data-theme="dark"] .req-item { color: #ced3d9; }
+html[data-theme="dark"] .req-item.valid { color: #92c1fc; }
 </style>
 </head>
 

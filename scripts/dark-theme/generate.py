@@ -126,12 +126,13 @@ def dark_color(c, role):
     if role == 'text':
         if l >= 0.75:
             return None
+        # (brightened a notch after testing on phones: muted text was a bit too dim)
         if s > 0.45 and l > 0.2:
-            return from_hls(h, min(0.72, l + 0.24), s, a)  # keep accents, just brighter
+            return from_hls(h, min(0.78, l + 0.28), s, a)  # keep accents, just brighter
         hh, ss = (h, min(s, 0.35) * 0.6) if s > 0.15 else (NAVY_HUE, 0.18)
         if l <= 0.45:
-            return from_hls(hh, 0.90 - l * 0.35, ss, a)
-        return from_hls(hh, min(0.74, l + 0.16), ss, a)
+            return from_hls(hh, 0.94 - l * 0.3, ss, a)
+        return from_hls(hh, min(0.83, l + 0.25), ss, a)
     if role == 'border':
         if l >= 0.72:
             if tinted:
@@ -247,6 +248,8 @@ def process_rules(rules, out, indent=''):
             prelude = tinycss2.serialize(rule.prelude).strip()
             if SKIP_SELECTORS.search(prelude):
                 continue
+            if 'data-theme' in prelude:
+                continue  # already a hand-written dark-mode rule
             decls = tinycss2.parse_declaration_list(rule.content, skip_comments=True, skip_whitespace=True)
             new = []
             for d in decls:

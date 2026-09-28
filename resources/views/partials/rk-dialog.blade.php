@@ -140,19 +140,19 @@
   .rkt-bot { width: 40px; height: 40px; flex-shrink: 0; background: #ffffff; border-radius: 50%; padding: 3px; overflow: visible; }
   .rkt-txt { flex: 1; min-width: 0; font-size: 13.5px; }
   .rkt-txt b { display: block; }
-  .rkt-txt span { color: #94a3b8; font-size: 12.5px; }
+  .rkt-txt span { color: #b6c2d1; font-size: 12.5px; }
   .rkt-undo { background: none; border: none; color: #5eead4; font-weight: 800; font-size: 13px; cursor: pointer; padding: 6px 4px; font-family: inherit; letter-spacing: .04em; }
   .rkt-bar { position: absolute; left: 0; bottom: 0; height: 3px; background: #5eead4; width: 100%; transform-origin: 0 50%; }
 
   /* dark mode */
   html[data-theme="dark"] .rkd { background: #131d2b; color: #e2e8f0; box-shadow: 0 30px 60px rgba(0,0,0,.6); }
   html[data-theme="dark"] .rkd-title { color: #f1f5f9; }
-  html[data-theme="dark"] .rkd-msg { color: #94a3b8; }
+  html[data-theme="dark"] .rkd-msg { color: #c3cdd9; }
   html[data-theme="dark"] .rkd-grab { background: #334155; }
   html[data-theme="dark"] .rkd-pill { background: rgba(248,113,113,.14); color: #fca5a5; }
   html[data-theme="dark"] .rkd-warn { color: #fca5a5; }
   html[data-theme="dark"] .rkd-list { background: #0d1520; }
-  html[data-theme="dark"] .rkd-list div { color: #cbd5e1; border-color: #1e293b; }
+  html[data-theme="dark"] .rkd-list div { color: #e2e8f0; border-color: #1e293b; }
   html[data-theme="dark"] .rkd-input { background: #0d1520; border-color: #334155; color: #f1f5f9; }
   html[data-theme="dark"] .rkd-cancel { background: #1e293b; color: #e2e8f0; }
   html[data-theme="dark"] .rkd-scene { filter: drop-shadow(0 0 .7px #cbd5e1) drop-shadow(0 0 .7px #cbd5e1); }
