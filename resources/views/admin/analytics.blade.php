@@ -57,9 +57,18 @@
         .topic-btn.muted .bar i { background: #e0a100; }
         a.topic-btn.muted:hover b { text-decoration: underline; }
         @media (max-width: 860px) { .topics { columns: 1; } }
-        .card.clickable { cursor: pointer; transition: box-shadow .15s, border-color .15s; text-align: left; font: inherit; color: inherit; width: 100%; }
-        .card.clickable:hover { border-color: #9cc7a9; box-shadow: 0 6px 18px rgba(47,107,74,.10); }
-        .card.clickable .view { font-size: 11.5px; color: #64748b; margin-top: 8px; }
+        .card.clickable { cursor: pointer; text-align: left; font: inherit; color: inherit; width: 100%; position: relative; overflow: hidden;
+            transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s ease, border-color .25s ease; }
+        .card.clickable::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: #2f6b4a; transform: scaleY(0); transform-origin: bottom; transition: transform .25s ease; }
+        .card.clickable:hover { transform: translateY(-3px); border-color: #b9d8c1; box-shadow: 0 10px 24px -8px rgba(47,107,74,.28); }
+        .card.clickable:hover::before { transform: scaleY(1); }
+        .card.clickable:active { transform: translateY(-1px); box-shadow: 0 4px 12px -6px rgba(47,107,74,.3); }
+        .card.clickable:focus-visible { outline: 2px solid #2f6b4a; outline-offset: 2px; }
+        .card.clickable .view { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #64748b; margin-top: 10px; transition: color .2s ease; }
+        .card.clickable .view .arrow { display: inline-block; transition: transform .25s ease; }
+        .card.clickable:hover .view { color: #2f6b4a; }
+        .card.clickable:hover .view .arrow { transform: translateX(4px); }
+        @media (prefers-reduced-motion: reduce) { .card.clickable, .card.clickable::before, .card.clickable .view .arrow { transition: none; } .card.clickable:hover { transform: none; } }
         dialog.list-modal { border: none; border-radius: 16px; padding: 0; width: min(760px, calc(100vw - 32px)); max-height: 80vh; box-shadow: 0 24px 60px rgba(15,40,25,.25); }
         dialog.list-modal::backdrop { background: rgba(15,30,20,.45); }
         .modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid #e8efe7; position: sticky; top: 0; background: #fff; }
@@ -119,13 +128,13 @@
             <div class="kpi-label">Total users</div>
             <div class="kpi-value">{{ number_format($totalUsers) }}</div>
             <div class="kpi-sub">▲ {{ $newThisWeek }} new this week</div>
-            <div class="view">View all accounts →</div>
+            <div class="view">View all accounts <span class="arrow">→</span></div>
         </button>
         <button type="button" class="card clickable" onclick="document.getElementById('onlineModal').showModal()">
             <div class="kpi-label">Online now</div>
             <div class="kpi-value"><span class="dot"></span>{{ $onlineNow }}</div>
             <div class="kpi-sub">active in the last 5 min</div>
-            <div class="view">See who's online →</div>
+            <div class="view">See who's online <span class="arrow">→</span></div>
         </button>
         <div class="card">
             <div class="kpi-label">Peak hour</div>
