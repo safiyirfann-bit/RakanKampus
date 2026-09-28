@@ -68,14 +68,8 @@
   .side-btn:hover { background: var(--navy-2); }
   .side-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
   .side-link { border-color: transparent; font-weight: 500; color: #cbd6e2; margin-top: 2px; }
-  .search-wrap { position: relative; margin: 8px 0 4px; }
-  .search-wrap svg { position: absolute; left: 12px; top: 50%; width: 15px; height: 15px; transform: translateY(-50%); color: #7f93a8; }
-  #recentSearchInput {
-    width: 100%; padding: 9px 12px 9px 34px; border-radius: 10px; border: none;
-    background: var(--navy-2); color: #fff; font-size: 13.5px; outline: none;
-  }
-  #recentSearchInput::placeholder { color: #7f93a8; }
-  #recentSearchInput:focus { box-shadow: 0 0 0 1px var(--teal); }
+  .side-search { border-color: transparent; font-weight: 500; color: #cbd6e2; }
+  .side-search kbd { margin-left: auto; font-family: inherit; font-size: 11px; line-height: 1; color: #6f8399; border: 1px solid var(--navy-line); border-radius: 5px; padding: 3px 5px; }
 
   .recent-list { flex: 1; overflow-y: auto; margin: 4px -4px 0; padding: 0 4px; }
   .recent-list::-webkit-scrollbar { width: 6px; }
@@ -256,6 +250,85 @@
   .hidden { display: none !important; }
   .disclaimer { text-align: center; font-size: 11.5px; color: var(--faint); margin-top: 8px; }
 
+
+  /* ---------- Collapsed icon rail (desktop, like ChatGPT) ---------- */
+  .rail { display: none; }
+  @media (min-width: 861px) {
+    .app.sidebar-collapsed .rail {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      width: 58px; min-width: 58px; background: var(--navy); padding: 10px 0 12px; z-index: 31;
+    }
+    #menuBtn { display: none; }
+  }
+  .rail-btn {
+    position: relative; width: 40px; height: 40px; border-radius: 10px; border: none; background: none;
+    color: #9fb0c2; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none;
+    transition: background .15s, color .15s;
+  }
+  .rail-btn:hover, .rail-btn.open { background: var(--navy-3); color: #fff; }
+  .rail-btn svg { width: 20px; height: 20px; }
+  .rail-logo { margin-bottom: 10px; }
+  .rail-logo .logo-face { width: 32px; height: 32px; border-radius: 9px; background: #fff; display: flex; align-items: center; justify-content: center; }
+  .rail-logo .logo-hover { display: none; }
+  .rail-logo:hover .logo-face { display: none; }
+  .rail-logo:hover .logo-hover { display: block; }
+  .rail-spacer { flex: 1; }
+  .rail .avatar { width: 30px; height: 30px; font-size: 11px; }
+  .rail-btn[data-tip]:hover::after {
+    content: attr(data-tip); position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%);
+    background: #0b1522; color: #fff; font-size: 12.5px; font-weight: 600; padding: 6px 10px; border-radius: 8px;
+    white-space: nowrap; pointer-events: none; box-shadow: 0 6px 16px rgba(0,0,0,.25); z-index: 70;
+    animation: tipIn .12s ease;
+  }
+  .rail-btn.open[data-tip]::after { display: none; }
+  @keyframes tipIn { from { opacity: 0; transform: translate(-3px, -50%); } }
+
+  /* "Chats" flyout next to the rail */
+  .flyout {
+    position: fixed; left: 66px; z-index: 65; width: 290px; max-height: min(460px, calc(100vh - 40px)); overflow-y: auto;
+    background: var(--navy-2); border: 1px solid var(--navy-line); border-radius: 16px; padding: 10px 6px;
+    box-shadow: 0 18px 40px rgba(0,0,0,.35); animation: flyIn .15s ease;
+  }
+  @keyframes flyIn { from { opacity: 0; transform: translateX(-6px); } }
+  .fly-title { font-size: 12.5px; font-weight: 600; color: #7f93a8; padding: 4px 12px 8px; }
+  .fly-item {
+    display: block; width: 100%; text-align: left; border: none; background: none; color: #e2e8f0; cursor: pointer;
+    padding: 9px 12px; border-radius: 9px; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .fly-item:hover { background: var(--navy-3); }
+  .fly-item.active { background: var(--navy-3); color: #fff; }
+  .fly-empty { color: #7f93a8; font-size: 13px; padding: 8px 12px; }
+
+  /* Search chats pop-up */
+  dialog.search-modal {
+    border: none; padding: 0; border-radius: 18px; width: min(640px, calc(100vw - 32px)); max-height: min(560px, calc(100vh - 80px));
+    background: #fff; color: var(--ink); box-shadow: 0 30px 70px rgba(15,29,46,.35); overflow: hidden; margin-top: 10vh;
+  }
+  dialog.search-modal[open] { display: flex; flex-direction: column; animation: popIn .16s ease; }
+  @keyframes popIn { from { opacity: 0; transform: translateY(8px) scale(.98); } }
+  dialog.search-modal::backdrop { background: rgba(15,29,46,.45); }
+  .sm-head { display: flex; align-items: center; gap: 12px; padding: 16px 16px 14px 22px; border-bottom: 1px solid #eef1f4; }
+  .sm-head svg { width: 19px; height: 19px; color: var(--faint); flex-shrink: 0; }
+  #searchModalInput { flex: 1; border: none; outline: none; font: inherit; font-size: 16px; color: var(--ink); background: none; }
+  #searchModalInput::placeholder { color: var(--faint); }
+  .sm-close { width: 34px; height: 34px; border-radius: 50%; border: none; background: none; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .sm-close:hover { background: #f1f5f9; color: var(--ink); }
+  .sm-body { overflow-y: auto; padding: 8px 10px 14px; }
+  .sm-label { font-size: 12.5px; font-weight: 600; color: var(--muted); padding: 10px 12px 6px; }
+  .sm-item {
+    display: flex; align-items: center; gap: 14px; width: 100%; border: none; background: none; text-align: left;
+    padding: 11px 12px; border-radius: 10px; cursor: pointer; color: var(--ink); font-size: 14.5px;
+  }
+  .sm-item svg { width: 18px; height: 18px; color: var(--muted); flex-shrink: 0; }
+  .sm-item:hover, .sm-item.focus { background: #f1f5f9; }
+  .sm-item .sm-text { min-width: 0; flex: 1; }
+  .sm-item .sm-text b { display: block; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sm-item .sm-text small { display: block; color: var(--faint); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+  .sm-item .sm-when { font-size: 12px; color: var(--faint); flex-shrink: 0; }
+  .sm-new svg { color: var(--teal); }
+  .sm-empty { color: var(--faint); font-size: 14px; padding: 20px 12px; text-align: center; }
+  mark { background: #ccfbf1; color: inherit; border-radius: 3px; padding: 0 1px; }
+
   /* ---------- Mobile ---------- */
   @media (max-width: 860px) {
     .sidebar { position: fixed; top: 0; bottom: 0; left: 0; margin-left: 0 !important; transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,.25); }
@@ -275,6 +348,26 @@
 
 <div class="app sidebar-collapsed is-empty" id="app">
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+  <!-- Collapsed rail (desktop): logo opens the sidebar, like ChatGPT -->
+  <nav class="rail" id="rail" aria-label="{{ __('Chat navigation') }}">
+    <button class="rail-btn rail-logo" id="railOpen" data-tip="{{ __('Open sidebar') }}" aria-label="{{ __('Open sidebar') }}">
+      <span class="logo-face"><x-brand-logo size="22" /></span>
+      <span class="logo-hover"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg></span>
+    </button>
+    <button class="rail-btn" id="railNew" data-tip="{{ __('New Chat') }}" aria-label="{{ __('New Chat') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></button>
+    <button class="rail-btn" id="railSearch" data-tip="{{ __('Search chats') }}" aria-label="{{ __('Search chats') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg></button>
+    <button class="rail-btn" id="railChats" data-tip="{{ __('Chats') }}" aria-label="{{ __('Chats') }}" aria-expanded="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.8 8.8 0 0 1-3.8-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"></path></svg></button>
+    <div class="rail-spacer"></div>
+    <a class="rail-btn" href="{{ route('student.home') }}" data-tip="{{ __('Back to Home') }}" aria-label="{{ __('Back to Home') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg></a>
+    <a class="rail-btn" href="{{ route('student.profile') }}" data-tip="{{ __('Profile') }}" aria-label="{{ __('Profile') }}">
+      <span class="avatar">@if($user->photo_data)<img src="{{ $user->photo_data }}" alt="">@else{{ $initials }}@endif</span>
+    </a>
+  </nav>
+  <div class="flyout" id="chatsFlyout" hidden>
+    <div class="fly-title">{{ __('Recents') }}</div>
+    <div id="flyList"></div>
+  </div>
 
   <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
@@ -297,10 +390,11 @@
       {{ __('Back to Home') }}
     </a>
 
-    <div class="search-wrap">
+    <button class="side-btn side-search" id="sideSearchBtn" type="button">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
-      <input type="text" id="recentSearchInput" placeholder="{{ __('Search conversation...') }}" autocomplete="off">
-    </div>
+      {{ __('Search chats') }}
+      <kbd>Ctrl K</kbd>
+    </button>
 
     <div class="recent-list" id="recentList"></div>
 
@@ -349,6 +443,18 @@
     </div>
   </div>
 </div>
+
+{{-- Search chats pop-up --}}
+<dialog class="search-modal" id="searchModal" aria-label="{{ __('Search chats') }}">
+  <div class="sm-head">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+    <input type="text" id="searchModalInput" placeholder="{{ __('Search chats...') }}" autocomplete="off">
+    <button class="sm-close" type="button" id="searchModalClose" aria-label="{{ __('Close') }}">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+    </button>
+  </div>
+  <div class="sm-body" id="searchResults"></div>
+</dialog>
 
 {{-- Empty state (new chat) --}}
 <template id="emptyTpl">
@@ -759,9 +865,8 @@ function closeMenus() {
 document.addEventListener('click', closeMenus);
 
 function renderRecentList() {
-  const query = document.getElementById('recentSearchInput').value.toLowerCase().trim();
-  const list = conversationsCache.filter(c =>
-    !query || (c.title || '').toLowerCase().includes(query) || (c.preview || '').toLowerCase().includes(query));
+  const query = '';
+  const list = conversationsCache;
 
   recentList.innerHTML = '';
   if (list.length === 0) {
@@ -812,7 +917,6 @@ function renderRecentList() {
     recentList.appendChild(item);
   });
 }
-document.getElementById('recentSearchInput').addEventListener('input', renderRecentList);
 
 function renameConversation(id, currentTitle) {
   const newTitle = prompt(t('Rename conversation:'), currentTitle);
@@ -866,6 +970,121 @@ function startNewChat() {
 }
 document.getElementById('newChatBtn').addEventListener('click', startNewChat);
 document.getElementById('topNewChatBtn').addEventListener('click', startNewChat);
+
+/* ---------- Collapsed rail, Chats flyout & Search pop-up ---------- */
+const SVG_BUBBLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.8 8.8 0 0 1-3.8-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"></path></svg>`;
+const SVG_PEN = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>`;
+const railChats = document.getElementById('railChats');
+const flyout = document.getElementById('chatsFlyout');
+const flyList = document.getElementById('flyList');
+
+document.getElementById('railOpen').addEventListener('click', () => { closeFlyout(); setSidebarOpen(true); });
+document.getElementById('railNew').addEventListener('click', () => { closeFlyout(); startNewChat(); });
+document.getElementById('railSearch').addEventListener('click', () => { closeFlyout(); openSearch(); });
+document.getElementById('sideSearchBtn').addEventListener('click', () => openSearch());
+
+function renderFlyout() {
+  flyList.innerHTML = '';
+  if (!conversationsCache.length) {
+    flyList.innerHTML = `<div class="fly-empty">${escapeHtml(t('No conversations yet'))}</div>`;
+    return;
+  }
+  conversationsCache.forEach(conv => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'fly-item' + (conv.id === currentConversationId ? ' active' : '');
+    b.textContent = conv.title;
+    b.title = conv.title;
+    b.addEventListener('click', () => { closeFlyout(); openConversation(conv.id); });
+    flyList.appendChild(b);
+  });
+}
+function openFlyout() {
+  renderFlyout();
+  const r = railChats.getBoundingClientRect();
+  flyout.hidden = false;
+  const top = Math.min(r.top - 6, window.innerHeight - flyout.offsetHeight - 16);
+  flyout.style.top = Math.max(12, top) + 'px';
+  railChats.classList.add('open');
+  railChats.setAttribute('aria-expanded', 'true');
+}
+function closeFlyout() {
+  flyout.hidden = true;
+  railChats.classList.remove('open');
+  railChats.setAttribute('aria-expanded', 'false');
+}
+railChats.addEventListener('click', (e) => {
+  e.stopPropagation();
+  flyout.hidden ? openFlyout() : closeFlyout();
+});
+flyout.addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', closeFlyout);
+
+// Search pop-up
+const searchModal = document.getElementById('searchModal');
+const searchInput = document.getElementById('searchModalInput');
+const searchResults = document.getElementById('searchResults');
+let searchFocus = -1;
+
+function highlight(text, q) {
+  const safe = escapeHtml(text);
+  if (!q) return safe;
+  const i = text.toLowerCase().indexOf(q);
+  if (i < 0) return safe;
+  return escapeHtml(text.slice(0, i)) + '<mark>' + escapeHtml(text.slice(i, i + q.length)) + '</mark>' + escapeHtml(text.slice(i + q.length));
+}
+function renderSearch() {
+  const q = searchInput.value.toLowerCase().trim();
+  const list = conversationsCache.filter(c =>
+    !q || (c.title || '').toLowerCase().includes(q) || (c.preview || '').toLowerCase().includes(q));
+  searchFocus = -1;
+  let html = '';
+  if (!q) {
+    html += `<button type="button" class="sm-item sm-new" data-new>${SVG_PEN}<span class="sm-text"><b>${escapeHtml(t('New Chat'))}</b></span></button>`;
+  }
+  if (list.length) {
+    html += `<div class="sm-label">${escapeHtml(q ? t('Results') : t('Recent chats'))}</div>`;
+    list.forEach(c => {
+      html += `<button type="button" class="sm-item" data-id="${c.id}">${SVG_BUBBLE}<span class="sm-text"><b>${highlight(c.title || '', q)}</b>${q && c.preview ? `<small>${highlight(c.preview, q)}</small>` : ''}</span><span class="sm-when">${escapeHtml(groupLabel(c.updated_at))}</span></button>`;
+    });
+  } else {
+    html += `<div class="sm-empty">${escapeHtml(q ? t('No matching conversations') : t('No conversations yet'))}</div>`;
+  }
+  searchResults.innerHTML = html;
+  searchResults.querySelectorAll('.sm-item').forEach(el => el.addEventListener('click', () => pickSearch(el)));
+}
+function pickSearch(el) {
+  searchModal.close();
+  if (el.hasAttribute('data-new')) startNewChat();
+  else openConversation(parseInt(el.dataset.id, 10));
+}
+function openSearch() {
+  searchInput.value = '';
+  renderSearch();
+  searchModal.showModal();
+  searchInput.focus();
+  if (isMobile()) setSidebarOpen(false);
+}
+searchInput.addEventListener('input', renderSearch);
+searchInput.addEventListener('keydown', (e) => {
+  const items = [...searchResults.querySelectorAll('.sm-item')];
+  if (!items.length) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    searchFocus = (searchFocus + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    items.forEach((el, i) => el.classList.toggle('focus', i === searchFocus));
+    items[searchFocus].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    pickSearch(items[searchFocus >= 0 ? searchFocus : (items.length > 1 && items[0].hasAttribute('data-new') && searchInput.value ? 1 : 0)]);
+  }
+});
+document.getElementById('searchModalClose').addEventListener('click', () => searchModal.close());
+searchModal.addEventListener('click', (e) => { if (e.target === searchModal) searchModal.close(); });
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openSearch(); }
+  if (e.key === 'Escape') closeFlyout();
+});
 
 /* ---------- Start ---------- */
 const urlParams = new URLSearchParams(window.location.search);
