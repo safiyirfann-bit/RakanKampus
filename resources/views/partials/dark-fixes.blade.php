@@ -29,6 +29,9 @@ html[data-theme="dark"] .rkp-d.sel,
 html[data-theme="dark"] .rkp-ampm button.on,
 html[data-theme="dark"] .rkp-days button.on { background: #2ec4c6 !important; color: #07202a !important; }
 
+/* RakanKampus button (Reminders / Timetable): the navy robot needs a light backing on a dark button */
+html[data-theme="dark"] .ai-fab .ai-fab-logo { background: #ffffff; border-radius: 50%; padding: 2px; }
+
 /* Autofilled inputs keep Chrome's light yellow otherwise */
 html[data-theme="dark"] input:-webkit-autofill {
   -webkit-text-fill-color: #e2e8f0;
