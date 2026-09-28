@@ -102,6 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/student/chat', function (Illuminate\Http\Request $request) {
         return view('chat', [
             'user' => $request->user(),
+            'quickQuestions' => \App\Services\PopularQuestions::top(4),
         ]);
     })->name('student.chat');
 

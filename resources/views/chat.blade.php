@@ -2,729 +2,453 @@
 <html lang="{{ app()->getLocale() }}">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 @include('partials.pwa-head')
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>{{ __('RakanKampus - New Conversation') }}</title>
+@php
+  $initials = strtoupper(substr($user->first_name ?? $user->name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1));
+  $displayName = trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) ?: $user->name;
+  $firstName = $user->first_name ?: strtok((string) $user->name, ' ');
+  $suggestIcons = ['💬', '💳', '📍', '📚'];
+@endphp
 <style>
-
   :root {
-    --blue-primary: #60a5fa;
-    --blue-dark: #3355a6;
-    --sidebar-bg: #4c3d7a;
-    --sidebar-bg-2: #4c1d95;
-    --bg-page: #eef0ff;
-    --border-light: #ece6fb;
-    --text-muted: #8b7fae;
-    --input-bg: #ece4fb;
-    --input-placeholder: #a998cf;
+    --navy: #0f1d2e;
+    --navy-2: #16273b;
+    --navy-3: #1d3149;
+    --navy-line: #22384f;
+    --teal: #14b8a6;
+    --teal-soft: #e6f7f5;
+    --ink: #1f2a37;
+    --muted: #64748b;
+    --faint: #94a3b8;
+    --line: #e5e9ee;
+    --user-bubble: #e8f1f8;
+    --col: 760px;
   }
-
   * { box-sizing: border-box; }
-
-  .sidebar-user {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 20px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-    transition: background 0.15s ease;
-  }
-
-  .sidebar-user:hover {
-    background: rgba(255,255,255,0.06);
-  }
-
-  html, body {
-    margin: 0;
-    height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  }
-
+  html, body { margin: 0; height: 100%; }
   body {
-    background: linear-gradient(120deg, #14213d, #1b3a5c, #2ec4c6, #14213d);
-    background-size: 300% 300%;
-    animation: gradientShift 15s ease infinite;
-  }
-
-  @media (min-width: 861px) {
-    body {
-        background: #f0fafa;
-    }
-  }
-
-  .app {
-    display: flex;
-    height: 100vh;
-    height: 100dvh;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #fff;
+    color: var(--ink);
     overflow: hidden;
   }
+  button { font: inherit; }
 
+  .app { display: flex; height: 100vh; height: 100dvh; }
+
+  /* ---------- Sidebar ---------- */
   .sidebar {
-    width: 300px;
-    min-width: 300px;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden;
-    background: linear-gradient(175deg, #14213d, #1b3a5c 55%, #1c4f57);
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    transform: translateX(0);
-    transition: transform 0.25s ease, margin-left 0.25s ease;
-}
-
-  .sidebar-backdrop {
-    display: none;
+    width: 280px; min-width: 280px;
+    background: var(--navy);
+    color: #cbd6e2;
+    display: flex; flex-direction: column;
+    padding: 12px 10px;
+    transition: margin-left .25s ease, transform .25s ease;
+    z-index: 30;
   }
-
-  .app.sidebar-collapsed .sidebar {
-    margin-left: -300px;
+  .app.sidebar-collapsed .sidebar { margin-left: -280px; }
+  .side-top { display: flex; align-items: center; justify-content: space-between; padding: 4px 6px 12px; }
+  .brand { display: flex; align-items: center; gap: 9px; color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
+  .brand-logo { width: 30px; height: 30px; border-radius: 9px; background: #fff; display: flex; align-items: center; justify-content: center; }
+  .icon-btn {
+    width: 34px; height: 34px; border-radius: 8px; border: none; background: none;
+    color: #9fb0c2; cursor: pointer; display: flex; align-items: center; justify-content: center; text-decoration: none;
   }
-
-  .sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 20px 20px 16px;
+  .icon-btn:hover { background: var(--navy-3); color: #fff; }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .side-btn {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 10px 12px; border-radius: 10px; border: 1px solid var(--navy-line);
+    background: none; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; text-align: left;
+    text-decoration: none;
   }
-
-  .sidebar-close-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px;
-    border-radius: 8px;
-    flex-shrink: 0;
+  .side-btn:hover { background: var(--navy-2); }
+  .side-btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+  .side-link { border-color: transparent; font-weight: 500; color: #cbd6e2; margin-top: 2px; }
+  .search-wrap { position: relative; margin: 8px 0 4px; }
+  .search-wrap svg { position: absolute; left: 12px; top: 50%; width: 15px; height: 15px; transform: translateY(-50%); color: #7f93a8; }
+  #recentSearchInput {
+    width: 100%; padding: 9px 12px 9px 34px; border-radius: 10px; border: none;
+    background: var(--navy-2); color: #fff; font-size: 13.5px; outline: none;
   }
+  #recentSearchInput::placeholder { color: #7f93a8; }
+  #recentSearchInput:focus { box-shadow: 0 0 0 1px var(--teal); }
 
-  .sidebar-close-btn:hover {
-    background: rgba(255,255,255,0.1);
-  }
-
-  .sidebar-close-btn svg { width: 22px; height: 22px; }
-
-  .sidebar-logo {
-    width: 42px;
-    height: 42px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25));
-  }
-
-  .sidebar-logo svg,
-  .sidebar-logo img { width: 100%; height: 100%; }
-
-  .sidebar-brand { font-size: 18px; font-weight: 800; }
-
-  .user-avatar {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--blue-primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
-    flex-shrink: 0;
-    overflow: hidden;
-  }
-
-  .user-name { font-size: 14px; font-weight: 700; }
-  .user-matric { font-size: 12px; color: #a998cf; }
-
-  .new-chat-btn {
-    margin: 16px 20px;
-    background: var(--blue-primary);
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-size: 14px;
-    font-weight: 700;
-    padding: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-  }
-
-  .new-chat-btn svg { width: 15px; height: 15px; }
-
-  .recent-label {
-    padding: 0 20px;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    color: rgba(255,255,255,0.85);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
-    margin-bottom: 8px;
-}
-
-  .recent-list {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    padding: 0 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
+  .recent-list { flex: 1; overflow-y: auto; margin: 4px -4px 0; padding: 0 4px; }
+  .recent-list::-webkit-scrollbar { width: 6px; }
+  .recent-list::-webkit-scrollbar-thumb { background: var(--navy-line); border-radius: 6px; }
+  .grp { font-size: 11.5px; font-weight: 600; color: #6f8399; padding: 16px 12px 6px; }
   .recent-item {
-    padding: 10px 8px;
-    border-radius: 10px;
-    cursor: pointer;
+    position: relative; display: flex; align-items: center; gap: 6px;
+    padding: 8px 8px 8px 12px; border-radius: 8px; cursor: pointer; font-size: 13.5px; color: #cbd6e2;
   }
-
-  .recent-item.active {
-    background: var(--blue-primary);
+  .recent-item:hover { background: var(--navy-2); }
+  .recent-item.active { background: var(--navy-3); color: #fff; }
+  .recent-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dots-btn {
+    width: 26px; height: 26px; border-radius: 6px; border: none; background: none; color: #9fb0c2;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; flex-shrink: 0;
   }
-
-  .recent-item:not(.active):hover {
-    background: rgba(255,255,255,0.06);
+  .recent-item:hover .dots-btn, .recent-item.active .dots-btn, .dots-btn[aria-expanded="true"] { opacity: 1; }
+  .dots-btn:hover { background: rgba(255,255,255,.08); color: #fff; }
+  @media (hover: none) { .dots-btn { opacity: 1; } }
+  .item-menu {
+    position: absolute; right: 6px; top: calc(100% - 2px); z-index: 40;
+    background: #fff; border-radius: 10px; padding: 5px; min-width: 150px;
+    box-shadow: 0 12px 30px rgba(15,29,46,.25);
   }
-
-  .recent-title {
-    font-size: 13.5px;
-    font-weight: 700;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
-    margin: 0 0 2px;
-    /* one line with "..." so a long title never runs under the edit/delete icons */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-  .recent-preview {
-    font-size: 12px;
-    color: rgba(255,255,255,0.85);
-    text-shadow: 0 1px 3px rgba(0,0,0,0.35);
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-  .recent-item.active .recent-preview { color: #e8e0fa; }
-
-  .main {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+  .item-menu button {
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 8px 10px; border: none; background: none;
+    border-radius: 7px; font-size: 13.5px; color: var(--ink); cursor: pointer; text-align: left;
   }
+  .item-menu button:hover { background: #f1f5f9; }
+  .item-menu button.danger { color: #dc2626; }
+  .item-menu svg { width: 15px; height: 15px; }
+  .recent-empty { font-size: 13px; color: #6f8399; padding: 14px 12px; }
 
+  .side-user {
+    display: flex; align-items: center; gap: 10px; padding: 10px; margin-top: 8px;
+    border-top: 1px solid var(--navy-line); text-decoration: none; border-radius: 10px;
+  }
+  .side-user:hover { background: var(--navy-2); }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--teal); color: #fff;
+    font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
+  }
+  .avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .side-user b { color: #fff; font-size: 13.5px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .side-user span { font-size: 11.5px; color: #7f93a8; }
+  .side-user .avatar { color: #fff; font-size: 12px; }
+
+  .sidebar-backdrop { display: none; }
+
+  /* ---------- Main ---------- */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
   .topbar {
-    background: #fff;
-    border-bottom: 1px solid var(--border-light);
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    height: 56px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+    padding: 0 14px; border-bottom: 1px solid #eef1f4; background: #fff;
   }
+  .topbar .icon-btn { color: var(--muted); }
+  .topbar .icon-btn:hover { background: #f1f5f9; color: var(--ink); }
+  .topbar-title { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .topbar-title span { color: var(--faint); font-weight: 400; font-size: 13px; margin-left: 6px; }
+  .app:not(.sidebar-collapsed) .show-when-collapsed { display: none; }
 
-  .menu-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 4px;
-    display: flex;
+  .chat-area { flex: 1; overflow-y: auto; padding: 28px 16px 40px; scroll-behavior: smooth; }
+  .col { max-width: var(--col); margin: 0 auto; }
+
+  .message-row { display: flex; margin: 22px 0; animation: rise .25s ease both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .message-row.user { justify-content: flex-end; }
+  .message-row.user .message {
+    background: var(--user-bubble); color: #0f2742; padding: 11px 16px; border-radius: 18px;
+    max-width: min(560px, 85%); font-size: 15px; line-height: 1.55; white-space: pre-wrap; word-break: break-word;
   }
+  .message-row.bot { gap: 14px; }
+  .bot-avatar {
+    width: 32px; height: 32px; border-radius: 50%; background: var(--teal-soft); border: 1px solid #cdeee9;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .bot-body { flex: 1; min-width: 0; padding-top: 4px; }
+  .message-row.bot .message { font-size: 15px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .msg-actions { display: flex; gap: 2px; margin-top: 6px; opacity: 0; transition: opacity .15s; }
+  .message-row.bot:hover .msg-actions, .message-row.bot:last-child .msg-actions { opacity: 1; }
+  @media (hover: none) { .msg-actions { opacity: 1; } }
+  .msg-actions button {
+    height: 28px; padding: 0 8px; border-radius: 6px; border: none; background: none; color: var(--faint);
+    cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 12px;
+  }
+  .msg-actions button:hover { background: #f1f5f9; color: var(--ink); }
+  .msg-actions svg { width: 15px; height: 15px; }
 
+  /* ---------- Robot "searching" animation ---------- */
+  .searching { display: flex; align-items: center; gap: 14px; padding-top: 2px; }
+  .search-bot { width: 84px; height: 56px; flex-shrink: 0; overflow: visible; }
+  .search-bot .bob { animation: bob 1.6s ease-in-out infinite; transform-origin: center; }
+  .search-bot .eyes { animation: look 2.4s ease-in-out infinite; }
+  .search-bot .antenna { animation: blink 1s steps(2, start) infinite; }
+  .search-bot .lens { animation: scan 2.4s ease-in-out infinite; transform-origin: 52px 44px; }
+  .search-bot .doc { animation: docs 2.4s ease-in-out infinite; opacity: 0; }
+  .search-bot .doc.d2 { animation-delay: .8s; }
+  .search-bot .doc.d3 { animation-delay: 1.6s; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+  @keyframes look { 0%,100% { transform: translateX(-2.5px); } 50% { transform: translateX(2.5px); } }
+  @keyframes blink { to { opacity: .25; } }
+  @keyframes scan { 0%,100% { transform: translate(-2px, 3px) rotate(-6deg); } 50% { transform: translate(12px, -4px) rotate(6deg); } }
+  @keyframes docs { 0% { opacity: 0; transform: translateY(6px); } 25%,60% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-6px); } }
+  .search-text { font-size: 14px; color: var(--muted); }
+  .search-text b { display: block; color: var(--ink); font-weight: 600; font-size: 14.5px; margin-bottom: 2px; }
+  .search-status { display: inline-block; animation: fadeStatus .35s ease; }
+  @keyframes fadeStatus { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+  .dots::after { content: ''; animation: dots 1.2s steps(4, end) infinite; }
+  @keyframes dots { 0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75%,100% { content: '...'; } }
+  .stopped { font-size: 13px; color: var(--faint); font-style: italic; }
+
+  /* ---------- Empty state ---------- */
+  .empty-state { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px 0 40px; }
+  .hero-bot { width: 60px; height: 60px; border-radius: 50%; background: var(--teal-soft); border: 1px solid #cdeee9; display: flex; align-items: center; justify-content: center; margin-bottom: 14px; }
+  .empty-state h2 { font-size: 28px; font-weight: 600; color: var(--navy); margin: 0 0 6px; }
+  .empty-state p { color: var(--muted); margin: 0 0 26px; }
+  .suggestions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: var(--col); margin-top: 16px; text-align: left; }
+  .suggestion {
+    border: 1px solid var(--line); border-radius: 14px; padding: 12px 16px; background: #fff; cursor: pointer;
+    font-size: 14px; color: #334155; text-align: left; transition: border-color .15s, background .15s, transform .15s;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .suggestion:hover { border-color: #b7e4dd; background: #f7fcfb; transform: translateY(-1px); }
+  .suggestion small { display: block; color: var(--faint); font-size: 12px; margin-top: 2px; }
+
+  /* ---------- Composer ---------- */
+  .composer { padding: 0 16px calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, #fff 75%, rgba(255,255,255,0)); }
+  .app.is-empty .composer { display: none; }
+  .composer-box {
+    max-width: var(--col); margin: 0 auto; border: 1px solid #dfe5eb; border-radius: 24px;
+    padding: 12px 10px 10px 18px; background: #fff; box-shadow: 0 6px 24px rgba(15,29,46,.08);
+    display: flex; align-items: flex-end; gap: 8px; transition: border-color .15s, box-shadow .15s;
+  }
+  .composer-box:focus-within { border-color: #b7e4dd; box-shadow: 0 6px 24px rgba(20,184,166,.12); }
+  #messageInput, .hero-input {
+    flex: 1; border: none; outline: none; resize: none; font: inherit; font-size: 15px; line-height: 1.5;
+    color: var(--ink); background: transparent; max-height: 160px; padding: 6px 0; overflow-y: hidden;
+  }
+  #messageInput::placeholder, .hero-input::placeholder { color: var(--faint); }
+  #messageInput.voice-live { color: var(--teal); }
+  .round-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; transition: background .15s, transform .1s;
+  }
+  .round-btn:active { transform: scale(.94); }
+  .round-btn svg { width: 18px; height: 18px; }
+  .mic-btn { background: none; color: var(--muted); }
+  .mic-btn:hover { background: #f1f5f9; color: var(--ink); }
+  .mic-btn svg { fill: none; stroke: currentColor; }
+  .mic-btn.listening { background: #fee2e2; color: #dc2626; animation: pulse 1.2s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(220,38,38,.35); } 50% { box-shadow: 0 0 0 7px rgba(220,38,38,0); } }
+  .send-btn { background: var(--navy); color: #fff; }
+  .send-btn:hover { background: #1d3149; }
+  .send-btn:disabled { background: #cbd5e1; cursor: default; }
+  .stop-btn { background: var(--navy); color: #fff; }
   .hidden { display: none !important; }
+  .disclaimer { text-align: center; font-size: 11.5px; color: var(--faint); margin-top: 8px; }
 
-.stop-btn {
-  background: #ef4444;
-}
-
-  .menu-btn svg { width: 22px; height: 22px; stroke: var(--blue-primary); }
-
-  .topbar-title { font-size: 16px; font-weight: 800; color: var(--blue-dark); margin: 0; }
-  .topbar-subtitle { font-size: 12.5px; color: #ad9cdb; margin: 0; }
-
-  .empty-state {
-    text-align: center;
-    max-width: 420px;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: blur(8px);
-    border-radius: 24px;
-    padding: 32px 28px;
-    box-shadow: 0 16px 40px rgba(37, 99, 235, 0.18);
-  }
-
-  .empty-icon {
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    background: var(--input-bg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 20px;
-  }
-
-  .empty-icon svg { width: 30px; height: 30px; stroke: var(--blue-primary); }
-
-  .empty-state h2 {
-    font-size: 22px;
-    font-weight: 800;
-    color: var(--blue-dark);
-    margin: 0 0 10px;
-  }
-
-  .empty-state p {
-    font-size: 14.5px;
-    color: #ad9cdb;
-    line-height: 1.5;
-    margin: 0;
-  }
-
-  .input-bar {
-    padding: 16px 24px 10px;
-    border-top: 1px solid var(--border-light);
-    background: #fff;
-  }
-
-  .input-row {
-    display: flex;
-    align-items: flex-end; /* buttons stay at the bottom when the text box grows */
-    background: var(--input-bg);
-    border-radius: 24px;
-    padding: 6px 8px 6px 20px;
-    gap: 10px;
-  }
-
-  /* Message box: a textarea that grows with the text (up to ~5 lines, then scrolls). */
-  .input-row textarea {
-    flex: 1;
-    border: none;
-    outline: none;
-    background: transparent;
-    font-size: 14.5px;
-    font-family: inherit;
-    line-height: 1.45;
-    color: var(--blue-dark);
-    padding: 9px 0;
-    margin: 0;
-    resize: none;
-    height: 39px;
-    max-height: 132px;
-    overflow-y: hidden;
-    overflow-wrap: anywhere;
-  }
-
-  .input-row textarea::placeholder { color: var(--input-placeholder); }
-
-  .send-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: var(--blue-primary);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-  }
-
-  .send-btn svg { width: 16px; height: 16px; fill: #fff; }
-
-  .mic-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    background: transparent;
-    border: 1.5px solid var(--input-placeholder, #b9c2d6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex-shrink: 0;
-    transition: background 0.15s ease, border-color 0.15s ease;
-  }
-
-  .mic-btn svg { width: 17px; height: 17px; stroke: var(--blue-dark); fill: none; }
-
-  .mic-btn.listening {
-    background: #ef4444;
-    border-color: #ef4444;
-    animation: micPulse 1.1s ease-in-out infinite;
-  }
-
-  .mic-btn.listening svg { stroke: #fff; }
-  #messageInput.voice-live { color: #0d9488; }
-
-  .mic-btn.hidden { display: none; }
-
-  @keyframes micPulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.35); }
-    50% { box-shadow: 0 0 0 8px rgba(239,68,68,0); }
-  }
-
-  .chat-area{
-    flex:1;
-    padding:24px;
-    overflow-y:auto;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-  }
-
-  .chat-area:has(.empty-state){
-    align-items:center;
-    justify-content:center;
-  }
-
-  .message-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    max-width: 75%;
-  }
-  .message-row.user { align-self: flex-end; flex-direction: row-reverse; }
-  .message-row.bot { align-self: flex-start; flex-direction: row; }
-
-  .msg-avatar {
-    width: 26px; height: 26px; min-width: 26px;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; overflow: hidden;
-    font-size: 10.5px; font-weight: 700;
-  }
-  .msg-avatar.user-avatar-mini { background: var(--blue-primary); color: #fff; }
-  .msg-avatar.user-avatar-mini img { width: 100%; height: 100%; object-fit: cover; }
-  .msg-avatar.bot-avatar-mini { background: #fff; border: 1px solid var(--border-light); padding: 4px; }
-  .msg-avatar.bot-avatar-mini svg { width: 100%; height: 100%; }
-
- .message{
-    padding:14px 18px;
-    border-radius:18px;
-    line-height:1.5;
-    font-size:14px;
-    white-space: pre-line;
-    min-width: 0;
-    /* Break very long words/links (e.g. "sccccccc...") onto the next line
-       instead of pushing the bubble off the screen. */
-    overflow-wrap: anywhere;
-    word-break: break-word;
-}
-
-  .message.user{
-    background:var(--blue-primary);
-    color:white;
-  }
-
-  .message.bot{
-    background:white;
-    color:var(--blue-dark);
-    border:1px solid var(--border-light);
-  }
-
-  @media (max-width: 768px) {
-    /* ChatGPT-style drawer: the panel doesn't take the whole screen, it
-       slides in over a dimmed backdrop instead — the backdrop is what
-       replaces the old "raw chat content peeking through" clutter. Tapping
-       the backdrop closes the panel, same as tapping outside a drawer. */
-    .sidebar {
-      position: fixed;
-      z-index: 20;
-      height: 100vh;
-      height: 100dvh;
-      width: 85vw;
-      max-width: 320px;
-      transition: transform 0.25s ease;
-    }
-    .app.sidebar-collapsed .sidebar {
-      margin-left: 0;
-      transform: translateX(-100%);
-    }
-    .app:not(.sidebar-collapsed) .sidebar {
-      margin-left: 0;
-      transform: translateX(0);
-    }
-    .sidebar-backdrop {
-      display: block;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 19;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
-    body.chat-panel-open .sidebar-backdrop {
-      opacity: 1;
-      pointer-events: auto;
-    }
-    body.chat-panel-open .rk-tabbar {
-      display: none !important;
-    }
-  }
+  /* ---------- Mobile ---------- */
   @media (max-width: 860px) {
-    .app {
-      /* Reserve the same 100px the floating bottom nav pill takes up
-         app-wide (see partials/app-nav.blade.php) so the message input
-         bar doesn't sit flush against — or under — it. */
-      height: calc(100vh - 100px);
-      height: calc(100dvh - 100px);
-    }
-  }
-  .recent-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.recent-info {
-    flex: 1;
-    min-width: 0; /* penting supaya text truncate still work */
-    overflow: hidden;
-}
-
-.recent-actions {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    flex-shrink: 0;
-}
-
-.recent-action-btn {
-    background: transparent;
-    border: none;
-    color: rgba(255,255,255,0.65);
-    cursor: pointer;
-    padding: 3px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.recent-action-btn:hover {
-    color: #ffffff;
-    background: rgba(255,255,255,0.14);
-}
-
-.recent-action-btn svg { width: 13px; height: 13px; }
-
-#recentSearchInput::placeholder {
-  color: rgba(255,255,255,0.7);
-  }
-
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  @media (min-width: 861px) {
-    /* From this width up, the campus-wide sidebar (partials/app-nav.blade.php)
-       is already on screen with its own "RakanKampus" branding and a Profile
-       item showing the user's real photo — so this panel repeating both as
-       its own header row + avatar/name card was just the same two things
-       twice, not new information. Below 861px there's no such persistent
-       sidebar (it's replaced by the bottom tab bar), so the mobile drawer
-       keeps both: they're what identifies the panel while it's open and
-       covering the screen. Placed last so it wins over the base rules above
-       at this width, since both share the same selector specificity. */
-    .sidebar-header,
-    .sidebar-user {
-      display: none;
-    }
-
-    /* With that header row gone, "New Chat" was sitting flush against the
-       very top edge with no breathing room, and the panel — same gradient
-       as the campus sidebar right next to it — had nothing marking where
-       one ends and the other begins. A little top padding plus a faint
-       seam fixes both. */
-    .sidebar {
-      padding-top: 18px;
-      border-left: 1px solid rgba(255,255,255,0.08);
-    }
+    .sidebar { position: fixed; top: 0; bottom: 0; left: 0; margin-left: 0 !important; transform: translateX(0); box-shadow: 10px 0 30px rgba(0,0,0,.25); }
+    .app.sidebar-collapsed .sidebar { transform: translateX(-100%); box-shadow: none; }
+    .sidebar-backdrop { display: block; position: fixed; inset: 0; background: rgba(15,29,46,.45); z-index: 25; transition: opacity .25s; }
+    .app.sidebar-collapsed .sidebar-backdrop { opacity: 0; pointer-events: none; }
+    .app:not(.sidebar-collapsed) .show-when-collapsed { display: flex; }
+    .topbar-title span { display: none; }
+    .suggestions { grid-template-columns: 1fr; }
+    .empty-state h2 { font-size: 23px; }
+    .chat-area { padding: 18px 14px 30px; }
+    .message-row.bot { gap: 10px; }
   }
 </style>
 </head>
 <body>
 
-@include('partials.app-nav', ['active' => 'chat', 'user' => $user])
+<div class="app sidebar-collapsed is-empty" id="app">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-  <div class="app" id="app">
-
-    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="{{ __('Close sidebar') }}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
-        </button>
-        <div class="sidebar-logo">
-          <x-brand-logo size="42" />
-        </div>
-        <span class="sidebar-brand">RakanKampus</span>
-      </div>
-
-      <a href="{{ route('student.profile') }}" class="sidebar-user" style="text-decoration:none; color:inherit; cursor:pointer;">
-        <div class="user-avatar">
-          @if($user->photo_data)
-            <img src="{{ $user->photo_data }}" alt="{{ __('Profile photo') }}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-          @else
-            {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
-          @endif
-        </div>
-        <div>
-          <div class="user-name">{{ $user->first_name }} {{ $user->last_name }}</div>
-          <div class="user-matric">{{ $user->student_id }}</div>
-        </div>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="side-top">
+      <a href="{{ route('student.home') }}" class="brand">
+        <span class="brand-logo"><x-brand-logo size="22" /></span>
+        RakanKampus
       </a>
-
-      <button class="new-chat-btn" id="newChatBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        {{ __('New Chat') }}
+      <button class="icon-btn" id="sidebarCloseBtn" aria-label="{{ __('Close sidebar') }}" title="{{ __('Close sidebar') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg>
       </button>
+    </div>
 
-      <p class="recent-label">{{ __('RECENT') }}</p>
+    <button class="side-btn" id="newChatBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+      {{ __('New Chat') }}
+    </button>
+    <a class="side-btn side-link" href="{{ route('student.home') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
+      {{ __('Back to Home') }}
+    </a>
 
-      <div style="padding: 0 20px 10px;">
-   <input type="text" id="recentSearchInput" placeholder="{{ __('Search conversation...') }}"
-    style="width:100%; padding:8px 12px; border-radius:10px; border:none; background:rgba(0,0,0,0.15); color:#fff; font-size:13px; outline:none;">
-</div>
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+      <input type="text" id="recentSearchInput" placeholder="{{ __('Search conversation...') }}" autocomplete="off">
+    </div>
 
-      <div class="recent-list" id="recentList">
-        <!-- diisi secara dinamik oleh JavaScript -->
-      </div>
-    </aside>
+    <div class="recent-list" id="recentList"></div>
 
-    <!-- Main -->
-    <div class="main">
-      <div class="topbar">
-        <button class="menu-btn" id="menuBtn" aria-label="{{ __('Toggle sidebar') }}">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line></svg>
+    <a href="{{ route('student.profile') }}" class="side-user">
+      <span class="avatar">@if($user->photo_data)<img src="{{ $user->photo_data }}" alt="">@else{{ $initials }}@endif</span>
+      <span style="min-width:0">
+        <b>{{ $displayName }}</b>
+        <span>{{ $user->student_id }}</span>
+      </span>
+    </a>
+  </aside>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="topbar">
+      <button class="icon-btn" id="menuBtn" aria-label="{{ __('Toggle sidebar') }}" title="{{ __('Toggle sidebar') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg>
+      </button>
+      <div class="topbar-title" id="topbarTitle">RakanKampus AI<span>· {{ __('Politeknik Assistant') }}</span></div>
+      <button class="icon-btn" id="topNewChatBtn" aria-label="{{ __('New Chat') }}" title="{{ __('New Chat') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+      </button>
+      <a class="icon-btn" href="{{ route('student.home') }}" aria-label="{{ __('Home') }}" title="{{ __('Home') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
+      </a>
+    </div>
+
+    <template id="botAvatarTpl"><div class="bot-avatar"><x-brand-logo size="20" /></div></template>
+
+    <div class="chat-area" id="chatArea"></div>
+
+    <div class="composer">
+      <div class="composer-box">
+        <textarea id="messageInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
+        <button type="button" class="round-btn mic-btn hidden" id="micBtn" aria-label="{{ __('Voice input') }}">
+          <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path><path d="M19 11a7 7 0 0 1-14 0"></path><line x1="12" y1="18" x2="12" y2="22"></line></svg>
         </button>
-        <div>
-          <p class="topbar-title">{{ __('New Conversation') }}</p>
-          <p class="topbar-subtitle">{{ __('RakanKampus AI · Politeknik Assistant') }}</p>
-        </div>
+        <button class="round-btn send-btn" id="sendBtn" aria-label="{{ __('Send') }}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>
+        </button>
+        <button class="round-btn stop-btn hidden" id="stopBtn" aria-label="{{ __('Stop') }}">
+          <svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"></rect></svg>
+        </button>
       </div>
-
-      <template id="userAvatarTpl"><div class="msg-avatar user-avatar-mini">@if($user->photo_data)<img src="{{ $user->photo_data }}" alt="">@else{{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}@endif</div></template>
-      <template id="botAvatarTpl"><div class="msg-avatar bot-avatar-mini"><x-brand-logo size="18" /></div></template>
-
-      <div class="chat-area" id="chatArea">
-        <div class="empty-state" id="emptyState">
-          <div class="empty-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-            </svg>
-          </div>
-          <h2>{{ __('How can I help you today?') }}</h2>
-          <p>{{ __('Ask me anything about courses, campus services, fees, library resources, and more.') }}</p>
-        </div>
-      </div>
-
-      <div class="input-bar">
-        <div class="input-row">
-          <textarea id="messageInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
-          <button type="button" class="mic-btn hidden" id="micBtn" aria-label="{{ __('Voice input') }}">
-            <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path>
-              <path d="M19 11a7 7 0 0 1-14 0"></path>
-              <line x1="12" y1="18" x2="12" y2="22"></line>
-            </svg>
-          </button>
-          <button class="send-btn" id="sendBtn" aria-label="{{ __('Send') }}">
-            <svg viewBox="0 0 24 24">
-              <path d="M2 21l21-9L2 3v7l15 2-15 2z"/>
-            </svg>
-          </button>
-          <button class="send-btn stop-btn hidden" id="stopBtn" aria-label="{{ __('Stop') }}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round">
-              <rect x="7" y="7" width="10" height="10" rx="2"></rect>
-            </svg>
-          </button>
-        </div>
-      </div>
+      <div class="disclaimer">{{ __('RakanKampus AI can make mistakes. Check important info with PUO.') }}</div>
     </div>
   </div>
+</div>
 
-  <script>
+{{-- Empty state (new chat) --}}
+<template id="emptyTpl">
+  <div class="empty-state" id="emptyState">
+    <div class="hero-bot"><x-brand-logo size="34" /></div>
+    <h2 id="greeting"></h2>
+    <p>{{ __('What can I help you with today?') }}</p>
+    <div class="composer-box" style="width:100%">
+      <textarea class="hero-input" id="heroInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
+      <button class="round-btn send-btn" id="heroSendBtn" aria-label="{{ __('Send') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>
+      </button>
+    </div>
+    <div class="suggestions">
+      @foreach($quickQuestions as $i => $q)
+        @php($label = $q['popular'] ? $q['text'] : __($q['text']))
+        <button type="button" class="suggestion" data-question="{{ $label }}">
+          <span>{{ $suggestIcons[$i % count($suggestIcons)] }}</span>
+          <span>{{ $label }}@if($q['popular'])<small>🔥 {{ __('Popular') }}</small>@endif</span>
+        </button>
+      @endforeach
+    </div>
+  </div>
+</template>
+
+{{-- Robot searching animation, shown while waiting for the bot --}}
+<template id="searchingTpl">
+  <div class="searching">
+    <svg class="search-bot" viewBox="0 0 96 64" aria-hidden="true">
+      <!-- documents being flipped through -->
+      <g class="doc d1"><rect x="58" y="8" width="20" height="25" rx="3" fill="#fff" stroke="#9ad8cf" stroke-width="1.6"/><path d="M62 15h12M62 20h12M62 25h8" stroke="#9ad8cf" stroke-width="1.8" stroke-linecap="round"/></g>
+      <g class="doc d2"><rect x="70" y="16" width="20" height="25" rx="3" fill="#fff" stroke="#9ad8cf" stroke-width="1.6"/><path d="M74 23h12M74 28h12M74 33h8" stroke="#9ad8cf" stroke-width="1.8" stroke-linecap="round"/></g>
+      <g class="doc d3"><rect x="62" y="28" width="20" height="25" rx="3" fill="#fff" stroke="#9ad8cf" stroke-width="1.6"/><path d="M66 35h12M66 40h12M66 45h8" stroke="#9ad8cf" stroke-width="1.8" stroke-linecap="round"/></g>
+      <!-- robot (same character as the RakanKampus logo) -->
+      <g class="bob">
+        <line x1="24" y1="4" x2="24" y2="11" stroke="#14213d" stroke-width="2.6" stroke-linecap="round"/>
+        <circle class="antenna" cx="24" cy="4" r="3.2" fill="#2ec4c6"/>
+        <circle cx="9" cy="23" r="5.5" fill="#2ec4c6"/>
+        <circle cx="39" cy="23" r="5.5" fill="#2ec4c6"/>
+        <rect x="9" y="11" width="30" height="24" rx="10" fill="#14213d"/>
+        <rect x="14" y="16" width="20" height="14" rx="6" fill="#fff"/>
+        <g class="eyes"><circle cx="20.5" cy="23" r="2.4" fill="#14213d"/><circle cx="27.5" cy="23" r="2.4" fill="#14213d"/></g>
+        <rect x="11" y="37" width="26" height="22" rx="9" fill="#fff" stroke="#14213d" stroke-width="2.2"/>
+        <circle cx="24" cy="46" r="2.6" fill="#2ec4c6"/>
+        <!-- arm reaching out to hold the magnifier -->
+        <path d="M35 43 Q44 42 49 36" stroke="#14213d" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+      </g>
+      <!-- magnifying glass sweeping across the documents -->
+      <g class="lens">
+        <line x1="55" y1="40" x2="49" y2="47" stroke="#14213d" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="62" cy="31" r="10" fill="rgba(46,196,198,.22)" stroke="#14213d" stroke-width="3"/>
+        <path d="M56.5 28a6 6 0 0 1 4.5-3.5" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+      </g>
+    </svg>
+    <div class="search-text">
+      <b>{{ __('RakanKampus is searching') }}<span class="dots"></span></b>
+      <span class="search-status" data-status></span>
+    </div>
+  </div>
+</template>
+
+<script>
 const app = document.getElementById('app');
+const chatArea = document.getElementById('chatArea');
+const recentList = document.getElementById('recentList');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const stopBtn = document.getElementById('stopBtn');
+const micBtn = document.getElementById('micBtn');
+const topbarTitle = document.getElementById('topbarTitle');
+const DEFAULT_TITLE = topbarTitle.innerHTML;
+const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+const FIRST_NAME = @json($firstName);
+const isMobile = () => window.matchMedia('(max-width: 860px)').matches;
 
-// Keeps the sidebar's open/closed state and the "a full-screen panel is
-// covering the page" body flag (which hides the bottom tab bar on mobile,
-// see the 768px breakpoint) in sync in one place.
+let currentConversationId = null;
+let currentController = null;
+let conversationsCache = [];
+let busy = false;
+
+/* ---------- Sidebar ---------- */
 function setSidebarOpen(open) {
   app.classList.toggle('sidebar-collapsed', !open);
-  document.body.classList.toggle('chat-panel-open', open);
+  try { if (!isMobile()) localStorage.setItem('rk.chatSidebar', open ? '1' : '0'); } catch (e) {}
 }
+// Desktop: remember open/closed (open by default, like ChatGPT). Mobile: always starts closed.
+(function () {
+  let saved = null;
+  try { saved = localStorage.getItem('rk.chatSidebar'); } catch (e) {}
+  setSidebarOpen(!isMobile() && saved !== '0');
+})();
+document.getElementById('menuBtn').addEventListener('click', () => setSidebarOpen(app.classList.contains('sidebar-collapsed')));
+document.getElementById('sidebarCloseBtn').addEventListener('click', () => setSidebarOpen(false));
+document.getElementById('sidebarBackdrop').addEventListener('click', () => setSidebarOpen(false));
 
-// The conversation list starts closed everywhere — mobile and desktop — and
-// only opens when the user taps the menu button, rather than popping up on
-// its own every time this page loads.
-setSidebarOpen(false);
-const menuBtn = document.getElementById('menuBtn');
-const sendBtn = document.getElementById('sendBtn');
-const messageInput = document.getElementById('messageInput');
-
-// Grow the message box with its text: one line by default, up to ~5 lines,
-// then it scrolls inside. Called whenever the text changes (typing, voice, send).
-function autoResizeInput() {
-  messageInput.style.height = 'auto';
-  const max = parseFloat(getComputedStyle(messageInput).maxHeight) || 132;
-  const h = Math.min(messageInput.scrollHeight, max);
-  messageInput.style.height = h + 'px';
-  messageInput.style.overflowY = messageInput.scrollHeight > max ? 'auto' : 'hidden';
+/* ---------- Input ---------- */
+function autoResize(el) {
+  el.style.height = 'auto';
+  const max = parseFloat(getComputedStyle(el).maxHeight) || 160;
+  el.style.height = Math.min(el.scrollHeight, max) + 'px';
+  el.style.overflowY = el.scrollHeight > max ? 'auto' : 'hidden';
 }
-messageInput.addEventListener('input', autoResizeInput);
-const chatArea = document.getElementById('chatArea');
-const newChatBtn = document.getElementById('newChatBtn');
-const recentList = document.getElementById('recentList');
-let emptyState = document.getElementById('emptyState');
-let currentConversationId = null;
-const stopBtn = document.getElementById('stopBtn');
-let currentController = null;
-const micBtn = document.getElementById('micBtn');
+messageInput.addEventListener('input', () => autoResize(messageInput));
+messageInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(); }
+});
+sendBtn.addEventListener('click', () => sendMessage());
+stopBtn.addEventListener('click', () => { if (currentController) currentController.abort(); });
 
-// Voice-to-text: fills the message input from speech instead of typing.
-// Uses the browser's built-in Web Speech API — only Chrome/Edge/Safari
-// support it, so the mic button stays hidden everywhere else.
-//
-// Keeps listening through short pauses: the mic stays on until the student
-// taps it again, sends the message, or stays silent for VOICE_SILENCE_MS.
-// (Browsers end a recognition session on their own after a pause, so we
-// quietly restart it and carry the text so far over.)
+/* ---------- Voice input (Web Speech API; hidden where unsupported) ---------- */
 const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
 const VOICE_SILENCE_MS = 3000;
-let recognition = null;
-let isListening = false;    // what the student wants: mic on/off
-let voiceBaseText = '';     // text in the box before the current recognition session
-let voiceSilenceTimer = null;
+let recognition = null, isListening = false, voiceBaseText = '', voiceSilenceTimer = null;
 
-function resetVoiceSilenceTimer() {
-  clearTimeout(voiceSilenceTimer);
-  voiceSilenceTimer = setTimeout(stopVoice, VOICE_SILENCE_MS);
-}
-
+function resetVoiceSilenceTimer() { clearTimeout(voiceSilenceTimer); voiceSilenceTimer = setTimeout(stopVoice, VOICE_SILENCE_MS); }
 function startVoice() {
   isListening = true;
   micBtn.classList.add('listening');
   messageInput.classList.add('voice-live');
   resetVoiceSilenceTimer();
-  try { recognition.start(); } catch (e) { /* already running */ }
+  try { recognition.start(); } catch (e) {}
 }
-
 function stopVoice() {
   if (!isListening) return;
   isListening = false;
@@ -734,146 +458,174 @@ function stopVoice() {
   try { recognition.stop(); } catch (e) {}
   messageInput.focus();
 }
-
 if (SpeechRecognitionAPI && micBtn) {
   micBtn.classList.remove('hidden');
-
   recognition = new SpeechRecognitionAPI();
-  // Speech language follows the chosen UI language (Malay by default, since most students speak Malay).
   recognition.lang = ({ zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'ms-MY';
-  recognition.interimResults = true;  // words appear while still talking
-  recognition.continuous = true;      // don't stop at the first pause
+  recognition.interimResults = true;
+  recognition.continuous = true;
   recognition.maxAlternatives = 1;
-
-  recognition.onstart = () => {
-    // Each (re)started session appends to whatever is already in the box.
-    voiceBaseText = messageInput.value.trim();
-  };
-
+  recognition.onstart = () => { voiceBaseText = messageInput.value.trim(); };
   recognition.onresult = (event) => {
-    if (!isListening) return; // late result after the student stopped/sent — ignore
+    if (!isListening) return;
     resetVoiceSilenceTimer();
-    // Rebuild this session's sentence every time: finished chunks + the part
-    // still being spoken, so the text grows word by word as you talk.
     let spoken = '';
-    for (let i = 0; i < event.results.length; i++) {
-      spoken += event.results[i][0].transcript;
-    }
+    for (let i = 0; i < event.results.length; i++) spoken += event.results[i][0].transcript;
     spoken = spoken.trim();
     messageInput.value = voiceBaseText ? `${voiceBaseText} ${spoken}` : spoken;
-    autoResizeInput();
-    messageInput.scrollTop = messageInput.scrollHeight; // keep the newest words visible
+    autoResize(messageInput);
+    messageInput.scrollTop = messageInput.scrollHeight;
   };
-
   recognition.onerror = (event) => {
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
       alert(t('Please allow microphone access to use voice input.'));
       stopVoice();
     }
-    // 'no-speech' / 'aborted' / 'network': onend fires next and restarts if still wanted.
   };
-
   recognition.onend = () => {
-    if (isListening) {
-      // Browser ended the session by itself (pause, timeout) — keep going.
-      setTimeout(() => {
-        if (isListening) {
-          try { recognition.start(); } catch (e) {}
-        }
-      }, 150);
-    }
+    if (isListening) setTimeout(() => { if (isListening) { try { recognition.start(); } catch (e) {} } }, 150);
   };
-
   micBtn.addEventListener('click', () => {
-    if (isListening) stopVoice();
-    else startVoice();
+    if (app.classList.contains('is-empty')) leaveEmptyState();
+    isListening ? stopVoice() : startVoice();
   });
 }
 
-menuBtn.addEventListener('click', () => {
-  setSidebarOpen(app.classList.contains('sidebar-collapsed'));
-});
+/* ---------- Messages ---------- */
+function ensureCol() {
+  let col = chatArea.querySelector('.col');
+  if (!col) { col = document.createElement('div'); col.className = 'col'; chatArea.appendChild(col); }
+  return col;
+}
+function scrollToBottom() { chatArea.scrollTop = chatArea.scrollHeight; }
 
-const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
-sidebarCloseBtn.addEventListener('click', () => {
-  setSidebarOpen(false);
-});
-
-// Tapping the dimmed backdrop (mobile drawer only — hidden on desktop)
-// closes the panel too, same as tapping outside any drawer/modal.
-const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-sidebarBackdrop.addEventListener('click', () => {
-  setSidebarOpen(false);
-});
-
-function showEmptyState(){
-  chatArea.innerHTML = `
-    <div class="empty-state" id="emptyState">
-      <div class="empty-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
-        </svg>
-      </div>
-      <h2>${t('How can I help you today?')}</h2>
-      <p>${t('Ask me anything about courses, campus services, fees, library resources, and more.')}</p>
-    </div>`;
-  emptyState = document.getElementById('emptyState');
+function greetingText() {
+  const h = new Date().getHours();
+  const g = h < 12 ? t('Good morning') : h < 19 ? t('Good afternoon') : t('Good evening');
+  return FIRST_NAME ? `${g}, ${FIRST_NAME} 👋` : `${g} 👋`;
 }
 
-function addMessage(text, sender){
-  if(emptyState){
-    emptyState.remove();
-    emptyState = null;
-  }
+function showEmptyState() {
+  app.classList.add('is-empty');
+  chatArea.innerHTML = '';
+  const node = document.getElementById('emptyTpl').content.cloneNode(true);
+  node.getElementById('greeting').textContent = greetingText();
+  chatArea.appendChild(node);
+  topbarTitle.innerHTML = DEFAULT_TITLE;
 
+  const heroInput = document.getElementById('heroInput');
+  heroInput.addEventListener('input', () => autoResize(heroInput));
+  heroInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(heroInput.value); }
+  });
+  document.getElementById('heroSendBtn').addEventListener('click', () => sendMessage(heroInput.value));
+  chatArea.querySelectorAll('.suggestion').forEach(b => b.addEventListener('click', () => sendMessage(b.dataset.question)));
+  if (!isMobile()) heroInput.focus();
+}
+
+function leaveEmptyState() {
+  if (!app.classList.contains('is-empty')) return;
+  app.classList.remove('is-empty');
+  chatArea.innerHTML = '';
+}
+
+function addMessage(text, sender) {
+  leaveEmptyState();
+  const col = ensureCol();
   const row = document.createElement('div');
   row.className = `message-row ${sender}`;
 
-  const avatarTpl = document.getElementById(sender === 'user' ? 'userAvatarTpl' : 'botAvatarTpl');
-  if (avatarTpl) {
-    row.appendChild(avatarTpl.content.firstElementChild.cloneNode(true));
+  if (sender === 'user') {
+    const msg = document.createElement('div');
+    msg.className = 'message';
+    msg.textContent = text;
+    row.appendChild(msg);
+  } else {
+    row.appendChild(document.getElementById('botAvatarTpl').content.firstElementChild.cloneNode(true));
+    const body = document.createElement('div');
+    body.className = 'bot-body';
+    const msg = document.createElement('div');
+    msg.className = 'message';
+    msg.textContent = text;
+    body.appendChild(msg);
+
+    const actions = document.createElement('div');
+    actions.className = 'msg-actions';
+    actions.innerHTML = `<button type="button" data-copy><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span>${t('Copy')}</span></button>`;
+    const copyBtn = actions.querySelector('[data-copy]');
+    copyBtn.addEventListener('click', () => {
+      navigator.clipboard?.writeText(text).then(() => {
+        copyBtn.querySelector('span').textContent = t('Copied');
+        setTimeout(() => { copyBtn.querySelector('span').textContent = t('Copy'); }, 1500);
+      });
+    });
+    body.appendChild(actions);
+    row.appendChild(body);
   }
 
-  const msg = document.createElement('div');
-  msg.className = `message ${sender}`;
-  msg.textContent = text;
-  row.appendChild(msg);
-
-  chatArea.appendChild(row);
-  chatArea.scrollTop = chatArea.scrollHeight;
+  col.appendChild(row);
+  scrollToBottom();
   return row;
 }
 
-function sendMessage(){
-  const text = messageInput.value.trim();
-  if(text === '') return;
+// Bot "thinking" row: robot with a magnifying glass flipping through documents,
+// with a status line that changes every couple of seconds.
+const SEARCH_STEPS = [
+  'Reading your question',
+  'Searching the campus knowledge base',
+  'Checking the matching information',
+  'Writing the answer',
+];
+function addSearching() {
+  leaveEmptyState();
+  const col = ensureCol();
+  const row = document.createElement('div');
+  row.className = 'message-row bot';
+  row.id = 'typingIndicator';
+  row.appendChild(document.getElementById('searchingTpl').content.cloneNode(true));
+  col.appendChild(row);
 
-  if (recognition) stopVoice(); // sending ends voice input, so the mic doesn't keep typing into the next message
+  const status = row.querySelector('[data-status]');
+  let step = 0;
+  const show = () => {
+    status.textContent = t(SEARCH_STEPS[Math.min(step, SEARCH_STEPS.length - 1)]);
+    status.style.animation = 'none'; void status.offsetWidth; status.style.animation = '';
+    step++;
+  };
+  show();
+  row._timer = setInterval(show, 1800);
+  scrollToBottom();
+  return row;
+}
+function removeSearching() {
+  const row = document.getElementById('typingIndicator');
+  if (row) { clearInterval(row._timer); row.remove(); }
+}
+
+function sendMessage(textArg) {
+  const text = (typeof textArg === 'string' ? textArg : messageInput.value).trim();
+  if (text === '' || busy) return;
+  if (recognition) stopVoice();
 
   addMessage(text, 'user');
   messageInput.value = '';
-  autoResizeInput();
+  autoResize(messageInput);
+  addSearching();
 
-  const typingMsg = addMessage(t('Typing...'), 'bot');
-  typingMsg.id = 'typingIndicator';
-
+  busy = true;
   currentController = new AbortController();
   sendBtn.classList.add('hidden');
   stopBtn.classList.remove('hidden');
 
   fetch('/chatbot', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-    },
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
     body: JSON.stringify({ message: text, conversation_id: currentConversationId }),
     signal: currentController.signal,
   })
     .then(res => res.json())
     .then(data => {
-      document.getElementById('typingIndicator')?.remove();
-
+      removeSearching();
       if (data.reply) {
         addMessage(data.reply, 'bot');
         currentConversationId = data.conversation_id;
@@ -882,170 +634,181 @@ function sendMessage(){
         addMessage(t('Sorry, there was a problem getting a response. Please try again.'), 'bot');
       }
     })
-    .catch((error) => {
-      document.getElementById('typingIndicator')?.remove();
+    .catch(error => {
+      removeSearching();
       if (error.name === 'AbortError') {
-        addMessage('(' + t('Stopped') + ')', 'bot');
+        const row = addMessage('', 'bot');
+        row.querySelector('.message').innerHTML = `<span class="stopped">${escapeHtml(t('Stopped'))}</span>`;
+        row.querySelector('.msg-actions')?.remove();
       } else {
         addMessage(t('Sorry, unable to connect to the server. Please try again.'), 'bot');
       }
     })
     .finally(() => {
+      busy = false;
       sendBtn.classList.remove('hidden');
       stopBtn.classList.add('hidden');
       currentController = null;
+      if (!isMobile()) messageInput.focus();
     });
 }
 
-function loadHistory(){
-  fetch('/chatbot/history')
+/* ---------- Conversation list ---------- */
+function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+function groupLabel(iso) {
+  if (!iso) return t('Older');
+  const d = new Date(iso), now = new Date();
+  const startOf = x => new Date(x.getFullYear(), x.getMonth(), x.getDate()).getTime();
+  const days = Math.round((startOf(now) - startOf(d)) / 86400000);
+  if (days <= 0) return t('Today');
+  if (days === 1) return t('Yesterday');
+  if (days <= 7) return t('Previous 7 days');
+  if (days <= 30) return t('Previous 30 days');
+  return t('Older');
+}
+
+function loadHistory() {
+  fetch('/chatbot/history', { headers: { 'Accept': 'application/json' } })
     .then(res => res.json())
-    .then(conversations => renderRecentList(conversations))
+    .then(conversations => {
+      conversationsCache = conversations;
+      renderRecentList();
+      const conv = conversationsCache.find(c => c.id === currentConversationId);
+      if (conv) setTitle(conv.title);
+    })
     .catch(() => {});
 }
 
-function escapeHtml(str){
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
+function closeMenus() {
+  document.querySelectorAll('.item-menu').forEach(m => m.remove());
+  document.querySelectorAll('.dots-btn[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
 }
+document.addEventListener('click', closeMenus);
 
-function renderRecentList(conversations) {
-    recentList.innerHTML = '';
+function renderRecentList() {
+  const query = document.getElementById('recentSearchInput').value.toLowerCase().trim();
+  const list = conversationsCache.filter(c =>
+    !query || (c.title || '').toLowerCase().includes(query) || (c.preview || '').toLowerCase().includes(query));
 
-    conversations.forEach(conv => {
-        const item = document.createElement('div');
-        item.className = 'recent-item' + (conv.id === currentConversationId ? ' active' : '');
-        item.innerHTML = `
-            <div class="recent-info">
-                <p class="recent-title">${escapeHtml(conv.title)}</p>
-                <p class="recent-preview">${escapeHtml(conv.preview)}</p>
-            </div>
-            <div class="recent-actions">
-                <button class="recent-action-btn" type="button" data-action="edit" aria-label="${t('Edit')}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.12 2.12 0 0 1 3 3L12 15l-4 1 1-4Z"></path></svg>
-                </button>
-                <button class="recent-action-btn" type="button" data-action="delete" aria-label="${t('Delete')}">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                </button>
-            </div>
-        `;
+  recentList.innerHTML = '';
+  if (list.length === 0) {
+    recentList.innerHTML = `<div class="recent-empty">${escapeHtml(query ? t('No matching conversations') : t('No conversations yet'))}</div>`;
+    return;
+  }
 
-        item.addEventListener('click', () => openConversation(conv.id));
+  let lastGroup = null;
+  list.forEach(conv => {
+    const group = groupLabel(conv.updated_at);
+    if (group !== lastGroup) {
+      const g = document.createElement('div');
+      g.className = 'grp';
+      g.textContent = group;
+      recentList.appendChild(g);
+      lastGroup = group;
+    }
 
-        item.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
-            e.stopPropagation();
-            renameConversation(conv.id, conv.title);
-        });
+    const item = document.createElement('div');
+    item.className = 'recent-item' + (conv.id === currentConversationId ? ' active' : '');
+    item.title = conv.preview || '';
+    item.innerHTML = `
+      <span class="recent-title">${escapeHtml(conv.title)}</span>
+      <button class="dots-btn" type="button" aria-label="${escapeHtml(t('Options'))}" aria-expanded="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+      </button>`;
 
-        item.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
-            e.stopPropagation();
-            deleteConversation(conv.id);
-        });
+    item.addEventListener('click', () => openConversation(conv.id));
 
-        recentList.appendChild(item);
+    const dots = item.querySelector('.dots-btn');
+    dots.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const wasOpen = dots.getAttribute('aria-expanded') === 'true';
+      closeMenus();
+      if (wasOpen) return;
+      dots.setAttribute('aria-expanded', 'true');
+      const menu = document.createElement('div');
+      menu.className = 'item-menu';
+      menu.innerHTML = `
+        <button type="button" data-act="rename"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>${escapeHtml(t('Rename'))}</button>
+        <button type="button" data-act="delete" class="danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>${escapeHtml(t('Delete'))}</button>`;
+      menu.addEventListener('click', ev => ev.stopPropagation());
+      menu.querySelector('[data-act="rename"]').addEventListener('click', () => { closeMenus(); renameConversation(conv.id, conv.title); });
+      menu.querySelector('[data-act="delete"]').addEventListener('click', () => { closeMenus(); deleteConversation(conv.id); });
+      item.appendChild(menu);
     });
+
+    recentList.appendChild(item);
+  });
 }
+document.getElementById('recentSearchInput').addEventListener('input', renderRecentList);
 
 function renameConversation(id, currentTitle) {
-   const newTitle = prompt(t('Rename conversation:'), currentTitle);
-    if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
-
-    fetch(`/chatbot/${id}/rename`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        },
-        body: JSON.stringify({ title: newTitle.trim() }),
-    })
+  const newTitle = prompt(t('Rename conversation:'), currentTitle);
+  if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
+  fetch(`/chatbot/${id}/rename`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+    body: JSON.stringify({ title: newTitle.trim() }),
+  })
     .then(res => res.json())
-    .then(() => loadHistory())
+    .then(() => { if (id === currentConversationId) setTitle(newTitle.trim()); loadHistory(); })
     .catch(err => console.error('Rename failed', err));
 }
 
 function deleteConversation(id) {
-    if (!confirm(t('Delete this conversation?'))) return;
-
-    fetch(`/chatbot/${id}`, {
-        method: 'DELETE',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-        },
-    })
+  if (!confirm(t('Delete this conversation?'))) return;
+  fetch(`/chatbot/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': CSRF } })
     .then(res => res.json())
     .then(() => {
-        if (id === currentConversationId) {
-            currentConversationId = null;
-            showEmptyState();
-        }
-        loadHistory();
+      if (id === currentConversationId) { currentConversationId = null; showEmptyState(); }
+      loadHistory();
     })
     .catch(err => console.error('Delete failed', err));
 }
-function openConversation(id){
-  fetch(`/chatbot/${id}`)
+
+function setTitle(title) {
+  topbarTitle.innerHTML = `${escapeHtml(title)}<span>· RakanKampus AI</span>`;
+}
+
+function openConversation(id) {
+  fetch(`/chatbot/${id}`, { headers: { 'Accept': 'application/json' } })
     .then(res => res.json())
     .then(messages => {
+      app.classList.remove('is-empty');
       chatArea.innerHTML = '';
-      emptyState = null;
       currentConversationId = id;
-
       messages.forEach(m => addMessage(m.message, m.sender));
-      loadHistory();
+      const conv = conversationsCache.find(c => c.id === id);
+      if (conv) setTitle(conv.title);
+      renderRecentList();
+      if (isMobile()) setSidebarOpen(false);
     });
 }
 
-newChatBtn.addEventListener('click', () => {
+function startNewChat() {
+  if (currentController) currentController.abort();
   currentConversationId = null;
   showEmptyState();
-  document.querySelectorAll('.recent-item').forEach(el => el.classList.remove('active'));
-});
+  renderRecentList();
+  if (isMobile()) setSidebarOpen(false);
+}
+document.getElementById('newChatBtn').addEventListener('click', startNewChat);
+document.getElementById('topNewChatBtn').addEventListener('click', startNewChat);
 
-sendBtn.addEventListener('click', sendMessage);
-stopBtn.addEventListener('click', () => {
-  if (currentController) currentController.abort();
-});
-
-// Enter sends; Shift+Enter adds a new line. (isComposing: don't send while an
-// IME, e.g. Chinese input, is still picking characters.)
-messageInput.addEventListener('keydown', function(e){
-  if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) {
-    e.preventDefault();
-    sendMessage();
-  }
-});
-
+/* ---------- Start ---------- */
 const urlParams = new URLSearchParams(window.location.search);
 const prefilledQuestion = urlParams.get('q');
 const conversationFromUrl = urlParams.get('conversation');
 
+loadHistory();
 if (prefilledQuestion) {
-  messageInput.value = prefilledQuestion;
-  sendMessage();
   window.history.replaceState({}, document.title, window.location.pathname);
+  sendMessage(prefilledQuestion);
 } else if (conversationFromUrl) {
-  openConversation(parseInt(conversationFromUrl));
+  openConversation(parseInt(conversationFromUrl, 10));
 } else {
-  loadHistory();
+  showEmptyState();
 }
-
-const recentSearchInput = document.getElementById('recentSearchInput');
-
-recentSearchInput.addEventListener('input', () => {
-    const query = recentSearchInput.value.toLowerCase().trim();
-
-    document.querySelectorAll('.recent-item').forEach(item => {
-        const title = item.querySelector('.recent-title')?.textContent.toLowerCase() || '';
-        const preview = item.querySelector('.recent-preview')?.textContent.toLowerCase() || '';
-
-        if (title.includes(query) || preview.includes(query)) {
-            item.style.display = 'flex';
-        } else {
-            item.style.display = 'none';
-        }
-    });
-});
 </script>
 
 </body>

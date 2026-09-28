@@ -218,6 +218,7 @@ $reply = trim($reply);;
                     'id' => $conversation->id,
                     'title' => $conversation->title ?: 'New Conversation',
                     'preview' => $lastMessage ? Str::limit($lastMessage->message, 45) : '',
+                    'updated_at' => $conversation->updated_at?->toIso8601String(),
                 ];
             });
 
