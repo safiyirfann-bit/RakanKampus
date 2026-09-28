@@ -153,7 +153,29 @@
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
   .bot-body { flex: 1; min-width: 0; padding-top: 4px; }
-  .message-row.bot .message { font-size: 15px; line-height: 1.7; white-space: pre-wrap; word-break: break-word; }
+  .message-row.bot .message { font-size: 15px; line-height: 1.7; word-break: break-word; }
+  .message-row.bot .message.plain { white-space: pre-wrap; }
+  .message-row.bot .message p { margin: 0 0 10px; }
+  .message-row.bot .message > :last-child { margin-bottom: 0; }
+  .message-row.bot .message a { color: #0d9488; text-decoration: underline; text-decoration-color: rgba(13,148,136,.35); text-underline-offset: 2px; word-break: break-all; }
+  .message-row.bot .message a:hover { text-decoration-color: currentColor; }
+  /* Numbered answers: step badges joined by a thin line, like a timeline */
+  .steps { list-style: none; margin: 4px 0 12px; padding: 0; counter-reset: step; }
+  .steps li { position: relative; counter-increment: step; padding: 0 0 12px 42px; min-height: 28px; }
+  .steps li::before {
+    content: counter(step); position: absolute; left: 0; top: 0;
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--teal-soft); color: #0f766e; border: 1px solid #b7e4dd;
+    font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+  }
+  .steps li::after { content: ''; position: absolute; left: 13.5px; top: 32px; bottom: 4px; width: 1px; background: #d5ece8; }
+  .steps li:last-child { padding-bottom: 0; }
+  .steps li:last-child::after { display: none; }
+  .steps li > span { display: block; padding-top: 2px; }
+  .steps b, .bullets b { color: var(--navy); font-weight: 600; }
+  .bullets { margin: 4px 0 12px; padding-left: 4px; list-style: none; }
+  .bullets li { position: relative; padding-left: 20px; margin: 4px 0; }
+  .bullets li::before { content: ''; position: absolute; left: 4px; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
   .msg-actions { display: flex; gap: 2px; margin-top: 6px; opacity: 0; transition: opacity .15s; }
   .message-row.bot:hover .msg-actions, .message-row.bot:last-child .msg-actions { opacity: 1; }
   @media (hover: none) { .msg-actions { opacity: 1; } }
@@ -546,7 +568,7 @@ function addMessage(text, sender) {
     body.className = 'bot-body';
     const msg = document.createElement('div');
     msg.className = 'message';
-    msg.textContent = text;
+    msg.innerHTML = formatBotText(text);
     body.appendChild(msg);
 
     const actions = document.createElement('div');
@@ -651,6 +673,56 @@ function sendMessage(textArg) {
       currentController = null;
       if (!isMobile()) messageInput.focus();
     });
+}
+
+/* ---------- Bot reply formatting ----------
+   Turns the bot's plain text into tidy HTML: "1. ..." lines become numbered
+   step badges, "- ..." lines become bullets, links become clickable, and a
+   short "Label:" at the start of a step is bolded. Everything is escaped
+   first, so no HTML from the reply is ever trusted. */
+function linkify(safe) {
+  return safe.replace(/(https?:\/\/[^\s<]+?)([.,;:!?)\]]*)(?=\s|$)/g,
+    (m, url, tail) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>${tail}`);
+}
+function inline(line) {
+  let html = linkify(escapeHtml(line));
+  // "Label: rest" → bold label (only short labels, so normal sentences aren't touched)
+  html = html.replace(/^([^:<]{2,40}?):\s+(?!\/\/)/, '<b>$1:</b> ');
+  return html;
+}
+function formatBotText(text) {
+  const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
+  const out = [];
+  let para = [], list = null; // list = { type: 'ol'|'ul', items: [] }
+
+  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(l => linkify(escapeHtml(l))).join('<br>') + '</p>'); para = []; } };
+  const flushList = () => {
+    if (!list) return;
+    const cls = list.type === 'ol' ? 'steps' : 'bullets';
+    out.push(`<${list.type} class="${cls}">` + list.items.map(i => `<li><span>${inline(i)}</span></li>`).join('') + `</${list.type}>`);
+    list = null;
+  };
+
+  for (const raw of lines) {
+    const line = raw.trim();
+    const num = line.match(/^(\d{1,2})[.)]\s+(.+)$/);
+    const bul = line.match(/^[-•*]\s+(.+)$/);
+    if (num || bul) {
+      const type = num ? 'ol' : 'ul';
+      flushPara();
+      if (!list || list.type !== type) { flushList(); list = { type, items: [] }; }
+      list.items.push((num ? num[2] : bul[1]).trim());
+    } else if (line === '') {
+      flushPara();
+      // keep a list going across a blank line only if the next line continues it
+    } else {
+      flushList();
+      para.push(line);
+    }
+  }
+  flushPara();
+  flushList();
+  return out.join('');
 }
 
 /* ---------- Conversation list ---------- */
