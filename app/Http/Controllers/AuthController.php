@@ -45,6 +45,7 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
+        $this->recordLogin($request);
 
         return redirect()->route('student.home');
     }
@@ -144,6 +145,7 @@ class AuthController extends Controller
             $request->session()->regenerate();
 
             Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
+            $this->recordLogin($request);
 
             return redirect()->route('admin.dashboard');
         }
@@ -165,5 +167,20 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    /** Sign-in history shown under Profile → Privacy & Security. Never blocks a login. */
+    private function recordLogin(Request $request): void
+    {
+        try {
+            \Illuminate\Support\Facades\DB::table('login_activities')->insert([
+                'user_id' => Auth::id(),
+                'ip_address' => $request->ip(),
+                'user_agent' => substr((string) $request->userAgent(), 0, 1000),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            report($e);
+        }
     }
 }

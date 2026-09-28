@@ -16,6 +16,10 @@ return Application::configure(
 
     ->withMiddleware(function (Middleware $middleware): void {
 
+        // Render sits in front of the app as a proxy — trust it so request()->ip()
+        // is the student's real IP (shown in Privacy & Security), not Render's.
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
 
             'admin' => \App\Http\Middleware\AdminMiddleware::class,

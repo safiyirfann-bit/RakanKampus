@@ -155,9 +155,19 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
         ->name('student.profile.password.update');
 
 
-    // Privacy Settings
-    Route::view('/student/profile/privacy', 'student.privacy-settings')
-        ->name('student.profile.privacy');
+    // Privacy & Security (replaces the old separate Privacy / Security pages)
+    Route::get('/student/profile/privacy-security', [\App\Http\Controllers\PrivacySecurityController::class, 'show'])
+        ->name('student.profile.privacy-security');
+    Route::delete('/student/profile/devices/{session}', [\App\Http\Controllers\PrivacySecurityController::class, 'logoutDevice'])
+        ->name('student.profile.devices.logout');
+    Route::post('/student/profile/devices/logout-others', [\App\Http\Controllers\PrivacySecurityController::class, 'logoutOthers'])
+        ->name('student.profile.devices.logout-others');
+    Route::delete('/student/profile/chat-history', [\App\Http\Controllers\PrivacySecurityController::class, 'clearChats'])
+        ->name('student.profile.chats.clear');
+    Route::get('/student/profile/my-data', [\App\Http\Controllers\PrivacySecurityController::class, 'download'])
+        ->name('student.profile.data.download');
+    Route::redirect('/student/profile/privacy', '/student/profile/privacy-security');
+    Route::redirect('/student/profile/security', '/student/profile/privacy-security');
 
     // Notification Settings
     Route::get('/student/profile/notifications', [ProfileController::class, 'notificationSettings'])
@@ -166,9 +176,6 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::put('/student/profile/notifications', [ProfileController::class, 'updateNotificationSettings'])
         ->name('student.profile.notifications.update');
 
-    // Security Settings
-    Route::view('/student/profile/security', 'student.security-settings')
-        ->name('student.profile.security');
 
     // Language
     Route::get('/student/profile/language', [ProfileController::class, 'language'])

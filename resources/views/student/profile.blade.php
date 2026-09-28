@@ -238,30 +238,8 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
     <div class="divide-y divide-indigo-50">
 
         
-        <!-- Privacy Settings -->
-        <a href="{{ route('student.profile.privacy') }}"
-           class="menu-row flex items-center justify-between px-5 py-4 hover:bg-indigo-50">
-
-            <div class="flex items-center gap-4">
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 2l7 4v5c0 5-3.5 9.7-7 11-3.5-1.3-7-6-7-11V6l7-4z"/>
-                </svg>
-
-                <div>
-    <p class="font-medium text-indigo-900">{{ __('Privacy Settings') }}</p>
-    <p class="text-sm text-indigo-400">{{ __('Control your personal data and visibility') }}</p>
-</div>
-
-            </div>
-
-            <span class="text-indigo-300 text-lg chevron">›</span>
-
-        </a>
-
-        <!-- Security -->
-        <a href="{{ route('student.profile.security') }}"
+        <!-- Privacy & Security -->
+        <a href="{{ route('student.profile.privacy-security') }}"
            class="menu-row flex items-center justify-between px-5 py-4 hover:bg-indigo-50">
 
             <div class="flex items-center gap-4">
@@ -274,9 +252,9 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                 </svg>
 
                 <div>
-    <p class="font-medium text-indigo-900">{{ __('Security') }}</p>
-    <p class="text-sm text-indigo-400">{{ __('Protect your account and password') }}</p>
-</div>
+                    <p class="font-medium text-indigo-900">{{ __('Privacy & Security') }}</p>
+                    <p class="text-sm text-indigo-400">{{ __('Devices, sign-in history and your data') }}</p>
+                </div>
 
             </div>
 
