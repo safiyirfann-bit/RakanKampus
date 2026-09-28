@@ -986,10 +986,29 @@ function openClassTimePicker() {
   });
 }
 
-function confirmDeleteFromModal() {
+// Custom confirm (partials/rk-dialog): the robot carries the class card to the bin.
+function classListFor(ids) {
+  return schedules.filter(s => ids.includes(s.id)).map(s => ({
+    label: s.subject,
+    meta: `${t(s.day_of_week)} · ${RKPicker.formatTime(String(s.start_time).slice(0, 5))}`,
+  }));
+}
+function oops(message) {
+  RKDialog.alert({ scene: 'oops', title: t('Oops!'), message });
+}
+
+async function confirmDeleteFromModal() {
   const id = parseInt(document.getElementById('scheduleId').value, 10);
   if (!id) return;
-  if (!confirm(t('Delete this class?'))) return;
+  const ok = await RKDialog.confirm({
+    scene: 'timetable',
+    title: t('Delete this class?'),
+    message: t('It will be removed from your timetable.'),
+    list: classListFor([id]),
+    warn: t('This cannot be undone.'),
+    confirmText: t('Delete'),
+  });
+  if (!ok) return;
   closeModals();
   removeSchedule(id);
 }
@@ -1033,7 +1052,7 @@ function saveSchedule() {
     .then(({ ok, status, data }) => {
       if (!ok || !data || !data.success) {
         if (status === 419) {
-          alert(t('Your session has expired. Please refresh the page and try again.'));
+          oops(t('Your session has expired. Please refresh the page and try again.'));
         } else {
           document.getElementById('formError').style.display = 'block';
         }
@@ -1066,23 +1085,32 @@ function removeSchedule(id) {
       if (ok || status === 404) {
         schedules = schedules.filter(s => s.id !== id);
         render();
+        RKToast.show({ text: t('Class deleted'), sub: t('Removed from your timetable') });
         return;
       }
       if (status === 419) {
-        alert(t('Your session has expired. Please refresh the page and try again.'));
+        oops(t('Your session has expired. Please refresh the page and try again.'));
       } else {
-        alert(t('Could not delete this class right now. Please try again.'));
+        oops(t('Could not delete this class right now. Please try again.'));
       }
     })
     .catch((err) => {
       console.error('Delete failed', err);
-      alert(t('Connection problem. Please try again.'));
+      oops(t('Connection problem. Please try again.'));
     });
 }
 
-function deleteAllSchedules() {
+async function deleteAllSchedules() {
   if (schedules.length === 0) return;
-  if (!confirm(t('Delete all :count class(es) from your timetable? This cannot be undone.', {count: schedules.length}))) return;
+  const ok = await RKDialog.confirm({
+    scene: 'timetable',
+    title: t('Delete whole timetable?'),
+    message: t('Every class in your timetable will be removed.'),
+    pill: t(':count class(es)', {count: schedules.length}),
+    warn: t('This cannot be undone.'),
+    confirmText: t('Delete all'),
+  });
+  if (!ok) return;
 
   fetch('{{ route('timetable.destroyAll') }}', {
     method: 'POST',
@@ -1091,26 +1119,36 @@ function deleteAllSchedules() {
     .then(safeJson)
     .then(({ ok, status }) => {
       if (ok) {
+        const n = schedules.length;
         schedules = [];
         render();
+        RKToast.show({ text: t('Timetable cleared'), sub: t(':count class(es) deleted', {count: n}) });
         return;
       }
       if (status === 419) {
-        alert(t('Your session has expired. Please refresh the page and try again.'));
+        oops(t('Your session has expired. Please refresh the page and try again.'));
       } else {
-        alert(t('Could not delete your classes right now. Please try again.'));
+        oops(t('Could not delete your classes right now. Please try again.'));
       }
     })
     .catch((err) => {
       console.error('Delete all failed', err);
-      alert(t('Connection problem. Please try again.'));
+      oops(t('Connection problem. Please try again.'));
     });
 }
 
-function deleteSelectedSchedules() {
+async function deleteSelectedSchedules() {
   const ids = Array.from(selectedIds);
   if (ids.length === 0) return;
-  if (!confirm(t('Delete :count selected class(es)? This cannot be undone.', {count: ids.length}))) return;
+  const ok = await RKDialog.confirm({
+    scene: 'timetable',
+    title: t('Delete :count class(es)?', {count: ids.length}),
+    message: t('These classes will be removed from your timetable.'),
+    list: classListFor(ids),
+    warn: t('This cannot be undone.'),
+    confirmText: t('Delete'),
+  });
+  if (!ok) return;
 
   fetch('{{ route('timetable.bulkDestroy') }}', {
     method: 'POST',
@@ -1125,17 +1163,18 @@ function deleteSelectedSchedules() {
         selectedIds.clear();
         document.getElementById('selectBar').classList.add('hidden');
         render();
+        RKToast.show({ text: t(':count class(es) deleted', {count: ids.length}), sub: t('Removed from your timetable') });
         return;
       }
       if (status === 419) {
-        alert(t('Your session has expired. Please refresh the page and try again.'));
+        oops(t('Your session has expired. Please refresh the page and try again.'));
       } else {
-        alert(t('Could not delete the selected classes right now. Please try again.'));
+        oops(t('Could not delete the selected classes right now. Please try again.'));
       }
     })
     .catch((err) => {
       console.error('Bulk delete failed', err);
-      alert(t('Connection problem. Please try again.'));
+      oops(t('Connection problem. Please try again.'));
     });
 }
 

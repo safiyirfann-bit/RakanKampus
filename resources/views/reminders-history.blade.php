@@ -582,10 +582,19 @@ function toggleSelectAll() {
   render();
 }
 
-function deleteSelected() {
+async function deleteSelected() {
   const ids = selectedIds.slice();
   if (ids.length === 0) return;
-  if (!confirm(t('Permanently delete :count record(s)?', {count: ids.length}))) return;
+  // Custom confirm (partials/rk-dialog): the robot carries the old records to the bin.
+  const ok = await RKDialog.confirm({
+    scene: 'trash',
+    title: t('Permanently delete :count record(s)?', {count: ids.length}),
+    message: t('They will be removed from your history for good.'),
+    list: items.filter(it => ids.includes(it.id)).map(it => ({ label: it.subject, meta: t(it.status === 'completed' ? 'Completed' : 'Deleted') })),
+    warn: t('This cannot be undone.'),
+    confirmText: t('Delete'),
+  });
+  if (!ok) return;
   fetch('/reminders/history/bulk-delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
@@ -594,6 +603,7 @@ function deleteSelected() {
     items = items.filter(it => !ids.includes(it.id));
     selectedIds = [];
     render();
+    RKToast.show({ text: t(':count record(s) deleted', {count: ids.length}) });
   }).catch(err => console.error('Bulk delete failed', err));
 }
 

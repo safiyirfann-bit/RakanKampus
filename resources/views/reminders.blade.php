@@ -1062,9 +1062,18 @@ function toggleSelectAll() {
   render();
 }
 
-function deleteSelected() {
+// Custom confirm (partials/rk-dialog): the robot files the reminders into History.
+async function deleteSelected() {
   const ids = selectedIds.slice();
   if (ids.length === 0) return;
+  const ok = await RKDialog.confirm({
+    scene: 'reminder',
+    title: t('Delete :count reminder(s)?', {count: ids.length}),
+    message: t('They will be moved to History.'),
+    list: reminders.filter(r => ids.includes(r.id)).map(r => ({ label: r.subject, meta: t(r.type) })),
+    confirmText: t('Delete'),
+  });
+  if (!ok) return;
   fetch('/reminders/bulk-delete', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
@@ -1074,6 +1083,7 @@ function deleteSelected() {
     historyCount += ids.length;
     selectedIds = [];
     render();
+    showDeletedToast(ids);
   }).catch(err => console.error('Bulk delete failed', err));
 }
 
@@ -1289,8 +1299,30 @@ function removeReminder(id) {
       historyCount += 1;
       if (dragId === id) { dragId = null; dragOffset = 0; }
       render();
+      showDeletedToast([id]);
     })
     .catch(err => console.error('Delete failed', err));
+}
+
+// Toast after a delete, with UNDO (reminders are only soft-deleted into History).
+function showDeletedToast(ids) {
+  RKToast.show({
+    text: ids.length === 1 ? t('Reminder deleted') : t(':count reminders deleted', {count: ids.length}),
+    sub: t('Moved to History'),
+    undo: () => {
+      fetch('/reminders/restore', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ ids }),
+      }).then(res => res.json()).then((data) => {
+        const back = (data && data.reminders) || [];
+        reminders = reminders.concat(back.filter(b => !reminders.some(r => r.id === b.id)));
+        historyCount = Math.max(0, historyCount - back.length);
+        render();
+        RKToast.show({ text: t('Restored'), sub: t(':count reminder(s) back in your list', {count: back.length}) });
+      }).catch(err => console.error('Restore failed', err));
+    },
+  });
 }
 
 // AI Assistant: real image capture — upload photo, AI reads it, reminder created automatically

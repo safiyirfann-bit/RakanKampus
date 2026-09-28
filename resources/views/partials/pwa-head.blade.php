@@ -39,3 +39,4 @@ function t(key, params) {
 </script>
 @include('partials.dark-tailwind')
 @include('partials.dark-fixes')
+@include('partials.rk-dialog')

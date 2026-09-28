@@ -681,7 +681,7 @@ if (SpeechRecognitionAPI && micBtn) {
   };
   recognition.onerror = (event) => {
     if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      alert(t('Please allow microphone access to use voice input.'));
+      RKDialog.alert({ scene: 'oops', title: t('Microphone blocked'), message: t('Please allow microphone access to use voice input.') });
       stopVoice();
     }
   };
@@ -985,7 +985,7 @@ function renderRecentList() {
         <button type="button" data-act="delete" class="danger"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path></svg>${escapeHtml(t('Delete'))}</button>`;
       menu.addEventListener('click', ev => ev.stopPropagation());
       menu.querySelector('[data-act="rename"]').addEventListener('click', () => { closeMenus(); renameConversation(conv.id, conv.title); });
-      menu.querySelector('[data-act="delete"]').addEventListener('click', () => { closeMenus(); deleteConversation(conv.id); });
+      menu.querySelector('[data-act="delete"]').addEventListener('click', () => { closeMenus(); deleteConversation(conv.id, conv.title); });
       item.appendChild(menu);
     });
 
@@ -993,8 +993,14 @@ function renderRecentList() {
   });
 }
 
-function renameConversation(id, currentTitle) {
-  const newTitle = prompt(t('Rename conversation:'), currentTitle);
+async function renameConversation(id, currentTitle) {
+  const newTitle = await RKDialog.prompt({
+      scene: 'write',
+      title: t('Rename conversation'),
+      value: currentTitle,
+      placeholder: t('Conversation name'),
+      confirmText: t('Save'),
+  });
   if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
   fetch(`/chatbot/${id}/rename`, {
     method: 'PUT',
@@ -1002,17 +1008,26 @@ function renameConversation(id, currentTitle) {
     body: JSON.stringify({ title: newTitle.trim() }),
   })
     .then(res => res.json())
-    .then(() => { if (id === currentConversationId) setTitle(newTitle.trim()); loadHistory(); })
+    .then(() => { if (id === currentConversationId) setTitle(newTitle.trim()); loadHistory(); RKToast.show({ text: t('Conversation renamed') }); })
     .catch(err => console.error('Rename failed', err));
 }
 
-function deleteConversation(id) {
-  if (!confirm(t('Delete this conversation?'))) return;
+async function deleteConversation(id, title) {
+  const ok = await RKDialog.confirm({
+    scene: 'chat',
+    title: t('Delete this conversation?'),
+    message: t('All messages in this chat will be removed.'),
+    list: title ? [{ label: title }] : [],
+    warn: t('This cannot be undone.'),
+    confirmText: t('Delete'),
+  });
+  if (!ok) return;
   fetch(`/chatbot/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': CSRF } })
     .then(res => res.json())
     .then(() => {
       if (id === currentConversationId) { currentConversationId = null; showEmptyState(); }
       loadHistory();
+      RKToast.show({ text: t('Conversation deleted') });
     })
     .catch(err => console.error('Delete failed', err));
 }

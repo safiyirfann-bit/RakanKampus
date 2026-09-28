@@ -378,6 +378,27 @@ class ReminderController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * Undo a delete (the "UNDO" button on the toast): bring soft-deleted
+     * reminders back and return them so the page can put them back in the list.
+     */
+    public function restore(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => 'required|array',
+            'ids.*' => 'integer',
+        ]);
+
+        $restored = $request->user()->reminders()->onlyTrashed()
+            ->whereIn('id', $data['ids'])
+            ->get()
+            ->each(fn (Reminder $r) => $r->restore())
+            ->map(fn (Reminder $r) => $this->toRaw($r))
+            ->values();
+
+        return response()->json(['success' => true, 'reminders' => $restored]);
+    }
+
     public function historyBulkDestroy(Request $request)
     {
         $data = $request->validate([

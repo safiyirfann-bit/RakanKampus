@@ -122,6 +122,7 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::put('/reminders/{reminder}', [ReminderController::class, 'update'])->name('reminders.update');
     Route::delete('/reminders/{reminder}', [ReminderController::class, 'destroy'])->name('reminders.destroy');
     Route::post('/reminders/bulk-delete', [ReminderController::class, 'bulkDestroy'])->name('reminders.bulkDestroy');
+    Route::post('/reminders/restore', [ReminderController::class, 'restore'])->name('reminders.restore');
     Route::post('/reminders/history/bulk-delete', [ReminderController::class, 'historyBulkDestroy'])->name('reminders.history.bulkDestroy');
 
     // Timetable

@@ -999,12 +999,19 @@ function deleteHomeConversationDirect(id) {
     .then(() => {
         const wrap = document.querySelector(`.conv-card[data-conv-id="${id}"]`)?.closest('.conv-swipe-wrap');
         if (wrap) wrap.remove();
+        RKToast.show({ text: t('Conversation deleted') });
     })
     .catch(err => console.error('Delete failed', err));
 }
 
-function renameHomeConversation(id, currentTitle) {
-    const newTitle = prompt(t('Rename conversation:'), currentTitle);
+async function renameHomeConversation(id, currentTitle) {
+    const newTitle = await RKDialog.prompt({
+        scene: 'write',
+        title: t('Rename conversation'),
+        value: currentTitle,
+        placeholder: t('Conversation name'),
+        confirmText: t('Save'),
+    });
     if (!newTitle || newTitle.trim() === '' || newTitle === currentTitle) return;
 
     fetch(`/chatbot/${id}/rename`, {
@@ -1019,12 +1026,22 @@ function renameHomeConversation(id, currentTitle) {
     .then(() => {
         const card = document.querySelector(`.conv-card[data-conv-id="${id}"]`);
         if (card) card.querySelector('.conv-title').textContent = newTitle.trim();
+        RKToast.show({ text: t('Conversation renamed') });
     })
     .catch(err => console.error('Rename failed', err));
 }
 
-function deleteHomeConversation(id) {
-    if (!confirm(t('Delete this conversation?'))) return;
+async function deleteHomeConversation(id) {
+    const title = document.querySelector(`.conv-card[data-conv-id="${id}"] .conv-title`)?.textContent.trim();
+    const ok = await RKDialog.confirm({
+        scene: 'chat',
+        title: t('Delete this conversation?'),
+        message: t('All messages in this chat will be removed.'),
+        list: title ? [{ label: title }] : [],
+        warn: t('This cannot be undone.'),
+        confirmText: t('Delete'),
+    });
+    if (!ok) return;
 
     fetch(`/chatbot/${id}`, {
         method: 'DELETE',
@@ -1036,6 +1053,7 @@ function deleteHomeConversation(id) {
     .then(() => {
         const wrap = document.querySelector(`.conv-card[data-conv-id="${id}"]`)?.closest('.conv-swipe-wrap');
         if (wrap) wrap.remove();
+        RKToast.show({ text: t('Conversation deleted') });
     })
     .catch(err => console.error('Delete failed', err));
 }

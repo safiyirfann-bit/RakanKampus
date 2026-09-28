@@ -172,7 +172,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                         </div>
                         @unless($d->current)
                             <form method="POST" action="{{ route('student.profile.devices.logout', $d->id) }}"
-                                  onsubmit="return confirm(@js(__('Sign out this device?')))">
+                                  onsubmit="return RKDialog.confirmForm(event, { scene: 'signout', title: @js(__('Sign out this device?')), message: @js(__('It will need to log in again to use RakanKampus.')), list: [{ label: @js($d->name) }], confirmText: @js(__('Sign out')) })">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-sm font-semibold text-red-600 hover:bg-red-50 rounded-xl px-3 py-2">{{ __('Sign out') }}</button>
@@ -184,7 +184,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
 
             @if($devices->where('current', false)->isNotEmpty())
                 <form method="POST" action="{{ route('student.profile.devices.logout-others') }}" class="px-5 pb-5 pt-1"
-                      onsubmit="return confirm(@js(__('Sign out all other devices? You will stay signed in here.')))">
+                      onsubmit="return RKDialog.confirmForm(event, { scene: 'signout', title: @js(__('Sign out all other devices?')), message: @js(__('You will stay signed in here.')), pill: @js(trans_choice(':count device|:count devices', $devices->where('current', false)->count())), confirmText: @js(__('Sign out all')) })">
                     @csrf
                     <button type="submit" class="w-full rounded-2xl border border-red-200 py-3 font-semibold text-red-600 hover:bg-red-50 transition">
                         {{ __('Sign out all other devices') }}
@@ -249,7 +249,7 @@ html[data-theme="dark"] body { background-image: linear-gradient(120deg, #0c1320
                 </a>
 
                 <form method="POST" action="{{ route('student.profile.chats.clear') }}"
-                      onsubmit="return confirm(@js(__('Delete all your chatbot conversations? This cannot be undone.')))">
+                      onsubmit="return RKDialog.confirmForm(event, { scene: 'chat', title: @js(__('Delete all conversations?')), message: @js(__('Every chat with RakanKampus will be removed.')), pill: @js(trans_choice(':count conversation|:count conversations', $chatCount)), warn: @js(__('This cannot be undone.')), confirmText: @js(__('Delete all')) })">
                     @csrf
                     @method('DELETE')
                     <button type="submit" @disabled($chatCount === 0)
