@@ -167,7 +167,8 @@
   .steps li:last-child::after { display: none; }
   .steps .st { display: block; padding-top: 2px; }
   /* a numbered item that has its own bullet points: title in bold, points tucked under it */
-  .steps li.has-sub .st { font-weight: 600; color: var(--navy); }
+  .steps li.has-sub .st { font-weight: 700; color: var(--navy); }
+  .steps li.has-sub .st b { font-weight: 700; }
   .steps .sub { list-style: none; margin: 4px 0 0; padding: 8px 12px 8px 6px; background: #f7fbfa; border: 1px solid #e3f1ee; border-radius: 12px; }
   .steps .sub li { padding: 0 0 0 20px; margin: 3px 0; min-height: 0; color: #475569; font-size: 14.5px; }
   .steps .sub li::after { display: none; }
@@ -888,14 +889,14 @@ function formatBotText(text) {
   const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
   const out = [];
   let para = [], list = null;   // list = { type: 'ol', items: [{ n, text, subs: [], notes: [] }] } | { type: 'ul', items: [text] }
-  let n = 0, paraSinceList = true;
+  let n = 0, paraSinceList = true, afterItem = false;   // afterItem: previous line was a numbered item or its note
 
   const flushPara = () => { if (para.length) { out.push('<p>' + para.map(l => linkify(escapeHtml(l)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')).join('<br>') + '</p>'); para = []; paraSinceList = true; } };
   const flushList = () => {
     if (!list) return;
     if (list.type === 'ol') {
       out.push('<ol class="steps">' + list.items.map(it =>
-        `<li data-n="${it.n}"${it.subs.length ? ' class="has-sub"' : ''}><span class="st">${inline(it.text)}</span>` +
+        `<li data-n="${it.n}"${it.subs.length || it.notes.length ? ' class="has-sub"' : ''}><span class="st">${inline(it.text)}</span>` +
         it.notes.map(x => `<span class="note">${inline(x)}</span>`).join('') +
         (it.subs.length ? '<ul class="sub">' + it.subs.map(x => `<li>${inline(x)}</li>`).join('') + '</ul>' : '') + '</li>').join('') + '</ol>');
     } else {
@@ -906,6 +907,7 @@ function formatBotText(text) {
 
   for (const raw of lines) {
     const line = raw.trim();
+    const wasAfterItem = afterItem; afterItem = false;
     const indented = /^\s{2,}\S/.test(raw);
     const num = line.match(/^(\d{1,2})[.)]\s+(.+)$/);
     const bul = line.match(/^[-•*]\s+(.+)$/);
@@ -919,6 +921,7 @@ function formatBotText(text) {
       n = (paraSinceList && k === 1) ? 1 : (k > n ? k : n + 1);
       paraSinceList = false;
       list.items.push({ n, text: num[2].trim(), subs: [], notes: [] });
+      afterItem = true;
     } else if (bul) {
       flushPara();
       if (list && list.type === 'ol') list.items[list.items.length - 1].subs.push(bul[1].trim());   // bullet belongs to the numbered item above
@@ -928,8 +931,8 @@ function formatBotText(text) {
     } else if (head) {
       flushPara(); flushList();
       out.push(`<h4>${inline(head[1])}</h4>`); paraSinceList = true;
-    } else if (list && list.type === 'ol' && indented) {
-      list.items[list.items.length - 1].notes.push(line);                         // indented text under a numbered item
+    } else if (list && list.type === 'ol' && (indented || wasAfterItem)) {
+      list.items[list.items.length - 1].notes.push(line); afterItem = true;                         // indented text under a numbered item
     } else {
       flushList();
       para.push(line);
