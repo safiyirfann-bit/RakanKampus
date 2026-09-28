@@ -443,6 +443,13 @@
 
   .modal-icon svg { width: 16px; height: 16px; }
 
+  /* RakanKampus Assistant: the robot logo in a soft tile, gently bobbing */
+  .modal-icon.rk-brand { width: 38px; height: 38px; border-radius: 12px; background: #e8f7f5; border: 1px solid #c9ece7; }
+  .modal-icon.rk-brand svg { width: 30px; height: 30px; animation: rkTileBob 2.4s ease-in-out infinite; }
+  @keyframes rkTileBob { 50% { transform: translateY(-2px) rotate(-4deg); } }
+  html[data-theme="dark"] .modal-icon.rk-brand { background: #e8f7f5 !important; border-color: #9fd9d1 !important; }
+  @media (prefers-reduced-motion: reduce) { .modal-icon.rk-brand svg { animation: none; } }
+
   .modal-title { font-size: 16px; font-weight: 800; color: #14213d; margin: 0; }
 
   .modal-close {
@@ -822,10 +829,8 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #c0c6cd; }
 <div class="modal" id="aiModal">
   <div class="modal-head">
     <div class="modal-title-row">
-      <div class="modal-icon">
-        <svg viewBox="0 0 24 24" fill="#ffffff" stroke="none"><path d="M12 2.5l1.7 5.3 5.3 1.7-5.3 1.7L12 16.5l-1.7-5.3-5.3-1.7 5.3-1.7L12 2.5z"></path></svg>
-      </div>
-      <p class="modal-title">{{ __('AI Assistant') }}</p>
+      <div class="modal-icon rk-brand"><x-brand-logo :size="30" /></div>
+      <p class="modal-title">{{ __('RakanKampus Assistant') }}</p>
     </div>
     <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
