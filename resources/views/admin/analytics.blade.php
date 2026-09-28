@@ -57,6 +57,28 @@
         .topic-btn.muted .bar i { background: #e0a100; }
         a.topic-btn.muted:hover b { text-decoration: underline; }
         @media (max-width: 860px) { .topics { columns: 1; } }
+        .card.clickable { cursor: pointer; transition: box-shadow .15s, border-color .15s; text-align: left; font: inherit; color: inherit; width: 100%; }
+        .card.clickable:hover { border-color: #9cc7a9; box-shadow: 0 6px 18px rgba(47,107,74,.10); }
+        .card.clickable .view { font-size: 11.5px; color: #64748b; margin-top: 8px; }
+        dialog.list-modal { border: none; border-radius: 16px; padding: 0; width: min(760px, calc(100vw - 32px)); max-height: 80vh; box-shadow: 0 24px 60px rgba(15,40,25,.25); }
+        dialog.list-modal::backdrop { background: rgba(15,30,20,.45); }
+        .modal-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 20px; border-bottom: 1px solid #e8efe7; position: sticky; top: 0; background: #fff; }
+        .modal-head h3 { margin: 0; font-size: 17px; }
+        .modal-head p { margin: 2px 0 0; font-size: 12.5px; color: #64748b; }
+        .modal-close { border: none; background: #f1f5f1; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; cursor: pointer; color: #334155; flex-shrink: 0; }
+        .modal-body { padding: 8px 20px 20px; overflow: auto; max-height: calc(80vh - 76px); }
+        .modal-search { width: 100%; border: 1px solid #d6e2d5; border-radius: 10px; padding: 9px 12px; font: inherit; font-size: 13px; margin: 10px 0 6px; }
+        .ulist { list-style: none; margin: 0; padding: 0; }
+        .ulist li { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #eef3ee; }
+        .ulist li:last-child { border-bottom: 0; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #e3f0e6; color: #2f6b4a; font-weight: 700; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+        .avatar.on::after { content: ''; position: absolute; right: -1px; bottom: -1px; width: 11px; height: 11px; border-radius: 50%; background: #22c55e; border: 2px solid #fff; }
+        .uinfo { flex: 1; min-width: 0; }
+        .uinfo b { display: block; font-size: 14px; }
+        .uinfo span { display: block; font-size: 12.5px; color: #64748b; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .umeta { text-align: right; font-size: 12px; color: #64748b; flex-shrink: 0; }
+        .umeta .tag { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 99px; background: #eef6ec; color: #2f6b4a; margin-bottom: 3px; }
+        .umeta .tag.admin { background: #fff4d6; color: #8a6300; }
         @media (max-width: 1100px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
         @media (max-width: 640px) {
             .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -93,16 +115,18 @@
 <div class="page">
 
     <div class="kpis">
-        <div class="card">
+        <button type="button" class="card clickable" onclick="document.getElementById('usersModal').showModal()">
             <div class="kpi-label">Total users</div>
             <div class="kpi-value">{{ number_format($totalUsers) }}</div>
             <div class="kpi-sub">▲ {{ $newThisWeek }} new this week</div>
-        </div>
-        <div class="card">
+            <div class="view">View all accounts →</div>
+        </button>
+        <button type="button" class="card clickable" onclick="document.getElementById('onlineModal').showModal()">
             <div class="kpi-label">Online now</div>
             <div class="kpi-value"><span class="dot"></span>{{ $onlineNow }}</div>
             <div class="kpi-sub">active in the last 5 min</div>
-        </div>
+            <div class="view">See who's online →</div>
+        </button>
         <div class="card">
             <div class="kpi-label">Peak hour</div>
             <div class="kpi-value" style="font-size:24px">{{ $peakLabel }}</div>
@@ -250,6 +274,84 @@
 </script>
 @endif
 
+
+
+{{-- User list pop-ups (opened from the Total users / Online now cards) --}}
+@php
+  $initials = fn ($name) => mb_strtoupper(mb_substr(trim((string) $name), 0, 1)) ?: '?';
+@endphp
+<dialog class="list-modal" id="usersModal">
+    <div class="modal-head">
+        <div>
+            <h3>All accounts</h3>
+            <p>{{ $userList->count() }} registered {{ $userList->count() === 1 ? 'account' : 'accounts' }} · newest first</p>
+        </div>
+        <button type="button" class="modal-close" aria-label="Close" onclick="this.closest('dialog').close()">&times;</button>
+    </div>
+    <div class="modal-body">
+        <input type="search" class="modal-search" placeholder="Search name, email or matric no..." oninput="filterUsers(this)">
+        <ul class="ulist" id="usersList">
+            @foreach($userList as $u)
+                <li data-search="{{ mb_strtolower($u->name.' '.$u->email.' '.$u->student_id) }}">
+                    <div class="avatar {{ $u->online ? 'on' : '' }}">{{ $initials($u->name) }}</div>
+                    <div class="uinfo">
+                        <b>{{ $u->name }}</b>
+                        <span>{{ $u->email }}@if($u->student_id) · {{ $u->student_id }}@endif</span>
+                    </div>
+                    <div class="umeta">
+                        <span class="tag {{ $u->role === 'admin' ? 'admin' : '' }}">{{ $u->role === 'admin' ? 'Admin' : 'Student' }}</span><br>
+                        Joined {{ \Illuminate\Support\Carbon::parse($u->created_at)->format('d M Y') }}<br>
+                        {{ $u->online ? 'Online now' : ($u->last_active ? 'Last active '.$u->last_active->diffForHumans() : 'No recent activity') }}
+                    </div>
+                </li>
+            @endforeach
+        </ul>
+    </div>
+</dialog>
+
+<dialog class="list-modal" id="onlineModal">
+    <div class="modal-head">
+        <div>
+            <h3>Online now</h3>
+            <p>Users active in the last 5 minutes</p>
+        </div>
+        <button type="button" class="modal-close" aria-label="Close" onclick="this.closest('dialog').close()">&times;</button>
+    </div>
+    <div class="modal-body">
+        @if($onlineUsers->isEmpty())
+            <div class="empty">Nobody is online right now.</div>
+        @else
+            <ul class="ulist">
+                @foreach($onlineUsers as $u)
+                    <li>
+                        <div class="avatar on">{{ $initials($u->name) }}</div>
+                        <div class="uinfo">
+                            <b>{{ $u->name }}</b>
+                            <span>{{ $u->email }}@if($u->student_id) · {{ $u->student_id }}@endif</span>
+                        </div>
+                        <div class="umeta">
+                            <span class="tag {{ $u->role === 'admin' ? 'admin' : '' }}">{{ $u->role === 'admin' ? 'Admin' : 'Student' }}</span><br>
+                            Active {{ $u->last_active->diffForHumans() }}
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+        @endif
+    </div>
+</dialog>
+
+<script>
+function filterUsers(input) {
+    const q = input.value.trim().toLowerCase();
+    document.querySelectorAll('#usersList li').forEach(function (li) {
+        li.hidden = q !== '' && !li.dataset.search.includes(q);
+    });
+}
+// Close a pop-up when clicking the dark area around it.
+document.querySelectorAll('dialog.list-modal').forEach(function (d) {
+    d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+});
+</script>
 
 </body>
 </html>

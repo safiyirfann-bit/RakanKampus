@@ -83,14 +83,34 @@ class AnalyticsController extends Controller
         $totalUsers = DB::table('users')->count();
         $newThisWeek = DB::table('users')->where('created_at', '>=', now()->subDays(7))->count();
 
-        $onlineNow = 0;
+        // Last activity per user (from sessions) — used for the user lists.
+        $lastActive = [];
         if (Schema::hasTable('sessions')) {
-            $onlineNow = DB::table('sessions')
+            $lastActive = DB::table('sessions')
                 ->whereNotNull('user_id')
-                ->where('last_activity', '>=', now()->subSeconds(self::ONLINE_WINDOW_SECONDS)->timestamp)
-                ->distinct('user_id')
-                ->count('user_id');
+                ->selectRaw('user_id, MAX(last_activity) as last_activity')
+                ->groupBy('user_id')
+                ->pluck('last_activity', 'user_id')
+                ->all();
         }
+
+        $cutoff = now()->subSeconds(self::ONLINE_WINDOW_SECONDS)->timestamp;
+
+        $userList = DB::table('users')
+            ->orderByDesc('created_at')
+            ->get(['id', 'name', 'email', 'student_id', 'role', 'created_at'])
+            ->map(function ($u) use ($lastActive, $cutoff) {
+                $ts = $lastActive[$u->id] ?? null;
+                $u->last_active = $ts ? \Illuminate\Support\Carbon::createFromTimestamp($ts, config('app.timezone')) : null;
+                $u->online = $ts !== null && $ts >= $cutoff;
+
+                return $u;
+            });
+
+        $onlineUsers = $userList->where('online', true)
+            ->sortByDesc(fn ($u) => $u->last_active)
+            ->values();
+        $onlineNow = $onlineUsers->count();
 
         // ---- Activity by hour + heatmap -----------------------------------
         $byHour = array_fill(0, 24, 0);
@@ -148,6 +168,8 @@ class AnalyticsController extends Controller
             'totalUsers' => $totalUsers,
             'newThisWeek' => $newThisWeek,
             'onlineNow' => $onlineNow,
+            'userList' => $userList,
+            'onlineUsers' => $onlineUsers,
             'byHour' => $byHour,
             'peakHour' => $peakHour,
             'heatmap' => $heatmap,
