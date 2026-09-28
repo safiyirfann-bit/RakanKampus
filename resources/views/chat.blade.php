@@ -154,10 +154,10 @@
   .message-row.bot .message a { color: #0d9488; text-decoration: underline; text-decoration-color: rgba(13,148,136,.35); text-underline-offset: 2px; word-break: break-all; }
   .message-row.bot .message a:hover { text-decoration-color: currentColor; }
   /* Numbered answers: step badges joined by a thin line, like a timeline */
-  .steps { list-style: none; margin: 4px 0 12px; padding: 0; counter-reset: step; }
-  .steps li { position: relative; counter-increment: step; padding: 0 0 12px 42px; min-height: 28px; }
+  .steps { list-style: none; margin: 6px 0 14px; padding: 0; }
+  .steps li { position: relative; padding: 0 0 14px 42px; min-height: 28px; }
   .steps li::before {
-    content: counter(step); position: absolute; left: 0; top: 0;
+    content: attr(data-n); position: absolute; left: 0; top: 0;
     width: 28px; height: 28px; border-radius: 50%;
     background: var(--teal-soft); color: #0f766e; border: 1px solid #b7e4dd;
     font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center;
@@ -165,11 +165,19 @@
   .steps li::after { content: ''; position: absolute; left: 13.5px; top: 32px; bottom: 4px; width: 1px; background: #d5ece8; }
   .steps li:last-child { padding-bottom: 0; }
   .steps li:last-child::after { display: none; }
-  .steps li > span { display: block; padding-top: 2px; }
+  .steps .st { display: block; padding-top: 2px; }
+  /* a numbered item that has its own bullet points: title in bold, points tucked under it */
+  .steps li.has-sub .st { font-weight: 600; color: var(--navy); }
+  .steps .sub { list-style: none; margin: 4px 0 0; padding: 8px 12px 8px 6px; background: #f7fbfa; border: 1px solid #e3f1ee; border-radius: 12px; }
+  .steps .sub li { padding: 0 0 0 20px; margin: 3px 0; min-height: 0; color: #475569; font-size: 14.5px; }
+  .steps .sub li::after { display: none; }
+  .steps .sub li::before { content: ''; left: 6px; top: .72em; width: 6px; height: 6px; border: 0; background: var(--teal); }
+  .steps .note { display: block; margin-top: 4px; color: #475569; font-size: 14.5px; }
   .steps b, .bullets b { color: var(--navy); font-weight: 600; }
   .bullets { margin: 4px 0 12px; padding-left: 4px; list-style: none; }
   .bullets li { position: relative; padding-left: 20px; margin: 4px 0; }
   .bullets li::before { content: ''; position: absolute; left: 4px; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
+  .message-row.bot .message h4 { font-size: 15.5px; font-weight: 700; color: var(--navy); margin: 12px 0 6px; }
   .msg-actions { display: flex; gap: 2px; margin-top: 6px; opacity: 0; transition: opacity .15s; }
   .message-row.bot:hover .msg-actions, .message-row.bot:last-child .msg-actions { opacity: 1; }
   @media (hover: none) { .msg-actions { opacity: 1; } }
@@ -370,6 +378,10 @@ html[data-theme="dark"] .message-row.bot .message a { color: #2feddc; text-decor
 html[data-theme="dark"] .steps li::before { background: #1e3e3a; color: #1de2d3; border: 1px solid #284843; }
 html[data-theme="dark"] .steps li::after { background: #234a43; }
 html[data-theme="dark"] .steps b, html[data-theme="dark"] .bullets b { color: #d3dae2; }
+html[data-theme="dark"] .steps li.has-sub .st, html[data-theme="dark"] .message-row.bot .message h4 { color: #e2e8f0; }
+html[data-theme="dark"] .steps .sub { background: #122029; border-color: #1f3a3a; }
+html[data-theme="dark"] .steps .sub li, html[data-theme="dark"] .steps .note { color: #aab6c3; }
+html[data-theme="dark"] .steps .sub li::before { background: #1de2d3; border: 0; }
 html[data-theme="dark"] .msg-actions button { color: #b5bbc5; }
 html[data-theme="dark"] .msg-actions button:hover { background: #10161f; color: #d0d6dd; }
 html[data-theme="dark"] .search-text { color: #979faa; }
@@ -868,34 +880,56 @@ function linkify(safe) {
 function inline(line) {
   let html = linkify(escapeHtml(line));
   // "Label: rest" → bold label (only short labels, so normal sentences aren't touched)
-  html = html.replace(/^([^:<]{2,40}?):\s+(?!\/\/)/, '<b>$1:</b> ');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|\s)\*(\S[^*]*?)\*(?=\s|$)/g, '$1<i>$2</i>');
+  if (!/^<b>/.test(html)) html = html.replace(/^([^:<]{2,40}?):\s+(?!\/\/)/, '<b>$1:</b> ');
   return html;
 }
 function formatBotText(text) {
   const lines = String(text || '').replace(/\r\n?/g, '\n').split('\n');
   const out = [];
-  let para = [], list = null; // list = { type: 'ol'|'ul', items: [] }
+  let para = [], list = null;   // list = { type: 'ol', items: [{ n, text, subs: [], notes: [] }] } | { type: 'ul', items: [text] }
+  let n = 0, paraSinceList = true;
 
-  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(l => linkify(escapeHtml(l))).join('<br>') + '</p>'); para = []; } };
+  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(l => linkify(escapeHtml(l)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')).join('<br>') + '</p>'); para = []; paraSinceList = true; } };
   const flushList = () => {
     if (!list) return;
-    const cls = list.type === 'ol' ? 'steps' : 'bullets';
-    out.push(`<${list.type} class="${cls}">` + list.items.map(i => `<li><span>${inline(i)}</span></li>`).join('') + `</${list.type}>`);
+    if (list.type === 'ol') {
+      out.push('<ol class="steps">' + list.items.map(it =>
+        `<li data-n="${it.n}"${it.subs.length ? ' class="has-sub"' : ''}><span class="st">${inline(it.text)}</span>` +
+        it.notes.map(x => `<span class="note">${inline(x)}</span>`).join('') +
+        (it.subs.length ? '<ul class="sub">' + it.subs.map(x => `<li>${inline(x)}</li>`).join('') + '</ul>' : '') + '</li>').join('') + '</ol>');
+    } else {
+      out.push('<ul class="bullets">' + list.items.map(i => `<li><span>${inline(i)}</span></li>`).join('') + '</ul>');
+    }
     list = null;
   };
 
   for (const raw of lines) {
     const line = raw.trim();
+    const indented = /^\s{2,}\S/.test(raw);
     const num = line.match(/^(\d{1,2})[.)]\s+(.+)$/);
     const bul = line.match(/^[-•*]\s+(.+)$/);
-    if (num || bul) {
-      const type = num ? 'ol' : 'ul';
+    const head = line.match(/^#{1,4}\s+(.+)$/) || line.match(/^\*\*([^*]{2,80})\*\*:?$/);
+    if (num) {
       flushPara();
-      if (!list || list.type !== type) { flushList(); list = { type, items: [] }; }
-      list.items.push((num ? num[2] : bul[1]).trim());
+      if (list && list.type !== 'ol') flushList();
+      if (!list) list = { type: 'ol', items: [] };
+      // keep counting across bullets/blank lines; the model sometimes writes "1." for every item
+      const k = parseInt(num[1], 10);
+      n = (paraSinceList && k === 1) ? 1 : (k > n ? k : n + 1);
+      paraSinceList = false;
+      list.items.push({ n, text: num[2].trim(), subs: [], notes: [] });
+    } else if (bul) {
+      flushPara();
+      if (list && list.type === 'ol') list.items[list.items.length - 1].subs.push(bul[1].trim());   // bullet belongs to the numbered item above
+      else { if (!list) list = { type: 'ul', items: [] }; list.items.push(bul[1].trim()); }
     } else if (line === '') {
-      flushPara();
-      // keep a list going across a blank line only if the next line continues it
+      flushPara();                // a blank line doesn't end a list; the next line decides
+    } else if (head) {
+      flushPara(); flushList();
+      out.push(`<h4>${inline(head[1])}</h4>`); paraSinceList = true;
+    } else if (list && list.type === 'ol' && indented) {
+      list.items[list.items.length - 1].notes.push(line);                         // indented text under a numbered item
     } else {
       flushList();
       para.push(line);
