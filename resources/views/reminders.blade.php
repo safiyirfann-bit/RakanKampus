@@ -383,6 +383,8 @@
   }
 
   .bulk-delete-btn.open { display: flex; }
+  /* While picking reminders to delete, hide the AI Assistant button so the Delete bar never covers it */
+  body:has(.bulk-delete-btn.open) .ai-fab { display: none; }
   .bulk-delete-btn svg { width: 15px; height: 15px; }
 
   .ai-fab {
@@ -631,7 +633,8 @@
     .empty-state { background: #ffffff; border: 1px solid #dbeeee; color: #64748b; }
 
     .ai-fab { right: 40px; bottom: 30px; }
-    .bulk-delete-btn { left: 264px; right: 44px; max-width: none; margin: 0; }
+    /* Same width as the reminder list (sidebar 220 + container padding 44, list max 992px), like the original design */
+    .bulk-delete-btn { left: 264px; right: auto; width: min(992px, calc(100vw - 264px - 44px)); max-width: none; margin: 0; }
   }
 
   .ai-desc { font-size: 12.5px; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
