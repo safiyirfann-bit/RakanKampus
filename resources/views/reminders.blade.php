@@ -445,10 +445,14 @@
 
   /* RakanKampus Assistant: the robot logo in a soft tile, gently bobbing */
   .modal-icon.rk-brand { width: 38px; height: 38px; border-radius: 12px; background: #e8f7f5; border: 1px solid #c9ece7; }
-  .modal-icon.rk-brand svg { width: 30px; height: 30px; animation: rkTileBob 2.4s ease-in-out infinite; }
-  @keyframes rkTileBob { 50% { transform: translateY(-2px) rotate(-4deg); } }
+  /* the robot stands still in the tile and waves hello (no strolling) */
+  .modal-icon.rk-brand { overflow: visible; }
+  .modal-icon.rk-brand .tile-bot { width: 50px; height: 34px; margin: 0 -6px -1px; flex-shrink: 0; }
+  .modal-icon.rk-brand .tile-bot .rb-walk, .modal-icon.rk-brand .tile-bot .rb-face { animation: none; }
+  .modal-icon.rk-brand .tile-bot .rb-wave { animation-duration: .9s; }
+  .modal-icon.rk-brand .tile-bot .rb-legL, .modal-icon.rk-brand .tile-bot .rb-legR { animation: none; }
+  .modal-icon.rk-brand .tile-bot .rb-bob, .modal-icon.rk-brand .tile-bot .rb-shadow { animation-duration: 1.4s; }
   html[data-theme="dark"] .modal-icon.rk-brand { background: #e8f7f5 !important; border-color: #9fd9d1 !important; }
-  @media (prefers-reduced-motion: reduce) { .modal-icon.rk-brand svg { animation: none; } }
 
   .modal-title { font-size: 16px; font-weight: 800; color: #14213d; margin: 0; }
 
@@ -829,7 +833,7 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #c0c6cd; }
 <div class="modal" id="aiModal">
   <div class="modal-head">
     <div class="modal-title-row">
-      <div class="modal-icon rk-brand"><x-brand-logo :size="30" /></div>
+      <div class="modal-icon rk-brand"><x-brand-bot-animated :size="34" class="tile-bot" /></div>
       <p class="modal-title">{{ __('RakanKampus Assistant') }}</p>
     </div>
     <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
