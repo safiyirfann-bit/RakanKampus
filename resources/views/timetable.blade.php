@@ -68,17 +68,17 @@
   .delete-week-link { background: none; border: none; padding: 0; font-size: 11.5px; font-weight: 700; color: #fca5a5; text-decoration: underline; cursor: pointer; }
   .delete-week-link.hidden { display: none; }
 
+  /* Select mode: small red "Delete (n)" button at the right end of the Select All row */
   .bulk-delete-btn {
-    display: none; align-items: center; justify-content: center; gap: 8px;
-    position: fixed; left: 20px; right: 20px; bottom: 24px; max-width: 600px; margin: 0 auto;
-    background: #dc2626; color: #fff; border: none; border-radius: 14px; padding: 14px;
-    font-size: 13.5px; font-weight: 800; cursor: pointer;
-    box-shadow: 0 10px 24px rgba(220,38,38,0.4); z-index: 32;
+    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+    background: #dc2626; color: #fff; border: 1px solid #dc2626; border-radius: 8px;
+    padding: 7px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    transition: opacity .15s, background .15s;
   }
-  .bulk-delete-btn.open { display: flex; }
-  .bulk-delete-btn svg { width: 15px; height: 15px; }
-  body:has(.bulk-delete-btn.open) .ai-fab { display: none; }
-  @media (max-width: 860px) { .bulk-delete-btn { bottom: 88px; } }
+  .bulk-delete-btn:hover:not(:disabled) { background: #b91c1c; }
+  .bulk-delete-btn:disabled { opacity: .45; cursor: default; }
+  .bulk-delete-btn svg { width: 12px; height: 12px; }
+  .select-bar-actions { display: flex; align-items: center; gap: 14px; }
 
   .day-section { margin-bottom: 18px; }
   .day-label {
@@ -371,8 +371,6 @@
     .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
     .select-all-label { color: #0d9488; }
     .delete-week-link { color: #dc2626; }
-    /* Same width as the class list (sidebar 220 + container padding 44, list max 992px) */
-    .bulk-delete-btn { left: 264px; right: auto; width: min(992px, calc(100vw - 264px - 44px)); max-width: none; margin: 0; }
     .day-label { color: #64748b; }
     .class-card { background: #ffffff; border: 1.5px solid #dbeeee; }
     .class-meta { color: #64748b; }
@@ -404,7 +402,6 @@
 html[data-theme="dark"] body { background-image: linear-gradient(160deg, #0c1320, #112031 55%, #1d6869); }
 html[data-theme="dark"] .add-btn { box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45); }
 html[data-theme="dark"] .select-btn { border: 1px solid rgba(42, 51, 65, 0.25); }
-html[data-theme="dark"] .bulk-delete-btn { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.77); }
 html[data-theme="dark"] .class-card { background: #39231b; }
 html[data-theme="dark"] .class-time { color: #cfd4e0; background: #17202d; }
 html[data-theme="dark"] .class-subject { color: #cfd4e0; }
@@ -518,7 +515,13 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
       <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)">
       {{ __('Select All') }}
     </label>
-    <button type="button" class="delete-week-link hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">{{ __('Delete whole timetable') }}</button>
+    <div class="select-bar-actions">
+      <button type="button" class="delete-week-link hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">{{ __('Delete whole timetable') }}</button>
+      <button type="button" class="bulk-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+        <span>{{ __('Delete') }} (<span id="selectedCount">0</span>)</span>
+      </button>
+    </div>
   </div>
 
   <div id="scheduleList"></div>
@@ -615,10 +618,6 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">{{ __('Delete Class') }}</button>
 </div>
 
-<button type="button" class="bulk-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-  {{ __('Delete ·') }} <span id="selectedCount">0</span>
-</button>
 
 <script>
 let schedules = @json($schedules);
@@ -908,7 +907,7 @@ function updateSelectBar() {
 
   selectAllCheckbox.checked = dayIds.length > 0 && selectedOnDay.length === dayIds.length;
   document.getElementById('selectedCount').textContent = selectedOnDay.length;
-  deleteBtn.classList.toggle('open', selectMode && selectedOnDay.length > 0);
+  deleteBtn.disabled = selectedOnDay.length === 0;
 }
 
 function showModal(id) {

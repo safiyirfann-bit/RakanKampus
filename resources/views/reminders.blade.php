@@ -178,18 +178,18 @@
 
   .history-link svg { width: 10px; height: 10px; }
 
+  .select-all-bar { display: none; align-items: center; justify-content: space-between; gap: 10px; padding: 0 2px 10px; }
+  .select-all-bar.open { display: flex; }
+
   .select-all-row {
-    display: none;
+    display: flex;
     align-items: center;
     gap: 8px;
-    width: 100%;
     background: none;
     border: none;
-    padding: 0 2px 10px;
+    padding: 0;
     cursor: pointer;
   }
-
-  .select-all-row.open { display: flex; }
 
   .select-all-row input { width: 16px; height: 16px; accent-color: #dc2626; cursor: pointer; }
   .select-all-row span { font-size: 12px; font-weight: 700; color: #bfe9ea; }
@@ -346,33 +346,16 @@
     font-size: 13px;
   }
 
+  /* Select mode: small red "Delete (n)" button at the right end of the Select All row */
   .bulk-delete-btn {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    position: fixed;
-    left: 20px;
-    right: 20px;
-    bottom: 24px;
-    max-width: 600px;
-    margin: 0 auto;
-    background: #dc2626;
-    color: #fff;
-    border: none;
-    border-radius: 14px;
-    padding: 14px;
-    font-size: 13.5px;
-    font-weight: 800;
-    cursor: pointer;
-    box-shadow: 0 10px 24px rgba(220,38,38,0.4);
-    z-index: 32;
+    display: inline-flex; align-items: center; gap: 6px; flex-shrink: 0;
+    background: #dc2626; color: #fff; border: 1px solid #dc2626; border-radius: 8px;
+    padding: 7px 12px; font-size: 11.5px; font-weight: 700; cursor: pointer;
+    transition: opacity .15s, background .15s;
   }
-
-  .bulk-delete-btn.open { display: flex; }
-  /* While picking reminders to delete, hide the AI Assistant button so the Delete bar never covers it */
-  body:has(.bulk-delete-btn.open) .ai-fab { display: none; }
-  .bulk-delete-btn svg { width: 15px; height: 15px; }
+  .bulk-delete-btn:hover:not(:disabled) { background: #b91c1c; }
+  .bulk-delete-btn:disabled { opacity: .45; cursor: default; }
+  .bulk-delete-btn svg { width: 12px; height: 12px; }
 
   .ai-fab {
     position: fixed;
@@ -575,7 +558,6 @@
 
   @media (max-width: 860px) {
     .ai-fab { bottom: 88px; }
-    .bulk-delete-btn { bottom: 88px; }
   }
 
   @media (min-width: 861px) {
@@ -619,8 +601,6 @@
     .empty-state { background: #ffffff; border: 1px solid #dbeeee; color: #64748b; }
 
     .ai-fab { right: 40px; bottom: 30px; }
-    /* Same width as the reminder list (sidebar 220 + container padding 44, list max 992px), like the original design */
-    .bulk-delete-btn { left: 264px; right: auto; width: min(992px, calc(100vw - 264px - 44px)); max-width: none; margin: 0; }
   }
 
   .ai-desc { font-size: 12.5px; color: #64748b; margin: 0 0 16px; line-height: 1.4; }
@@ -715,7 +695,6 @@ html[data-theme="dark"] .reminder-when { color: #b5bbc5; }
 html[data-theme="dark"] .notify-banner { background: #382b1b; border: 1px solid #483928; color: #e8693e; }
 html[data-theme="dark"] .reminder-action-btn { color: #b5bbc5; }
 html[data-theme="dark"] .reminder-action-btn:hover { color: #8750dd; }
-html[data-theme="dark"] .bulk-delete-btn { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.77); }
 html[data-theme="dark"] .ai-fab { box-shadow: 0 8px 18px rgba(0, 0, 0, 0.55); }
 html[data-theme="dark"] .ai-fab-inner { background: #17202d; }
 html[data-theme="dark"] .ai-fab-inner span { color: #cfd4e0; }
@@ -820,19 +799,21 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #c0c6cd; }
     </a>
   </div>
 
-  <button type="button" class="select-all-row" id="selectAllRow" onclick="toggleSelectAll()">
-    <input type="checkbox" id="selectAllCheckbox" style="pointer-events: none;">
-    <span>{{ __('Select All') }}</span>
-  </button>
+  <div class="select-all-bar" id="selectAllRow">
+    <button type="button" class="select-all-row" onclick="toggleSelectAll()">
+      <input type="checkbox" id="selectAllCheckbox" style="pointer-events: none;">
+      <span>{{ __('Select All') }}</span>
+    </button>
+    <button type="button" class="bulk-delete-btn" id="bulkDeleteBtn" onclick="deleteSelected()" disabled>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+      <span>{{ __('Delete') }} (<span id="selectedCount">0</span>)</span>
+    </button>
+  </div>
 
   <div class="reminder-list" id="reminderList"></div>
   <div class="empty-state" id="emptyState" style="display:none;">{{ __('No reminders yet — tap "Add Reminder" to add your first exam, assignment or deadline.') }}</div>
 </div>
 
-<button type="button" class="bulk-delete-btn" id="bulkDeleteBtn" onclick="deleteSelected()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-  {{ __('Delete ·') }} <span id="selectedCount">0</span>
-</button>
 
 <button type="button" class="ai-fab" aria-label="{{ __('AI Assistant') }}" onclick="openAiModal()">
   <span class="ai-fab-inner">
@@ -1034,7 +1015,7 @@ function render() {
   const allSelected = visible.length > 0 && visible.every(r => selectedIds.includes(r.id));
   document.getElementById('selectAllCheckbox').checked = allSelected;
 
-  document.getElementById('bulkDeleteBtn').classList.toggle('open', selectedIds.length > 0);
+  document.getElementById('bulkDeleteBtn').disabled = selectedIds.length === 0;
   document.getElementById('selectedCount').textContent = selectedIds.length;
 
   window._visibleIds = visible.map(r => r.id);
