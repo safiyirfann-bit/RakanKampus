@@ -21,6 +21,8 @@ html[data-theme="dark"] .history-status { filter: brightness(1.3); }
 /* Reminder cards are peach on mobile in light mode; in dark mode use the normal card surface */
 html[data-theme="dark"] .reminder-card:not(.selected) { background: #172233 !important; border-color: #243247 !important; }
 
+html[data-theme="dark"] .timeline-card:has(input[type=checkbox]:checked) { background: #3a1d22 !important; border-color: #7f1d1d !important; }
+
 /* Autofilled inputs keep Chrome's light yellow otherwise */
 html[data-theme="dark"] input:-webkit-autofill {
   -webkit-text-fill-color: #e2e8f0;

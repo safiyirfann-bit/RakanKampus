@@ -66,23 +66,26 @@
   .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
   .select-btn.hidden { display: none; }
 
-  /* Shown while selecting: select-all for the day on screen, delete selected,
-     and (tucked away here instead of a big red button) delete the whole timetable. */
-  .select-bar {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-    background: rgba(255,255,255,0.1); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px;
-  }
+  /* Select mode — same as the Reminders page: a "Select all" row above the
+     list and a red "Delete · n" bar pinned to the bottom, as wide as the list. */
+  .select-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 2px 12px; }
   .select-bar.hidden { display: none; }
   .select-all-label { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: #bfe9ea; cursor: pointer; }
   .select-all-label input { width: 16px; height: 16px; accent-color: #dc2626; cursor: pointer; }
-  .select-bar-actions { display: flex; align-items: center; gap: 12px; }
   .delete-week-link { background: none; border: none; padding: 0; font-size: 11.5px; font-weight: 700; color: #fca5a5; text-decoration: underline; cursor: pointer; }
   .delete-week-link.hidden { display: none; }
-  .select-delete-btn {
-    background: #dc2626; color: #fff; border: none;
-    border-radius: 8px; padding: 8px 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+
+  .bulk-delete-btn {
+    display: none; align-items: center; justify-content: center; gap: 8px;
+    position: fixed; left: 20px; right: 20px; bottom: 24px; max-width: 600px; margin: 0 auto;
+    background: #dc2626; color: #fff; border: none; border-radius: 14px; padding: 14px;
+    font-size: 13.5px; font-weight: 800; cursor: pointer;
+    box-shadow: 0 10px 24px rgba(220,38,38,0.4); z-index: 32;
   }
-  .select-delete-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .bulk-delete-btn.open { display: flex; }
+  .bulk-delete-btn svg { width: 15px; height: 15px; }
+  body:has(.bulk-delete-btn.open) .ai-fab { display: none; }
+  @media (max-width: 860px) { .bulk-delete-btn { bottom: 88px; } }
 
   .day-section { margin-bottom: 18px; }
   .day-label {
@@ -162,6 +165,9 @@
   .timeline-card.t2 { background: #eef1f8; border-left-color: #14213d; }
   .timeline-card.t3 { background: #e8f6f0; border-left-color: #17a589; }
   .timeline-card.t4 { background: #eaf3fb; border-left-color: #1b6ea6; }
+  /* Picked in select mode — same pink as a selected reminder */
+  .timeline-card:has(input[type=checkbox]:checked) { background: #fef2f2 !important; border-color: #fca5a5; }
+  .timeline-card input[type=checkbox] { accent-color: #dc2626; }
 
   .timeline-card-main { flex: 1; min-width: 0; }
   .timeline-subject { font-size: 13.5px; font-weight: 800; color: #14213d; margin: 0 0 3px; }
@@ -371,9 +377,10 @@
     .add-btn { width: auto; padding: 12px 22px; }
     .select-btn { background: #ffffff; border: 1px solid #dbeeee; color: #0d9488; }
     .select-btn.active { background: #dc2626; border-color: #dc2626; color: #fff; }
-    .select-bar { background: #ffffff; border: 1px solid #dbeeee; }
     .select-all-label { color: #0d9488; }
     .delete-week-link { color: #dc2626; }
+    /* Same width as the class list (sidebar 220 + container padding 44, list max 992px) */
+    .bulk-delete-btn { left: 264px; right: auto; width: min(992px, calc(100vw - 264px - 44px)); max-width: none; margin: 0; }
     .day-label { color: #64748b; }
     .class-card { background: #ffffff; border: 1.5px solid #dbeeee; }
     .class-meta { color: #64748b; }
@@ -405,6 +412,7 @@
 html[data-theme="dark"] body { background-image: linear-gradient(160deg, #0c1320, #112031 55%, #1d6869); }
 html[data-theme="dark"] .add-btn { box-shadow: 0 10px 22px rgba(0, 0, 0, 0.45); }
 html[data-theme="dark"] .select-btn { border: 1px solid rgba(42, 51, 65, 0.25); }
+html[data-theme="dark"] .bulk-delete-btn { box-shadow: 0 10px 24px rgba(0, 0, 0, 0.77); }
 html[data-theme="dark"] .class-card { background: #39231b; }
 html[data-theme="dark"] .class-time { color: #cfd4e0; background: #17202d; }
 html[data-theme="dark"] .class-subject { color: #cfd4e0; }
@@ -416,6 +424,7 @@ html[data-theme="dark"] .timeline-card.t1 { background: #1c3b39; }
 html[data-theme="dark"] .timeline-card.t2 { background: #1c253b; }
 html[data-theme="dark"] .timeline-card.t3 { background: #1e3e30; }
 html[data-theme="dark"] .timeline-card.t4 { background: #1c2d3b; }
+html[data-theme="dark"] .timeline-card:has(input[type=checkbox]:checked) { background: #371a1a !important; border-color: #482828; }
 html[data-theme="dark"] .timeline-subject { color: #cfd4e0; }
 html[data-theme="dark"] .timeline-meta { color: #c0c6cd; }
 html[data-theme="dark"] .timeline-lecturer { color: #979faa; }
@@ -465,7 +474,6 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   html[data-theme="dark"] .header-title { color: #cfd4e0; }
   html[data-theme="dark"] .header-sub { color: #979faa; }
   html[data-theme="dark"] .select-btn { background: #17202d; border: 1px solid #284848; color: #2feddc; }
-  html[data-theme="dark"] .select-bar { background: #17202d; border: 1px solid #284848; }
   html[data-theme="dark"] .select-all-label { color: #2feddc; }
   html[data-theme="dark"] .delete-week-link { color: #eb8484; }
   html[data-theme="dark"] .day-label { color: #979faa; }
@@ -514,19 +522,15 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
     </button>
   </div>
 
+  <div class="day-picker" id="dayPicker"></div>
+
   <div class="select-bar hidden" id="selectBar">
     <label class="select-all-label">
       <input type="checkbox" id="selectAllCheckbox" onchange="toggleSelectAll(this.checked)">
-      {{ __('Select all') }}
+      {{ __('Select All') }}
     </label>
-    <div class="select-bar-actions">
-      <button type="button" class="delete-week-link hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">{{ __('Delete whole timetable') }}</button>
-      <button type="button" class="select-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()" disabled>{{ __('Delete') }}</button>
-    </div>
+    <button type="button" class="delete-week-link hidden" id="deleteAllBtn" onclick="deleteAllSchedules()">{{ __('Delete whole timetable') }}</button>
   </div>
-
-
-  <div class="day-picker" id="dayPicker"></div>
 
   <div id="scheduleList"></div>
 
@@ -621,6 +625,11 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   <button type="button" class="save-btn" onclick="saveSchedule()">{{ __('Save') }}</button>
   <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">{{ __('Delete Class') }}</button>
 </div>
+
+<button type="button" class="bulk-delete-btn" id="selectDeleteBtn" onclick="deleteSelectedSchedules()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+  {{ __('Delete ·') }} <span id="selectedCount">0</span>
+</button>
 
 <script>
 let schedules = @json($schedules);
@@ -909,8 +918,8 @@ function updateSelectBar() {
   const selectedOnDay = dayIds.filter(id => selectedIds.has(id));
 
   selectAllCheckbox.checked = dayIds.length > 0 && selectedOnDay.length === dayIds.length;
-  deleteBtn.disabled = selectedOnDay.length === 0;
-  deleteBtn.textContent = selectedOnDay.length > 0 ? `${t('Delete')} (${selectedOnDay.length})` : t('Delete');
+  document.getElementById('selectedCount').textContent = selectedOnDay.length;
+  deleteBtn.classList.toggle('open', selectMode && selectedOnDay.length > 0);
 }
 
 function showModal(id) {
