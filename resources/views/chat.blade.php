@@ -240,7 +240,7 @@
     color: var(--ink); background: transparent; max-height: 160px; padding: 6px 0; overflow-y: hidden;
   }
   #messageInput::placeholder, .hero-input::placeholder { color: var(--faint); }
-  #messageInput.voice-live { color: var(--teal); }
+  #messageInput.voice-live, .hero-input.voice-live { color: var(--teal); }
   .round-btn {
     width: 38px; height: 38px; border-radius: 50%; border: none; cursor: pointer; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center; transition: background .15s, transform .1s;
@@ -400,7 +400,7 @@ html[data-theme="dark"] .composer-box { border: 1px solid #2a3341; background: #
 html[data-theme="dark"] .composer-box:focus-within { border-color: #284843; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.27); }
 html[data-theme="dark"] #messageInput, html[data-theme="dark"] .hero-input { color: #dee2e8; }
 html[data-theme="dark"] #messageInput::placeholder, html[data-theme="dark"] .hero-input::placeholder { color: #ced3d9; }
-html[data-theme="dark"] #messageInput.voice-live { color: #6cefe1; }
+html[data-theme="dark"] #messageInput.voice-live, html[data-theme="dark"] .hero-input.voice-live { color: #6cefe1; }
 html[data-theme="dark"] .mic-btn { color: #b0b6be; }
 html[data-theme="dark"] .mic-btn:hover { background: #10161f; color: #dee2e8; }
 html[data-theme="dark"] .mic-btn.listening { background: #3d1d1d; color: #ef9e9e; }
@@ -553,6 +553,9 @@ html[data-theme="dark"] mark { background: #22473f; }
     <p>{{ __('What can I help you with today?') }}</p>
     <div class="composer-box" style="width:100%">
       <textarea class="hero-input" id="heroInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
+      <button type="button" class="round-btn mic-btn hidden" id="heroMicBtn" aria-label="{{ __('Voice input') }}">
+        <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path><path d="M19 11a7 7 0 0 1-14 0"></path><line x1="12" y1="18" x2="12" y2="22"></line></svg>
+      </button>
       <button class="round-btn send-btn" id="heroSendBtn" aria-label="{{ __('Send') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>
       </button>
@@ -653,98 +656,102 @@ messageInput.addEventListener('keydown', (e) => {
 sendBtn.addEventListener('click', () => sendMessage());
 stopBtn.addEventListener('click', () => { if (currentController) currentController.abort(); });
 
-/* ---------- Voice input (Web Speech API in browsers, the phone's own recogniser in the
-   RakanKampus Android app; hidden where neither works) ---------- */
+/* ---------- Voice input ----------
+   Browsers: Web Speech API. RakanKampus Android app: the phone's own recogniser via the
+   RKAppVoice bridge (WebView's webkitSpeechRecognition never hears anything).
+   Works in both the new-chat box and the normal composer; words appear live while you
+   talk and it keeps listening until ~3 s of silence or you tap the mic again. */
 const IN_APP = /RakanKampusApp/.test(navigator.userAgent);
 const APP_VOICE = (() => { try { return !!(window.RKAppVoice && RKAppVoice.available()); } catch (e) { return false; } })();
 const VOICE_LANG = ({ zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'ms-MY';
-// Android's WebView pretends to have webkitSpeechRecognition but it never hears anything
 const SpeechRecognitionAPI = IN_APP ? null : (window.SpeechRecognition || window.webkitSpeechRecognition);
+const VOICE_OK = !!(SpeechRecognitionAPI || APP_VOICE);
 const VOICE_SILENCE_MS = 3000;
-let recognition = null, isListening = false, voiceBaseText = '', voiceSilenceTimer = null;
+let recognition = null, isListening = false, voiceBaseText = '', voiceSilenceTimer = null, voiceInput = null, voiceBtn = null;
 
+function voiceTarget() {
+  return (app.classList.contains('is-empty') && document.getElementById('heroInput')) || messageInput;
+}
+function showVoiceText(spoken) {
+  if (!voiceInput) return;
+  spoken = (spoken || '').trim();
+  voiceInput.value = [voiceBaseText, spoken].filter(Boolean).join(' ');
+  autoResize(voiceInput);
+  voiceInput.scrollTop = voiceInput.scrollHeight;
+}
 function resetVoiceSilenceTimer() { clearTimeout(voiceSilenceTimer); voiceSilenceTimer = setTimeout(stopVoice, VOICE_SILENCE_MS); }
-function startVoice() {
+function startVoice(btn) {
+  voiceInput = voiceTarget();
+  voiceBtn = btn;
+  voiceBaseText = voiceInput.value.trim();
   isListening = true;
-  micBtn.classList.add('listening');
-  messageInput.classList.add('voice-live');
+  btn.classList.add('listening');
+  voiceInput.classList.add('voice-live');
   resetVoiceSilenceTimer();
-  try { recognition.start(); } catch (e) {}
+  if (APP_VOICE) { try { RKAppVoice.start(VOICE_LANG); } catch (e) { stopVoice(); } }
+  else { try { recognition.start(); } catch (e) {} }
 }
 function stopVoice() {
   if (!isListening) return;
   isListening = false;
   clearTimeout(voiceSilenceTimer);
-  micBtn.classList.remove('listening');
-  messageInput.classList.remove('voice-live');
-  try { recognition.stop(); } catch (e) {}
-  messageInput.focus();
+  if (voiceBtn) voiceBtn.classList.remove('listening');
+  if (voiceInput) voiceInput.classList.remove('voice-live');
+  if (APP_VOICE) { try { RKAppVoice.stop(); } catch (e) {} }
+  else { try { recognition.stop(); } catch (e) {} }
+  if (voiceInput && document.body.contains(voiceInput)) voiceInput.focus();
 }
-if (SpeechRecognitionAPI && micBtn) {
-  micBtn.classList.remove('hidden');
+function voiceBlocked() {
+  stopVoice();
+  RKDialog.alert({ scene: 'oops', title: t('Microphone blocked'), message: t('Please allow microphone access to use voice input.') });
+}
+function wireMic(btn) {
+  if (!btn || !VOICE_OK) return;
+  btn.classList.remove('hidden');
+  btn.addEventListener('click', () => { isListening ? stopVoice() : startVoice(btn); });
+}
+
+if (SpeechRecognitionAPI) {
   recognition = new SpeechRecognitionAPI();
   recognition.lang = VOICE_LANG;
   recognition.interimResults = true;
   recognition.continuous = true;
   recognition.maxAlternatives = 1;
-  recognition.onstart = () => { voiceBaseText = messageInput.value.trim(); };
+  recognition.onstart = () => { if (voiceInput) voiceBaseText = voiceInput.value.trim(); };
   recognition.onresult = (event) => {
     if (!isListening) return;
     resetVoiceSilenceTimer();
     let spoken = '';
     for (let i = 0; i < event.results.length; i++) spoken += event.results[i][0].transcript;
-    spoken = spoken.trim();
-    messageInput.value = voiceBaseText ? `${voiceBaseText} ${spoken}` : spoken;
-    autoResize(messageInput);
-    messageInput.scrollTop = messageInput.scrollHeight;
+    showVoiceText(spoken);
   };
   recognition.onerror = (event) => {
-    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
-      RKDialog.alert({ scene: 'oops', title: t('Microphone blocked'), message: t('Please allow microphone access to use voice input.') });
-      stopVoice();
-    }
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') voiceBlocked();
   };
   recognition.onend = () => {
     if (isListening) setTimeout(() => { if (isListening) { try { recognition.start(); } catch (e) {} } }, 150);
   };
-  micBtn.addEventListener('click', () => {
-    if (app.classList.contains('is-empty')) leaveEmptyState();
-    isListening ? stopVoice() : startVoice();
-  });
-} else if (APP_VOICE && micBtn) {
-  // Android app: one sentence per tap; the phone stops listening by itself after a pause
-  micBtn.classList.remove('hidden');
-  const endAppVoice = () => {
-    isListening = false;
-    micBtn.classList.remove('listening');
-    messageInput.classList.remove('voice-live');
-    messageInput.focus();
-  };
-  const putSpoken = (spoken) => {
-    spoken = (spoken || '').trim();
-    messageInput.value = voiceBaseText ? (spoken ? `${voiceBaseText} ${spoken}` : voiceBaseText) : spoken;
-    autoResize(messageInput);
-    messageInput.scrollTop = messageInput.scrollHeight;
-  };
+} else if (APP_VOICE) {
+  // Called by the app. Partial text streams in while talking; after each pause the phone
+  // sends a final result, so keep what was said and listen again (like the web version).
   window.RKVoice = {
     onStart() {},
-    onPartial(text) { if (isListening) putSpoken(text); },
-    onFinal(text) { if (isListening) putSpoken(text); endAppVoice(); },
+    onPartial(text) { if (!isListening) return; resetVoiceSilenceTimer(); showVoiceText(text); },
+    onFinal(text) {
+      if (!isListening) return;
+      showVoiceText(text);
+      voiceBaseText = voiceInput.value.trim();
+      try { RKAppVoice.start(VOICE_LANG); } catch (e) { stopVoice(); }
+    },
     onError(code) {
-      endAppVoice();
-      if (code === 'not-allowed') RKDialog.alert({ scene: 'oops', title: t('Microphone blocked'), message: t('Please allow microphone access to use voice input.') });
+      if (!isListening) return;
+      if (code === 'not-allowed') return voiceBlocked();
+      if (code === 'no-speech') { try { RKAppVoice.start(VOICE_LANG); } catch (e) { stopVoice(); } return; } // silence timer ends it
+      stopVoice();
     },
   };
-  micBtn.addEventListener('click', () => {
-    if (app.classList.contains('is-empty')) leaveEmptyState();
-    if (isListening) { try { RKAppVoice.stop(); } catch (e) {} endAppVoice(); return; }
-    isListening = true;
-    voiceBaseText = messageInput.value.trim();
-    micBtn.classList.add('listening');
-    messageInput.classList.add('voice-live');
-    try { RKAppVoice.start(VOICE_LANG); } catch (e) { endAppVoice(); }
-  });
 }
+wireMic(micBtn);
 
 /* ---------- Messages ---------- */
 function ensureCol() {
@@ -761,6 +768,7 @@ function greetingText() {
 }
 
 function showEmptyState() {
+  if (isListening) stopVoice();
   app.classList.add('is-empty');
   chatArea.innerHTML = '';
   const node = document.getElementById('emptyTpl').content.cloneNode(true);
@@ -774,6 +782,7 @@ function showEmptyState() {
     if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); sendMessage(heroInput.value); }
   });
   document.getElementById('heroSendBtn').addEventListener('click', () => sendMessage(heroInput.value));
+  wireMic(document.getElementById('heroMicBtn'));
   chatArea.querySelectorAll('.suggestion').forEach(b => b.addEventListener('click', () => sendMessage(b.dataset.question)));
   if (!isMobile()) heroInput.focus();
 }
@@ -860,7 +869,7 @@ function removeSearching() {
 function sendMessage(textArg) {
   const text = (typeof textArg === 'string' ? textArg : messageInput.value).trim();
   if (text === '' || busy) return;
-  if (recognition) stopVoice();
+  if (isListening) stopVoice();
 
   addMessage(text, 'user');
   messageInput.value = '';
