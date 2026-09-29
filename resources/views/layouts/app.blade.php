@@ -9,6 +9,8 @@
 
 <title>RakanKampus</title>
 
+@include('partials.no-hscroll')
+
 @vite([
 'resources/css/app.css',
 'resources/js/app.js'

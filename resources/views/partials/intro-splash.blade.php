@@ -22,12 +22,11 @@
     background:linear-gradient(180deg,#6fb7e6 0%,#b9def4 29%,#fff1d6 46%,#9fc4c9 58%,#8cc265 64%,#6aa84f 100%);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;transition:opacity .2s}
   #rki-stage{position:absolute;left:50%;top:50%;width:360px;height:640px;transform-origin:50% 50%}
-  /* wide screens: soften the scene's left/right edges into the sky & grass behind it */
-  #rki.wide #rki-stage{-webkit-mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent);mask-image:linear-gradient(90deg,transparent,#000 4%,#000 96%,transparent)}
-  #rki-art{position:absolute;inset:0;width:360px;height:640px;transform-origin:50% 60%}
+  /* the sky, hills and grass run on past the 360×640 scene, so any screen shape is filled edge to edge */
+  #rki-art{position:absolute;inset:0;width:360px;height:640px;transform-origin:50% 60%;overflow:visible}
   .rki-cap{position:absolute;left:0;right:0;top:62px;text-align:center;font-weight:800;font-size:21px;color:#fff;text-shadow:0 2px 10px rgba(40,70,110,.45);opacity:0}
   .rki-cap small{display:block;font-size:12.5px;font-weight:600;margin-top:3px}
-  .rki-pill{position:absolute;left:50%;width:210px;margin-left:-105px;top:128px;background:rgba(255,253,246,.95);color:#4a3b2e;border:1.5px solid #c9b79c;border-radius:14px;padding:8px 10px;font-size:12.5px;font-weight:700;box-shadow:0 8px 18px rgba(60,40,20,.15);text-align:center;opacity:0}
+  .rki-pill{position:absolute;left:50%;width:250px;margin-left:-125px;top:128px;background:rgba(255,253,246,.95);color:#4a3b2e;border:1.5px solid #c9b79c;border-radius:14px;padding:8px 10px;font-size:12.5px;font-weight:700;box-shadow:0 8px 18px rgba(60,40,20,.15);text-align:center;opacity:0}
   .rki-pill b{color:#3f9b5a}
   #rki-skip{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));right:16px;z-index:2;font:800 13px/1 inherit;font-family:inherit;padding:9px 14px;border-radius:99px;border:0;cursor:pointer;background:rgba(255,255,255,.8);color:#4a3b2e;box-shadow:0 4px 12px rgba(0,0,0,.12)}
   #rki-skip:hover{background:#fff}
@@ -138,24 +137,24 @@
   }
   const art = $('art');
   art.innerHTML = `<defs>
-      <linearGradient id="rki-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fb7e6"/><stop offset=".45" stop-color="#b9def4"/><stop offset=".72" stop-color="#fff1d6"/></linearGradient>
-      <linearGradient id="rki-grass" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8d672"/><stop offset="1" stop-color="#6aa84f"/></linearGradient>
+      <linearGradient id="rki-sky" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="640"><stop offset="0" stop-color="#6fb7e6"/><stop offset=".45" stop-color="#b9def4"/><stop offset=".72" stop-color="#fff1d6"/></linearGradient>
+      <linearGradient id="rki-grass" gradientUnits="userSpaceOnUse" x1="0" y1="430" x2="0" y2="640"><stop offset="0" stop-color="#a8d672"/><stop offset="1" stop-color="#6aa84f"/></linearGradient>
       <radialGradient id="rki-sunG"><stop offset="0" stop-color="#fffbe6"/><stop offset=".4" stop-color="#fff2b8" stop-opacity=".8"/><stop offset="1" stop-color="#fff2b8" stop-opacity="0"/></radialGradient>
       <filter id="rki-glow"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
       <filter id="rki-soft"><feGaussianBlur stdDeviation="1.2"/></filter>
       <linearGradient id="rki-beam" x1="0" x2="1"><stop offset="0" stop-color="#ffb347"/><stop offset=".5" stop-color="#ff7eb6"/><stop offset="1" stop-color="#3fd0c0"/></linearGradient><filter id="rki-bglow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5"/></filter>
     </defs>
-    <rect width="360" height="640" fill="url(#rki-sky)"/>
+    <rect x="-600" y="-900" width="1560" height="1700" fill="url(#rki-sky)"/>
     <circle cx="290" cy="150" r="110" fill="url(#rki-sunG)"/>
     ${cloud(20, 200, .9, 'cl1')}${cloud(220, 118, .7, 'cl2')}${cloud(150, 270, .5, 'cl3')}
-    <path d="M-10 372 Q60 318 130 350 Q200 300 280 342 Q330 320 380 340 V420 H-10Z" fill="#9fc4c9" opacity=".85"/>
+    <path d="M-600 380 L-10 372 Q60 318 130 350 Q200 300 280 342 Q330 320 380 340 L960 346 V420 H-600Z" fill="#9fc4c9" opacity=".85"/>
     <g transform="translate(196 318)">
       <rect x="0" y="16" width="58" height="30" fill="#fbf1de" stroke="${LINE}" stroke-width="1.2"/><path d="M-6 18 L29 0 L64 18 Z" fill="#4f9a8f" stroke="${LINE}" stroke-width="1.2"/>
       <rect x="66" y="24" width="30" height="22" fill="#fbf1de" stroke="${LINE}" stroke-width="1.2"/><path d="M62 26 L81 14 L100 26 Z" fill="#c9674f" stroke="${LINE}" stroke-width="1.2"/>
       <g fill="#8fb3c9">${[6, 20, 34, 72, 84].map(x => `<rect x="${x}" y="${x > 60 ? 30 : 24}" width="7" height="8"/>`).join('')}</g><rect x="24" y="34" width="10" height="12" fill="#b08968"/>
     </g>
-    <path d="M-10 404 Q90 360 190 392 Q280 368 380 388 V640 H-10Z" fill="#8cc265"/>
-    <path d="M-10 430 Q120 400 240 424 Q320 410 380 420 V640 H-10Z" fill="url(#rki-grass)"/>
+    <path d="M-600 410 L-10 404 Q90 360 190 392 Q280 368 380 388 L960 392 V1600 H-600Z" fill="#8cc265"/>
+    <path d="M-600 436 L-10 430 Q120 400 240 424 Q320 410 380 420 L960 424 V1600 H-600Z" fill="url(#rki-grass)"/>
     <g transform="translate(18 350)"><rect x="-4" y="30" width="9" height="46" rx="3" fill="#7a5a3c" stroke="${LINE}" stroke-width="1.2"/>
       <g fill="#5f9e46" stroke="${LINE}" stroke-width="1.2"><circle cx="-16" cy="22" r="22"/><circle cx="14" cy="18" r="24"/><circle cx="0" cy="-2" r="24"/></g><path d="M-8 -14 Q6 -18 16 -8" stroke="#8cc265" stroke-width="3" fill="none"/></g>
     <g id="rki-flowers">${(() => { let r = 7; const rnd = () => (r = (r * 9301 + 49297) % 233280) / 233280; let out = '';

@@ -1,4 +1,5 @@
 <link rel="manifest" href="/manifest.json">
+@include('partials.no-hscroll')
 <meta name="theme-color" content="#0f2747">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
