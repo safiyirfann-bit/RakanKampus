@@ -1,4 +1,4 @@
-@props(['title', 'sub' => null, 'back' => null, 'kpis' => []])
+@props(['title', 'sub' => null, 'back' => null, 'backLabel' => 'Back', 'label' => null, 'kpis' => []])
 {{--
   Green hero banner used at the top of every admin page.
   <x-admin-hero title="Inbox" sub="…" :kpis="[['icon' => 'mail', 'value' => 3, 'label' => 'Unread', 'tag' => 'new', 'tone' => 'red', 'href' => '…']]">
@@ -25,32 +25,33 @@
     'peak' => '<path d="M3 20h18M6 16V9M11 16V5M16 16v-5M21 16v-8"/>',
   ];
 @endphp
-<section {{ $attributes->merge(['class' => 'adm-hero']) }}>
-  <div class="adm-hero-top">
-    @if($back)
-      <a href="{{ $back }}" class="adm-hero-back" aria-label="Back"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></a>
+@php $wide = count($kpis) > 4; @endphp
+<section {{ $attributes->merge(['class' => 'adm-hero' . ($wide ? ' wide' : '')]) }}>
+  <div class="adm-hero-text">
+    @if($label || $back)
+      <small>
+        @if($back)<a href="{{ $back }}">‹ {{ $backLabel }}</a>@if($label)<span>·</span>@endif @endif
+        @if($label)<span>{{ $label }}</span>@endif
+      </small>
     @endif
-    <div class="adm-hero-title">
-      <h1>{!! $title !!}</h1>
-      @if($sub)<p>{{ $sub }}</p>@endif
-    </div>
+    <h1>{!! $title !!}</h1>
+    @if($sub)<p>{{ $sub }}</p>@endif
     @isset($actions)
-      <div class="adm-hero-actions">{{ $actions }}</div>
+      <div class="adm-hero-acts">{{ $actions }}</div>
     @endisset
   </div>
   @if(count($kpis))
-    <div class="adm-kpis">
+    <div class="adm-hstats" style="--n: {{ count($kpis) }}">
       @foreach($kpis as $k)
         @php $tagName = isset($k['href']) ? 'a' : (isset($k['onclick']) ? 'button' : 'div'); @endphp
-        <{{ $tagName }} class="adm-kpi" @if(isset($k['href'])) href="{{ $k['href'] }}" @endif @if(isset($k['onclick'])) type="button" onclick="{{ $k['onclick'] }}" @endif>
-          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $icons[$k['icon'] ?? 'check'] ?? $icons['check'] !!}</svg></span>
-          @if(!empty($k['tag']))<span class="tag {{ $k['tone'] ?? '' }}">{{ $k['tag'] }}</span>@endif
-          <b>{{ $k['value'] }}</b>
-          <span class="lbl">{{ $k['label'] }}</span>
+        <{{ $tagName }} class="adm-hs" @if(isset($k['href'])) href="{{ $k['href'] }}" @endif @if(isset($k['onclick'])) type="button" onclick="{{ $k['onclick'] }}" @endif>
+          <span>{{ $k['label'] }}</span>
+          <b class="{{ !empty($k['small']) ? 'sm' : '' }}">{{ $k['value'] }}</b>
+          @if(!empty($k['tag']))<em class="{{ ($k['tone'] ?? '') === 'red' ? 'red' : '' }}">{{ $k['tag'] }}</em>@endif
           @if(!empty($k['spark']))
             @php $pts = $k['spark']; $mx = max(1, max($pts)); $n = max(1, count($pts) - 1);
-                 $poly = collect($pts)->map(fn($v, $i) => round($i * 84 / $n, 1) . ',' . round(26 - ($v / $mx) * 22, 1))->implode(' '); @endphp
-            <svg class="spark" viewBox="0 0 84 28" aria-hidden="true"><polyline points="{{ $poly }}" fill="none" stroke="#f5e6a8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                 $poly = collect($pts)->map(fn($v, $i) => round($i * 70 / $n, 1) . ',' . round(22 - ($v / $mx) * 19, 1))->implode(' '); @endphp
+            <svg class="spark" viewBox="0 0 70 24" aria-hidden="true"><polyline points="{{ $poly }}" fill="none" stroke="#f5e6a8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
           @endif
         </{{ $tagName }}>
       @endforeach

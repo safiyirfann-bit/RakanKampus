@@ -104,7 +104,7 @@
 @include('partials.admin-nav', ['active' => 'analytics', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
 
 <div class="adm-wrap" style="padding-bottom:0">
-    <x-admin-hero title="📈 Analytics" sub="Users, online activity & data entries across the app"
+    <x-admin-hero title="Analytics" label="Overview" sub="Users, online activity & data entries across the app"
       :kpis="[
         ['icon' => 'users', 'value' => number_format($totalUsers), 'label' => 'Total users · view all', 'tag' => $newThisWeek ? '+' . $newThisWeek . ' this week' : null, 'onclick' => 'document.getElementById(\'usersModal\').showModal()'],
         ['icon' => 'online', 'value' => $onlineNow, 'label' => 'Online now · see who', 'tag' => $onlineNow ? 'live' : null, 'onclick' => 'document.getElementById(\'onlineModal\').showModal()'],

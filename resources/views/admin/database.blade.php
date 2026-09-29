@@ -116,7 +116,7 @@
 
 @include('partials.admin-nav', ['active' => 'database'])
 <div class="adm-wrap" style="padding-bottom:0">
-    <x-admin-hero title="🗄️ Database" sub="Read-only view of every table (rows can be deleted with care)"
+    <x-admin-hero title="Database" label="System" sub="Read-only view of every table (rows can be deleted with care)"
       :kpis="[
         ['icon' => 'online', 'value' => $onlineNowCount, 'label' => 'Online now (last ' . (int) ($onlineWindowSeconds / 60) . ' min)', 'tag' => $onlineNowCount ? 'live' : null],
         ['icon' => 'db', 'value' => count($tables), 'label' => 'Tables'],

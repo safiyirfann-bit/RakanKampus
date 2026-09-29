@@ -26,13 +26,21 @@ class UnansweredQuestionController extends Controller
 
         $history = UnansweredQuestion::where('status', 'resolved')
             ->latest('updated_at')
-            ->take(50)
+            ->take(100)
             ->get();
+
+        $answeredTotal = UnansweredQuestion::where('status', 'resolved')->where('resolution', 'answered')->count();
+        $dismissedTotal = UnansweredQuestion::where('status', 'resolved')->count() - $answeredTotal;
+
+        // Average time from first ask to being answered (last 100 answered).
+        $avgAnswerHours = UnansweredQuestion::where('status', 'resolved')->where('resolution', 'answered')
+            ->latest('updated_at')->take(100)->get(['created_at', 'updated_at'])
+            ->avg(fn ($q) => $q->created_at->diffInMinutes($q->updated_at) / 60);
 
         $topics = Information::orderBy('main_topic')->get();
         $unreadFeedbackCount = Feedback::where('is_read', false)->count();
 
-        return view('admin.unanswered', compact('questions', 'history', 'topics', 'sort', 'unreadFeedbackCount'));
+        return view('admin.unanswered', compact('questions', 'history', 'topics', 'sort', 'unreadFeedbackCount', 'answeredTotal', 'dismissedTotal', 'avgAnswerHours'));
     }
 
     public function storeAndResolve(Request $request, UnansweredQuestion $unansweredQuestion)

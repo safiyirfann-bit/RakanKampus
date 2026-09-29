@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ChatMessage;
 use App\Models\Feedback;
 use App\Models\Information;
 use App\Models\KnowledgeBase;
@@ -15,9 +16,30 @@ class KnowledgeBaseController extends Controller
     {
         $entries = $information->knowledgeEntries()->latest()->get();
 
+        // How often the bot used this topic's answers (chat_messages.knowledge_base_id).
+        $ids = $entries->pluck('id');
+        $askCounts = collect();
+        $askedThisWeek = 0;
+        $askedLastWeek = 0;
+        try {
+            if ($ids->isNotEmpty()) {
+                $askCounts = ChatMessage::whereIn('knowledge_base_id', $ids)
+                    ->selectRaw('knowledge_base_id, COUNT(*) as n')
+                    ->groupBy('knowledge_base_id')
+                    ->pluck('n', 'knowledge_base_id');
+                $askedThisWeek = ChatMessage::whereIn('knowledge_base_id', $ids)->where('created_at', '>=', now()->subDays(7))->count();
+                $askedLastWeek = ChatMessage::whereIn('knowledge_base_id', $ids)->whereBetween('created_at', [now()->subDays(14), now()->subDays(7)])->count();
+            }
+        } catch (\Throwable $e) {
+            // column not migrated yet: show zeros
+        }
+
         return view('admin.knowledge-detail', [
             'information' => $information,
             'entries' => $entries,
+            'askCounts' => $askCounts,
+            'askedThisWeek' => $askedThisWeek,
+            'askedLastWeek' => $askedLastWeek,
             'unansweredCount' => UnansweredQuestion::where('status', 'pending')->count(),
             'unreadFeedbackCount' => Feedback::where('is_read', false)->count(),
         ]);

@@ -71,6 +71,11 @@ class InformationController extends Controller
             'description' => $request->description,
         ]);
 
+        if ($request->input('back') === 'topic') {
+            return redirect()->route('admin.information.show', $information->id)
+                ->with('status', 'Topic updated successfully.');
+        }
+
         return redirect()->route('admin.dashboard')
             ->with('status', 'Information updated successfully!');
     }
