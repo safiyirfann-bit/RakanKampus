@@ -449,7 +449,15 @@
     gap: 5px;
     cursor: pointer;
     color: #fff;
+    /* only shown while a card is being swiped / is swiped open — never peeks out
+       from behind a card that is still fading in */
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.15s ease;
   }
+  .conv-swipe-wrap.swiping .conv-swipe-delete,
+  .conv-swipe-wrap.open .conv-swipe-delete { opacity: 1; pointer-events: auto; }
+  .conv-swipe-wrap.swiping .conv-card { transition: none; }
 
   .conv-swipe-delete svg { width: 17px; height: 17px; }
   .conv-swipe-delete span { font-size: 11px; font-weight: 700; }
@@ -466,14 +474,15 @@
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(20, 40, 100, 0.04);
     transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.2s ease;
-    animation: fadeInUp 0.5s ease both;
+    /* "backwards", not "both": once it has faded in, the swipe can move the card */
+    animation: fadeInUp 0.5s ease backwards;
     touch-action: pan-y;
   }
 
-  .conversation-list .conv-card:nth-child(1) { animation-delay: 0.45s; }
-  .conversation-list .conv-card:nth-child(2) { animation-delay: 0.52s; }
-  .conversation-list .conv-card:nth-child(3) { animation-delay: 0.59s; }
-  .conversation-list .conv-card:nth-child(4) { animation-delay: 0.66s; }
+  .conversation-list .conv-swipe-wrap:nth-child(1) .conv-card { animation-delay: 0.45s; }
+  .conversation-list .conv-swipe-wrap:nth-child(2) .conv-card { animation-delay: 0.52s; }
+  .conversation-list .conv-swipe-wrap:nth-child(3) .conv-card { animation-delay: 0.59s; }
+  .conversation-list .conv-swipe-wrap:nth-child(4) .conv-card { animation-delay: 0.66s; }
 
   .conv-card:hover {
     box-shadow: 0 10px 24px rgba(20, 33, 61, 0.14);
@@ -753,7 +762,7 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
                 <span>{{ __('Delete') }}</span>
             </button>
             <div class="conv-card" data-conv-id="{{ $conv['id'] }}" data-conv-title="{{ $conv['title'] }}" data-chat-url="{{ route('student.chat') }}?conversation={{ $conv['id'] }}"
-                 onpointerdown="startConvDrag(event, {{ $conv['id'] }})" onpointermove="moveConvDrag(event)" onpointerup="endConvDrag(event, {{ $conv['id'] }})" onpointerleave="endConvDrag(event, {{ $conv['id'] }})">
+                 onpointerdown="startConvDrag(event, {{ $conv['id'] }})" onpointermove="moveConvDrag(event)" onpointerup="endConvDrag(event, {{ $conv['id'] }})" onpointerleave="endConvDrag(event, {{ $conv['id'] }})" onpointercancel="endConvDrag(event, {{ $conv['id'] }})">
                 <div class="conv-icon">
                     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
@@ -944,49 +953,65 @@ function updateGreeting() {
 updateGreeting();
 setInterval(updateGreeting, 60000);
 
-let convDragId = null;
-let convDragStartX = null;
-let convDragOffset = 0;
-let convDragMoved = false;
+// Conversation cards: swipe right to reveal "Delete", tap Delete to remove it,
+// tap the card (or swipe back) to close. A mostly-vertical drag is left to the
+// page scroll, so scrolling past the list never opens or deletes anything.
+const CONV_OPEN_X = 90;
+let convDrag = null;
+
+function closeConvSwipes(except) {
+    document.querySelectorAll('.conv-swipe-wrap.open').forEach(w => {
+        if (w === except) return;
+        w.classList.remove('open');
+        const c = w.querySelector('.conv-card');
+        if (c) c.style.transform = '';
+    });
+}
 
 function startConvDrag(e, id) {
-    convDragId = id;
-    convDragStartX = e.clientX;
-    convDragOffset = 0;
-    convDragMoved = false;
+    if (e.button > 0) return;
+    const card = e.currentTarget;
+    const wrap = card.closest('.conv-swipe-wrap');
+    closeConvSwipes(wrap);
+    convDrag = { id, card, wrap, x: e.clientX, y: e.clientY, dx: 0, horiz: false, moved: false,
+                 base: wrap.classList.contains('open') ? CONV_OPEN_X : 0 };
 }
 
 function moveConvDrag(e) {
-    if (convDragId === null) return;
-    let delta = e.clientX - convDragStartX;
-    if (Math.abs(delta) > 5) convDragMoved = true;
-    if (delta < 0) delta = 0;
-    if (delta > 90) delta = 90;
-    convDragOffset = delta;
-    const card = document.querySelector(`.conv-card[data-conv-id="${convDragId}"]`);
-    if (card) card.style.transform = `translateX(${convDragOffset}px)`;
+    const d = convDrag;
+    if (!d) return;
+    const dx = e.clientX - d.x, dy = e.clientY - d.y;
+    if (!d.horiz) {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        if (Math.abs(dx) <= Math.abs(dy)) { convDrag = null; return; } // it's a scroll
+        d.horiz = true;
+        d.wrap.classList.add('swiping');
+        try { d.card.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    d.moved = true;
+    d.dx = Math.max(0, Math.min(CONV_OPEN_X, d.base + dx));
+    d.card.style.transform = `translateX(${d.dx}px)`;
 }
 
 function endConvDrag(e, id) {
-    if (convDragId === null) return;
-    const shouldDelete = convDragOffset > 45;
-    const moved = convDragMoved;
-    convDragId = null;
-    convDragStartX = null;
-    convDragOffset = 0;
-    convDragMoved = false;
-
-    if (shouldDelete) {
-        deleteHomeConversationDirect(id);
+    const d = convDrag;
+    convDrag = null;
+    if (!d) return;
+    d.wrap.classList.remove('swiping');
+    if (d.moved) {
+        const open = d.dx > CONV_OPEN_X / 2;
+        d.wrap.classList.toggle('open', open);
+        d.card.style.transform = open ? `translateX(${CONV_OPEN_X}px)` : '';
         return;
     }
-
-    const card = document.querySelector(`.conv-card[data-conv-id="${id}"]`);
-    if (card) card.style.transform = 'translateX(0px)';
-    if (!moved && card) {
-        window.location = card.dataset.chatUrl;
-    }
+    if (e.type !== 'pointerup') return;
+    if (d.wrap.classList.contains('open')) { closeConvSwipes(); return; }
+    if (e.target.closest('.conv-actions')) return; // rename / delete buttons handle themselves
+    window.location = d.card.dataset.chatUrl;
 }
+
+// tapping anywhere else closes an open card
+document.addEventListener('pointerdown', (e) => { if (!e.target.closest('.conv-swipe-wrap')) closeConvSwipes(); });
 
 function deleteHomeConversationDirect(id) {
     fetch(`/chatbot/${id}`, {
