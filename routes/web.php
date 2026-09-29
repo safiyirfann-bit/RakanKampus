@@ -222,6 +222,10 @@ Route::middleware(['auth', 'admin'])
         Route::get('/dashboard', [InformationController::class, 'index'])
             ->name('dashboard');
 
+        // Knowledge base (all topics)
+        Route::get('/knowledge', [InformationController::class, 'knowledge'])
+            ->name('knowledge');
+
         // Store new information
         Route::post('/information', [InformationController::class, 'store'])
             ->name('information.store');

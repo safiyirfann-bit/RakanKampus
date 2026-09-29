@@ -30,7 +30,7 @@
 
 <div class="adm-wrap">
     <x-admin-hero :title="e($information->main_topic)" :sub="$information->description" label="Knowledge base · Topic"
-      :back="route('admin.dashboard') . '#topics'" back-label="All topics"
+      :back="route('admin.knowledge')" back-label="All topics"
       :kpis="[
         ['value' => $entries->count(), 'label' => 'Q&A entries', 'tag' => $cats->count() . ' ' . \Illuminate\Support\Str::plural('category', $cats->count())],
         ['value' => number_format($askedThisWeek), 'label' => 'Asked this week', 'tag' => $trend === null ? 'last 7 days' : ($trend >= 0 ? '▲ ' . $trend . '%' : '▼ ' . abs($trend) . '%'), 'tone' => ($trend ?? 0) < 0 ? 'red' : null],
