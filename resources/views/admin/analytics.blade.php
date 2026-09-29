@@ -23,7 +23,10 @@
         .page-header p { margin: 4px 0 0; color: #64748b; font-size: 14px; }
         .filters { display: flex; gap: 8px; flex-wrap: wrap; }
         .filters select, .filters a { border: 1px solid #cfdccf; border-radius: 10px; padding: 8px 12px; background: #fff; font-size: 13px; color: #334155; text-decoration: none; font-family: inherit; cursor: pointer; }
-        .page { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+        .page { padding: 0 28px 32px; max-width: 1400px; }
+        .adm-hero .filters { display: flex; gap: 8px; align-items: center; }
+        .adm-hero .kpis-x { display: none; }
+        .adm-kpi b { font-size: 24px; }
         .kpis { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; margin-bottom: 16px; }
         .card { background: #fff; border: 1px solid #e1eadf; border-radius: 14px; padding: 18px; margin-bottom: 16px; }
         .kpis .card { margin-bottom: 0; }
@@ -100,12 +103,17 @@
 
 @include('partials.admin-nav', ['active' => 'analytics', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
 
-<div class="page-header">
-    <div>
-        <h1>Analytics</h1>
-        <p>Users, online activity &amp; data entries across the app</p>
-    </div>
-    <form class="filters" method="GET" action="{{ route('admin.analytics') }}">
+<div class="adm-wrap" style="padding-bottom:0">
+    <x-admin-hero title="📈 Analytics" sub="Users, online activity & data entries across the app"
+      :kpis="[
+        ['icon' => 'users', 'value' => number_format($totalUsers), 'label' => 'Total users · view all', 'tag' => $newThisWeek ? '+' . $newThisWeek . ' this week' : null, 'onclick' => 'document.getElementById(\'usersModal\').showModal()'],
+        ['icon' => 'online', 'value' => $onlineNow, 'label' => 'Online now · see who', 'tag' => $onlineNow ? 'live' : null, 'onclick' => 'document.getElementById(\'onlineModal\').showModal()'],
+        ['icon' => 'peak', 'value' => $peakLabel, 'label' => 'Peak hour'],
+        ['icon' => 'db', 'value' => number_format($totalRecords), 'label' => 'Records in ' . $tableCount . ' tables'],
+        ['icon' => 'history', 'value' => number_format($updatedToday), 'label' => 'Records updated today'],
+      ]">
+      <x-slot:actions>
+        <form class="filters" method="GET" action="{{ route('admin.analytics') }}">
         <select name="range" onchange="this.form.submit()" aria-label="Date range">
             @foreach($ranges as $r)
                 <option value="{{ $r }}" @selected($r === $range)>Last {{ $r }} days</option>
@@ -117,41 +125,14 @@
                 <option value="{{ $t }}" @selected($tableFilter === $t)>{{ $t }}</option>
             @endforeach
         </select>
-        <a href="{{ request()->fullUrl() }}">⟳ Refresh</a>
+        <a href="{{ request()->fullUrl() }}" class="adm-btn-glass">⟳ Refresh</a>
     </form>
+      </x-slot:actions>
+    </x-admin-hero>
 </div>
 
 <div class="page">
 
-    <div class="kpis">
-        <button type="button" class="card clickable" onclick="document.getElementById('usersModal').showModal()">
-            <div class="kpi-label">Total users</div>
-            <div class="kpi-value">{{ number_format($totalUsers) }}</div>
-            <div class="kpi-sub">▲ {{ $newThisWeek }} new this week</div>
-            <div class="view">View all accounts <span class="arrow">→</span></div>
-        </button>
-        <button type="button" class="card clickable" onclick="document.getElementById('onlineModal').showModal()">
-            <div class="kpi-label">Online now</div>
-            <div class="kpi-value"><span class="dot"></span>{{ $onlineNow }}</div>
-            <div class="kpi-sub">active in the last 5 min</div>
-            <div class="view">See who's online <span class="arrow">→</span></div>
-        </button>
-        <div class="card">
-            <div class="kpi-label">Peak hour</div>
-            <div class="kpi-value" style="font-size:24px">{{ $peakLabel }}</div>
-            <div class="kpi-sub">most users online</div>
-        </div>
-        <div class="card">
-            <div class="kpi-label">Total records</div>
-            <div class="kpi-value">{{ number_format($totalRecords) }}</div>
-            <div class="kpi-sub">across {{ $tableCount }} tables</div>
-        </div>
-        <div class="card">
-            <div class="kpi-label">Updated today</div>
-            <div class="kpi-value">{{ number_format($updatedToday) }}</div>
-            <div class="kpi-sub">records edited</div>
-        </div>
-    </div>
 
     <div class="card">
         <h3>Users online by hour of day</h3>

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Database Viewer - RakanKampus</title>
 <style>
-    :root { --teal: #2dd4bf; --navy: #2a5f59; --blue: #3355a6; --purple: #c084fc; }
+    :root { --teal: #3f7a52; --navy: #2f4f3a; --blue: #3355a6; --purple: #c084fc; }
     * { box-sizing: border-box; }
     body {
         margin: 0;
@@ -37,7 +37,7 @@
     }
     .header a.back-link:hover { background: #e2e8f0; }
 
-    .content { padding: 24px 28px 60px; max-width: 1200px; margin: 0 auto; }
+    .content { padding: 0 28px 60px; max-width: 1400px; }
 
     .stat-grid {
         display: grid;
@@ -114,9 +114,15 @@
 </head>
 <body>
 
-<div class="header">
-    <strong>RakanKampus &mdash; Database Viewer</strong>
-    <a href="{{ route('admin.dashboard') }}" class="back-link">&larr; Back to Dashboard</a>
+@include('partials.admin-nav', ['active' => 'database'])
+<div class="adm-wrap" style="padding-bottom:0">
+    <x-admin-hero title="🗄️ Database" sub="Read-only view of every table (rows can be deleted with care)"
+      :kpis="[
+        ['icon' => 'online', 'value' => $onlineNowCount, 'label' => 'Online now (last ' . (int) ($onlineWindowSeconds / 60) . ' min)', 'tag' => $onlineNowCount ? 'live' : null],
+        ['icon' => 'db', 'value' => count($tables), 'label' => 'Tables'],
+        ['icon' => 'book', 'value' => number_format(array_sum($counts)), 'label' => 'Records in total'],
+        ['icon' => 'check', 'value' => number_format($rows->total()), 'label' => 'Rows in ' . $table],
+      ]" />
 </div>
 
 <div class="content">
@@ -128,11 +134,6 @@
         <div class="flash error">{{ session('db_viewer_error') }}</div>
     @endif
 
-    <div class="online-banner">
-        <div class="online-dot"></div>
-        <strong>{{ $onlineNowCount }} user online now</strong>
-        <span>&mdash; active within the last {{ (int) ($onlineWindowSeconds / 60) }} minutes</span>
-    </div>
 
     <div class="stat-grid">
         @foreach ($counts as $t => $count)

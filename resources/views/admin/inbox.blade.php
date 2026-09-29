@@ -263,24 +263,19 @@
 
 @include('partials.admin-nav', ['active' => 'inbox', 'unansweredCount' => $unansweredCount])
 
-<div class="page-header">
-    <h1>Feedback Inbox</h1>
-    <p>Student feedback, feature requests & reported issues</p>
+<div class="adm-wrap">
+    @php $unreadNow = $feedbacks->where('is_read', false)->count(); @endphp
+    <x-admin-hero title="✉️ Feedback Inbox" sub="Student feedback, feature requests & reported issues"
+      :kpis="[
+        ['icon' => 'mail', 'value' => $feedbacks->count(), 'label' => 'Total messages', 'onclick' => 'setInboxTab(\'all\', document.querySelector(\'.tab\'))'],
+        ['icon' => 'alert', 'value' => $unreadNow, 'label' => 'Unread', 'tag' => $unreadNow ? 'new' : null, 'tone' => 'red'],
+        ['icon' => 'chat', 'value' => $feedbacks->filter(fn ($f) => filled($f->feedback))->count(), 'label' => 'Feedback', 'onclick' => 'setInboxTab(\'feedback\', document.querySelectorAll(\'.tab\')[1])'],
+        ['icon' => 'bulb', 'value' => $feedbacks->filter(fn ($f) => filled($f->feature_request))->count(), 'label' => 'Feature requests', 'onclick' => 'setInboxTab(\'feature\', document.querySelectorAll(\'.tab\')[2])'],
+        ['icon' => 'warn', 'value' => $feedbacks->filter(fn ($f) => filled($f->issue_report))->count(), 'label' => 'Reported issues', 'onclick' => 'setInboxTab(\'issue\', document.querySelectorAll(\'.tab\')[3])'],
+      ]" />
 </div>
 
     <div class="page">
-
-        <div class="top-row">
-            <div class="stat-card">
-                <p class="label">Total</p>
-                <p class="value">{{ $feedbacks->count() }}</p>
-            </div>
-
-            <div class="stat-card">
-                <p class="label">Unread</p>
-                <p class="value accent">{{ $feedbacks->where('is_read', false)->count() }}</p>
-            </div>
-        </div>
 
         <div class="tabs">
             <button class="tab active" onclick="setInboxTab('all', this)">

@@ -367,9 +367,13 @@
 
 @include('partials.admin-nav', ['active' => 'unanswered', 'unansweredCount' => $questions->count(), 'unreadFeedbackCount' => $unreadFeedbackCount])
 
-<div class="page-header">
-    <h1>Unanswered Questions</h1>
-    <p>Questions the bot couldn't find an answer for in the knowledge base</p>
+<div class="adm-wrap">
+    <x-admin-hero title="❓ Unanswered Questions" sub="Questions the bot couldn't find an answer for in the knowledge base"
+      :kpis="[
+        ['icon' => 'alert', 'value' => $questions->count(), 'label' => 'Waiting for an answer', 'tag' => $questions->count() ? 'needs you' : null, 'tone' => 'red', 'onclick' => 'setTab(\'pending\', document.querySelector(\'.tab\'))'],
+        ['icon' => 'repeat', 'value' => $questions->sum('asked_count'), 'label' => 'Times asked by students'],
+        ['icon' => 'history', 'value' => $history->count(), 'label' => 'Answered / resolved', 'onclick' => 'setTab(\'history\', document.querySelectorAll(\'.tab\')[1])'],
+      ]" />
 </div>
 
     <div class="page">
@@ -378,22 +382,6 @@
             <div class="status-msg">{{ session('status') }}</div>
         @endif
 
-        <div class="top-row">
-            <div class="stat-card">
-                <p class="label">Total Pending</p>
-                <p class="value">{{ $questions->count() }}</p>
-            </div>
-
-            <div class="stat-card">
-                <p class="label">Total Times Asked</p>
-                <p class="value">{{ $questions->sum('asked_count') }}</p>
-            </div>
-
-            <div class="stat-card">
-                <p class="label">Total History</p>
-                <p class="value">{{ $history->count() }}</p>
-            </div>
-        </div>
 
         <div class="tabs">
             <button class="tab active" onclick="setTab('pending', this)">

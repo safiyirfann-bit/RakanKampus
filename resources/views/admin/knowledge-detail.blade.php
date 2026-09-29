@@ -290,16 +290,21 @@ tbody tr:hover{ background:#f5faf6; }
 
 <body>
 
-@include('partials.admin-nav', ['active' => 'dashboard', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
+@include('partials.admin-nav', ['active' => 'knowledge', 'unansweredCount' => $unansweredCount, 'unreadFeedbackCount' => $unreadFeedbackCount])
 
-<div class="page-header">
-    <div class="page-title">
-        <a href="{{ route('admin.dashboard') }}" class="back-btn" aria-label="Back to dashboard">
-            <i class="ti ti-arrow-left" aria-hidden="true"></i>
-        </a>
-        <h2>{{ $information->main_topic }}</h2>
-    </div>
-    <p class="subtitle">{{ $information->description }}</p>
+<div class="adm-wrap" style="padding-bottom:0">
+    <x-admin-hero :title="e($information->main_topic)" :sub="$information->description" :back="route('admin.dashboard')"
+      :kpis="[
+        ['icon' => 'book', 'value' => $entries->count(), 'label' => 'Q&A entries'],
+        ['icon' => 'tag', 'value' => $entries->pluck('category')->filter()->unique()->count(), 'label' => 'Categories'],
+        ['icon' => 'clock', 'value' => $information->updated_at?->diffForHumans() ?? '—', 'label' => 'Last updated'],
+      ]">
+      <x-slot:actions>
+        <label class="adm-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+          <input type="text" placeholder="Search question, answer, keyword…" id="searchInput" oninput="filterEntries()"></label>
+        <button type="button" class="adm-btn-light" onclick="openModal()">＋ Add New Data</button>
+      </x-slot:actions>
+    </x-admin-hero>
 </div>
 
 <div class="container">
@@ -308,24 +313,7 @@ tbody tr:hover{ background:#f5faf6; }
         <div class="status-msg">{{ session('status') }}</div>
     @endif
 
-    <button class="add-btn" onclick="openModal()">+ Add New Data</button>
 
-    <div class="top-row">
-        <div class="stat-card">
-            <p class="label">Total Entries</p>
-            <p class="value">{{ $entries->count() }}</p>
-        </div>
-
-        <div class="stat-card">
-            <p class="label">Categories</p>
-            <p class="value">{{ $entries->pluck('category')->filter()->unique()->count() }}</p>
-        </div>
-
-        <div class="search-card">
-            <i class="ti ti-search" aria-hidden="true"></i>
-            <input type="text" placeholder="Search question, answer, keyword..." id="searchInput" onkeyup="filterEntries()">
-        </div>
-    </div>
 
     <div style="overflow-x:auto;">
     <table>
