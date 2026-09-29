@@ -653,8 +653,13 @@ messageInput.addEventListener('keydown', (e) => {
 sendBtn.addEventListener('click', () => sendMessage());
 stopBtn.addEventListener('click', () => { if (currentController) currentController.abort(); });
 
-/* ---------- Voice input (Web Speech API; hidden where unsupported) ---------- */
-const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+/* ---------- Voice input (Web Speech API in browsers, the phone's own recogniser in the
+   RakanKampus Android app; hidden where neither works) ---------- */
+const IN_APP = /RakanKampusApp/.test(navigator.userAgent);
+const APP_VOICE = (() => { try { return !!(window.RKAppVoice && RKAppVoice.available()); } catch (e) { return false; } })();
+const VOICE_LANG = ({ zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'ms-MY';
+// Android's WebView pretends to have webkitSpeechRecognition but it never hears anything
+const SpeechRecognitionAPI = IN_APP ? null : (window.SpeechRecognition || window.webkitSpeechRecognition);
 const VOICE_SILENCE_MS = 3000;
 let recognition = null, isListening = false, voiceBaseText = '', voiceSilenceTimer = null;
 
@@ -678,7 +683,7 @@ function stopVoice() {
 if (SpeechRecognitionAPI && micBtn) {
   micBtn.classList.remove('hidden');
   recognition = new SpeechRecognitionAPI();
-  recognition.lang = ({ zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'ms-MY';
+  recognition.lang = VOICE_LANG;
   recognition.interimResults = true;
   recognition.continuous = true;
   recognition.maxAlternatives = 1;
@@ -705,6 +710,39 @@ if (SpeechRecognitionAPI && micBtn) {
   micBtn.addEventListener('click', () => {
     if (app.classList.contains('is-empty')) leaveEmptyState();
     isListening ? stopVoice() : startVoice();
+  });
+} else if (APP_VOICE && micBtn) {
+  // Android app: one sentence per tap; the phone stops listening by itself after a pause
+  micBtn.classList.remove('hidden');
+  const endAppVoice = () => {
+    isListening = false;
+    micBtn.classList.remove('listening');
+    messageInput.classList.remove('voice-live');
+    messageInput.focus();
+  };
+  const putSpoken = (spoken) => {
+    spoken = (spoken || '').trim();
+    messageInput.value = voiceBaseText ? (spoken ? `${voiceBaseText} ${spoken}` : voiceBaseText) : spoken;
+    autoResize(messageInput);
+    messageInput.scrollTop = messageInput.scrollHeight;
+  };
+  window.RKVoice = {
+    onStart() {},
+    onPartial(text) { if (isListening) putSpoken(text); },
+    onFinal(text) { if (isListening) putSpoken(text); endAppVoice(); },
+    onError(code) {
+      endAppVoice();
+      if (code === 'not-allowed') RKDialog.alert({ scene: 'oops', title: t('Microphone blocked'), message: t('Please allow microphone access to use voice input.') });
+    },
+  };
+  micBtn.addEventListener('click', () => {
+    if (app.classList.contains('is-empty')) leaveEmptyState();
+    if (isListening) { try { RKAppVoice.stop(); } catch (e) {} endAppVoice(); return; }
+    isListening = true;
+    voiceBaseText = messageInput.value.trim();
+    micBtn.classList.add('listening');
+    messageInput.classList.add('voice-live');
+    try { RKAppVoice.start(VOICE_LANG); } catch (e) { endAppVoice(); }
   });
 }
 
