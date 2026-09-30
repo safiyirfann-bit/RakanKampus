@@ -6,27 +6,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Feedback;
 use App\Models\UnansweredQuestion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * How students use RakanKampus: students, who's online, questions per day,
+ * busiest hours and most asked topics. (Database internals are not shown.)
+ */
 class AnalyticsController extends Controller
 {
-    /** Tables shown in the summary (fixed allow-list, never taken from input). */
-    private const TABLES = [
-        'users',
-        'profiles',
-        'information',
-        'knowledge_bases',
-        'feedback',
-        'chat_conversations',
-        'chat_messages',
-        'unanswered_questions',
-        'reminders',
-        'class_schedules',
-        'push_subscriptions',
-        'sessions',
-    ];
-
     private const RANGES = [7, 30, 90];
 
     private const ONLINE_WINDOW_SECONDS = 300;
@@ -38,52 +27,15 @@ class AnalyticsController extends Controller
             $range = 30;
         }
 
-        $tableFilter = $request->query('table', 'all');
-        if ($tableFilter !== 'all' && ! in_array($tableFilter, self::TABLES, true)) {
-            $tableFilter = 'all';
-        }
+        $since = now()->subDays($range - 1)->startOfDay();
+        $prevSince = now()->subDays($range * 2 - 1)->startOfDay();
 
-        $since = now()->subDays($range)->startOfDay();
-        $today = now()->startOfDay();
+        // ---- Students ------------------------------------------------------
+        $students = DB::table('users')->where('role', 'student');
+        $totalStudents = (clone $students)->count();
+        $newStudents = (clone $students)->where('created_at', '>=', $since)->count();
 
-        // ---- Table summary -------------------------------------------------
-        $summary = [];
-        $totalRecords = 0;
-        $updatedToday = 0;
-
-        foreach (self::TABLES as $t) {
-            if (! Schema::hasTable($t)) {
-                continue;
-            }
-
-            $cols = Schema::getColumnListing($t);
-            $hasCreated = in_array('created_at', $cols, true);
-            $hasUpdated = in_array('updated_at', $cols, true);
-
-            $row = [
-                'table' => $t,
-                'rows' => DB::table($t)->count(),
-                'first' => $hasCreated ? DB::table($t)->min('created_at') : null,
-                'last_created' => $hasCreated ? DB::table($t)->max('created_at') : null,
-                'last_updated' => $hasUpdated ? DB::table($t)->max('updated_at') : null,
-                'added' => $hasCreated ? DB::table($t)->where('created_at', '>=', $since)->count() : null,
-                'updated_today' => $hasUpdated ? DB::table($t)->where('updated_at', '>=', $today)->count() : 0,
-            ];
-
-            $totalRecords += $row['rows'];
-            $updatedToday += $row['updated_today'];
-            $summary[] = $row;
-        }
-
-        $visibleSummary = $tableFilter === 'all'
-            ? $summary
-            : array_values(array_filter($summary, fn ($r) => $r['table'] === $tableFilter));
-
-        // ---- Users ---------------------------------------------------------
-        $totalUsers = DB::table('users')->count();
-        $newThisWeek = DB::table('users')->where('created_at', '>=', now()->subDays(7))->count();
-
-        // Last activity per user (from sessions) — used for the user lists.
+        // Last activity per user (from sessions) — for "online now" and the user lists.
         $lastActive = [];
         if (Schema::hasTable('sessions')) {
             $lastActive = DB::table('sessions')
@@ -93,7 +45,6 @@ class AnalyticsController extends Controller
                 ->pluck('last_activity', 'user_id')
                 ->all();
         }
-
         $cutoff = now()->subSeconds(self::ONLINE_WINDOW_SECONDS)->timestamp;
 
         $userList = DB::table('users')
@@ -101,81 +52,76 @@ class AnalyticsController extends Controller
             ->get(['id', 'name', 'email', 'student_id', 'role', 'created_at'])
             ->map(function ($u) use ($lastActive, $cutoff) {
                 $ts = $lastActive[$u->id] ?? null;
-                $u->last_active = $ts ? \Illuminate\Support\Carbon::createFromTimestamp($ts, config('app.timezone')) : null;
+                $u->last_active = $ts ? Carbon::createFromTimestamp($ts, config('app.timezone')) : null;
                 $u->online = $ts !== null && $ts >= $cutoff;
 
                 return $u;
             });
+        $onlineUsers = $userList->where('online', true)->sortByDesc(fn ($u) => $u->last_active)->values();
 
-        $onlineUsers = $userList->where('online', true)
-            ->sortByDesc(fn ($u) => $u->last_active)
-            ->values();
-        $onlineNow = $onlineUsers->count();
+        // ---- Questions -----------------------------------------------------
+        $questions = DB::table('chat_messages')->where('sender', 'user');
+        $asked = (clone $questions)->where('created_at', '>=', $since)->count();
+        $askedPrev = (clone $questions)->whereBetween('created_at', [$prevSince, $since])->count();
+        $missed = Schema::hasTable('unanswered_questions')
+            ? (int) DB::table('unanswered_questions')->where('updated_at', '>=', $since)->sum('asked_count')
+            : 0;
+        $answeredRate = $asked > 0 ? max(0, min(100, (int) round((1 - $missed / $asked) * 100))) : null;
 
-        // ---- Activity by hour + heatmap -----------------------------------
+        // ---- Per day: questions + active students ------------------------------
+        $qPerDay = (clone $questions)->where('created_at', '>=', $since)->get(['created_at'])
+            ->groupBy(fn ($m) => Carbon::parse($m->created_at)->toDateString())->map->count();
+        $activePerDay = collect();
         $byHour = array_fill(0, 24, 0);
-        $heatmap = array_fill(1, 7, array_fill(0, 24, 0)); // 1 = Mon … 7 = Sun
-
         if (Schema::hasTable('user_activity_logs')) {
-            DB::table('user_activity_logs')
-                ->where('active_at', '>=', $since)
-                ->orderBy('id')
-                ->select('id', 'active_at')
-                ->chunk(2000, function ($rows) use (&$byHour, &$heatmap) {
-                    foreach ($rows as $r) {
-                        $ts = strtotime((string) $r->active_at);
-                        $h = (int) date('G', $ts);
-                        $d = (int) date('N', $ts);
-                        $byHour[$h]++;
-                        $heatmap[$d][$h]++;
-                    }
-                });
+            $logs = DB::table('user_activity_logs')->where('active_at', '>=', $since)->get(['user_id', 'active_at']);
+            $activePerDay = $logs->groupBy(fn ($r) => Carbon::parse($r->active_at)->toDateString())
+                ->map(fn ($rows) => $rows->pluck('user_id')->unique()->count());
+            foreach ($logs as $r) {
+                $byHour[(int) Carbon::parse($r->active_at)->format('G')]++;
+            }
         }
+        $daily = collect(range($range - 1, 0))->map(function ($d) use ($qPerDay, $activePerDay) {
+            $day = now()->subDays($d);
+            $key = $day->toDateString();
 
-        // ---- Most asked topics --------------------------------------------
+            return ['d' => $day->format('j M'), 'q' => (int) ($qPerDay[$key] ?? 0), 'a' => (int) ($activePerDay[$key] ?? 0)];
+        })->values()->all();
+        $peakHour = max($byHour) > 0 ? array_search(max($byHour), $byHour, true) : null;
+
+        // ---- Most asked topics ---------------------------------------------
         $topics = [];
         if (Schema::hasColumn('chat_messages', 'knowledge_base_id')) {
             $topics = DB::table('chat_messages')
                 ->join('knowledge_bases', 'knowledge_bases.id', '=', 'chat_messages.knowledge_base_id')
                 ->leftJoin('information', 'information.id', '=', 'knowledge_bases.information_id')
-                ->where('chat_messages.sender', 'user')
                 ->where('chat_messages.created_at', '>=', $since)
-                ->groupBy('information.main_topic')
-                ->selectRaw('information.main_topic as name, COUNT(*) as count')
+                ->groupBy('information.id', 'information.main_topic')
+                ->selectRaw('information.id as id, information.main_topic as name, COUNT(*) as count')
                 ->orderByDesc('count')
-                ->limit(10)
+                ->limit(6)
                 ->get()
-                ->map(fn ($r) => ['name' => $r->name ?: 'Other', 'count' => (int) $r->count])
+                ->map(fn ($r) => ['id' => $r->id, 'name' => $r->name ?: 'Other', 'count' => (int) $r->count])
                 ->all();
         }
-
-        $unansweredAsked = Schema::hasTable('unanswered_questions')
-            ? (int) DB::table('unanswered_questions')->where('updated_at', '>=', $since)->sum('asked_count')
-            : 0;
-
-        $peakHour = max($byHour) > 0 ? array_search(max($byHour), $byHour, true) : null;
-        $heatMax = max(array_map('max', $heatmap));
 
         return view('admin.analytics', [
             'range' => $range,
             'ranges' => self::RANGES,
-            'tableFilter' => $tableFilter,
-            'tables' => array_column($summary, 'table'),
-            'summary' => $visibleSummary,
-            'totalRecords' => $totalRecords,
-            'tableCount' => count($summary),
-            'updatedToday' => $updatedToday,
-            'totalUsers' => $totalUsers,
-            'newThisWeek' => $newThisWeek,
-            'onlineNow' => $onlineNow,
+            'totalStudents' => $totalStudents,
+            'newStudents' => $newStudents,
+            'onlineNow' => $onlineUsers->count(),
             'userList' => $userList,
             'onlineUsers' => $onlineUsers,
+            'recentUsers' => $userList->where('role', '!=', 'admin')->sortByDesc(fn ($u) => $u->last_active?->timestamp ?? 0)->take(6)->values(),
+            'asked' => $asked,
+            'askedPrev' => $askedPrev,
+            'answeredRate' => $answeredRate,
+            'missed' => $missed,
+            'daily' => $daily,
             'byHour' => $byHour,
             'peakHour' => $peakHour,
-            'heatmap' => $heatmap,
-            'heatMax' => $heatMax,
             'topics' => $topics,
-            'unansweredAsked' => $unansweredAsked,
             'unansweredCount' => UnansweredQuestion::where('status', 'pending')->count(),
             'unreadFeedbackCount' => Feedback::where('is_read', false)->count(),
         ]);

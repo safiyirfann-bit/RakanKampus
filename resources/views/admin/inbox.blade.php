@@ -9,12 +9,13 @@
         body { margin: 0; }
         .ib-grid { display: grid; grid-template-columns: 400px minmax(0, 1fr); gap: 20px; align-items: start; }
         .ib-list { max-height: calc(100vh - 250px); min-height: 320px; overflow-y: auto; }
-        .ib-tabs { gap: 14px; padding: 0 16px; }
+        .ib-tabs { gap: 2px; padding: 0 14px; }
+        .ib-tabs button { padding: 16px 8px 14px !important; }
         .ib-tabs button { font-size: 13px; }
         .item { display: flex; gap: 12px; align-items: flex-start; padding: 14px 20px; border-top: 1px solid #eef3ef; cursor: pointer; transition: background .12s; position: relative; }
         .item:first-child { border-top: 0; }
         .item:hover { background: #fafcfb; }
-        .item.on { background: var(--a-g50); box-shadow: inset 3px 0 0 var(--a-g600); }
+        .item.on { background: var(--a-g100); box-shadow: inset 3px 0 0 var(--a-dark); }
         .ib-av { width: 36px; height: 36px; border-radius: 50%; color: #fff; font-weight: 800; font-size: 13px; display: grid; place-items: center; flex-shrink: 0; }
         .ib-av.feedback { background: linear-gradient(135deg, #5f9370, #3f6e4f); }
         .ib-av.feature { background: linear-gradient(135deg, #5b8fd0, #3c6fb0); }
@@ -30,7 +31,7 @@
         .p-feature { background: #e7f0fb; color: #3c6fb0; }
         .p-issue { background: #fdecec; color: #d64545; }
 
-        .ib-detail { padding: 26px 30px; position: sticky; top: 90px; min-height: 360px; }
+        .ib-detail { padding: 30px 34px; position: sticky; top: 90px; min-height: 360px; }
         .ib-head { display: flex; gap: 14px; align-items: center; }
         .ib-head .ib-av { width: 46px; height: 46px; font-size: 17px; }
         .ib-head b { font-size: 15.5px; color: var(--a-ink); display: block; }

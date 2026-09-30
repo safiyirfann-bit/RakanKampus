@@ -1,7 +1,7 @@
 {{--
-  Admin sidebar (PC only) — white sidebar, grouped menu with count badges,
-  "teach the bot" card, admin row + logout, and a top bar (breadcrumb, quick search, inbox bell). Also pulls in the shared admin
-  theme (partials/admin-theme: page background, green hero banner, glass stat tiles, cards).
+  Admin navigation (PC only, "Bento Premium"): a slim icon rail (labels pop out on hover,
+  red/dark count badges, avatar + log out at the bottom) and a top bar (page name + date,
+  quick search with Ctrl K, inbox bell). Also pulls in the shared admin theme (partials/admin-theme).
 
   @include('partials.admin-nav', ['active' => 'dashboard'])
   Counts are looked up here when a page doesn't pass them.
@@ -29,94 +29,77 @@
 @endphp
 @include('partials.admin-theme')
 <style>
-  body { margin-left: 256px !important; }
-  .rk-admin-sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 256px; box-sizing: border-box; z-index: 38; display: flex; flex-direction: column; padding: 20px 16px;
-    background: #fff; border-right: 1px solid var(--a-line); font-family: var(--a-font); }
-  .rk-admin-brand { display: flex; align-items: center; gap: 12px; padding: 2px 8px 18px; text-decoration: none; }
-  .rk-admin-brand .logo { width: 40px; height: 40px; border-radius: 12px; background: linear-gradient(135deg, var(--a-g800), var(--a-g500)); display: grid; place-items: center; box-shadow: 0 6px 16px rgba(47,79,58,.25); }
-  .rk-admin-brand b { display: block; font-size: 16px; font-weight: 800; letter-spacing: -.01em; color: var(--a-ink); }
-  .rk-admin-brand small { display: block; font-size: 11.5px; font-weight: 600; color: var(--a-mute); }
-  .rk-admin-nav { flex: 1; min-height: 0; overflow-y: auto; margin: 0 -16px; padding: 0 16px; }
-  .rk-admin-grp { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #9aa8a0; padding: 14px 12px 8px; }
-  .rk-admin-link { position: relative; display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; margin-bottom: 2px;
-    color: var(--a-ink2); font-size: 14px; font-weight: 600; text-decoration: none; transition: background .15s, color .15s; }
-  .rk-admin-link svg { width: 19px; height: 19px; stroke: #8a9a90; flex-shrink: 0; }
-  .rk-admin-link:hover { background: var(--a-g50); color: var(--a-g800); }
-  .rk-admin-link.active { background: var(--a-g100); color: var(--a-g800); }
-  .rk-admin-link.active svg { stroke: var(--a-g700); }
-  .rk-admin-link.active::before { content: ''; position: absolute; left: -16px; top: 9px; bottom: 9px; width: 4px; border-radius: 0 4px 4px 0; background: var(--a-g600); }
-  .rk-admin-badge { margin-left: auto; min-width: 24px; height: 22px; padding: 0 7px; border-radius: 8px; font-size: 11.5px; font-weight: 700; display: grid; place-items: center; background: #eef2ef; color: var(--a-ink2); }
-  .rk-admin-badge.red { background: #fdecec; color: var(--a-red); }
-  .rk-admin-cta { display: block; margin-top: 12px; border-radius: 18px; padding: 16px; background: linear-gradient(145deg, var(--a-g800), var(--a-g600)); color: #fff; position: relative; overflow: hidden; text-decoration: none; }
-  .rk-admin-cta::after { content: ''; position: absolute; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.12); right: -40px; top: -50px; }
-  .rk-admin-cta b { font-size: 14px; display: block; }
-  .rk-admin-cta p { font-size: 12px; color: #d8e8dc; margin: 4px 0 12px; line-height: 1.45; }
-  .rk-admin-cta span { display: inline-block; background: #fff; color: var(--a-g800); font-weight: 700; font-size: 12px; padding: 8px 12px; border-radius: 10px; }
-  .rk-admin-cta:hover span { background: var(--a-g50); }
-  .rk-admin-me { display: flex; align-items: center; gap: 10px; padding: 14px 8px 0; margin-top: 14px; border-top: 1px solid var(--a-line); }
-  .rk-admin-me .av { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, #f5c563, #e49b3b); color: #fff; display: grid; place-items: center; font-weight: 800; flex-shrink: 0; }
-  .rk-admin-me .who { min-width: 0; }
-  .rk-admin-me b { display: block; font-size: 13.5px; color: var(--a-ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rk-admin-me small { display: block; font-size: 12px; color: var(--a-mute); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .rk-admin-me form { margin-left: auto; }
-  .rk-admin-me button { width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--a-line); background: #fff; color: var(--a-mute); cursor: pointer; display: grid; place-items: center; }
-  .rk-admin-me button:hover { background: #fdecec; color: var(--a-red); border-color: #f3d0d0; }
-  .rk-admin-me button svg { width: 17px; height: 17px; }
+  /* Bento Premium: slim icon rail on the left, airy top bar */
+  body { margin-left: 92px !important; }
+  .rk-admin-sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: 92px; box-sizing: border-box; z-index: 38; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 22px 0 18px; background: #fff; border-right: 1px solid var(--a-line); font-family: var(--a-font); }
+  .rk-admin-brand { width: 50px; height: 50px; border-radius: 17px; background: var(--a-dark); display: grid; place-items: center; margin-bottom: 18px; text-decoration: none; transition: transform .15s; }
+  .rk-admin-brand:hover { transform: rotate(-6deg) scale(1.04); }
+  .rk-admin-nav { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .rk-admin-sep { width: 28px; height: 1px; background: var(--a-line); margin: 8px 0; }
+  .rk-admin-link { position: relative; width: 50px; height: 50px; border-radius: 17px; display: grid; place-items: center; color: #8a948d; text-decoration: none; transition: background .15s, color .15s; }
+  .rk-admin-link svg { width: 22px; height: 22px; stroke: currentColor; }
+  .rk-admin-link:hover { background: #f3f5f2; color: var(--a-ink); }
+  .rk-admin-link.active { background: var(--a-g100); color: var(--a-g700); }
+  .rk-admin-badge { position: absolute; top: 3px; left: 31px; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 99px; font-size: 9.5px; font-weight: 800; line-height: 16px; text-align: center;
+    background: var(--a-dark); color: #fff; box-shadow: 0 0 0 2px #fff; box-sizing: border-box; }
+  .rk-admin-badge.red { background: #e24b4b; }
+  /* label bubble on hover */
+  .rk-admin-link::after, .rk-admin-out::after { content: attr(data-label); position: absolute; left: 62px; top: 50%; transform: translate(-6px, -50%); opacity: 0; pointer-events: none;
+    background: var(--a-dark); color: #fff; font-size: 12.5px; font-weight: 700; padding: 7px 11px; border-radius: 10px; white-space: nowrap; transition: opacity .12s, transform .12s; z-index: 50; }
+  .rk-admin-link:hover::after, .rk-admin-out:hover::after { opacity: 1; transform: translate(0, -50%); }
+  .rk-admin-me { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .rk-admin-me .av { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, #f5c563, #e49b3b); color: #fff; display: grid; place-items: center; font-weight: 800; font-size: 15px; }
+  .rk-admin-me form { margin: 0; }
+  .rk-admin-out { position: relative; width: 42px; height: 42px; border-radius: 14px; border: 0; background: transparent; color: #8a948d; cursor: pointer; display: grid; place-items: center; }
+  .rk-admin-out:hover { background: #fdecec; color: var(--a-red); }
+  .rk-admin-out svg { width: 19px; height: 19px; }
 
-  .rk-admin-top { position: sticky; top: 0; z-index: 30; height: 68px; box-sizing: border-box; display: flex; align-items: center; gap: 14px; padding: 0 32px;
-    border-bottom: 1px solid var(--a-line); background: rgba(255,255,255,.72); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); font-family: var(--a-font); }
-  .rk-admin-crumb { font-size: 13px; color: var(--a-mute); font-weight: 600; }
-  .rk-admin-crumb b { color: var(--a-ink); }
-  .rk-admin-jump { margin-left: auto; width: 340px; height: 40px; border-radius: 12px; border: 1px solid var(--a-line); background: #fff; display: flex; align-items: center; gap: 10px; padding: 0 12px; color: #9aa8a0; position: relative; }
-  .rk-admin-jump:focus-within { border-color: #b9d4c1; box-shadow: 0 0 0 3px rgba(95,147,112,.12); }
+  .rk-admin-top { position: sticky; top: 0; z-index: 30; height: 84px; box-sizing: border-box; display: flex; align-items: center; gap: 12px; padding: 0 34px;
+    background: rgba(246,247,245,.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); font-family: var(--a-font); }
+  .rk-admin-crumb { font-size: 12px; color: #8a948d; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .rk-admin-crumb b { color: var(--a-ink); font-weight: 800; }
+  .rk-admin-crumb span { display: block; font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none; color: #9aa39c; margin-top: 3px; }
+  .rk-admin-jump { margin-left: auto; width: 340px; height: 46px; border-radius: 99px; border: 1px solid var(--a-line); background: #fff; display: flex; align-items: center; gap: 10px; padding: 0 18px; color: #9aa39c; position: relative; }
+  .rk-admin-jump:focus-within { border-color: #bfe3cc; box-shadow: 0 0 0 4px rgba(63,176,112,.12); }
   .rk-admin-jump svg { width: 16px; height: 16px; flex-shrink: 0; }
   .rk-admin-jump input { border: 0; outline: 0; background: transparent; font-size: 13px; color: var(--a-ink); width: 100%; font-family: inherit; }
-  .rk-admin-jump kbd { white-space: nowrap; font-family: inherit; font-size: 11px; font-weight: 700; border: 1px solid var(--a-line); border-radius: 6px; padding: 1px 6px; color: var(--a-mute); }
-  .rk-admin-jump ul { display: none; position: absolute; left: 0; right: 0; top: 46px; list-style: none; margin: 0; padding: 6px; background: #fff; border: 1px solid var(--a-line); border-radius: 14px; box-shadow: 0 18px 40px rgba(22,36,28,.14); max-height: 320px; overflow-y: auto; }
+  .rk-admin-jump kbd { white-space: nowrap; font-family: inherit; font-size: 11px; font-weight: 800; background: #f3f5f2; border-radius: 99px; padding: 3px 9px; color: #8a948d; }
+  .rk-admin-jump ul { display: none; position: absolute; left: 0; right: 0; top: 52px; list-style: none; margin: 0; padding: 8px; background: #fff; border: 1px solid var(--a-line); border-radius: 22px; box-shadow: 0 24px 50px rgba(17,28,21,.14); max-height: 340px; overflow-y: auto; }
   .rk-admin-jump ul.open { display: block; }
-  .rk-admin-jump li a { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 10px; color: var(--a-ink); font-size: 13.5px; font-weight: 600; text-decoration: none; }
-  .rk-admin-jump li a small { margin-left: auto; font-size: 11px; color: var(--a-mute); font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
-  .rk-admin-jump li a.sel, .rk-admin-jump li a:hover { background: var(--a-g50); color: var(--a-g800); }
+  .rk-admin-jump li a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; color: var(--a-ink); font-size: 13.5px; font-weight: 600; text-decoration: none; }
+  .rk-admin-jump li a small { margin-left: auto; font-size: 10.5px; color: #8a948d; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+  .rk-admin-jump li a.sel, .rk-admin-jump li a:hover { background: var(--a-g100); color: var(--a-g800); }
   .rk-admin-jump li.none { padding: 10px; font-size: 13px; color: var(--a-mute); }
-  .rk-admin-bell { width: 40px; height: 40px; border-radius: 12px; border: 1px solid var(--a-line); background: #fff; display: grid; place-items: center; color: var(--a-ink2); position: relative; text-decoration: none; }
-  .rk-admin-bell:hover { background: var(--a-g50); }
-  .rk-admin-bell svg { width: 18px; height: 18px; }
-  .rk-admin-bell i { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--a-red); border: 2px solid #fff; }
+  .rk-admin-bell { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--a-line); background: #fff; display: grid; place-items: center; color: var(--a-ink); position: relative; text-decoration: none; }
+  .rk-admin-bell:hover { background: #f3f5f2; }
+  .rk-admin-bell svg { width: 19px; height: 19px; }
+  .rk-admin-bell i { position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: #e24b4b; border: 2px solid #fff; }
 </style>
 
 <nav class="rk-admin-sidebar" aria-label="Admin">
-  <a href="{{ route('admin.dashboard') }}" class="rk-admin-brand">
-    <span class="logo"><svg width="24" height="26" viewBox="0 0 200 220" aria-hidden="true"><line x1="100" y1="14" x2="100" y2="30" stroke="#fff" stroke-width="8"/><circle cx="100" cy="12" r="9" fill="#bff0cd"/><rect x="56" y="30" width="88" height="64" rx="24" fill="#fff"/><circle cx="54" cy="58" r="14" fill="#bff0cd"/><circle cx="146" cy="58" r="14" fill="#bff0cd"/><rect x="72" y="44" width="56" height="38" rx="14" fill="#2f4f3a"/><circle cx="90" cy="62" r="6" fill="#bff0cd"/><circle cx="110" cy="62" r="6" fill="#bff0cd"/><rect x="52" y="100" width="96" height="82" rx="26" fill="#fff"/><circle cx="100" cy="132" r="9" fill="#5f9370"/><rect x="68" y="178" width="20" height="36" rx="9" fill="#fff"/><rect x="112" y="178" width="20" height="36" rx="9" fill="#fff"/></svg></span>
-    <span><b>RakanKampus</b><small>Admin Console</small></span>
+  <a href="{{ route('admin.dashboard') }}" class="rk-admin-brand" title="RakanKampus Admin">
+    <svg width="26" height="28" viewBox="0 0 200 220" aria-hidden="true"><line x1="100" y1="14" x2="100" y2="30" stroke="#fff" stroke-width="8"/><circle cx="100" cy="12" r="9" fill="#7ee0b0"/><rect x="56" y="30" width="88" height="64" rx="24" fill="#fff"/><circle cx="54" cy="58" r="14" fill="#7ee0b0"/><circle cx="146" cy="58" r="14" fill="#7ee0b0"/><rect x="72" y="44" width="56" height="38" rx="14" fill="#111c15"/><circle cx="90" cy="62" r="6" fill="#7ee0b0"/><circle cx="110" cy="62" r="6" fill="#7ee0b0"/><rect x="52" y="100" width="96" height="82" rx="26" fill="#fff"/><circle cx="100" cy="132" r="9" fill="#3fb070"/><rect x="68" y="178" width="20" height="36" rx="9" fill="#fff"/><rect x="112" y="178" width="20" height="36" rx="9" fill="#fff"/></svg>
   </a>
   <div class="rk-admin-nav">
     @foreach($adminNavGroups as $group => $items)
-      <div class="rk-admin-grp">{{ $group }}</div>
+      @if(! $loop->first)<div class="rk-admin-sep"></div>@endif
       @foreach($items as $item)
-        <a href="{{ route($item['route']) }}{{ $item['hash'] ?? '' }}" class="rk-admin-link {{ $adminNavActive === $item['key'] ? 'active' : '' }}">
+        <a href="{{ route($item['route']) }}{{ $item['hash'] ?? '' }}" class="rk-admin-link {{ $adminNavActive === $item['key'] ? 'active' : '' }}" data-label="{{ $item['label'] }}" aria-label="{{ $item['label'] }}">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
-          <span>{{ $item['label'] }}</span>
-          @if($item['badge'] > 0)
+          @if($item['badge'] > 0 && $item['key'] !== 'knowledge')
             <span class="rk-admin-badge {{ ($item['tone'] ?? '') === 'red' ? 'red' : '' }}">{{ $item['badge'] }}</span>
           @endif
         </a>
       @endforeach
     @endforeach
   </div>
-  @if($adminUnanswered > 0 && $adminNavActive !== 'unanswered')
-    <a href="{{ route('admin.unanswered.index') }}" class="rk-admin-cta">
-      <b>Teach the bot faster</b>
-      <p>{{ $adminUnanswered }} {{ \Illuminate\Support\Str::plural('question', $adminUnanswered) }} waiting for an answer.</p>
-      <span>Answer now →</span>
-    </a>
-  @endif
   <div class="rk-admin-me">
-    <span class="av">{{ strtoupper(mb_substr($adminUser->name ?? 'A', 0, 1)) }}</span>
-    <span class="who"><b>{{ $adminUser->name ?? 'Admin' }}</b><small>{{ $adminUser->email ?? '' }}</small></span>
+    <span class="av" title="{{ $adminUser->name ?? 'Admin' }} · {{ $adminUser->email ?? '' }}">{{ strtoupper(mb_substr($adminUser->name ?? 'A', 0, 1)) }}</span>
     <form method="POST" action="{{ route('logout') }}"
           onsubmit="return RKDialog.confirmForm(event, { scene: 'signout', title: 'Log out?', message: 'You will be signed out of the admin panel.', confirmText: 'Log Out' })">
       @csrf
-      <button type="submit" aria-label="Logout" title="Logout">
+      <button type="submit" class="rk-admin-out" aria-label="Log out" data-label="Log out">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
       </button>
     </form>
@@ -124,10 +107,11 @@
 </nav>
 
 <header class="rk-admin-top">
-  <div class="rk-admin-crumb">Admin &nbsp;/&nbsp; @if($adminCrumbSub){{ $adminCrumb }} &nbsp;/&nbsp; <b>{{ $adminCrumbSub }}</b>@else<b>{{ $adminCrumb }}</b>@endif</div>
+  <div class="rk-admin-crumb">Admin &nbsp;·&nbsp; <b>{{ $adminCrumb }}</b>@if($adminCrumbSub) &nbsp;·&nbsp; {{ \Illuminate\Support\Str::limit($adminCrumbSub, 40) }}@endif
+    <span>{{ now()->translatedFormat('l, j F Y') }}</span></div>
   <div class="rk-admin-jump" id="rkJump">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
-    <input type="text" id="rkJumpInput" placeholder="Jump to a page or topic…" autocomplete="off" aria-label="Jump to a page or topic">
+    <input type="text" id="rkJumpInput" placeholder="Search pages & topics…" autocomplete="off" aria-label="Jump to a page or topic">
     <kbd>Ctrl K</kbd>
     <ul id="rkJumpList" role="listbox"></ul>
   </div>

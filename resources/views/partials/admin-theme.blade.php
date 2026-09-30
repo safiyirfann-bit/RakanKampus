@@ -1,7 +1,8 @@
 {{--
-  Shared look for every admin page (PC only): Plus Jakarta Sans, soft green-grey page,
-  white cards, green hero banner with glass stats (<x-admin-hero>), tidy tables,
-  tabs, chips and buttons. Included once by partials/admin-nav.
+  Shared look for every admin page (PC only), "Bento Premium": Plus Jakarta Sans, warm
+  off-white page, big rounded white tiles, one deep-green hero, near-black + mint accents,
+  pill buttons. The base rules come first; the "Bento Premium" block at the end refines them.
+  Included once by partials/admin-nav.
 --}}
 @once
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,5 +155,84 @@
   .modal .cancel-btn { background: #fff; color: var(--a-ink2); border: 1px solid var(--a-line); }
   .modal .submit-btn { background: var(--a-g700); color: #fff; }
   .modal .submit-btn:hover { background: var(--a-g800); }
+
+  /* =====================  Bento Premium  ===================== */
+  :root {
+    --a-bg: #f6f7f5; --a-ink: #111c15; --a-ink2: #3d4a42; --a-mute: #7a847d; --a-line: #eceee9;
+    --a-g900: #0f2a1c; --a-g800: #15502f; --a-g700: #1f6b43; --a-g600: #2f7a4f; --a-g500: #3fb070; --a-g100: #e7f5ec; --a-g50: #f2f9f4;
+    --a-dark: #111c15; --a-mint: #7ee0b0;
+  }
+  .adm-wrap { padding: 8px 34px 48px; max-width: 1520px; }
+  .adm-ph { align-items: flex-end; margin-bottom: 22px; }
+  .adm-ph h1 { font-size: 30px; letter-spacing: -.03em; }
+  .adm-ph p { font-size: 14px; }
+
+  /* tiles */
+  .adm-card { border-radius: 28px; border: 1px solid var(--a-line); box-shadow: none; padding: 22px 24px; }
+  .adm-card.flush { padding: 0; }
+  .adm-ch { padding: 22px 24px 14px; }
+  .adm-ch h3 { font-size: 17px; font-weight: 800; letter-spacing: -.01em; }
+  .adm-ci { width: 40px; height: 40px; border-radius: 13px; }
+  .adm-ci svg { width: 19px; height: 19px; }
+  .adm-card-h { font-size: 17px; font-weight: 800; }
+
+  /* metric tiles: icon + chip on top, big number at the bottom */
+  .adm-kpis { gap: 18px; margin-bottom: 22px; }
+  .adm-k { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; align-items: start; gap: 0; min-height: 148px; padding: 20px 22px; }
+  .adm-k .adm-ci { width: 42px; height: 42px; border-radius: 14px; grid-column: 1; grid-row: 1; }
+  .adm-k > div:not(.adm-ci) { grid-column: 1 / -1; grid-row: 2; align-self: end; padding-top: 16px; }
+  .adm-k b { font-size: 34px; letter-spacing: -.04em; line-height: 1.05; }
+  .adm-k span { font-size: 13px; }
+  .adm-k em { position: static; grid-column: 2; grid-row: 1; justify-self: end; align-self: start; font-size: 11.5px; font-weight: 800; padding: 4px 10px; }
+  .adm-k.dark { background: var(--a-dark); border-color: var(--a-dark); }
+  .adm-k.dark b { color: #fff; } .adm-k.dark span { color: #9fb3a6; }
+  .adm-k.dark .adm-ci { background: rgba(255,255,255,.1); color: var(--a-mint); }
+  .adm-k.dark em { background: rgba(126,224,176,.16); color: var(--a-mint); }
+
+  /* buttons: pills */
+  .adm-btn { height: 42px; padding: 0 18px; border-radius: 99px; }
+  .adm-btn.sm { height: 34px; padding: 0 14px; border-radius: 99px; }
+  .adm-btn.g { background: var(--a-dark); color: #fff; box-shadow: none; } .adm-btn.g:hover { background: #24322a; }
+  .adm-btn.o { border-color: var(--a-line); color: var(--a-ink); } .adm-btn.o:hover { background: #f3f5f2; }
+  .adm-btn.w { background: var(--a-mint); color: var(--a-g900); box-shadow: none; } .adm-btn.w:hover { background: #9aeac3; }
+  .adm-btn.gl { border-radius: 99px; }
+  .adm-ab { width: 34px; height: 34px; border-radius: 12px; border-color: var(--a-line); }
+
+  /* search, segmented control, tabs */
+  .adm-search { height: 42px; border-radius: 99px; padding: 0 16px; border-color: var(--a-line); }
+  .adm-search:focus-within { border-color: #bfe3cc; box-shadow: 0 0 0 4px rgba(63,176,112,.12); }
+  .adm-seg { background: #f1f3f0; border-radius: 99px; padding: 4px; }
+  .adm-seg button { border-radius: 99px; padding: 6px 13px; }
+  .adm-seg button.on { background: var(--a-dark); color: #fff; box-shadow: none; }
+  .adm-tabs { padding: 0 24px; gap: 8px; border-bottom: 1px solid var(--a-line); }
+  .adm-tabs button { padding: 16px 12px 14px; }
+  .adm-tabs button.on { color: var(--a-ink); border-color: var(--a-dark); }
+  .adm-tabs button.on i { background: var(--a-dark); color: #fff; }
+  .adm-chip { border-radius: 99px; padding: 3px 10px; background: var(--a-g100); border-color: transparent; color: var(--a-g800); }
+  .adm-code { background: #f1f3f0; color: var(--a-ink2); border-radius: 8px; }
+
+  /* tables */
+  .adm-table th { background: #fafbf9; color: #9aa39c; border-color: var(--a-line); padding: 12px 18px; }
+  .adm-table td { padding: 15px 18px; border-color: #f1f2ef; }
+  .adm-table tbody tr:hover { background: #fafbf9; }
+  .adm-foot { padding: 14px 24px; border-color: #f1f2ef; }
+  .adm-flash { border-radius: 99px; padding: 11px 20px; }
+
+  /* hero: deep green tile with a soft mint glow */
+  .adm-hero { border-radius: 28px; padding: 30px 32px; background: linear-gradient(135deg, #0f2a1c 0%, #1d4d33 60%, #2f7a4f 100%); box-shadow: none; }
+  .adm-hero::before { background: radial-gradient(460px 320px at 88% -10%, rgba(126,224,176,.35), transparent 65%), radial-gradient(420px 260px at 0% 120%, rgba(126,224,176,.14), transparent 60%); }
+  .adm-hero::after { opacity: .5; }
+  .adm-hero-text h1 { font-size: 30px; letter-spacing: -.03em; }
+  .adm-hero-text p { color: #bfe0cb; font-size: 14px; }
+  .adm-hero-text small, .adm-hero-text small a { color: #9fd6b6; }
+  .adm-hs { border-radius: 22px; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.14); }
+  .adm-hs em { color: var(--a-mint); }
+
+  /* modals */
+  .modal .modal-content { border-radius: 28px; padding: 26px 28px; }
+  .modal .close-btn { border-radius: 99px; }
+  .modal .cancel-btn, .modal .submit-btn { border-radius: 99px; }
+  .modal .submit-btn { background: var(--a-dark); } .modal .submit-btn:hover { background: #24322a; }
+  .modal .form-group input, .modal .form-group textarea, .modal .form-group select { border-radius: 14px; }
 </style>
 @endonce
