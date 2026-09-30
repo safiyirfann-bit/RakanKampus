@@ -1,7 +1,7 @@
 {{--
   Admin navigation (PC only, "Bento Premium"): a slim icon rail (labels pop out on hover,
   red/dark count badges, avatar + log out at the bottom) and a top bar (page name + date,
-  quick search with Ctrl K, inbox bell). Also pulls in the shared admin theme (partials/admin-theme).
+  quick search with Ctrl K, notification bell listing new unanswered questions + unread messages). Also pulls in the shared admin theme (partials/admin-theme).
 
   @include('partials.admin-nav', ['active' => 'dashboard'])
   Counts are looked up here when a page doesn't pass them.
@@ -15,6 +15,14 @@
   $adminCrumb = ['dashboard' => 'Dashboard', 'analytics' => 'Analytics', 'knowledge' => 'Knowledge base', 'unanswered' => 'Unanswered', 'inbox' => 'Inbox', ][$adminNavActive] ?? 'Dashboard';
   $adminCrumbSub = $crumb ?? null;
   $adminJump = \App\Models\Information::orderBy('main_topic')->get(['id', 'main_topic']);
+  // Bell: what happened lately that needs the admin (new student questions the bot couldn't answer + unread messages)
+  $adminNotes = \App\Models\UnansweredQuestion::where('status', 'pending')->orderByDesc('updated_at')->take(6)->get()
+    ->map(fn ($q) => ['kind' => 'q', 'title' => $q->question, 'sub' => 'Bot couldn\'t answer · asked ' . $q->asked_count . '×', 'at' => $q->updated_at, 'url' => route('admin.unanswered.index')])
+    ->concat(\App\Models\Feedback::where('is_read', false)->latest()->take(6)->get()->map(function ($f) {
+        [$label, $text] = filled($f->issue_report) ? [$f->issue_type ?: 'Issue report', $f->issue_report] : (filled($f->feature_request) ? ['Feature request', $f->feature_request] : ['Feedback', $f->feedback]);
+        return ['kind' => filled($f->issue_report) ? 'i' : 'f', 'title' => \Illuminate\Support\Str::limit((string) $text, 70), 'sub' => ($f->user_name ?: 'Student') . ' · ' . $label, 'at' => $f->created_at, 'url' => route('admin.inbox')];
+    }))
+    ->filter(fn ($n) => $n['at'])->sortByDesc(fn ($n) => $n['at']->timestamp)->take(7)->values();
   $adminNavGroups = [
     'Overview' => [
       ['key' => 'dashboard', 'route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => '<rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect>', 'badge' => 0],
@@ -74,7 +82,33 @@
   .rk-admin-bell { width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--a-line); background: #fff; display: grid; place-items: center; color: var(--a-ink); position: relative; text-decoration: none; }
   .rk-admin-bell:hover { background: #f3f5f2; }
   .rk-admin-bell svg { width: 19px; height: 19px; }
-  .rk-admin-bell i { position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: #e24b4b; border: 2px solid #fff; }
+  .rk-admin-bell { cursor: pointer; font-family: inherit; }
+  .rk-admin-bell i { position: absolute; top: 11px; right: 12px; width: 8px; height: 8px; border-radius: 50%; background: #e24b4b; border: 2px solid #fff; display: none; }
+  .rk-admin-bell.has-new i { display: block; }
+  .rk-admin-bell[aria-expanded="true"] { background: var(--a-dark); color: #fff; border-color: var(--a-dark); }
+  .rk-notes-wrap { position: relative; }
+  .rk-notes { display: none; position: absolute; right: 0; top: 56px; width: 380px; background: #fff; border: 1px solid var(--a-line); border-radius: 24px; box-shadow: 0 28px 60px rgba(17,28,21,.16); overflow: hidden; z-index: 60; }
+  .rk-notes.open { display: block; animation: rkNotesIn .16s ease-out; }
+  @keyframes rkNotesIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  .rk-notes-h { display: flex; align-items: center; gap: 8px; padding: 18px 20px 12px; }
+  .rk-notes-h b { font-size: 16px; font-weight: 800; color: var(--a-ink); }
+  .rk-notes-h span { font-size: 11.5px; font-weight: 800; padding: 2px 9px; border-radius: 99px; background: #fdecec; color: #d64545; }
+  .rk-notes-list { max-height: 380px; overflow-y: auto; }
+  .rk-note { display: flex; gap: 12px; align-items: flex-start; padding: 12px 20px; text-decoration: none; color: inherit; position: relative; }
+  .rk-note:hover { background: #fafbf9; }
+  .rk-note .ic { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; flex-shrink: 0; }
+  .rk-note .ic svg { width: 18px; height: 18px; }
+  .rk-note .tx { min-width: 0; flex: 1; }
+  .rk-note .tx b { display: block; font-size: 13.5px; font-weight: 700; color: var(--a-ink); line-height: 1.35; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .rk-note .tx small { display: block; font-size: 12px; color: var(--a-mute); margin-top: 3px; }
+  .rk-note .tm { font-size: 11.5px; font-weight: 700; color: #9aa39c; white-space: nowrap; }
+  .rk-note.new::before { content: ''; position: absolute; left: 8px; top: 26px; width: 6px; height: 6px; border-radius: 50%; background: #e24b4b; }
+  .rk-notes-empty { padding: 26px 20px 30px; text-align: center; font-size: 13px; color: var(--a-mute); }
+  .rk-notes-empty b { display: block; font-size: 14.5px; color: var(--a-ink); margin: 10px 0 2px; }
+  .rk-notes-f { display: flex; border-top: 1px solid var(--a-line); }
+  .rk-notes-f a { flex: 1; text-align: center; padding: 13px; font-size: 12.5px; font-weight: 800; color: var(--a-ink); text-decoration: none; }
+  .rk-notes-f a + a { border-left: 1px solid var(--a-line); }
+  .rk-notes-f a:hover { background: #fafbf9; }
 </style>
 
 <nav class="rk-admin-sidebar" aria-label="Admin">
@@ -115,10 +149,40 @@
     <kbd>Ctrl K</kbd>
     <ul id="rkJumpList" role="listbox"></ul>
   </div>
-  <a href="{{ route('admin.inbox') }}" class="rk-admin-bell" title="{{ $adminUnreadFeedback ? $adminUnreadFeedback . ' unread in inbox' : 'Inbox' }}" aria-label="Inbox">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-    @if($adminUnreadFeedback)<i></i>@endif
-  </a>
+  <div class="rk-notes-wrap" id="rkNotesWrap">
+    <button type="button" class="rk-admin-bell" id="rkBell" aria-label="Notifications" aria-expanded="false" aria-controls="rkNotes"
+            data-latest="{{ optional($adminNotes->first())['at']?->timestamp ?? 0 }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
+      <i></i>
+    </button>
+    <div class="rk-notes" id="rkNotes" role="dialog" aria-label="Notifications">
+      <div class="rk-notes-h"><b>Notifications</b>@if($adminNotes->count())<span>{{ $adminUnanswered + $adminUnreadFeedback }} need you</span>@endif</div>
+      <div class="rk-notes-list">
+        @forelse($adminNotes as $n)
+          <a class="rk-note" href="{{ $n['url'] }}" data-at="{{ $n['at']->timestamp }}">
+            @if($n['kind'] === 'q')
+              <span class="ic t-amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1 1-1 1.7M12 17h.01"/></svg></span>
+            @elseif($n['kind'] === 'i')
+              <span class="ic t-red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20L12 3z"/><path d="M12 10v4M12 17h.01"/></svg></span>
+            @else
+              <span class="ic t-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 8 9 6 9-6"/></svg></span>
+            @endif
+            <span class="tx"><b>{{ $n['title'] }}</b><small>{{ $n['sub'] }}</small></span>
+            <span class="tm">{{ $n['at']->diffForHumans(null, true, true) }}</span>
+          </a>
+        @empty
+          <div class="rk-notes-empty">
+            <span class="ic t-green" style="width:48px;height:48px;border-radius:16px;display:inline-grid;place-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 6 9 17l-5-5"/></svg></span>
+            <b>You're all caught up</b>No new questions or messages from students.
+          </div>
+        @endforelse
+      </div>
+      <div class="rk-notes-f">
+        <a href="{{ route('admin.unanswered.index') }}">Unanswered{{ $adminUnanswered ? ' (' . $adminUnanswered . ')' : '' }}</a>
+        <a href="{{ route('admin.inbox') }}">Inbox{{ $adminUnreadFeedback ? ' (' . $adminUnreadFeedback . ')' : '' }}</a>
+      </div>
+    </div>
+  </div>
 </header>
 
 <script>
@@ -156,5 +220,23 @@
   document.addEventListener('keydown', function (e) {
     if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) { e.preventDefault(); inp.focus(); inp.select(); }
   });
+
+  // Bell: red dot until the admin has opened the list since the newest item arrived (remembered in this browser)
+  var bell = document.getElementById('rkBell'), notes = document.getElementById('rkNotes'), wrap = document.getElementById('rkNotesWrap');
+  var seen = 0; try { seen = +localStorage.getItem('rkAdminNotesSeen') || 0; } catch (e) {}
+  var latest = +bell.dataset.latest || 0;
+  bell.classList.toggle('has-new', latest > seen);
+  notes.querySelectorAll('.rk-note').forEach(function (n) { n.classList.toggle('new', +n.dataset.at > seen); });
+  function setOpen(open) {
+    notes.classList.toggle('open', open);
+    bell.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open && latest) {
+      bell.classList.remove('has-new');
+      try { localStorage.setItem('rkAdminNotesSeen', String(latest)); } catch (e) {}
+    }
+  }
+  bell.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!notes.classList.contains('open')); });
+  document.addEventListener('click', function (e) { if (!wrap.contains(e.target)) setOpen(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
 })();
 </script>
