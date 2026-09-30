@@ -156,7 +156,7 @@
       <i></i>
     </button>
     <div class="rk-notes" id="rkNotes" role="dialog" aria-label="Notifications">
-      <div class="rk-notes-h"><b>Notifications</b>@if($adminNotes->count())<span>{{ $adminUnanswered + $adminUnreadFeedback }} need you</span>@endif</div>
+      <div class="rk-notes-h"><b>Notifications</b>@if($adminNotes->count())<span>{{ $adminUnanswered + $adminUnreadFeedback }} pending</span>@endif</div>
       <div class="rk-notes-list">
         @forelse($adminNotes as $n)
           <a class="rk-note" href="{{ $n['url'] }}" data-at="{{ $n['at']->timestamp }}">
