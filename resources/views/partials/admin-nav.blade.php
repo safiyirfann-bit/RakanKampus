@@ -12,7 +12,7 @@
   $adminUnreadFeedback = $unreadFeedbackCount ?? \App\Models\Feedback::where('is_read', false)->count();
   $adminTopics = \App\Models\Information::count();
   $adminUser = auth()->user();
-  $adminCrumb = ['dashboard' => 'Dashboard', 'analytics' => 'Analytics', 'knowledge' => 'Knowledge base', 'unanswered' => 'Unanswered', 'inbox' => 'Inbox', 'database' => 'Database'][$adminNavActive] ?? 'Dashboard';
+  $adminCrumb = ['dashboard' => 'Dashboard', 'analytics' => 'Analytics', 'knowledge' => 'Knowledge base', 'unanswered' => 'Unanswered', 'inbox' => 'Inbox', ][$adminNavActive] ?? 'Dashboard';
   $adminCrumbSub = $crumb ?? null;
   $adminJump = \App\Models\Information::orderBy('main_topic')->get(['id', 'main_topic']);
   $adminNavGroups = [
@@ -24,9 +24,6 @@
       ['key' => 'knowledge', 'route' => 'admin.knowledge', 'label' => 'Knowledge base', 'icon' => '<path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6.5A2.5 2.5 0 0 0 4 21.5"></path><path d="M8 7h7M8 11h5"></path>', 'badge' => $adminTopics, 'tone' => 'soft'],
       ['key' => 'unanswered', 'route' => 'admin.unanswered.index', 'label' => 'Unanswered', 'icon' => '<path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path>', 'badge' => $adminUnanswered, 'tone' => 'red'],
       ['key' => 'inbox', 'route' => 'admin.inbox', 'label' => 'Inbox', 'icon' => '<path d="M3 8l7.89 4.26a2 2 0 0 0 2.22 0L21 8m-2 10H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2z"></path>', 'badge' => $adminUnreadFeedback, 'tone' => 'soft'],
-    ],
-    'System' => [
-      ['key' => 'database', 'route' => 'admin.database', 'label' => 'Database', 'icon' => '<ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"></path>', 'badge' => 0],
     ],
   ];
 @endphp
