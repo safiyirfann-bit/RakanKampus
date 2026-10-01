@@ -852,21 +852,85 @@ function stopSpeaking() {
   if (speakingBtn) { speakingBtn.innerHTML = ICONS.speak + `<span>${t('Read aloud')}</span>`; speakingBtn = null; }
 }
 window.RKSpeakDone = stopSpeaking;   // called by the app when its voice finishes
-function speak(text, btn) {
+// Browsers ship different voices: Edge has natural Malay voices (Yasmin / Osman),
+// Chrome only has "Google Bahasa Indonesia" (close to Malay, very clear), and an
+// English voice reading Malay sounds silly — so pick the best match, never a wrong-language one.
+let VOICES = [];
+function loadVoices() { try { VOICES = speechSynthesis.getVoices() || []; } catch (e) { VOICES = []; } }
+if (WEB_TTS) { loadVoices(); speechSynthesis.addEventListener?.('voiceschanged', loadVoices); }
+
+function pickVoice(lang) {
+  const want = lang === 'ms-MY' ? ['ms', 'id'] : ['en'];
+  let best = null, bestScore = -1;
+  VOICES.forEach(v => {
+    const l = (v.lang || '').toLowerCase().replace('_', '-');
+    const i = want.findIndex(w => l.startsWith(w));
+    if (i < 0) return;
+    let score = 100 - i * 40;                                  // Malay first, then Indonesian
+    if (/natural|neural|online/i.test(v.name)) score += 30;     // Edge "Online (Natural)" voices
+    if (/google/i.test(v.name)) score += 20;                     // Chrome's cloud voices
+    if (lang === 'en-US' && /^en-(us|gb)/.test(l)) score += 5;
+    if (score > bestScore) { best = v; bestScore = score; }
+  });
+  return best;
+}
+
+// Make the text pleasant to listen to and cut it into sentence-sized pieces
+// (Chrome's voices stop by themselves on very long text).
+function speechChunks(text) {
+  const clean = text
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/gu, '')
+    .replace(/^\s*(\d+)[.)]\s+/gm, '$1, ')
+    .replace(/[*_#|`>~]/g, ' ')
+    .replace(/&/g, ' dan ')
+    .replace(/\s*\n+\s*/g, '. ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\.\s*\./g, '.')
+    .trim();
+  const parts = clean.match(/[^.!?]+[.!?]*/g) || [clean];
+  const out = [];
+  parts.forEach(p => {
+    p = p.trim();
+    if (!p) return;
+    while (p.length > 220) {                                  // split long sentences at a comma/space
+      let cut = p.lastIndexOf(',', 220);
+      if (cut < 80) cut = p.lastIndexOf(' ', 220);
+      if (cut < 80) cut = 220;
+      out.push(p.slice(0, cut + 1).trim());
+      p = p.slice(cut + 1).trim();
+    }
+    if (p) out.push(p);
+  });
+  return out;
+}
+
+function speak(text, btn, actions) {
   const wasMine = speakingBtn === btn;
   stopSpeaking();
   if (wasMine) return;
-  const plain = text.replace(/https?:\/\/\S+/g, '').trim();
-  const lang = guessLang(plain);
+  const lang = guessLang(text);
   speakingBtn = btn;
   btn.innerHTML = ICONS.stop + `<span>${t('Stop reading')}</span>`;
-  if (APP_TTS) { try { RKAppVoice.speak(plain, lang); } catch (e) { stopSpeaking(); } return; }
-  const u = new SpeechSynthesisUtterance(plain);
-  u.lang = lang;
-  const v = speechSynthesis.getVoices().find(x => x.lang && x.lang.replace('_', '-').startsWith(lang.slice(0, 2)));
-  if (v) u.voice = v;
-  u.onend = u.onerror = () => { if (speakingBtn === btn) stopSpeaking(); };
-  speechSynthesis.speak(u);
+  if (APP_TTS) { try { RKAppVoice.speak(text.replace(/https?:\/\/\S+/g, '').trim(), lang); } catch (e) { stopSpeaking(); } return; }
+
+  if (!VOICES.length) loadVoices();
+  const voice = pickVoice(lang);
+  if (lang === 'ms-MY' && !voice && actions) {
+    flashNote(actions, t('No Malay voice in this browser — Microsoft Edge or Chrome sounds clearer'));
+  }
+
+  const chunks = speechChunks(text);
+  chunks.forEach((chunk, i) => {
+    const u = new SpeechSynthesisUtterance(chunk);
+    u.lang = voice ? voice.lang : lang;
+    if (voice) u.voice = voice;
+    u.rate = 0.95;      // a touch slower = clearer
+    u.pitch = 1;
+    if (i === chunks.length - 1) u.onend = () => { if (speakingBtn === btn) stopSpeaking(); };
+    u.onerror = e => { if (e.error !== 'interrupted' && e.error !== 'canceled' && speakingBtn === btn) stopSpeaking(); };
+    speechSynthesis.speak(u);
+  });
 }
 
 function flashNote(actions, msg) {
@@ -952,7 +1016,7 @@ function buildActions(row, text, meta) {
     const speakBtn = document.createElement('button');
     speakBtn.type = 'button';
     speakBtn.innerHTML = (speakingBtn ? ICONS.stop : ICONS.speak) + `<span>${t(speakingBtn ? 'Stop reading' : 'Read aloud')}</span>`;
-    speakBtn.addEventListener('click', () => { speak(text, speakBtn); setTimeout(closeActMenus, 150); });
+    speakBtn.addEventListener('click', () => { speak(text, speakBtn, actions); setTimeout(closeActMenus, 150); });
     menu.appendChild(speakBtn);
     actions.classList.add('pinned');
     actions.appendChild(menu);
