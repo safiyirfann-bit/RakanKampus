@@ -837,16 +837,22 @@ const ICONS = {
 };
 
 // Read aloud: the browser's own voice on the web; the app uses its native voice when it has one.
+// Best: natural Azure voice from our server (same clear voice on web and in the app).
+// Fallbacks: the app's own voice, then the browser's voice.
+const SERVER_TTS = @json(\App\Http\Controllers\SpeechController::enabled());
 const APP_TTS = (() => { try { return !!(window.RKAppVoice && RKAppVoice.canSpeak && RKAppVoice.canSpeak()); } catch (e) { return false; } })();
 const WEB_TTS = !IN_APP && 'speechSynthesis' in window;
-const TTS_OK = APP_TTS || WEB_TTS;
-let speakingBtn = null;
+const TTS_OK = SERVER_TTS || APP_TTS || WEB_TTS;
+const SILENT_CLIP = 'data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==';
+let speakingBtn = null, speakingAudio = null, speakingFetch = null, speakingFor = null;
 
 function guessLang(text) {
   const malay = (text.toLowerCase().match(/\b(yang|dan|anda|untuk|boleh|tidak|ini|itu|dengan|saya|ada|kepada|akan|pelajar|sila)\b/g) || []).length;
   return malay >= 2 ? 'ms-MY' : 'en-US';
 }
 function stopSpeaking() {
+  if (speakingFetch) { speakingFetch.abort(); speakingFetch = null; }
+  if (speakingAudio) { speakingAudio.pause(); if (speakingAudio.src.startsWith('blob:')) URL.revokeObjectURL(speakingAudio.src); speakingAudio = null; }
   if (APP_TTS) { try { RKAppVoice.stopSpeaking(); } catch (e) {} }
   if (WEB_TTS) speechSynthesis.cancel();
   if (speakingBtn) { speakingBtn.innerHTML = ICONS.speak + `<span>${t('Read aloud')}</span>`; speakingBtn = null; }
@@ -912,6 +918,44 @@ function speak(text, btn, actions) {
   const lang = guessLang(text);
   speakingBtn = btn;
   btn.innerHTML = ICONS.stop + `<span>${t('Stop reading')}</span>`;
+  if (SERVER_TTS) { speakFromServer(text, lang, btn, actions); return; }
+  speakLocally(text, lang, btn, actions);
+}
+
+function speakFromServer(text, lang, btn, actions) {
+  // Start a silent clip inside the tap so phones/the app allow the real audio to play afterwards
+  const audio = new Audio(SILENT_CLIP);
+  audio.play().catch(() => {});
+  speakingAudio = audio;
+  const ctrl = new AbortController();
+  speakingFetch = ctrl;
+  btn.innerHTML = ICONS.stop + `<span>${t('Loading voice…')}</span>`;
+  fetch('/chatbot/speak', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'audio/mpeg' },
+    body: JSON.stringify({ text, lang }),
+    signal: ctrl.signal,
+  })
+    .then(res => { if (!res.ok) throw new Error('tts ' + res.status); return res.blob(); })
+    .then(blob => {
+      if (speakingBtn !== btn) return;
+      speakingFetch = null;
+      btn.innerHTML = ICONS.stop + `<span>${t('Stop reading')}</span>`;
+      audio.src = URL.createObjectURL(blob);
+      audio.onended = () => { if (speakingBtn === btn) stopSpeaking(); };
+      audio.onerror = () => { if (speakingBtn === btn) stopSpeaking(); };
+      return audio.play();
+    })
+    .catch(err => {
+      if (err && err.name === 'AbortError') return;
+      if (speakingBtn !== btn) return;
+      speakingFetch = null; speakingAudio = null;
+      if (APP_TTS || WEB_TTS) { btn.innerHTML = ICONS.stop + `<span>${t('Stop reading')}</span>`; speakLocally(text, lang, btn, actions); }
+      else { stopSpeaking(); if (actions) flashNote(actions, t('Voice is not available right now.')); }
+    });
+}
+
+function speakLocally(text, lang, btn, actions) {
   if (APP_TTS) { try { RKAppVoice.speak(text.replace(/https?:\/\/\S+/g, '').trim(), lang); } catch (e) { stopSpeaking(); } return; }
 
   if (!VOICES.length) loadVoices();
@@ -1015,8 +1059,12 @@ function buildActions(row, text, meta) {
     menu.className = 'act-menu';
     const speakBtn = document.createElement('button');
     speakBtn.type = 'button';
-    speakBtn.innerHTML = (speakingBtn ? ICONS.stop : ICONS.speak) + `<span>${t(speakingBtn ? 'Stop reading' : 'Read aloud')}</span>`;
-    speakBtn.addEventListener('click', () => { speak(text, speakBtn, actions); setTimeout(closeActMenus, 150); });
+    const mine = speakingBtn && speakingFor === text;
+    speakBtn.innerHTML = (mine ? ICONS.stop : ICONS.speak) + `<span>${t(mine ? 'Stop reading' : 'Read aloud')}</span>`;
+    speakBtn.addEventListener('click', () => {
+      if (speakingBtn && speakingFor === text) stopSpeaking(); else { speak(text, speakBtn, actions); speakingFor = text; }
+      setTimeout(closeActMenus, 150);
+    });
     menu.appendChild(speakBtn);
     actions.classList.add('pinned');
     actions.appendChild(menu);

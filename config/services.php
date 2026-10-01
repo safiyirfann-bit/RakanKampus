@@ -18,6 +18,16 @@ return [
     'key' => env('GROQ_API_KEY'),
 ],
 
+    // "Read aloud" in the chat: Microsoft Azure neural voices (free tier F0 = 500k characters/month).
+    // Leave the key empty and the chat falls back to the browser's own voice.
+    'azure_tts' => [
+        'key' => env('AZURE_SPEECH_KEY', ''),
+        'region' => env('AZURE_SPEECH_REGION', 'southeastasia'),
+        'voice_ms' => env('AZURE_SPEECH_VOICE_MS', 'ms-MY-YasminNeural'),
+        'voice_en' => env('AZURE_SPEECH_VOICE_EN', 'en-US-JennyNeural'),
+        'endpoint' => env('AZURE_SPEECH_ENDPOINT'), // only for testing; normally built from the region
+    ],
+
     'gemini' => [
         'key' => env('GEMINI_API_KEY'),
         'model' => env('GEMINI_MODEL'),
