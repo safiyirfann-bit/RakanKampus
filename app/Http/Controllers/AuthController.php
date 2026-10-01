@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PasswordResetCode;
 use App\Models\User;
+use App\Support\EmailCode;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -58,8 +62,14 @@ class AuthController extends Controller
     /**
      * Show register page
      */
-    public function showRegister()
+    public function showRegister(Request $request)
     {
+        // Coming back from "Change details" on the code screen: refill the form
+        $pending = $this->pendingSignup($request);
+        if ($pending && ! $request->session()->hasOldInput()) {
+            $request->session()->now('_old_input', \Illuminate\Support\Arr::only($pending, ['first_name', 'last_name', 'student_id', 'email']));
+        }
+
         return view('auth.register');
     }
 
@@ -89,19 +99,107 @@ class AuthController extends Controller
             'password'   => 'required|min:6|confirmed',
         ]);
 
-        User::create([
-            'name'       => $request->first_name . ' ' . $request->last_name,
+        // Don't create the account yet: first prove the email is real.
+        // The details wait in the session until the 6-digit code is typed in.
+        $pending = [
             'first_name' => $request->first_name,
             'last_name'  => $request->last_name,
             'student_id' => $request->student_id,
             'email'      => $request->email,
-            // Programme comes from the matric number (e.g. DIT -> Diploma Teknologi Maklumat).
             'faculty'    => \App\Support\MatricNumber::programme($request->student_id) ?? $request->faculty,
-            'password'   => $request->password, // auto hashed by User model
+            'password'   => Hash::make($request->password),
+            'until'      => now()->addMinutes(30)->timestamp,
+        ];
+
+        if ($error = $this->sendSignupCode($pending)) {
+            return back()->withInput($request->except('password', 'password_confirmation'))->withErrors(['email' => $error]);
+        }
+
+        $request->session()->put('reg_pending', $pending);
+
+        return redirect()->route('register.verify');
+    }
+
+    /**
+     * Sign-up step 2: type the code that was emailed
+     */
+    public function showRegisterVerify(Request $request)
+    {
+        $pending = $this->pendingSignup($request);
+        if (! $pending) {
+            return redirect()->route('register');
+        }
+        $email = mb_strtolower($pending['email']);
+
+        return view('auth.register-verify', [
+            'maskedEmail' => EmailCode::mask($email),
+            'resendIn'    => EmailCode::waitSeconds($email, 'register'),
+            'minutes'     => EmailCode::MINUTES,
+        ]);
+    }
+
+    public function registerResend(Request $request)
+    {
+        $pending = $this->pendingSignup($request);
+        if (! $pending) {
+            return redirect()->route('register');
+        }
+
+        $error = $this->sendSignupCode($pending);
+
+        return redirect()->route('register.verify')
+            ->with($error ? 'otp_error' : 'otp_status', $error ?: 'We sent you a new code.');
+    }
+
+    public function registerVerify(Request $request)
+    {
+        $pending = $this->pendingSignup($request);
+        if (! $pending) {
+            return redirect()->route('register')->withErrors(['email' => 'Your sign-up timed out. Please fill in the form again.']);
+        }
+        $email = mb_strtolower($pending['email']);
+
+        if ($error = EmailCode::check($email, 'register', (string) $request->input('code'))) {
+            return back()->with('otp_error', $error);
+        }
+
+        // Someone may have taken the email or matric number while this one was waiting
+        if (User::whereRaw('LOWER(email) = ?', [$email])->exists() || User::where('student_id', $pending['student_id'])->exists()) {
+            $request->session()->forget('reg_pending');
+
+            return redirect()->route('register')->withErrors(['email' => 'This email or matric number was registered in the meantime. Try logging in instead.']);
+        }
+
+        User::create([
+            'name'       => $pending['first_name'] . ' ' . $pending['last_name'],
+            'first_name' => $pending['first_name'],
+            'last_name'  => $pending['last_name'],
+            'student_id' => $pending['student_id'],
+            'email'      => $pending['email'],
+            'faculty'    => $pending['faculty'],
+            'password'   => $pending['password'], // already hashed; the model keeps it as is
             'role'       => 'student',
         ]);
 
-        return redirect()->route('login')->with('success', 'Account created successfully! Please log in.');
+        EmailCode::clear($email, 'register');
+        $request->session()->forget('reg_pending');
+
+        return redirect()->route('login')->with('success', 'Email verified and account created! Please log in.');
+    }
+
+    private function pendingSignup(Request $request): ?array
+    {
+        $p = $request->session()->get('reg_pending');
+
+        return ($p && ($p['until'] ?? 0) >= now()->timestamp) ? $p : null;
+    }
+
+    private function sendSignupCode(array $pending): ?string
+    {
+        return EmailCode::issue(mb_strtolower($pending['email']), 'register', function (string $code) use ($pending) {
+            Mail::to($pending['email'], $pending['first_name'])
+                ->send(new PasswordResetCode($code, $pending['first_name'], EmailCode::MINUTES, 'register'));
+        });
     }
 
     /**

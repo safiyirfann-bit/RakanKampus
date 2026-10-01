@@ -25,7 +25,10 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Student Register
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:20,1');
+Route::get('/register/verify', [AuthController::class, 'showRegisterVerify'])->middleware('guest')->name('register.verify');
+Route::post('/register/verify', [AuthController::class, 'registerVerify'])->middleware(['guest', 'throttle:20,1'])->name('register.verify.post');
+Route::post('/register/resend', [AuthController::class, 'registerResend'])->middleware(['guest', 'throttle:20,1'])->name('register.resend');
 
 // Forgot password (email a 6-digit code -> verify -> new password)
 Route::middleware('guest')->controller(\App\Http\Controllers\PasswordResetController::class)->group(function () {
