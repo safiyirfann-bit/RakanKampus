@@ -936,7 +936,14 @@ function speakFromServer(text, lang, btn, actions) {
     body: JSON.stringify({ text, lang }),
     signal: ctrl.signal,
   })
-    .then(res => { if (!res.ok) throw new Error('tts ' + res.status); return res.blob(); })
+    .then(async res => {
+      if (!res.ok) {
+        const info = await res.json().catch(() => ({}));
+        console.warn('[RakanKampus] AI voice failed, using the browser voice instead:', info);
+        throw new Error('tts ' + res.status);
+      }
+      return res.blob();
+    })
     .then(blob => {
       if (speakingBtn !== btn) return;
       speakingFetch = null;

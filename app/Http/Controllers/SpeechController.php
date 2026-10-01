@@ -58,7 +58,19 @@ class SpeechController extends Controller
             if ($res->failed() || $res->body() === '' || str_contains($type, 'json')) {
                 Log::warning("TTS ({$provider}) failed", ['status' => $res->status(), 'body' => mb_substr($res->body(), 0, 300)]);
 
-                return response()->json(['error' => 'tts_failed'], 502);
+                // Say why (e.g. ElevenLabs "detected_unusual_activity" or "paid_plan_required")
+                // so it can be fixed without digging through server logs. No keys are included.
+                $detail = $res->json('detail');
+                $reason = is_array($detail)
+                    ? trim(($detail['status'] ?? '') . ': ' . ($detail['message'] ?? ''), ': ')
+                    : (is_string($detail) ? $detail : mb_substr(strip_tags($res->body()), 0, 160));
+
+                return response()->json([
+                    'error' => 'tts_failed',
+                    'provider' => $provider,
+                    'status' => $res->status(),
+                    'reason' => mb_substr((string) $reason, 0, 240),
+                ], 502);
             }
             $disk->put($path, $res->body());
         }
