@@ -16,14 +16,14 @@ use Illuminate\View\View;
 
 /**
  * Forgot password in three steps:
- *   1. enter your email  -> we email a 6-digit code (valid 10 min)
+ *   1. enter your email  -> we email a 6-digit code (valid 5 min)
  *   2. type the code     -> max 5 wrong tries, then ask for a new code
  *   3. set a new password -> other devices are signed out, back to login
  * The page never says whether an email is registered.
  */
 class PasswordResetController extends Controller
 {
-    private const CODE_MINUTES = 10;
+    private const CODE_MINUTES = 5;
     private const MAX_ATTEMPTS = 5;
     private const RESEND_SECONDS = 60;
     private const MAX_PER_HOUR = 5;
@@ -33,7 +33,7 @@ class PasswordResetController extends Controller
 
     public function showRequest(): View
     {
-        return view('auth.forgot-password');
+        return view('auth.forgot-password', ['minutes' => self::CODE_MINUTES]);
     }
 
     public function sendCode(Request $request): RedirectResponse

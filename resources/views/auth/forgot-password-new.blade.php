@@ -13,11 +13,8 @@
   $eye = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
 @endphp
 
-<div class="card">
-  <div class="fp-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5c0 4.5 3 8.3 7 10 4-1.7 7-5.5 7-10V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
-  </div>
-  <div class="fp-steps"><span></span><span></span><span class="on"></span></div>
+<div class="card fp-card">
+  @include('partials.forgot-head', ['step' => 3])
 
   <h1>New password</h1>
   <p class="fp-lead">Code verified! Choose a new password for your account.</p>
@@ -45,10 +42,10 @@
       </div>
       <div class="pw-match" id="pwMatch"></div>
     </div>
-    <button type="submit" class="btn-signin" id="pwBtn" disabled>Save new password</button>
+    <button type="submit" class="btn-signin" id="pwBtn" disabled><span>Save new password</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
   </form>
 
-  <a class="fp-back" href="{{ route('login') }}">Cancel</a>
+  <div class="fp-foot"><a class="fp-back" href="{{ route('login') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Cancel</a></div>
 </div>
 
 <footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
@@ -90,7 +87,7 @@
     });
   });
   document.getElementById('pwForm').addEventListener('submit', function () {
-    setTimeout(function () { btn.disabled = true; btn.textContent = 'Saving…'; }, 0);
+    setTimeout(function () { btn.disabled = true; btn.querySelector('span').textContent = 'Saving…'; }, 0);
   });
 })();
 </script>

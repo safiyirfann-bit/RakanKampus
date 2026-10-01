@@ -9,11 +9,8 @@
 <div class="blob blob-2"></div>
 <div class="blob blob-3"></div>
 
-<div class="card">
-  <div class="fp-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>
-  </div>
-  <div class="fp-steps"><span></span><span class="on"></span><span></span></div>
+<div class="card fp-card">
+  @include('partials.forgot-head', ['step' => 2])
 
   <h1>Check your email</h1>
   <p class="fp-lead">If <b>{{ $maskedEmail }}</b> has an account, we sent it a 6-digit code. It works for {{ $minutes }} minutes. Check your spam folder too.</p>
@@ -29,10 +26,11 @@
     <input type="hidden" name="code" id="otpCode">
     <div class="otp {{ session('otp_error') ? 'shake' : '' }}" id="otpBoxes">
       @for ($i = 0; $i < 6; $i++)
+        @if ($i === 3)<span class="gap"></span>@endif
         <input type="text" inputmode="numeric" maxlength="1" aria-label="Digit {{ $i + 1 }}" {{ $i === 0 ? 'autocomplete=one-time-code autofocus' : 'autocomplete=off' }}>
       @endfor
     </div>
-    <button type="submit" class="btn-signin" id="otpBtn" disabled>Verify code</button>
+    <button type="submit" class="btn-signin" id="otpBtn" disabled><span>Verify code</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
   </form>
 
   <form method="POST" action="{{ route('password.resend') }}" class="fp-resend">
@@ -43,7 +41,7 @@
     </button>
   </form>
 
-  <a class="fp-back" href="{{ route('password.request') }}">Use a different email</a>
+  <div class="fp-foot"><a class="fp-back" href="{{ route('password.request') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Use a different email</a></div>
 </div>
 
 <footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
@@ -66,7 +64,7 @@
     for (var i = 0; i < digits.length && from + i < boxes.length; i++) boxes[from + i].value = digits[i];
     var next = Math.min(from + digits.length, boxes.length - 1);
     boxes[next].focus();
-    if (sync().length === 6) { btn.disabled = true; btn.textContent = 'Checking…'; form.submit(); }
+    if (sync().length === 6) { btn.disabled = true; btn.querySelector('span').textContent = 'Checking…'; form.submit(); }
   }
 
   boxes.forEach(function (box, i) {
