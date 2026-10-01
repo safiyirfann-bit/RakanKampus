@@ -179,15 +179,41 @@
   .bullets li { position: relative; padding-left: 20px; margin: 4px 0; }
   .bullets li::before { content: ''; position: absolute; left: 4px; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
   .message-row.bot .message h4 { font-size: 15.5px; font-weight: 700; color: var(--navy); margin: 12px 0 6px; }
-  .msg-actions { display: flex; gap: 2px; margin-top: 6px; opacity: 0; transition: opacity .15s; }
-  .message-row.bot:hover .msg-actions, .message-row.bot:last-child .msg-actions { opacity: 1; }
+  /* Action bar under each bot answer (copy, rate, share, regenerate, more) */
+  .msg-actions { position: relative; display: flex; align-items: center; gap: 2px; margin: 6px 0 0 -6px; opacity: 0; transition: opacity .15s; }
+  .message-row.bot:hover .msg-actions, .message-row.bot:last-child .msg-actions, .msg-actions.pinned { opacity: 1; }
   @media (hover: none) { .msg-actions { opacity: 1; } }
   .msg-actions button {
-    height: 28px; padding: 0 8px; border-radius: 6px; border: none; background: none; color: var(--faint);
-    cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 12px;
+    position: relative; width: 32px; height: 32px; padding: 0; border-radius: 8px; border: none; background: none; color: var(--faint);
+    cursor: pointer; display: grid; place-items: center; transition: background .15s, color .15s, transform .1s;
   }
   .msg-actions button:hover { background: #f1f5f9; color: var(--ink); }
-  .msg-actions svg { width: 15px; height: 15px; }
+  .msg-actions button:active { transform: scale(.9); }
+  .msg-actions button.on { color: var(--ink); }
+  .msg-actions button.on svg { fill: currentColor; }
+  .msg-actions button.gone { display: none; }
+  .msg-actions button.pop svg { animation: actPop .35s cubic-bezier(.2,1.6,.4,1); }
+  .msg-actions svg { width: 17px; height: 17px; }
+  .msg-actions [data-regen].spin svg { animation: actSpin .8s linear infinite; }
+  .message-row.bot:not(:last-child) [data-regen] { display: none; }
+  .msg-actions button[data-tip]::after {
+    content: attr(data-tip); position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%) translateY(3px);
+    background: #0f172a; color: #fff; font-size: 11.5px; font-weight: 500; white-space: nowrap; padding: 5px 8px; border-radius: 7px;
+    opacity: 0; pointer-events: none; transition: opacity .12s, transform .12s; z-index: 5;
+  }
+  @media (hover: hover) { .msg-actions button[data-tip]:hover::after { opacity: 1; transform: translateX(-50%); } }
+  .msg-actions .act-note { font-size: 12px; color: var(--faint); margin-left: 6px; animation: actFade 2.2s ease forwards; }
+  .act-menu {
+    position: absolute; left: 150px; bottom: calc(100% + 6px); min-width: 170px; padding: 6px; border-radius: 14px; z-index: 20;
+    background: #fff; border: 1px solid #e2e8f0; box-shadow: 0 12px 30px rgba(15,23,42,.14); animation: actMenu .14s ease-out;
+  }
+  .act-menu button { width: 100%; height: auto; display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 9px; color: var(--ink); font-size: 14px; }
+  .act-menu button:hover { background: #f1f5f9; }
+  .msg-actions .act-menu button::after { display: none; }
+  @keyframes actPop { 0% { transform: scale(1); } 45% { transform: scale(1.35) rotate(-8deg); } 100% { transform: scale(1); } }
+  @keyframes actSpin { to { transform: rotate(360deg); } }
+  @keyframes actFade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
+  @keyframes actMenu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
   /* ---------- Robot "searching" animation ---------- */
   .searching { display: flex; align-items: center; gap: 14px; padding-top: 2px; }
@@ -386,6 +412,11 @@ html[data-theme="dark"] .steps b, html[data-theme="dark"] .bullets b { color: #e
 html[data-theme="dark"] .message-row.bot .message h4 { color: #e1e6ec; }
 html[data-theme="dark"] .msg-actions button { color: #ced3d9; }
 html[data-theme="dark"] .msg-actions button:hover { background: #10161f; color: #dee2e8; }
+html[data-theme="dark"] .msg-actions button.on { color: #dee2e8; }
+html[data-theme="dark"] .act-menu { background: #1a212b; border-color: #2a3340; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
+html[data-theme="dark"] .act-menu button { color: #dee2e8; }
+html[data-theme="dark"] .act-menu button:hover { background: #10161f; }
+html[data-theme="dark"] .msg-actions button[data-tip]::after { background: #f1f5f9; color: #0f172a; }
 html[data-theme="dark"] .search-text { color: #b0b6be; }
 html[data-theme="dark"] .search-text b { color: #dee2e8; }
 html[data-theme="dark"] .stopped { color: #ced3d9; }
@@ -793,11 +824,149 @@ function leaveEmptyState() {
   chatArea.innerHTML = '';
 }
 
-function addMessage(text, sender) {
+const ICONS = {
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg>',
+  check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5 9-10"></path></svg>',
+  up: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 10v11H4a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h3Z"></path><path d="M7 10l4.2-7.2a1.9 1.9 0 0 1 3.5 1.3L14 9h5.3a2 2 0 0 1 2 2.4l-1.5 7.5a2.5 2.5 0 0 1-2.4 2.1H7"></path></svg>',
+  down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3Z"></path><path d="M17 14l-4.2 7.2a1.9 1.9 0 0 1-3.5-1.3L10 15H4.7a2 2 0 0 1-2-2.4l1.5-7.5A2.5 2.5 0 0 1 6.6 3H17"></path></svg>',
+  share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="m7 8 5-5 5 5"></path><path d="M20 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5"></path></svg>',
+  regen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"></path><path d="M21 3v5h-5"></path></svg>',
+  more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>',
+  speak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>',
+  stop: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"></rect></svg>',
+};
+
+// Read aloud: the browser's own voice on the web; the app uses its native voice when it has one.
+const APP_TTS = (() => { try { return !!(window.RKAppVoice && RKAppVoice.canSpeak && RKAppVoice.canSpeak()); } catch (e) { return false; } })();
+const WEB_TTS = !IN_APP && 'speechSynthesis' in window;
+const TTS_OK = APP_TTS || WEB_TTS;
+let speakingBtn = null;
+
+function guessLang(text) {
+  const malay = (text.toLowerCase().match(/\b(yang|dan|anda|untuk|boleh|tidak|ini|itu|dengan|saya|ada|kepada|akan|pelajar|sila)\b/g) || []).length;
+  return malay >= 2 ? 'ms-MY' : 'en-US';
+}
+function stopSpeaking() {
+  if (APP_TTS) { try { RKAppVoice.stopSpeaking(); } catch (e) {} }
+  if (WEB_TTS) speechSynthesis.cancel();
+  if (speakingBtn) { speakingBtn.innerHTML = ICONS.speak + `<span>${t('Read aloud')}</span>`; speakingBtn = null; }
+}
+window.RKSpeakDone = stopSpeaking;   // called by the app when its voice finishes
+function speak(text, btn) {
+  const wasMine = speakingBtn === btn;
+  stopSpeaking();
+  if (wasMine) return;
+  const plain = text.replace(/https?:\/\/\S+/g, '').trim();
+  const lang = guessLang(plain);
+  speakingBtn = btn;
+  btn.innerHTML = ICONS.stop + `<span>${t('Stop reading')}</span>`;
+  if (APP_TTS) { try { RKAppVoice.speak(plain, lang); } catch (e) { stopSpeaking(); } return; }
+  const u = new SpeechSynthesisUtterance(plain);
+  u.lang = lang;
+  const v = speechSynthesis.getVoices().find(x => x.lang && x.lang.replace('_', '-').startsWith(lang.slice(0, 2)));
+  if (v) u.voice = v;
+  u.onend = u.onerror = () => { if (speakingBtn === btn) stopSpeaking(); };
+  speechSynthesis.speak(u);
+}
+
+function flashNote(actions, msg) {
+  actions.querySelector('.act-note')?.remove();
+  const n = document.createElement('span');
+  n.className = 'act-note';
+  n.textContent = msg;
+  actions.appendChild(n);
+  setTimeout(() => n.remove(), 2300);
+}
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+  return new Promise((ok, fail) => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy') ? ok() : fail(); } catch (e) { fail(e); } finally { ta.remove(); }
+  });
+}
+function closeActMenus() { document.querySelectorAll('.act-menu').forEach(m => { m.parentElement.classList.remove('pinned'); m.remove(); }); }
+document.addEventListener('click', e => { if (!e.target.closest('.act-menu, [data-more]')) closeActMenus(); });
+
+function buildActions(row, text, meta) {
+  const actions = document.createElement('div');
+  actions.className = 'msg-actions';
+  const btn = (key, icon, tip) => `<button type="button" data-${key} data-tip="${escapeHtml(t(tip))}" aria-label="${escapeHtml(t(tip))}">${icon}</button>`;
+  actions.innerHTML =
+    btn('copy', ICONS.copy, 'Copy') +
+    btn('up', ICONS.up, 'Good response') +
+    btn('down', ICONS.down, 'Bad response') +
+    btn('share', ICONS.share, 'Share') +
+    btn('regen', ICONS.regen, 'Regenerate') +
+    (TTS_OK ? btn('more', ICONS.more, 'More') : '');
+
+  const copyBtn = actions.querySelector('[data-copy]');
+  copyBtn.addEventListener('click', () => {
+    copyText(text).then(() => {
+      copyBtn.innerHTML = ICONS.check; copyBtn.dataset.tip = t('Copied');
+      setTimeout(() => { copyBtn.innerHTML = ICONS.copy; copyBtn.dataset.tip = t('Copy'); }, 1500);
+    }).catch(() => {});
+  });
+
+  // Thumbs up / down — saved on the message so the admin side can use it later
+  let rating = meta.rating || 0;
+  const up = actions.querySelector('[data-up]'), down = actions.querySelector('[data-down]');
+  const paint = () => {
+    up.classList.toggle('on', rating === 1); down.classList.toggle('on', rating === -1);
+    up.classList.toggle('gone', rating === -1); down.classList.toggle('gone', rating === 1);
+  };
+  paint();
+  const rate = (value, b) => {
+    rating = rating === value ? 0 : value;
+    paint();
+    if (rating) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); flashNote(actions, t('Thanks for your feedback!')); }
+    const id = row.dataset.id;
+    if (id) fetch(`/chatbot/message/${id}/rate`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }, body: JSON.stringify({ rating }) }).catch(() => {});
+  };
+  up.addEventListener('click', () => rate(1, up));
+  down.addEventListener('click', () => rate(-1, down));
+
+  // Share the question + answer (phone share sheet when there is one, otherwise copy)
+  const shareBtn = actions.querySelector('[data-share]');
+  shareBtn.addEventListener('click', () => {
+    let q = row.previousElementSibling;
+    while (q && !q.classList.contains('user')) q = q.previousElementSibling;
+    const body = (q ? `${t('Question')}: ${q.textContent.trim()}\n\n` : '') + `RakanKampus: ${text}`;
+    if (navigator.share && !IN_APP) {
+      navigator.share({ title: 'RakanKampus', text: body }).catch(() => {});
+    } else {
+      copyText(body).then(() => flashNote(actions, t('Copied — paste it anywhere to share'))).catch(() => {});
+    }
+  });
+
+  actions.querySelector('[data-regen]').addEventListener('click', e => regenerate(row, e.currentTarget));
+
+  const moreBtn = actions.querySelector('[data-more]');
+  if (moreBtn) moreBtn.addEventListener('click', () => {
+    const open = actions.querySelector('.act-menu');
+    closeActMenus();
+    if (open) return;
+    const menu = document.createElement('div');
+    menu.className = 'act-menu';
+    const speakBtn = document.createElement('button');
+    speakBtn.type = 'button';
+    speakBtn.innerHTML = (speakingBtn ? ICONS.stop : ICONS.speak) + `<span>${t(speakingBtn ? 'Stop reading' : 'Read aloud')}</span>`;
+    speakBtn.addEventListener('click', () => { speak(text, speakBtn); setTimeout(closeActMenus, 150); });
+    menu.appendChild(speakBtn);
+    actions.classList.add('pinned');
+    actions.appendChild(menu);
+  });
+
+  return actions;
+}
+
+function addMessage(text, sender, meta = {}) {
   leaveEmptyState();
   const col = ensureCol();
   const row = document.createElement('div');
   row.className = `message-row ${sender}`;
+  if (meta.id) row.dataset.id = meta.id;
 
   if (sender === 'user') {
     const msg = document.createElement('div');
@@ -812,24 +981,35 @@ function addMessage(text, sender) {
     msg.className = 'message';
     msg.innerHTML = formatBotText(text);
     body.appendChild(msg);
-
-    const actions = document.createElement('div');
-    actions.className = 'msg-actions';
-    actions.innerHTML = `<button type="button" data-copy><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg><span>${t('Copy')}</span></button>`;
-    const copyBtn = actions.querySelector('[data-copy]');
-    copyBtn.addEventListener('click', () => {
-      navigator.clipboard?.writeText(text).then(() => {
-        copyBtn.querySelector('span').textContent = t('Copied');
-        setTimeout(() => { copyBtn.querySelector('span').textContent = t('Copy'); }, 1500);
-      });
-    });
-    body.appendChild(actions);
+    if (meta.actions !== false) body.appendChild(buildActions(row, text, meta));
     row.appendChild(body);
   }
 
   col.appendChild(row);
   scrollToBottom();
   return row;
+}
+
+// Ask the AI for a different answer to the last question
+function regenerate(row, btn) {
+  if (busy || !currentConversationId) return;
+  stopSpeaking();
+  btn.classList.add('spin');
+  busy = true;
+  fetch('/chatbot', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
+    body: JSON.stringify({ message: '-', conversation_id: currentConversationId, regenerate: true }),
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.reply) throw new Error('no reply');
+      const fresh = addMessage(data.reply, 'bot', { id: data.message_id });
+      row.replaceWith(fresh);
+      fresh.querySelector('.message').animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
+    })
+    .catch(() => { btn.classList.remove('spin'); flashNote(btn.parentElement, t('Could not regenerate. Try again.')); })
+    .finally(() => { busy = false; });
 }
 
 // Bot "thinking" row: robot with a magnifying glass flipping through documents,
@@ -891,7 +1071,7 @@ function sendMessage(textArg) {
     .then(data => {
       removeSearching();
       if (data.reply) {
-        addMessage(data.reply, 'bot');
+        addMessage(data.reply, 'bot', { id: data.message_id });
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
@@ -901,9 +1081,8 @@ function sendMessage(textArg) {
     .catch(error => {
       removeSearching();
       if (error.name === 'AbortError') {
-        const row = addMessage('', 'bot');
+        const row = addMessage('', 'bot', { actions: false });
         row.querySelector('.message').innerHTML = `<span class="stopped">${escapeHtml(t('Stopped'))}</span>`;
-        row.querySelector('.msg-actions')?.remove();
       } else {
         addMessage(t('Sorry, unable to connect to the server. Please try again.'), 'bot');
       }
@@ -1122,13 +1301,14 @@ function setTitle(title) {
 }
 
 function openConversation(id) {
+  stopSpeaking();
   fetch(`/chatbot/${id}`, { headers: { 'Accept': 'application/json' } })
     .then(res => res.json())
     .then(messages => {
       app.classList.remove('is-empty');
       chatArea.innerHTML = '';
       currentConversationId = id;
-      messages.forEach(m => addMessage(m.message, m.sender));
+      messages.forEach(m => addMessage(m.message, m.sender, { id: m.id, rating: m.rating }));
       const conv = conversationsCache.find(c => c.id === id);
       if (conv) setTitle(conv.title);
       renderRecentList();
@@ -1137,6 +1317,7 @@ function openConversation(id) {
 }
 
 function startNewChat() {
+  stopSpeaking();
   if (currentController) currentController.abort();
   currentConversationId = null;
   showEmptyState();

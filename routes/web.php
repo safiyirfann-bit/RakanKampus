@@ -122,6 +122,7 @@ Route::middleware('auth')->group(function () {
     // Chatbot API
     Route::post('/chatbot', [ChatbotController::class, 'chat'])->middleware('throttle:20,1')->name('chatbot.send');
     Route::get('/chatbot/history', [ChatbotController::class, 'history'])->name('chatbot.history');
+    Route::post('/chatbot/message/{message}/rate', [ChatbotController::class, 'rate'])->middleware('throttle:60,1')->name('chatbot.rate');
     Route::get('/chatbot/{conversation}', [ChatbotController::class, 'show'])->name('chatbot.show');
     Route::put('/chatbot/{conversation}/rename', [ChatbotController::class, 'rename'])->name('chatbot.rename');
 Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])->name('chatbot.destroy');

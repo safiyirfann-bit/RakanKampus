@@ -431,5 +431,16 @@
     "Please enter a valid email address, e.g. name@example.com.": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும், எ.கா. name@example.com.",
     "Please enter a valid phone number, e.g. 012-3456789.": "சரியான தொலைபேசி எண்ணை உள்ளிடவும், எ.கா. 012-3456789.",
     "This email is already used by another account.": "இந்த மின்னஞ்சல் ஏற்கனவே மற்றொரு கணக்கால் பயன்படுத்தப்படுகிறது.",
-    "This matric number is already registered to another account.": "இந்த மெட்ரிக் எண் ஏற்கனவே மற்றொரு கணக்கில் பதிவு செய்யப்பட்டுள்ளது."
+    "This matric number is already registered to another account.": "இந்த மெட்ரிக் எண் ஏற்கனவே மற்றொரு கணக்கில் பதிவு செய்யப்பட்டுள்ளது.",
+    "Good response": "நல்ல பதில்",
+    "Bad response": "மோசமான பதில்",
+    "Share": "பகிர்",
+    "Regenerate": "மீண்டும் உருவாக்கு",
+    "More": "மேலும்",
+    "Read aloud": "சத்தமாக வாசி",
+    "Stop reading": "வாசிப்பதை நிறுத்து",
+    "Thanks for your feedback!": "உங்கள் கருத்துக்கு நன்றி!",
+    "Question": "கேள்வி",
+    "Copied — paste it anywhere to share": "நகலெடுக்கப்பட்டது — பகிர ஒட்டவும்",
+    "Could not regenerate. Try again.": "மீண்டும் உருவாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
 }

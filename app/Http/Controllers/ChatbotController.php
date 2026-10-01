@@ -50,6 +50,7 @@ class ChatbotController extends Controller
         $request->validate([
             'message' => 'required|string',
             'conversation_id' => 'nullable|integer',
+            'regenerate' => 'nullable|boolean',
         ]);
 
         $user = $request->user();
@@ -78,10 +79,20 @@ class ChatbotController extends Controller
             ]);
         }
 
-        $userMessage = $conversation->messages()->create([
-            'sender' => 'user',
-            'message' => $message,
-        ]);
+        // "Regenerate": answer the last question again instead of storing a new one.
+        // The old bot answer is removed so the AI doesn't just repeat it.
+        $regenerate = $request->boolean('regenerate') && $conversation->wasRecentlyCreated === false;
+        if ($regenerate) {
+            $userMessage = $conversation->messages()->where('sender', 'user')->latest('id')->first();
+            abort_unless($userMessage, 422);
+            $conversation->messages()->where('sender', 'bot')->where('id', '>', $userMessage->id)->delete();
+            $message = $userMessage->message;
+        } else {
+            $userMessage = $conversation->messages()->create([
+                'sender' => 'user',
+                'message' => $message,
+            ]);
+        }
 
         $entries = $this->searchKnowledgeBase($message, 5, $conversation);
 
@@ -91,7 +102,7 @@ class ChatbotController extends Controller
         }
 
 
-        if ($entries->isEmpty()) {
+        if ($entries->isEmpty() && ! $regenerate) {
     $existing = \App\Models\UnansweredQuestion::where('question', $message)->first();
 
     if ($existing) {
@@ -172,7 +183,7 @@ $reply = str_replace('|', '', $reply);                      // buang simbol tabl
 $reply = trim($reply);;
 
 
-        $conversation->messages()->create([
+        $botMessage = $conversation->messages()->create([
             'sender' => 'bot',
             'message' => $reply,
         ]);
@@ -182,7 +193,19 @@ $reply = trim($reply);;
         return response()->json([
             'reply' => $reply,
             'conversation_id' => $conversation->id,
+            'message_id' => $botMessage->id,
         ]);
+    }
+
+    /** Thumbs up (1) / thumbs down (-1) on one of the bot's answers; 0 clears it. */
+    public function rate(Request $request, \App\Models\ChatMessage $message)
+    {
+        abort_unless($message->sender === 'bot' && $message->conversation?->user_id === $request->user()->id, 403);
+
+        $data = $request->validate(['rating' => 'required|integer|in:-1,0,1']);
+        $message->update(['rating' => $data['rating'] ?: null]);
+
+        return response()->json(['success' => true, 'rating' => $message->rating]);
     }
 
     private function containsUnsafeContent(string $message): bool
@@ -231,7 +254,8 @@ $reply = trim($reply);;
 
         $messages = $conversation->messages()
             ->orderBy('created_at')
-            ->get(['sender', 'message']);
+            ->orderBy('id')
+            ->get(['id', 'sender', 'message', 'rating']);
 
         return response()->json($messages);
     }
