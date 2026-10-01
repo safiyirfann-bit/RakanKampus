@@ -215,6 +215,62 @@
   @keyframes actFade { 0%, 75% { opacity: 1; } 100% { opacity: 0; } }
   @keyframes actMenu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
+
+  /* ---------- Read aloud: floating talking mascot ---------- */
+  .rk-mascot {
+    position: absolute; right: 22px; bottom: 108px; z-index: 30; display: flex; align-items: flex-end;
+    pointer-events: none; animation: mascotIn .5s cubic-bezier(.2,1.5,.4,1);
+  }
+  .rk-mascot.out { animation: mascotOut .3s ease-in forwards; }
+  .rk-mascot > * { pointer-events: auto; }
+  .rk-mascot .m-bot { width: 86px; height: 96px; flex: none; filter: drop-shadow(0 10px 16px rgba(15,29,46,.28)); animation: mascotHover 2.4s ease-in-out infinite; }
+  .rk-mascot .m-say {
+    position: relative; margin: 0 4px 64px 0; max-width: 250px; padding: 10px 14px 11px; border-radius: 18px 18px 4px 18px;
+    background: var(--navy); color: #fff; font-size: 13px; line-height: 1.5; box-shadow: 0 12px 28px rgba(15,29,46,.28);
+  }
+  .rk-mascot .m-top { display: flex; align-items: center; gap: 7px; font-size: 10.5px; font-weight: 800; letter-spacing: .5px; color: #99f6e4; margin-bottom: 3px; text-transform: uppercase; }
+  .rk-mascot .m-eq { display: flex; align-items: center; gap: 2px; height: 12px; }
+  .rk-mascot .m-eq i { width: 2.5px; height: 3px; border-radius: 2px; background: #2dd4bf; }
+  .rk-mascot.talking .m-eq i { animation: mEq .8s ease-in-out infinite; }
+  .rk-mascot .m-eq i:nth-child(2) { animation-delay: -.3s; } .rk-mascot .m-eq i:nth-child(3) { animation-delay: -.55s; } .rk-mascot .m-eq i:nth-child(4) { animation-delay: -.15s; }
+  .rk-mascot .m-text { display: block; max-height: 4.5em; overflow: hidden; animation: mText .3s ease; }
+  .rk-mascot .m-stop {
+    position: absolute; right: -9px; top: -9px; width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff;
+    background: #ef4444; color: #fff; display: grid; place-items: center; cursor: pointer; padding: 0; box-shadow: 0 4px 10px rgba(239,68,68,.4);
+  }
+  .rk-mascot .m-stop svg { width: 11px; height: 11px; }
+  .rk-mascot .m-stop:hover { transform: scale(1.08); }
+  /* robot parts */
+  .m-bot .eyes { transform-box: fill-box; transform-origin: center; animation: mBlink 3.4s infinite; }
+  .m-bot .tongue { opacity: 0; }
+  .rk-mascot.talking .m-bot .mouth { transform-box: fill-box; transform-origin: center; animation: mTalk 1.1s steps(1) infinite; }
+  .rk-mascot.talking .m-bot .tongue { transform-box: fill-box; transform-origin: center; animation: mTongue 1.1s steps(1) infinite; }
+  .rk-mascot.talking .m-bot .ant { animation: mAnt .55s ease-in-out infinite alternate; }
+  .rk-mascot.talking .m-bot .chest { animation: mChest .4s ease-in-out infinite alternate; }
+  .rk-mascot.talking .m-bot .head { transform-box: view-box; transform-origin: 100px 94px; animation: mNod 1.6s ease-in-out infinite; }
+  .rk-mascot.talking .m-bot .arm { transform-box: view-box; transform-origin: 58px 118px; animation: mGest 1.3s ease-in-out infinite; }
+  .rk-mascot.loading .m-bot .head { transform-box: view-box; transform-origin: 100px 94px; animation: mThink 1.4s ease-in-out infinite; }
+  /* the sentence being read, underlined inside the answer */
+  ::highlight(rk-reading) { background-color: rgba(45,212,191,.28); }
+  @keyframes mascotIn { from { transform: translateY(50px) scale(.6); opacity: 0; } to { transform: none; opacity: 1; } }
+  @keyframes mascotOut { to { transform: translateY(40px) scale(.7); opacity: 0; } }
+  @keyframes mascotHover { 50% { transform: translateY(-5px); } }
+  @keyframes mEq { 0%,100% { height: 3px; } 50% { height: 12px; } }
+  @keyframes mText { from { opacity: .35; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+  @keyframes mBlink { 0%,92%,100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+  @keyframes mTalk { 0% { transform: scaleY(.35); } 12% { transform: scaleY(1.25) scaleX(.85); } 24% { transform: scaleY(.6); } 36% { transform: scaleY(1.45) scaleX(.8); } 48% { transform: scaleY(.3) scaleX(1.1); } 60% { transform: scaleY(1.1); } 72% { transform: scaleY(.5) scaleX(1.05); } 84% { transform: scaleY(1.35) scaleX(.85); } 100% { transform: scaleY(.35); } }
+  @keyframes mTongue { 0%,24%,48%,72% { opacity: 0; } 12%,36%,60%,84% { opacity: 1; } }
+  @keyframes mAnt { to { fill: #f472b6; } }
+  @keyframes mChest { from { opacity: .5; } to { opacity: 1; } }
+  @keyframes mNod { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(3deg); } }
+  @keyframes mGest { 0%,100% { transform: rotate(0); } 50% { transform: rotate(-14deg); } }
+  @keyframes mThink { 0%,100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
+  @media (max-width: 760px) {
+    .rk-mascot { right: 10px; bottom: 96px; }
+    .rk-mascot .m-bot { width: 66px; height: 74px; }
+    .rk-mascot .m-say { max-width: min(220px, 60vw); margin-bottom: 50px; font-size: 12.5px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .rk-mascot, .rk-mascot * { animation: none !important; } }
   /* ---------- Robot "searching" animation ---------- */
   .searching { display: flex; align-items: center; gap: 14px; padding-top: 2px; }
   .search-bot { width: 84px; height: 56px; flex-shrink: 0; overflow: visible; }
@@ -413,6 +469,9 @@ html[data-theme="dark"] .message-row.bot .message h4 { color: #e1e6ec; }
 html[data-theme="dark"] .msg-actions button { color: #ced3d9; }
 html[data-theme="dark"] .msg-actions button:hover { background: #10161f; color: #dee2e8; }
 html[data-theme="dark"] .msg-actions button.on { color: #dee2e8; }
+html[data-theme="dark"] .rk-mascot .m-say { background: #1f2a37; border: 1px solid #334155; }
+html[data-theme="dark"] .rk-mascot .m-bot { filter: drop-shadow(0 10px 16px rgba(0,0,0,.5)); }
+html[data-theme="dark"] ::highlight(rk-reading) { background-color: rgba(45,212,191,.22); }
 html[data-theme="dark"] .act-menu { background: #1a212b; border-color: #2a3340; box-shadow: 0 12px 30px rgba(0,0,0,.45); }
 html[data-theme="dark"] .act-menu button { color: #dee2e8; }
 html[data-theme="dark"] .act-menu button:hover { background: #10161f; }
@@ -542,6 +601,21 @@ html[data-theme="dark"] mark { background: #22473f; }
       </a>
     </div>
 
+    <template id="mascotTpl"><div class="rk-mascot" role="status" aria-live="polite">
+      <div class="m-say"><div class="m-top"><span class="m-eq"><i></i><i></i><i></i><i></i></span><span class="m-label"></span></div><span class="m-text"></span>
+        <button type="button" class="m-stop" aria-label="{{ __('Stop reading') }}" title="{{ __('Stop reading') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+      <svg class="m-bot" viewBox="0 0 200 222" fill="none" aria-hidden="true">
+        <line x1="100" y1="14" x2="100" y2="30" stroke="#14213d" stroke-width="5" stroke-linecap="round"/><circle class="ant" cx="100" cy="12" r="6" fill="#2ec4c6"/>
+        <g class="head"><rect x="56" y="30" width="88" height="64" rx="24" fill="#14213d"/><circle cx="54" cy="58" r="14" fill="#2ec4c6"/><circle cx="146" cy="58" r="14" fill="#2ec4c6"/>
+          <rect x="72" y="44" width="56" height="38" rx="14" fill="#ffffff"/><g class="eyes"><circle cx="90" cy="60" r="6" fill="#14213d"/><circle cx="110" cy="60" r="6" fill="#14213d"/></g>
+          <ellipse class="mouth" cx="100" cy="74" rx="9" ry="4.5" fill="#14213d"/><ellipse class="tongue" cx="100" cy="76.5" rx="5" ry="1.8" fill="#f472b6"/></g>
+        <rect x="52" y="96" width="96" height="86" rx="26" fill="#ffffff" stroke="#14213d" stroke-width="4"/><circle class="chest" cx="100" cy="128" r="7" fill="#2ec4c6"/>
+        <g class="arm"><path d="M58 118 Q26 108 22 76" stroke="#14213d" stroke-width="20" stroke-linecap="round" fill="none"/><circle cx="24" cy="80" r="10" fill="#2ec4c6"/><circle cx="22" cy="64" r="15" fill="#ffffff" stroke="#14213d" stroke-width="4"/>
+          <line x1="22" y1="50" x2="14" y2="38" stroke="#14213d" stroke-width="4" stroke-linecap="round"/><line x1="22" y1="49" x2="22" y2="36" stroke="#14213d" stroke-width="4" stroke-linecap="round"/><line x1="22" y1="50" x2="30" y2="38" stroke="#14213d" stroke-width="4" stroke-linecap="round"/></g>
+        <path d="M142 118 Q160 130 158 152" stroke="#14213d" stroke-width="18" stroke-linecap="round" fill="none"/><circle cx="158" cy="158" r="12" fill="#14213d"/>
+        <rect x="68" y="176" width="20" height="32" rx="9" fill="#14213d"/><rect x="112" y="176" width="20" height="32" rx="9" fill="#14213d"/>
+        <ellipse cx="78" cy="214" rx="17" ry="8" fill="#14213d"/><ellipse cx="122" cy="214" rx="17" ry="8" fill="#14213d"/>
+      </svg></div></template>
     <template id="botAvatarTpl"><div class="bot-avatar"><x-brand-logo size="20" /></div></template>
 
     <div class="chat-area" id="chatArea"></div>
@@ -856,6 +930,7 @@ function stopSpeaking() {
   if (APP_TTS) { try { RKAppVoice.stopSpeaking(); } catch (e) {} }
   if (WEB_TTS) speechSynthesis.cancel();
   if (speakingBtn) { speakingBtn.innerHTML = ICONS.speak + `<span>${t('Read aloud')}</span>`; speakingBtn = null; }
+  hideMascot();
 }
 window.RKSpeakDone = stopSpeaking;   // called by the app when its voice finishes
 // Browsers ship different voices: Edge has natural Malay voices (Yasmin / Osman),
@@ -911,6 +986,82 @@ function speechChunks(text) {
   return out;
 }
 
+
+// ---------- Floating talking mascot while reading aloud ----------
+let mascotEl = null, mascotMsg = null, mascotParts = [];
+function showMascot(text, msgEl) {
+  hideMascot(true);
+  const main = document.querySelector('.main');
+  mascotEl = document.getElementById('mascotTpl').content.firstElementChild.cloneNode(true);
+  mascotEl.querySelector('.m-stop').addEventListener('click', stopSpeaking);
+  main.appendChild(mascotEl);
+  mascotMsg = msgEl;
+  // same pieces the voice reads, minus the '1,' list numbers (shown as badges in the answer)
+  mascotParts = speechChunks(text).map(x => x.replace(/^\d+,\s*/, ''));
+  mascotLoading();
+}
+function mascotLoading() {
+  if (!mascotEl) return;
+  mascotEl.classList.add('loading'); mascotEl.classList.remove('talking');
+  mascotEl.querySelector('.m-label').textContent = t('Loading voice…');
+  mascotEl.querySelector('.m-text').textContent = mascotParts[0] || '';
+}
+function mascotSay(i) {
+  if (!mascotEl) return;
+  mascotEl.classList.remove('loading'); mascotEl.classList.add('talking');
+  mascotEl.querySelector('.m-label').textContent = t('Reading aloud');
+  const part = mascotParts[Math.max(0, Math.min(i, mascotParts.length - 1))] || '';
+  const box = mascotEl.querySelector('.m-text');
+  if (box.dataset.i !== String(i)) {
+    box.dataset.i = i; box.textContent = part;
+    box.style.animation = 'none'; void box.offsetWidth; box.style.animation = '';
+    highlightSentence(part);
+  }
+}
+function hideMascot(now) {
+  clearHighlight();
+  if (!mascotEl) return;
+  const el = mascotEl; mascotEl = null; mascotMsg = null;
+  if (now) { el.remove(); return; }
+  el.classList.add('out');
+  setTimeout(() => el.remove(), 320);
+}
+// Underline the sentence being read inside the answer (CSS Custom Highlight API; skipped where unsupported)
+function clearHighlight() { try { CSS.highlights && CSS.highlights.delete('rk-reading'); } catch (e) {} }
+function highlightSentence(part) {
+  clearHighlight();
+  if (!mascotMsg || !window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
+  const norm = x => x.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '');
+  const target = norm(part);
+  if (target.length < 3) return;
+  // map every letter/number of the answer back to its text node + offset
+  const map = []; const walker = document.createTreeWalker(mascotMsg, NodeFilter.SHOW_TEXT);
+  let flat = '';
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const v = n.nodeValue;
+    for (let k = 0; k < v.length; k++) {
+      const c = v[k].toLowerCase();
+      if (/[\p{L}\p{N}]/u.test(c)) { flat += c; map.push([n, k]); }
+    }
+  }
+  const at = flat.indexOf(target.slice(0, Math.min(target.length, 40)));
+  if (at < 0) return;
+  const end = Math.min(at + target.length, map.length) - 1;
+  try {
+    const r = new Range();
+    r.setStart(map[at][0], map[at][1]);
+    r.setEnd(map[end][0], map[end][1] + 1);
+    CSS.highlights.set('rk-reading', new Highlight(r));
+  } catch (e) {}
+}
+// Which sentence is playing, estimated from how far through the audio we are
+function partAtFraction(f) {
+  const total = mascotParts.reduce((n, p) => n + p.length, 0) || 1;
+  let acc = 0;
+  for (let i = 0; i < mascotParts.length; i++) { acc += mascotParts[i].length; if (f * total < acc) return i; }
+  return mascotParts.length - 1;
+}
+
 function speak(text, btn, actions) {
   const wasMine = speakingBtn === btn;
   stopSpeaking();
@@ -918,6 +1069,7 @@ function speak(text, btn, actions) {
   const lang = guessLang(text);
   speakingBtn = btn;
   btn.innerHTML = ICONS.stop + `<span>${t('Stop reading')}</span>`;
+  showMascot(text, actions ? actions.parentElement.querySelector('.message') : null);
   if (SERVER_TTS) { speakFromServer(text, lang, btn, actions); return; }
   speakLocally(text, lang, btn, actions);
 }
@@ -951,6 +1103,8 @@ function speakFromServer(text, lang, btn, actions) {
       audio.src = URL.createObjectURL(blob);
       audio.onended = () => { if (speakingBtn === btn) stopSpeaking(); };
       audio.onerror = () => { if (speakingBtn === btn) stopSpeaking(); };
+      audio.onplaying = () => { if (speakingBtn === btn) mascotSay(partAtFraction(audio.duration ? audio.currentTime / audio.duration : 0)); };
+      audio.ontimeupdate = () => { if (speakingBtn === btn && audio.duration) mascotSay(partAtFraction(audio.currentTime / audio.duration)); };
       return audio.play();
     })
     .catch(err => {
@@ -963,7 +1117,7 @@ function speakFromServer(text, lang, btn, actions) {
 }
 
 function speakLocally(text, lang, btn, actions) {
-  if (APP_TTS) { try { RKAppVoice.speak(text.replace(/https?:\/\/\S+/g, '').trim(), lang); } catch (e) { stopSpeaking(); } return; }
+  if (APP_TTS) { mascotSay(0); try { RKAppVoice.speak(text.replace(/https?:\/\/\S+/g, '').trim(), lang); } catch (e) { stopSpeaking(); } return; }
 
   if (!VOICES.length) loadVoices();
   const voice = pickVoice(lang);
@@ -978,6 +1132,7 @@ function speakLocally(text, lang, btn, actions) {
     if (voice) u.voice = voice;
     u.rate = 0.95;      // a touch slower = clearer
     u.pitch = 1;
+    u.onstart = () => { if (speakingBtn === btn) mascotSay(i); };
     if (i === chunks.length - 1) u.onend = () => { if (speakingBtn === btn) stopSpeaking(); };
     u.onerror = e => { if (e.error !== 'interrupted' && e.error !== 'canceled' && speakingBtn === btn) stopSpeaking(); };
     speechSynthesis.speak(u);

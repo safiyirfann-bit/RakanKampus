@@ -445,5 +445,6 @@
     "Could not regenerate. Try again.": "无法重新生成，请重试。",
     "No Malay voice in this browser — Microsoft Edge or Chrome sounds clearer": "此浏览器没有马来语语音 — 使用 Microsoft Edge 或 Chrome 更清晰",
     "Loading voice…": "正在加载语音…",
-    "Voice is not available right now.": "语音暂时不可用。"
+    "Voice is not available right now.": "语音暂时不可用。",
+    "Reading aloud": "正在朗读"
 }
