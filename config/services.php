@@ -18,7 +18,16 @@ return [
     'key' => env('GROQ_API_KEY'),
 ],
 
-    // "Read aloud" in the chat: Microsoft Azure neural voices (free tier F0 = 500k characters/month).
+    // "Read aloud" in the chat, option 1: ElevenLabs (free plan, no card needed).
+    // Used first when ELEVENLABS_API_KEY is set. Flash v2.5 speaks Malay and English.
+    'elevenlabs' => [
+        'key' => env('ELEVENLABS_API_KEY', ''),
+        'voice' => env('ELEVENLABS_VOICE_ID', 'EXAVITQu4vr4xnSDxMaL'),
+        'model' => env('ELEVENLABS_MODEL', 'eleven_flash_v2_5'),
+        'endpoint' => env('ELEVENLABS_ENDPOINT', 'https://api.elevenlabs.io/v1/text-to-speech'),
+    ],
+
+    // "Read aloud" option 2: Microsoft Azure neural voices (free tier F0 = 500k characters/month).
     // Leave the key empty and the chat falls back to the browser's own voice.
     'azure_tts' => [
         'key' => env('AZURE_SPEECH_KEY', ''),
