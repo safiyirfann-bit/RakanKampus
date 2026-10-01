@@ -1203,6 +1203,9 @@ function buildActions(row, text, meta) {
     let q = row.previousElementSibling;
     while (q && !q.classList.contains('user')) q = q.previousElementSibling;
     const body = (q ? `${t('Question')}: ${q.textContent.trim()}\n\n` : '') + `RakanKampus: ${text}`;
+    if (window.RKAppShare) {
+      try { RKAppShare.share(body); return; } catch (e) { /* older app: fall through to copy */ }
+    }
     if (navigator.share && !IN_APP) {
       navigator.share({ title: 'RakanKampus', text: body }).catch(() => {});
     } else {
