@@ -48,4 +48,10 @@ return [
         ],
     ],
 
+    // Email over HTTPS (used for "Forgot password" codes)
+    'brevo' => [
+        'key' => env('BREVO_API_KEY', ''),
+        'endpoint' => env('BREVO_ENDPOINT', 'https://api.brevo.com/v3/smtp/email'),
+    ],
+
 ];

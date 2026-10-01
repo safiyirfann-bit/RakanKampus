@@ -27,6 +27,17 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
+// Forgot password (email a 6-digit code -> verify -> new password)
+Route::middleware('guest')->controller(\App\Http\Controllers\PasswordResetController::class)->group(function () {
+    Route::get('/forgot-password', 'showRequest')->name('password.request');
+    Route::post('/forgot-password', 'sendCode')->middleware('throttle:20,1')->name('password.email');
+    Route::get('/forgot-password/verify', 'showVerify')->name('password.verify');
+    Route::post('/forgot-password/verify', 'verify')->middleware('throttle:20,1')->name('password.verify.post');
+    Route::post('/forgot-password/resend', 'resend')->middleware('throttle:20,1')->name('password.resend');
+    Route::get('/forgot-password/new', 'showNew')->name('password.new');
+    Route::post('/forgot-password/new', 'saveNew')->middleware('throttle:20,1')->name('password.new.post');
+});
+
 // Admin Login
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.post');
