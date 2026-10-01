@@ -7,6 +7,8 @@
                         tab: 'date'|'time', onDone(date, time) })
     RKPicker.timeRange({ title, subtitle, start: 'HH:MM', end: 'HH:MM', tab: 'start'|'end',
                          onDone(start, end) })
+    RKPicker.date({ title, subtitle, date: 'YYYY-MM-DD', min: 'YYYY-MM-DD', range: ['YYYY-MM-DD','YYYY-MM-DD'],
+                    onDone(date) })   — calendar only (used for programme start/end dates)
 --}}
 <style>
   body > .rkp-overlay, body > .rkp-sheet { animation: none !important; }
@@ -80,6 +82,8 @@
   .rkp-done:disabled { opacity: .45; cursor: not-allowed; }
 
   /* The field in the form that opens the picker */
+  .rkp-d.inr { background: #ccfbf1; color: #0f766e; border-radius: 10px; }
+  .rkp-d.off { opacity: .3; cursor: not-allowed; }
   .rkp-field { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; box-sizing: border-box;
     border: 1.5px solid #e2e8f0; background: #ffffff; border-radius: 12px; padding: 11px 14px; font-size: 14px; color: #14213d;
     cursor: pointer; text-align: left; font-family: inherit; }
@@ -112,6 +116,7 @@ html[data-theme="dark"] .rkp-nav button { background: #10161f; color: #d6dae1; }
 html[data-theme="dark"] .rkp-w { color: #ced3d9; }
 html[data-theme="dark"] .rkp-d { color: #dee2e8; }
 html[data-theme="dark"] .rkp-d:hover { background: #10161f; }
+html[data-theme="dark"] .rkp-d.inr { background: #134e4a; color: #99f6e4; }
 html[data-theme="dark"] .rkp-d.today { box-shadow: inset 0 0 0 1.5px #000000; color: #2fe5d6; }
 html[data-theme="dark"] .rkp-num { color: #dee1e9; background: #10161f; }
 html[data-theme="dark"] .rkp-num.on { background: #1d3d3b; color: #2fe5d6; box-shadow: inset 0 0 0 2px #000000; }
@@ -193,6 +198,7 @@ window.RKPicker = (function () {
 
   function done() {
     if (!st) return;
+    if (st.kind === 'd') { if (!st.date) return; const cb = st.onDone; const d = st.date; close(); cb && cb(d); return; }
     if (st.kind === 'dt') {
       if (st.tab === 'date' && !st.visitedTime) { st.tab = 'time'; st.visitedTime = true; render(); return; }
       const cb = st.onDone; const d = st.date, tm = st.time; close(); cb && cb(d, tm);
@@ -207,7 +213,9 @@ window.RKPicker = (function () {
   function render() {
     $('rkpTitle').textContent = st.title || '';
     $('rkpSub').textContent = st.subtitle || '';
-    const tabs = st.kind === 'dt'
+    const tabs = st.kind === 'd'
+      ? [['date', tt('Date'), fmtDate(st.date)]]
+      : st.kind === 'dt'
       ? [['date', tt('Date'), fmtDate(st.date)], ['time', tt('Time'), fmtTime(st.time)]]
       : [['start', tt('Start'), fmtTime(st.start)], ['end', tt('End'), fmtTime(st.end)]];
     $('rkpTabs').innerHTML = tabs.map(([k, l, v]) =>
@@ -219,7 +227,7 @@ window.RKPicker = (function () {
       render();
     });
 
-    if (st.kind === 'dt' && st.tab === 'date') renderCalendar(); else renderClock();
+    if (st.kind === 'd' || (st.kind === 'dt' && st.tab === 'date')) renderCalendar(); else renderClock();
 
     // summary + main button
     const sum = $('rkpSum');
@@ -230,11 +238,16 @@ window.RKPicker = (function () {
         const dur = mins >= 60 ? `${Math.floor(mins / 60)} ${tt('hr')}${mins % 60 ? ' ' + (mins % 60) + ' ' + tt('min') : ''}` : `${mins} ${tt('min')}`;
         sum.innerHTML = `<div class="rkp-sum ${ok ? '' : 'bad'}"><span>${fmtTime(st.start)} – ${fmtTime(st.end)}</span><span>${ok ? dur : tt('End must be after start')}</span></div>`;
       } else sum.innerHTML = '';
+    } else if (st.kind === 'd') {
+      sum.innerHTML = st.date ? `<div class="rkp-sum"><span>📅 ${fmtDate(st.date, true)}</span><span>${relDays(st.date)}</span></div>` : '';
     } else {
       sum.innerHTML = st.date ? `<div class="rkp-sum"><span>📅 ${fmtDate(st.date, true)} · ${fmtTime(st.time)}</span><span>${relDays(st.date)}</span></div>` : '';
     }
     const btn = $('rkpDone');
-    if (st.kind === 'dt') {
+    if (st.kind === 'd') {
+      btn.textContent = tt('Done');
+      btn.disabled = !st.date;
+    } else if (st.kind === 'dt') {
       btn.textContent = (st.tab === 'date' && !st.visitedTime) ? tt('Next: Time') + ' →' : tt('Done');
       btn.disabled = !st.date;
     } else {
@@ -280,11 +293,14 @@ window.RKPicker = (function () {
       if (+d === +today) cls.push('today');
       if (iso === st.date) cls.push('sel');
       if (marks.has(iso)) cls.push('mark');
+      if (st.range && st.range[0] && st.range[1] && iso >= st.range[0] && iso <= st.range[1] && iso !== st.date) cls.push('inr');
+      if (st.min && iso < st.min) cls.push('off');
       html += `<button type="button" class="${cls.join(' ')}" data-iso="${iso}">${d.getDate()}</button>`;
     }
     html += '</div>';
     $('rkpBody').innerHTML = html;
     $('rkpBody').querySelectorAll('[data-iso]').forEach(b => b.onclick = () => {
+      if (st.min && b.dataset.iso < st.min) return;
       st.date = b.dataset.iso; const d = fromISO(st.date);
       st.view = new Date(d.getFullYear(), d.getMonth(), 1); render();
     });
@@ -413,6 +429,11 @@ window.RKPicker = (function () {
     },
     timeRange(opts) {
       st = Object.assign({ kind: 'range', tab: opts.tab || 'start', dialMode: 'h', visitedEnd: opts.tab === 'end' || !!(opts.start && opts.end) }, opts);
+      render(); open();
+    },
+    date(opts) {
+      st = Object.assign({ kind: 'd', tab: 'date' }, opts);
+      st.view = null;
       render(); open();
     },
     formatTime: fmtTime,

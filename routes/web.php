@@ -149,6 +149,9 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     Route::post('/timetable/bulk-delete', [ClassScheduleController::class, 'bulkDestroy'])->name('timetable.bulkDestroy');
     Route::put('/timetable/{schedule}', [ClassScheduleController::class, 'update'])->name('timetable.update');
     Route::delete('/timetable/{schedule}', [ClassScheduleController::class, 'destroy'])->name('timetable.destroy');
+    Route::post('/programs', [\App\Http\Controllers\ProgramController::class, 'store'])->name('programs.store');
+    Route::put('/programs/{program}', [\App\Http\Controllers\ProgramController::class, 'update'])->name('programs.update');
+    Route::delete('/programs/{program}', [\App\Http\Controllers\ProgramController::class, 'destroy'])->name('programs.destroy');
 
     // Web push subscriptions
     Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe');

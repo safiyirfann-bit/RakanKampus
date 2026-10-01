@@ -321,6 +321,74 @@
   .ai-pv-save:disabled { opacity: 0.5; cursor: default; }
   .ai-pv-cancel { background: #f1f5f9; color: #475569; }
 
+
+  /* ---------- One-off programmes (camp, workshop, orientation week...) ---------- */
+  .mode-seg { display: grid; grid-template-columns: 1fr 1fr; background: #f1f5f9; border-radius: 13px; padding: 4px; margin-bottom: 14px; }
+  .mode-seg button { border: none; background: none; border-radius: 10px; padding: 9px 6px; font-size: 13px; font-weight: 800; color: #64748b; cursor: pointer; font-family: inherit; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s, color .15s; }
+  .mode-seg button.on { background: #fff; color: #14213d; box-shadow: 0 2px 6px rgba(20,33,61,.12); }
+  .mode-seg.hidden { display: none; }
+  #progTimeField[hidden] { display: none; }
+  .prog-dates { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .prog-dates .rkp-field { margin: 0; }
+  .prog-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+  .prog-chips button { border: none; background: #f1f5f9; color: #475569; border-radius: 99px; padding: 7px 12px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; }
+  .prog-chips button.on { background: #14213d; color: #fff; }
+  .prog-days-note { font-size: 11.5px; font-weight: 700; color: #0d9488; margin: 4px 0 0; min-height: 15px; }
+  .allday-row { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 10px 12px; font-size: 13.5px; font-weight: 700; color: #14213d; cursor: pointer; margin-bottom: 8px; }
+  .allday-row input { display: none; }
+  .switch { width: 40px; height: 23px; border-radius: 99px; background: #cbd5e1; position: relative; transition: background .2s; flex-shrink: 0; }
+  .switch::after { content: ''; position: absolute; left: 3px; top: 3px; width: 17px; height: 17px; border-radius: 50%; background: #fff; transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .allday-row input:checked + .switch { background: #14b8a6; }
+  .allday-row input:checked + .switch::after { transform: translateX(17px); }
+  .prog-colors { display: flex; gap: 10px; }
+  .prog-colors button { width: 28px; height: 28px; border-radius: 50%; border: none; cursor: pointer; padding: 0; transition: transform .12s; }
+  .prog-colors button.on { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #14213d; transform: scale(1.05); }
+  .c-amber { --pc: #f59e0b; --pc2: #f97316; --pbg: #fff7ed; --pbd: #fed7aa; --ptx: #c2410c; }
+  .c-violet { --pc: #8b5cf6; --pc2: #a855f7; --pbg: #f5f3ff; --pbd: #ddd6fe; --ptx: #6d28d9; }
+  .c-pink { --pc: #ec4899; --pc2: #f43f5e; --pbg: #fdf2f8; --pbd: #fbcfe8; --ptx: #be185d; }
+  .c-green { --pc: #22c55e; --pc2: #10b981; --pbg: #f0fdf4; --pbd: #bbf7d0; --ptx: #15803d; }
+  .c-blue { --pc: #3b82f6; --pc2: #0ea5e9; --pbg: #eff6ff; --pbd: #bfdbfe; --ptx: #1d4ed8; }
+  .prog-colors button { background: linear-gradient(135deg, var(--pc), var(--pc2)); }
+
+  .prog-card {
+    display: flex; align-items: center; gap: 12px; border-radius: 16px; padding: 12px 12px 12px 14px; margin-bottom: 14px; cursor: pointer;
+    background: var(--pbg); border: 1.5px solid var(--pbd); position: relative; overflow: hidden; animation: progIn .35s ease;
+  }
+  .prog-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(var(--pc), var(--pc2)); }
+  .prog-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; flex-shrink: 0; color: #fff; background: linear-gradient(135deg, var(--pc), var(--pc2)); box-shadow: 0 6px 14px rgba(0,0,0,.12); }
+  .prog-ic svg { width: 20px; height: 20px; }
+  .prog-main { flex: 1; min-width: 0; }
+  .prog-title { margin: 0; font-size: 13.5px; font-weight: 800; color: #14213d; }
+  .prog-meta { margin: 2px 0 0; font-size: 11.5px; color: var(--ptx); font-weight: 600; }
+  .prog-day { flex-shrink: 0; font-size: 10.5px; font-weight: 800; color: var(--ptx); background: #fff; border: 1px solid var(--pbd); border-radius: 99px; padding: 5px 9px; white-space: nowrap; }
+  .prog-bar { height: 4px; border-radius: 9px; background: rgba(0,0,0,.06); margin-top: 7px; overflow: hidden; }
+  .prog-bar i { display: block; height: 100%; border-radius: 9px; background: linear-gradient(90deg, var(--pc), var(--pc2)); }
+  @keyframes progIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+  /* coloured line under days that have a programme */
+  .day-picker-item { position: relative; }
+  .dp-prog { display: flex; gap: 2px; height: 4px; width: 70%; justify-content: center; }
+  .dp-prog i { flex: 1; max-width: 18px; border-radius: 4px; background: linear-gradient(90deg, var(--pc), var(--pc2)); }
+  .dp-prog.empty { visibility: hidden; }
+
+  .upcoming { margin-top: 6px; }
+  .upcoming-title { font-size: 11.5px; font-weight: 800; color: #bfe9ea; text-transform: uppercase; letter-spacing: .04em; margin: 0 0 8px; }
+  .up-row { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 14px; background: rgba(255,255,255,.1); margin-bottom: 8px; cursor: pointer; }
+  .up-date { width: 42px; text-align: center; border-radius: 11px; padding: 5px 0; color: #fff; flex-shrink: 0; background: linear-gradient(135deg, var(--pc), var(--pc2)); }
+  .up-date small { display: block; font-size: 9.5px; font-weight: 800; opacity: .9; text-transform: uppercase; }
+  .up-date b { font-size: 16px; }
+  .up-main { flex: 1; min-width: 0; }
+  .up-main p { margin: 0; font-size: 13px; font-weight: 800; color: #fff; }
+  .up-main span { font-size: 11px; color: #bfe9ea; }
+  .up-left { font-size: 10.5px; font-weight: 800; border-radius: 99px; padding: 4px 8px; background: rgba(255,255,255,.16); color: #fff; white-space: nowrap; }
+  @media (min-width: 861px) {
+    .upcoming-title { color: #64748b; }
+    .up-row { background: #fff; border: 1.5px solid rgba(20,33,61,0.08); }
+    .up-main p { color: #14213d; }
+    .up-main span { color: #64748b; }
+    .up-left { background: var(--pbg); color: var(--ptx); }
+  }
+  @media (prefers-reduced-motion: reduce) { .prog-card { animation: none; } }
   /* Desktop weekly grid — hidden on mobile, shown instead of the day-list at >=861px */
   .grid-wrap { display: none; }
 
@@ -490,6 +558,26 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   html[data-theme="dark"] .timeline-time span { color: #ced3d9; }
   html[data-theme="dark"] .break-pill span { color: #b0b6be; background: #1d2f3c; }
 }
+
+/* programmes — dark */
+html[data-theme="dark"] .mode-seg { background: #10161f; }
+html[data-theme="dark"] .mode-seg button { color: #94a3b8; }
+html[data-theme="dark"] .mode-seg button.on { background: #1f2a37; color: #e2e8f0; }
+html[data-theme="dark"] .prog-chips button { background: #10161f; color: #cbd5e1; }
+html[data-theme="dark"] .prog-chips button.on { background: #e2e8f0; color: #14213d; }
+html[data-theme="dark"] .allday-row { border-color: #283648; color: #dee1e9; }
+html[data-theme="dark"] .prog-colors button.on { box-shadow: 0 0 0 2px #17202d, 0 0 0 4px #e2e8f0; }
+html[data-theme="dark"] .prog-card { background: #1f2430; border-color: #343c4c; }
+html[data-theme="dark"] .prog-title { color: #e5e7eb; }
+html[data-theme="dark"] .prog-meta { color: #cbd5e1; }
+html[data-theme="dark"] .prog-day { background: #10161f; border-color: #343c4c; color: #e5e7eb; }
+@media (min-width: 861px) {
+  html[data-theme="dark"] .upcoming-title { color: #b0b6be; }
+  html[data-theme="dark"] .up-row { background: #17202d; border-color: #284848; }
+  html[data-theme="dark"] .up-main p { color: #dee1e9; }
+  html[data-theme="dark"] .up-main span { color: #b0b6be; }
+  html[data-theme="dark"] .up-left { background: #10161f; color: #e5e7eb; }
+}
 </style>
 </head>
 <body>
@@ -506,7 +594,7 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
 
   <button type="button" class="add-btn" onclick="openAddModal()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-    {{ __('Add Class') }}
+    {{ __('Add class / programme') }}
   </button>
 
   <div class="heading-row">
@@ -537,6 +625,7 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
   </div>
 
   <div id="scheduleList"></div>
+  <div class="upcoming" id="upcomingPrograms"></div>
 
   <div class="grid-wrap" id="scheduleGridWrap">
     <div class="grid-header" id="gridHeaderRow"></div>
@@ -595,9 +684,17 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
     <p class="modal-title" id="modalTitle">{{ __('Add Class') }}</p>
     <button type="button" class="modal-close" aria-label="{{ __('Close') }}" onclick="closeModals()">×</button>
   </div>
+
+  <div class="mode-seg" id="modeSeg">
+    <button type="button" data-mode="class" onclick="setMode('class')">📚 {{ __('Weekly class') }}</button>
+    <button type="button" data-mode="program" onclick="setMode('program')">🎯 {{ __('Programme') }}</button>
+  </div>
+
   <input type="hidden" id="scheduleId">
+  <input type="hidden" id="programId">
   <input type="text" id="subjectInput" placeholder="{{ __('e.g. Database Systems') }}">
 
+  <div id="classFields">
   <p class="field-label">{{ __('Day') }}</p>
   <select id="dayInput" hidden>
     @foreach($days as $d)
@@ -623,10 +720,47 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
 
   <p class="field-label">{{ __('Lecturer (optional)') }}</p>
   <input type="text" id="lecturerInput" placeholder="{{ __('e.g. En. Ahmad') }}">
+  </div>
+
+  <div id="programFields" hidden>
+    <p class="field-label">{{ __('Dates') }}</p>
+    <input type="hidden" id="progStart"><input type="hidden" id="progEnd">
+    <div class="prog-dates">
+      <button type="button" class="rkp-field empty" id="progStartField" onclick="pickProgDate('start')"><span><small>{{ __('Start') }}</small><b>{{ __('Pick date') }}</b></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button>
+      <button type="button" class="rkp-field empty" id="progEndField" onclick="pickProgDate('end')"><span><small>{{ __('End') }}</small><b>{{ __('Pick date') }}</b></span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M16 3v4M8 3v4M3 10h18"></path></svg></button>
+    </div>
+    <div class="prog-chips" id="progChips">
+      <button type="button" data-n="1" onclick="setProgLength(1)">{{ __('1 day') }}</button>
+      <button type="button" data-n="2" onclick="setProgLength(2)">{{ __('2 days') }}</button>
+      <button type="button" data-n="3" onclick="setProgLength(3)">{{ __('3 days') }}</button>
+      <button type="button" data-n="7" onclick="setProgLength(7)">{{ __('A week') }}</button>
+    </div>
+    <p class="prog-days-note" id="progDaysNote"></p>
+
+    <p class="field-label">{{ __('Time') }}</p>
+    <label class="allday-row"><span>{{ __('All day') }}</span><input type="checkbox" id="progAllDay" checked onchange="syncProgramFields()"><span class="switch"></span></label>
+    <input type="hidden" id="progStartTime"><input type="hidden" id="progEndTime">
+    <button type="button" class="rkp-field empty" id="progTimeField" onclick="openProgTimePicker()" hidden>
+      <span><small>{{ __('Start – End') }}</small><b id="progTimeText">{{ __('Pick time') }}</b></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 3"></path></svg>
+    </button>
+
+    <p class="field-label">{{ __('Place (optional)') }}</p>
+    <input type="text" id="progPlace" placeholder="{{ __('e.g. Dewan Besar PUO') }}">
+
+    <p class="field-label">{{ __('Colour') }}</p>
+    <div class="prog-colors" id="progColors">
+      @foreach(['amber', 'violet', 'pink', 'green', 'blue'] as $c)
+        <button type="button" class="c-{{ $c }}" data-color="{{ $c }}" aria-label="{{ $c }}" onclick="pickProgColor('{{ $c }}')"></button>
+      @endforeach
+    </div>
+  </div>
 
   <p class="form-error" id="formError">{{ __('Please fill in subject, day and time.') }}</p>
 
-  <button type="button" class="save-btn" onclick="saveSchedule()">{{ __('Save') }}</button>
+  <button type="button" class="save-btn" id="saveBtn" onclick="saveSchedule()">{{ __('Save') }}</button>
   <button type="button" class="delete-btn" id="deleteScheduleBtn" onclick="confirmDeleteFromModal()">{{ __('Delete Class') }}</button>
 </div>
 
@@ -635,6 +769,7 @@ html[data-theme="dark"] .grid-block:hover { box-shadow: 0 6px 14px rgba(0, 0, 0,
 
 <script>
 let schedules = @json($schedules);
+let programs = @json($programs);
 const DAYS = @json($days);
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 
@@ -699,9 +834,12 @@ function renderDayPicker() {
   if (!picker) return;
   picker.innerHTML = DAYS.map((day, i) => {
     const d = weekDates[i];
-    return `<button type="button" class="day-picker-item ${day === selectedDay ? 'active' : ''}" onclick="selectDay('${day}')">
+    const progs = programsOn(isoOf(d)).slice(0, 3);
+    const marks = `<span class="dp-prog ${progs.length ? '' : 'empty'}">${progs.map(p => `<i class="c-${p.color}"></i>`).join('')}</span>`;
+    return `<button type="button" class="day-picker-item ${day === selectedDay ? 'active' : ''}" onclick="selectDay('${day}')" ${progs.length ? `title="${escapeHtml(progs.map(p => p.title).join(', '))}"` : ''}>
         <span class="dp-label">${t(day.slice(0, 3))}</span>
         <span class="dp-date">${d.getDate()}</span>
+        ${marks}
       </button>`;
   }).join('');
 }
@@ -743,12 +881,15 @@ function renderMobileTimeline() {
     .filter(s => s.day_of_week === selectedDay)
     .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
+  const dayIso = isoOf(weekDates[DAYS.indexOf(selectedDay)]);
+  const progHtml = programsOn(dayIso).map(p => programCardHtml(p, dayIso)).join('');
+
   if (items.length === 0) {
-    list.innerHTML = `<p class="empty-day">${selectedDay === todayName ? t('No classes today') : t('No classes on :day', {day: t(selectedDay)})}</p>`;
+    list.innerHTML = progHtml + `<p class="empty-day">${selectedDay === todayName ? t('No classes today') : t('No classes on :day', {day: t(selectedDay)})}</p>`;
     return;
   }
 
-  let html = '<div class="timeline">';
+  let html = progHtml + '<div class="timeline">';
   items.forEach((s, idx) => {
     if (idx > 0) {
       const gap = toMinutes(s.start_time) - toMinutes(items[idx - 1].end_time);
@@ -854,6 +995,7 @@ function render() {
   renderTodayHeading();
   renderDayPicker();
   renderMobileTimeline();
+  renderUpcomingPrograms();
   renderDesktopGrid();
   document.getElementById('deleteAllBtn').classList.toggle('hidden', schedules.length === 0);
   updateSelectToggleVisibility();
@@ -924,8 +1066,242 @@ function updateSelectBar() {
   deleteBtn.disabled = selectedOnDay.length === 0;
 }
 
-function showModal(id) {
+
+// ---------- One-off programmes ----------
+let modalMode = 'class';
+let progColor = 'amber';
+const PROG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"/><path d="M5 4h11l-2 4 2 4H5"/></svg>';
+
+function isoOf(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
+function dateOf(iso) { const [y, m, d] = iso.split('-').map(Number); return new Date(y, m - 1, d); }
+function addDays(iso, n) { const d = dateOf(iso); d.setDate(d.getDate() + n); return isoOf(d); }
+function dayCount(a, b) { return Math.round((dateOf(b) - dateOf(a)) / 86400000) + 1; }
+function shortDate(iso) { return RKPicker.formatDate(iso); }
+function daysLabel(n) { return n === 1 ? t('1 day') : t(':n days', {n}); }
+function programsOn(iso) { return programs.filter(p => p.start_date <= iso && p.end_date >= iso); }
+function programWhen(p) {
+  return p.all_day ? t('All day') : `${formatTime12(p.start_time)} – ${formatTime12(p.end_time)}`;
+}
+function programRange(p) {
+  const n = dayCount(p.start_date, p.end_date);
+  return n === 1 ? shortDate(p.start_date) : `${shortDate(p.start_date)} – ${shortDate(p.end_date)} · ${daysLabel(n)}`;
+}
+
+function programCardHtml(p, iso) {
+  const total = dayCount(p.start_date, p.end_date);
+  const nth = dayCount(p.start_date, iso);
+  const meta = [programWhen(p), p.place ? escapeHtml(p.place) : ''].filter(Boolean).join(' · ');
+  return `<div class="prog-card c-${p.color}" onclick="openProgramModal(${p.id})" role="button" tabindex="0">
+      <div class="prog-ic">${PROG_ICON}</div>
+      <div class="prog-main">
+        <p class="prog-title">${escapeHtml(p.title)}</p>
+        <p class="prog-meta">${meta}</p>
+        ${total > 1 ? `<div class="prog-bar"><i style="width:${Math.round(nth / total * 100)}%"></i></div>` : ''}
+      </div>
+      ${total > 1 ? `<span class="prog-day">${t('Day :n / :total', {n: nth, total})}</span>` : `<span class="prog-day">${t('Programme')}</span>`}
+    </div>`;
+}
+
+// Programmes after this week (this week's ones already show on their days)
+function renderUpcomingPrograms() {
+  const box = document.getElementById('upcomingPrograms');
+  if (!box) return;
+  const weekEnd = isoOf(weekDates[6]);
+  const today = isoOf(new Date());
+  const list = programs.filter(p => p.start_date > weekEnd).slice(0, 4);
+  if (!list.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<p class="upcoming-title">${t('Upcoming programmes')}</p>` + list.map(p => {
+    const d = dateOf(p.start_date);
+    const left = dayCount(today, p.start_date) - 1;
+    return `<div class="up-row c-${p.color}" onclick="openProgramModal(${p.id})" role="button" tabindex="0">
+        <div class="up-date"><small>${t(MONTH_NAMES[d.getMonth()]).slice(0, 3)}</small><b>${d.getDate()}</b></div>
+        <div class="up-main"><p>${escapeHtml(p.title)}</p><span>${programRange(p)}${p.place ? ' · ' + escapeHtml(p.place) : ''}</span></div>
+        <span class="up-left">${left === 1 ? t('Tomorrow') : t('in :count days', {count: left})}</span>
+      </div>`;
+  }).join('');
+}
+
+function setMode(mode) {
+  modalMode = mode;
+  const isProg = mode === 'program';
+  document.querySelectorAll('#modeSeg button').forEach(b => b.classList.toggle('on', b.dataset.mode === mode));
+  document.getElementById('classFields').hidden = isProg;
+  document.getElementById('programFields').hidden = !isProg;
+  document.getElementById('subjectInput').placeholder = isProg ? t('e.g. Kem Kepimpinan JTMK') : t('e.g. Database Systems');
   document.getElementById('formError').style.display = 'none';
+  const editing = isProg ? !!document.getElementById('programId').value : !!document.getElementById('scheduleId').value;
+  document.getElementById('modalTitle').textContent = isProg ? (editing ? t('Edit Programme') : t('Add Programme')) : (editing ? t('Edit Class') : t('Add Class'));
+  document.getElementById('saveBtn').textContent = isProg ? t('Save programme') : t('Save');
+  document.getElementById('deleteScheduleBtn').textContent = isProg ? t('Delete Programme') : t('Delete Class');
+  if (isProg) syncProgramFields();
+}
+
+function resetProgramFields(startIso) {
+  document.getElementById('programId').value = '';
+  document.getElementById('progStart').value = startIso || '';
+  document.getElementById('progEnd').value = startIso || '';
+  document.getElementById('progAllDay').checked = true;
+  document.getElementById('progStartTime').value = '';
+  document.getElementById('progEndTime').value = '';
+  document.getElementById('progPlace').value = '';
+  progColor = 'amber';
+}
+
+function syncProgramFields() {
+  const a = document.getElementById('progStart').value, b = document.getElementById('progEnd').value;
+  const setField = (id, iso) => {
+    const el = document.getElementById(id);
+    el.classList.toggle('empty', !iso);
+    el.querySelector('b').textContent = iso ? shortDate(iso) : t('Pick date');
+  };
+  setField('progStartField', a); setField('progEndField', b);
+  const n = a && b ? dayCount(a, b) : 0;
+  document.querySelectorAll('#progChips button').forEach(c => c.classList.toggle('on', +c.dataset.n === n));
+  document.getElementById('progDaysNote').textContent = n > 0 ? `✓ ${daysLabel(n)} · ${shortDate(a)}${n > 1 ? ' – ' + shortDate(b) : ''}` : '';
+  const allDay = document.getElementById('progAllDay').checked;
+  const tf = document.getElementById('progTimeField');
+  tf.hidden = allDay;
+  const ts = document.getElementById('progStartTime').value, te = document.getElementById('progEndTime').value;
+  tf.classList.toggle('empty', !(ts && te));
+  document.getElementById('progTimeText').textContent = ts && te ? `${RKPicker.formatTime(ts)} – ${RKPicker.formatTime(te)}` : t('Pick time');
+  document.querySelectorAll('#progColors button').forEach(c => c.classList.toggle('on', c.dataset.color === progColor));
+}
+
+function pickProgDate(which) {
+  const a = document.getElementById('progStart').value, b = document.getElementById('progEnd').value;
+  RKPicker.date({
+    title: which === 'start' ? t('Start date') : t('End date'),
+    subtitle: document.getElementById('subjectInput').value.trim(),
+    date: which === 'start' ? a : (b || a),
+    min: which === 'end' ? a : '',
+    range: [a, b],
+    onDone(iso) {
+      if (which === 'start') {
+        // keep the same length when the start moves
+        const len = a && b ? dayCount(a, b) : 1;
+        document.getElementById('progStart').value = iso;
+        document.getElementById('progEnd').value = addDays(iso, len - 1);
+      } else {
+        document.getElementById('progEnd').value = iso < a ? a : iso;
+      }
+      syncProgramFields();
+    },
+  });
+}
+
+function setProgLength(n) {
+  let a = document.getElementById('progStart').value;
+  if (!a) { a = isoOf(weekDates[DAYS.indexOf(selectedDay)]); document.getElementById('progStart').value = a; }
+  document.getElementById('progEnd').value = addDays(a, n - 1);
+  syncProgramFields();
+}
+
+function pickProgColor(c) { progColor = c; syncProgramFields(); }
+
+function openProgTimePicker() {
+  RKPicker.timeRange({
+    title: t('Programme time'),
+    subtitle: document.getElementById('subjectInput').value.trim(),
+    start: document.getElementById('progStartTime').value,
+    end: document.getElementById('progEndTime').value,
+    onDone(start, end) {
+      document.getElementById('progStartTime').value = start;
+      document.getElementById('progEndTime').value = end;
+      syncProgramFields();
+    },
+  });
+}
+
+function openProgramModal(id) {
+  const p = programs.find(x => x.id === id);
+  if (!p) return;
+  resetProgramFields();
+  document.getElementById('programId').value = p.id;
+  document.getElementById('scheduleId').value = '';
+  document.getElementById('subjectInput').value = p.title;
+  document.getElementById('progStart').value = p.start_date;
+  document.getElementById('progEnd').value = p.end_date;
+  document.getElementById('progAllDay').checked = !!p.all_day;
+  document.getElementById('progStartTime').value = p.start_time || '';
+  document.getElementById('progEndTime').value = p.end_time || '';
+  document.getElementById('progPlace').value = p.place || '';
+  progColor = p.color || 'amber';
+  document.getElementById('modeSeg').classList.add('hidden');
+  document.getElementById('deleteScheduleBtn').classList.add('open');
+  showModal('modal');
+  setMode('program');
+}
+
+function saveProgram() {
+  const id = document.getElementById('programId').value;
+  const err = document.getElementById('formError');
+  const title = document.getElementById('subjectInput').value.trim();
+  const start_date = document.getElementById('progStart').value;
+  const end_date = document.getElementById('progEnd').value;
+  const all_day = document.getElementById('progAllDay').checked;
+  const start_time = document.getElementById('progStartTime').value;
+  const end_time = document.getElementById('progEndTime').value;
+  const showErr = (msg) => { err.textContent = msg; err.style.display = 'block'; };
+
+  if (!title || !start_date || !end_date) return showErr(t('Please fill in the programme name and dates.'));
+  if (!all_day && !(start_time && end_time)) return showErr(t('Pick a time, or switch on "All day".'));
+  if (dayCount(start_date, end_date) > 31) return showErr(t('A programme can be at most :days days long.', {days: 31}));
+
+  const payload = { title, start_date, end_date, all_day, start_time: all_day ? null : start_time, end_time: all_day ? null : end_time,
+    place: document.getElementById('progPlace').value.trim() || null, color: progColor };
+  const btn = document.getElementById('saveBtn');
+  btn.disabled = true;
+  fetch(id ? `/programs/${id}` : '/programs', {
+    method: id ? 'PUT' : 'POST',
+    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+    .then(safeJson)
+    .then(({ ok, status, data }) => {
+      if (!ok || !data || !data.success) {
+        if (status === 419) return oops(t('Your session has expired. Please refresh the page and try again.'));
+        const first = data && data.errors ? Object.values(data.errors)[0][0] : null;
+        return showErr(first || t('Could not save. Please try again.'));
+      }
+      programs = id ? programs.map(p => p.id === parseInt(id, 10) ? data.program : p) : programs.concat(data.program);
+      programs.sort((a, b) => a.start_date.localeCompare(b.start_date));
+      closeModals();
+      // jump to the programme's first day when it's in this week
+      const wk = weekDates.map(isoOf);
+      const i = wk.indexOf(data.program.start_date);
+      if (!id && i >= 0) selectedDay = DAYS[i];
+      render();
+    })
+    .catch(() => showErr(t('Could not save. Please try again.')))
+    .finally(() => { btn.disabled = false; });
+}
+
+async function deleteProgram(id) {
+  const p = programs.find(x => x.id === id);
+  if (!p) return;
+  const ok = await RKDialog.confirm({
+    scene: 'timetable',
+    title: t('Delete this programme?'),
+    message: t('It will be removed from your timetable.'),
+    list: [{ label: p.title, meta: programRange(p) }],
+    warn: t('This cannot be undone.'),
+    confirmText: t('Delete'),
+  });
+  if (!ok) return;
+  closeModals();
+  fetch(`/programs/${id}`, { method: 'DELETE', headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' } })
+    .then(safeJson)
+    .then(({ ok }) => {
+      if (!ok) return oops(t('Could not delete. Please try again.'));
+      programs = programs.filter(x => x.id !== id);
+      render();
+    });
+}
+
+function showModal(id) {
+  const fe = document.getElementById('formError');
+  fe.style.display = 'none';
+  fe.textContent = t('Please fill in subject, day and time.');
   document.getElementById('overlay').classList.add('open');
   document.getElementById(id).classList.add('open');
 }
@@ -946,8 +1322,11 @@ function openAddModal() {
   document.getElementById('roomInput').value = '';
   document.getElementById('lecturerInput').value = '';
   document.getElementById('deleteScheduleBtn').classList.remove('open');
+  resetProgramFields(isoOf(weekDates[DAYS.indexOf(selectedDay)]));
+  document.getElementById('modeSeg').classList.remove('hidden');
   syncClassFields();
   showModal('modal');
+  setMode('class');
 }
 
 function openEditModal(id) {
@@ -962,8 +1341,11 @@ function openEditModal(id) {
   document.getElementById('roomInput').value = s.room || '';
   document.getElementById('lecturerInput').value = s.lecturer || '';
   document.getElementById('deleteScheduleBtn').classList.add('open');
+  document.getElementById('programId').value = '';
+  document.getElementById('modeSeg').classList.add('hidden');
   syncClassFields();
   showModal('modal');
+  setMode('class');
 }
 
 // Day chips + "Start – End" field → clock picker (partials/rk-picker)
@@ -1008,6 +1390,7 @@ function oops(message) {
 }
 
 async function confirmDeleteFromModal() {
+  if (modalMode === 'program') return deleteProgram(parseInt(document.getElementById('programId').value, 10));
   const id = parseInt(document.getElementById('scheduleId').value, 10);
   if (!id) return;
   const ok = await RKDialog.confirm({
@@ -1036,6 +1419,7 @@ function safeJson(res) {
 }
 
 function saveSchedule() {
+  if (modalMode === 'program') return saveProgram();
   const id = document.getElementById('scheduleId').value;
   const subject = document.getElementById('subjectInput').value.trim();
   const day = document.getElementById('dayInput').value;

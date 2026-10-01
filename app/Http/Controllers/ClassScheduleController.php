@@ -22,9 +22,18 @@ class ClassScheduleController extends Controller
             ->values()
             ->map(fn (ClassSchedule $s) => $this->toRaw($s));
 
+        // One-off programmes that haven't finished more than a week ago
+        $programs = $request->user()->programs()
+            ->whereDate('end_date', '>=', now()->subDays(7)->toDateString())
+            ->orderBy('start_date')
+            ->get()
+            ->map(fn ($p) => $p->toRaw())
+            ->values();
+
         return view('timetable', [
             'user' => $request->user(),
             'schedules' => $schedules,
+            'programs' => $programs,
             'days' => ClassSchedule::DAYS,
         ]);
     }
