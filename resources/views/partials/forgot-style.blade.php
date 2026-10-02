@@ -113,24 +113,16 @@
     .fp-sheet{flex:1;border-radius:0;padding:44px 48px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
   }
   @media (min-width:1100px){
-    .fp-shell{max-width:min(1280px,90vw);min-height:min(780px,86vh)}
-    .fp-hero{padding:64px}
-    .fp-chat{max-width:480px;gap:12px}
-    .fp-hdr{gap:14px;margin-bottom:10px}
-    .fp-hdr .fp-av{width:64px;height:64px}.fp-hdr .fp-av svg{width:64px;height:64px}
-    .fp-hdr b{font-size:21px}.fp-hdr span{font-size:14px}
-    .fp-bub{font-size:17px;padding:13px 18px;border-radius:22px}
-    .fp-typing{padding:15px 18px}.fp-typing i{width:9px;height:9px}
-    .fp-sheet{padding:56px 80px 36px}
-    .fp-sheet h1{font-size:40px;letter-spacing:-1px}
-    .fp-lead{font-size:16px;margin-bottom:24px}
-    .fp-stepper{margin-bottom:22px}.fp-stepper .dot{width:30px;height:30px;font-size:13px}.fp-stepper .lbl{font-size:14px}
-    .field label{font-size:13.5px}
-    .fp-sheet input[type=email],.fp-sheet input[type=password],.pw-wrap input[type=text]{height:60px;border-radius:30px;font-size:16.5px}
-    .btn-signin{height:60px;border-radius:30px;font-size:18px}
-    .otp{gap:12px}.otp input{width:62px;height:72px;font-size:30px;border-radius:18px}
-    .fp-chips span{font-size:13.5px}.fp-resend,.fp-resend button,.fp-back{font-size:15.5px}
-    .fp-copy{font-size:13px;margin-top:18px}
+    .fp-shell{max-width:1080px;min-height:min(620px,86vh)}
+    .fp-hero{padding:56px}
+    .fp-chat{max-width:400px;gap:10px}
+    .fp-hdr .fp-av{width:52px;height:52px}.fp-hdr .fp-av svg{width:52px;height:52px}
+    .fp-hdr b{font-size:17px}.fp-hdr span{font-size:12.5px}
+    .fp-bub{font-size:15px;padding:11px 15px}
+    .fp-sheet{padding:48px 64px 32px}
+    .fp-sheet h1{font-size:30px;letter-spacing:-.5px}
+    .fp-lead{font-size:14.5px;margin-bottom:20px}
+    .otp input{width:52px;height:62px;font-size:26px}
   }
   @media (max-width:860px){
     .fp-blob{filter:blur(38px)}

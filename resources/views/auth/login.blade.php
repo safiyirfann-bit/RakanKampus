@@ -99,22 +99,18 @@
   }
   /* big screens: a big card, not a small box in the middle */
   @media (min-width: 1100px){
-    .lg-card{max-width:min(1280px,90vw);min-height:min(780px,86vh)}
-    .lg-hero{padding:64px}
-    .lg-demo{max-width:480px;gap:12px}
-    .lg-hdr{gap:14px;margin-bottom:10px}
-    .lg-hdr .lg-av{width:64px;height:64px}.lg-hdr .lg-av svg{width:64px;height:64px}
-    .lg-hdr b{font-size:21px}.lg-hdr span{font-size:14px}
-    .lg-bub{font-size:17px;padding:13px 18px;border-radius:22px}
-    .lg-typing{padding:15px 18px}.lg-typing i{width:9px;height:9px}
-    .lg-sheet{padding:64px 80px 40px}
-    .lg-sheet h1{font-size:42px;letter-spacing:-1px}
-    .lg-sub{font-size:16.5px;margin:6px 0 28px}
-    .lg-field{height:60px;border-radius:30px;padding:0 22px;margin-bottom:16px}
-    .lg-field input{font-size:16.5px}.lg-field svg{width:21px;height:21px}
-    .lg-row a{font-size:14.5px}.lg-row{margin-bottom:20px}
-    .lg-btn{height:60px;border-radius:30px;font-size:18px}
-    .lg-foot{font-size:15.5px;margin-top:24px}.lg-admin{font-size:14.5px;margin-top:14px}.lg-copy{font-size:13px;margin-top:20px}
+    .lg-card{max-width:1080px;min-height:min(640px,86vh)}
+    .lg-hero{padding:56px}
+    .lg-demo{max-width:400px;gap:10px}
+    .lg-hdr .lg-av{width:52px;height:52px}.lg-hdr .lg-av svg{width:52px;height:52px}
+    .lg-hdr b{font-size:17px}.lg-hdr span{font-size:12.5px}
+    .lg-bub{font-size:15px;padding:11px 15px}
+    .lg-sheet{padding:56px 64px 36px}
+    .lg-sheet h1{font-size:32px;letter-spacing:-.6px}
+    .lg-sub{font-size:15px;margin:4px 0 24px}
+    .lg-field{height:52px}
+    .lg-field input{font-size:15px}
+    .lg-btn{height:52px;font-size:16px}
   }
   @media (max-width: 860px){ .lg-card{display:flex;flex-direction:column;min-height:100vh} }
   @media (prefers-reduced-motion: reduce){ body,.lg-blob{animation:none} }

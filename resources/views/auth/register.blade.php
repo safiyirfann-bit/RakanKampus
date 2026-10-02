@@ -134,21 +134,12 @@ body{
   .sheet{flex:1.1;border-radius:0;padding:40px 44px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
 }
 @media (min-width:1100px){
-  .shell{max-width:min(1320px,92vw);min-height:min(800px,90vh)}
-  .hero{padding:56px}
-  .idcard{width:min(480px,100%)}
-  .sheet{padding:48px 72px 32px}
-  .head h1{font-size:38px;letter-spacing:-1px}
-  .head p{font-size:16px;margin:6px 0 22px}
-  .field{margin-bottom:14px}
-  .row{gap:14px}
-  .box{height:56px;border-radius:28px;padding:0 20px}
-  .input{font-size:16px}.box > svg{width:20px;height:20px}
-  .pw-box{padding:14px 20px}
-  .req-list li{font-size:13.5px}
-  .btn{height:58px;border-radius:29px;font-size:17px}
-  .signin{font-size:15px;margin-top:18px}
-  .copy{font-size:12.5px}
+  .shell{max-width:1120px;min-height:min(640px,88vh)}
+  .hero{padding:48px}
+  .idcard{width:min(380px,100%)}
+  .sheet{padding:40px 56px 28px}
+  .head h1{font-size:30px;letter-spacing:-.5px}
+  .head p{font-size:14.5px;margin:4px 0 18px}
 }
 /* ================= phones: 2 steps ================= */
 @media (max-width:860px){
