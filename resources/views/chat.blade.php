@@ -400,6 +400,57 @@
   .src-badge svg { width: 12px; height: 12px; }
   .steps li::before { background: linear-gradient(135deg, #14b8a6, #0ea5e9); color: #fff; border: none; box-shadow: 0 4px 10px rgba(14,165,233,.25); }
 
+
+  /* ---------- Aurora Glass (A) ---------- */
+  .app { position: relative; }
+  body { background: #f7fafc; }
+  .main { background: transparent; }
+  .aurora i:nth-child(4) { width: 440px; height: 360px; right: 8%; bottom: -160px; background: #fbcfe8; opacity: .4; animation-delay: -9s; }
+  .sidebar, .rail { position: relative; z-index: 2; }
+  .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .online-pill { display: none; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #0f766e; background: rgba(255,255,255,.75); border: 1px solid #fff; border-radius: 99px; padding: 5px 11px; white-space: nowrap; }
+  .online-pill i { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
+  @media (min-width: 861px) { .online-pill { display: inline-flex; } }
+  .send-btn { background: linear-gradient(135deg, #14b8a6, #0ea5e9); box-shadow: 0 6px 14px rgba(14,165,233,.3); }
+  .send-btn:hover { background: linear-gradient(135deg, #0d9488, #0284c7); }
+  /* follow-up questions as a row of pills */
+  .suggest { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 7px; }
+  .suggest-label { width: 100%; }
+  .suggest button { border-radius: 99px; padding: 7px 13px; background: rgba(255,255,255,.82); border-color: #99f6e4; color: #0f766e; font-weight: 600; box-shadow: 0 4px 12px rgba(15,29,46,.05); }
+  .suggest button svg { display: none; }
+  .suggest button:first-of-type::before { content: '✨'; }
+
+  /* light glass sidebar + rail (light theme only; dark mode keeps the navy sidebar) */
+  html:not([data-theme="dark"]) .sidebar { background: rgba(255,255,255,.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); color: #334155; border-right: 1px solid rgba(255,255,255,.9); }
+  html:not([data-theme="dark"]) .brand { color: var(--navy); }
+  html:not([data-theme="dark"]) .brand-logo { box-shadow: 0 4px 10px rgba(15,29,46,.1); }
+  html:not([data-theme="dark"]) .sidebar .icon-btn { color: #64748b; }
+  html:not([data-theme="dark"]) .sidebar .icon-btn:hover { background: rgba(255,255,255,.8); color: var(--navy); }
+  html:not([data-theme="dark"]) .side-btn { color: #334155; border-color: transparent; }
+  html:not([data-theme="dark"]) .side-btn:hover { background: rgba(255,255,255,.75); }
+  html:not([data-theme="dark"]) #newChatBtn { background: linear-gradient(120deg, #14213d, #14b8a6); color: #fff; box-shadow: 0 8px 18px rgba(20,184,166,.25); }
+  html:not([data-theme="dark"]) .side-search kbd { color: #94a3b8; border-color: #e2e8f0; background: rgba(255,255,255,.7); }
+  html:not([data-theme="dark"]) .grp { color: #94a3b8; letter-spacing: .04em; }
+  html:not([data-theme="dark"]) .recent-item { color: #334155; }
+  html:not([data-theme="dark"]) .recent-item:hover { background: rgba(255,255,255,.7); }
+  html:not([data-theme="dark"]) .recent-item.active { background: #fff; color: var(--navy); font-weight: 600; box-shadow: 0 2px 10px rgba(15,29,46,.08); }
+  html:not([data-theme="dark"]) .dots-btn { color: #64748b; }
+  html:not([data-theme="dark"]) .dots-btn:hover { background: #f1f5f9; color: var(--navy); }
+  html:not([data-theme="dark"]) .recent-empty { color: #94a3b8; }
+  html:not([data-theme="dark"]) .recent-list::-webkit-scrollbar-thumb { background: #cbd5e1; }
+  html:not([data-theme="dark"]) .side-user { border-top-color: rgba(148,163,184,.25); }
+  html:not([data-theme="dark"]) .side-user:hover { background: rgba(255,255,255,.75); }
+  html:not([data-theme="dark"]) .side-user b { color: var(--navy); }
+  html:not([data-theme="dark"]) .side-user span { color: #64748b; }
+  html:not([data-theme="dark"]) .app.sidebar-collapsed .rail { background: rgba(255,255,255,.55); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-right: 1px solid rgba(255,255,255,.9); }
+  html:not([data-theme="dark"]) .rail-btn { color: #64748b; }
+  html:not([data-theme="dark"]) .rail-btn:hover, html:not([data-theme="dark"]) .rail-btn.open { background: #fff; color: var(--navy); box-shadow: 0 2px 8px rgba(15,29,46,.08); }
+  html:not([data-theme="dark"]) .rail-logo .logo-face { box-shadow: 0 4px 10px rgba(15,29,46,.1); }
+  html:not([data-theme="dark"]) .flyout { background: rgba(255,255,255,.95); backdrop-filter: blur(14px); border-color: #e2e8f0; box-shadow: 0 18px 40px rgba(15,29,46,.18); }
+  html:not([data-theme="dark"]) .fly-title, html:not([data-theme="dark"]) .fly-empty { color: #94a3b8; }
+  html:not([data-theme="dark"]) .fly-item { color: #334155; }
+  html:not([data-theme="dark"]) .fly-item:hover, html:not([data-theme="dark"]) .fly-item.active { background: #f0fdfa; color: var(--navy); }
+  @media (max-width: 860px) { html:not([data-theme="dark"]) .sidebar { background: rgba(255,255,255,.92); } }
   /* ---------- Info panel (wide screens) ---------- */
   .info-panel { display: none; }
   .panel-toggle { display: none; }
@@ -410,8 +461,6 @@
       background: linear-gradient(180deg, #eefbf8, #eef6fb); border-left: 1px solid #e3eef0;
     }
     .app:not(.is-empty):not(.panel-off) .panel-toggle { color: #0d9488; background: #e6f7f5; }
-    /* the panel already lists the follow-up questions */
-    .app:not(.panel-off) .suggest { display: none; }
   }
   .ip-card { background: rgba(255,255,255,.88); border: 1px solid #fff; border-radius: 18px; padding: 13px 14px; box-shadow: 0 8px 22px rgba(15,29,46,.06); animation: ipIn .35s ease; }
   @keyframes ipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
@@ -610,7 +659,10 @@ html[data-theme="dark"] .sm-item .sm-when { color: #ced3d9; }
 html[data-theme="dark"] .sm-new svg { color: #6cefe1; }
 html[data-theme="dark"] .sm-empty { color: #ced3d9; }
 html[data-theme="dark"] mark { background: #22473f; }
-html[data-theme="dark"] .main { background: #0f1722; }
+html[data-theme="dark"] body { background: #0f1722; }
+html[data-theme="dark"] .main { background: transparent; }
+html[data-theme="dark"] .online-pill { background: rgba(23,32,45,.8); border-color: #2a3341; color: #5eead4; }
+html[data-theme="dark"] .suggest button { background: rgba(23,32,45,.8); border-color: #23484a; color: #99f6e4; }
 html[data-theme="dark"] .aurora i { opacity: .22; }
 html[data-theme="dark"] .topbar { background: rgba(15,23,34,.6); border-bottom-color: rgba(42,51,65,.8); }
 html[data-theme="dark"] .composer { background: linear-gradient(to top, rgba(15,23,34,.95) 55%, rgba(15,23,34,0)); }
@@ -636,6 +688,7 @@ html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { back
 <body>
 
 <div class="app sidebar-collapsed is-empty" id="app">
+  <div class="aurora" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <!-- Collapsed rail (desktop): logo opens the sidebar, like ChatGPT -->
@@ -698,17 +751,14 @@ html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { back
 
   <!-- Main -->
   <div class="main">
-    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="topbar">
       <button class="icon-btn" id="menuBtn" aria-label="{{ __('Toggle sidebar') }}" title="{{ __('Toggle sidebar') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg>
       </button>
       <div class="topbar-title" id="topbarTitle">RakanKampus AI<span>· {{ __('Politeknik Assistant') }}</span></div>
+      <span class="online-pill"><i></i>RakanKampus AI · {{ __('online') }}</span>
       <button class="icon-btn mobile-only" id="topNewChatBtn" aria-label="{{ __('New Chat') }}" title="{{ __('New Chat') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
-      </button>
-      <button class="icon-btn panel-toggle" id="panelToggle" aria-label="{{ __('Info panel') }}" title="{{ __('Info panel') }}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M15 4v16"></path></svg>
       </button>
       <a class="icon-btn mobile-only" href="{{ route('student.home') }}" aria-label="{{ __('Home') }}" title="{{ __('Home') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
@@ -750,9 +800,6 @@ html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { back
       <div class="disclaimer">{{ __('RakanKampus AI can make mistakes. Check important info with PUO.') }}</div>
     </div>
   </div>
-
-  <!-- Info panel for the latest answer (wide screens) -->
-  <aside class="info-panel" id="infoPanel" aria-label="{{ __('Info panel') }}"></aside>
 </div>
 
 {{-- Search chats pop-up --}}
