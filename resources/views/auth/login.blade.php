@@ -37,21 +37,34 @@
   @keyframes lgFloat{to{transform:translate(40px,50px) scale(1.15)}}
 
   .lg{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
-  .lg-hero{flex:1;min-height:300px;display:flex;align-items:center;justify-content:center;padding:44px 22px 30px}
+  .lg-hero{flex:1;min-height:300px;display:flex;align-items:stretch;justify-content:center;padding:56px 22px 26px}
 
   /* ---- chat demo ---- */
-  .lg-demo{width:100%;max-width:330px;display:flex;flex-direction:column;gap:9px;min-height:200px}
-  .lg-hdr{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-  .lg-hdr .lg-av{width:46px;height:46px;display:grid;place-items:center;filter:drop-shadow(0 6px 10px rgba(46,16,101,.3));animation:lgBob 3s ease-in-out infinite}
-  @keyframes lgBob{50%{transform:translateY(-3px)}}
-  .lg-hdr b{display:block;color:#fff;font-size:16px;letter-spacing:-.2px}
-  .lg-hdr span{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.9);font-size:12px}
-  .lg-hdr span:before{content:"";width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.3)}
-  .lg-bub{max-width:84%;padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.4;opacity:0;transform:translateY(10px) scale(.96)}
+  .lg-win{position:relative;width:100%;max-width:360px;align-self:stretch;display:flex;flex-direction:column;min-height:0;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);border-radius:24px;padding:12px 12px 12px;
+    -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 18px 40px rgba(46,16,101,.2)}
+  .lg-peek{position:absolute;right:-10px;top:-38px;width:64px;height:64px;filter:drop-shadow(0 8px 12px rgba(46,16,101,.35));animation:lgPeek 3s ease-in-out infinite;transform-origin:50% 100%}
+  @keyframes lgPeek{0%,100%{transform:rotate(8deg)}50%{transform:rotate(-4deg) translateY(-5px)}}
+  .lg-wh{display:flex;align-items:center;gap:6px;padding:2px 4px 10px;border-bottom:1px solid rgba(255,255,255,.3);margin-bottom:8px}
+  .lg-wh i{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.7)}
+  .lg-wh b{color:#fff;font-size:14px;margin-left:6px}
+  .lg-wh span{display:flex;align-items:center;gap:5px;color:rgba(255,255,255,.9);font-size:11.5px}
+  .lg-wh span:before{content:"";width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.3)}
+  .lg-msgs{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:flex-end;gap:8px;overflow:hidden;padding:0 2px;
+    -webkit-mask-image:linear-gradient(transparent,#000 18%);mask-image:linear-gradient(transparent,#000 18%)}
+  .lg-bar{margin-top:10px;height:44px;border-radius:22px;background:rgba(255,255,255,.92);display:flex;align-items:center;padding:0 6px 0 16px;gap:8px;font-size:13.5px;color:#6d28d9}
+  .lg-t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lg-t .ph{color:#a596c9}
+  .lg-t .caret{display:inline-block;width:1.5px;height:15px;background:#7c3aed;vertical-align:middle;margin-left:1px;animation:lgBlink 1s steps(1) infinite}
+  @keyframes lgBlink{50%{opacity:0}}
+  .lg-send{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:#fff;background:linear-gradient(135deg,var(--lg-purple),var(--lg-pink));transition:transform .15s}
+  .lg-send.go{transform:scale(.85)}
+  .lg-send svg{width:16px;height:16px}
+  .lg-bub{flex:none;max-width:84%;padding:9px 13px;border-radius:18px;font-size:13.5px;line-height:1.4;opacity:0;transform:translateY(10px) scale(.96)}
   .lg-bub.u{align-self:flex-end;background:#fff;color:#6d28d9;border-bottom-right-radius:6px;font-weight:600;box-shadow:0 6px 16px rgba(46,16,101,.15)}
   .lg-bub.b{align-self:flex-start;background:rgba(255,255,255,.22);color:#fff;border:1px solid rgba(255,255,255,.38);
     -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom-left-radius:6px}
-  .lg-typing{align-self:flex-start;display:flex;gap:5px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.22);opacity:0}
+  .lg-typing{flex:none;align-self:flex-start;display:flex;gap:5px;padding:12px 14px;border-radius:18px;background:rgba(255,255,255,.22);opacity:0}
   .lg-typing i{width:7px;height:7px;border-radius:50%;background:#fff;animation:lgDot 1s infinite}
   .lg-typing i:nth-child(2){animation-delay:.15s}.lg-typing i:nth-child(3){animation-delay:.3s}
   .lg-in{animation:lgPop .35s ease forwards}
@@ -93,17 +106,16 @@
     .lg{align-items:center;justify-content:center;padding:32px}
     .lg-card{display:flex;width:100%;max-width:960px;min-height:580px;border-radius:32px;overflow:hidden;
       background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(46,16,101,.3)}
-    .lg-hero{flex:1.05;padding:48px}
+    .lg-hero{flex:1.05;padding:72px 48px 48px;align-items:center}
+    .lg-win{max-width:400px;height:min(440px,100%)}
     .lg-sheet{flex:1;border-radius:0;padding:56px 52px 36px;display:flex;flex-direction:column;justify-content:center;box-shadow:none}
     .lg-sheet h1{font-size:30px}
   }
   /* big screens: a big card, not a small box in the middle */
   @media (min-width: 1100px){
     .lg-card{max-width:1080px;min-height:min(640px,86vh)}
-    .lg-hero{padding:56px}
-    .lg-demo{max-width:400px;gap:10px}
-    .lg-hdr .lg-av{width:52px;height:52px}.lg-hdr .lg-av svg{width:52px;height:52px}
-    .lg-hdr b{font-size:17px}.lg-hdr span{font-size:12.5px}
+    .lg-hero{padding:76px 56px 56px}
+    .lg-win{max-width:420px;height:min(470px,100%)}
     .lg-bub{font-size:15px;padding:11px 15px}
     .lg-sheet{padding:56px 64px 36px}
     .lg-sheet h1{font-size:32px;letter-spacing:-.6px}
@@ -112,7 +124,19 @@
     .lg-field input{font-size:15px}
     .lg-btn{height:52px;font-size:16px}
   }
-  @media (max-width: 860px){ .lg-card{display:flex;flex-direction:column;min-height:100vh} }
+  @media (max-width: 860px){
+    .lg-card{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+    .lg-hero{flex:1 1 0;min-height:190px;padding:max(48px,env(safe-area-inset-top)) 20px 18px}
+    .lg-win{max-width:440px;margin:0 auto}
+    .lg-sheet{flex:none;padding:24px 22px 16px}
+  }
+  @media (max-width: 860px) and (max-height: 700px){
+    .lg-sub{display:none}.lg-sheet h1{margin-bottom:14px;font-size:23px}
+    .lg-copy{display:none}.lg-field{height:48px}.lg-btn{height:48px}
+    .lg-foot{margin-top:12px}.lg-row{margin-bottom:12px}
+    .lg-wh{padding-bottom:7px;margin-bottom:6px}.lg-bar{height:38px;margin-top:7px}.lg-send{width:30px;height:30px}
+    .lg-bub{font-size:12.5px;padding:7px 11px}
+  }
   @media (prefers-reduced-motion: reduce){ body,.lg-blob{animation:none} }
 </style>
 
@@ -123,11 +147,11 @@
  <div class="lg-card">
 
   <div class="lg-hero">
-    <div class="lg-demo" id="lgDemo" aria-hidden="true">
-      <div class="lg-hdr">
-        <div class="lg-av"><x-brand-logo size="46" /></div>
-        <div><b>RakanKampus</b><span>{{ __('Online') }}</span></div>
-      </div>
+    <div class="lg-win" aria-hidden="true">
+      <x-brand-logo size="64" class="lg-peek" />
+      <div class="lg-wh"><i></i><i></i><i></i><b>RakanKampus</b><span>{{ __('Online') }}</span></div>
+      <div class="lg-msgs" id="lgDemo"></div>
+      <div class="lg-bar"><span class="lg-t" id="lgType"></span><span class="lg-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></div>
     </div>
   </div>
 
@@ -196,32 +220,47 @@
 
   // live chat demo
   var convo = @json($lgDemo);
-  var demo = document.getElementById('lgDemo'), i = 0;
+  var box = document.getElementById('lgDemo'), bar = document.getElementById('lgType');
+  var send = document.querySelector('.lg-send'), PH = @json(__('Ask anything…'));
   var still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var wait = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
   function add(cls, text) {
     var d = document.createElement('div');
     d.className = cls;
     if (text) d.textContent = text; else d.innerHTML = '<i></i><i></i><i></i>';
-    demo.appendChild(d);
+    box.appendChild(d);
+    while (box.children.length > 8) box.firstChild.remove();
     requestAnimationFrame(function () { d.classList.add('lg-in'); });
     return d;
   }
-  function run() {
-    var old = demo.querySelectorAll('.lg-bub,.lg-typing');
-    old.forEach(function (e) { e.classList.add('lg-out'); });
-    setTimeout(function () {
-      old.forEach(function (e) { e.remove(); });
+  function placeholder() { bar.innerHTML = '<span class="ph"></span>'; bar.firstChild.textContent = PH; }
+  // start with two finished exchanges so the window already looks lived-in
+  var seed = window.innerWidth > 860 ? 3 : 2;
+  for (var k = 0; k < seed; k++) { add('lg-bub u', convo[k][0]); add('lg-bub b', convo[k][1]); }
+  placeholder();
+  if (still) return;
+  (async function loop() {
+    var i = seed;
+    while (true) {
       var qa = convo[i++ % convo.length];
+      await wait(1400);
+      for (var n = 1; n <= qa[0].length; n++) {
+        bar.textContent = qa[0].slice(0, n);
+        bar.insertAdjacentHTML('beforeend', '<i class="caret"></i>');
+        await wait(45);
+      }
+      await wait(350);
+      send.classList.add('go'); setTimeout(function () { send.classList.remove('go'); }, 160);
+      placeholder();
       add('lg-bub u', qa[0]);
-      if (still) { add('lg-bub b', qa[1]); return; }
-      setTimeout(function () {
-        var t = add('lg-typing');
-        setTimeout(function () { t.remove(); add('lg-bub b', qa[1]); }, 1300);
-      }, 800);
-      setTimeout(run, 5600);
-    }, old.length ? 320 : 0);
-  }
-  run();
+      await wait(500);
+      var t = add('lg-typing');
+      await wait(1300);
+      t.remove();
+      add('lg-bub b', qa[1]);
+      await wait(2400);
+    }
+  })();
 })();
 </script>
 
