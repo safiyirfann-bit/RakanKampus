@@ -107,12 +107,100 @@ class PopularQuestions
                     break;
                 }
                 if (! isset($seen[self::normalise($q)])) {
-                    $out[] = ['text' => __($q), 'topic' => null];
+                    $out[] = ['text' => $q, 'topic' => null];
                 }
             }
 
             return $out;
         });
+    }
+
+    /** Short English questions about things the knowledge base covers (used if translating fails). */
+    public const FALLBACK_EN = [
+        'How do I pay my tuition fees online?',
+        'What is SPMP and how do I use it?',
+        'Where is the surau on campus?',
+        'What clubs can I join at PUO?',
+        'Where are the canteens on campus?',
+        'What programmes does PUO offer?',
+        'Who is the director of PUO?',
+        'What does JTMK stand for?',
+        'How did PUO get its name?',
+        'Where are the lecture halls?',
+        'When is the fee payment deadline?',
+        'How do I access library resources?',
+    ];
+
+    /**
+     * The marquee questions in the student's language. The knowledge base is written
+     * in Malay, so for English / Chinese / Tamil the list is translated once with the
+     * AI and cached for a day; if that fails, a built-in English list is used.
+     *
+     * @return array<int, array{text: string, topic: ?string}>
+     */
+    public static function marqueeFor(string $locale, int $limit = 12): array
+    {
+        $items = self::marquee($limit);
+        if ($locale === 'ms') {
+            return array_map(fn ($q) => ['text' => __($q['text']), 'topic' => $q['topic']], $items);
+        }
+
+        $texts = array_column($items, 'text');
+        $key = 'chat.marquee_tr.' . $locale . '.' . md5(json_encode($texts));
+        $translated = Cache::get($key);
+        if (! is_array($translated)) {
+            $translated = self::translate($texts, $locale);
+            if ($translated) {
+                Cache::put($key, $translated, now()->addDay());
+            }
+        }
+
+        if ($translated && count($translated) === count($items)) {
+            foreach ($items as $i => $q) {
+                $items[$i]['text'] = $translated[$i];
+            }
+
+            return $items;
+        }
+
+        // No translation available: questions we know the bot can answer, in the UI language
+        return array_map(fn ($q) => ['text' => __($q), 'topic' => null], array_slice(self::FALLBACK_EN, 0, $limit));
+    }
+
+    /** @return array<int, string>|null */
+    private static function translate(array $texts, string $locale): ?array
+    {
+        $key = (string) config('services.groq.key');
+        if ($key === '' || ! $texts) {
+            return null;
+        }
+        $language = ['en' => 'English', 'zh' => 'Simplified Chinese', 'ta' => 'Tamil'][$locale] ?? 'English';
+
+        try {
+            $res = \Illuminate\Support\Facades\Http::withToken($key)->timeout(8)
+                ->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => 'openai/gpt-oss-20b',
+                    'temperature' => 0.2,
+                    'messages' => [
+                        ['role' => 'system', 'content' => "Translate each student question about Politeknik Ungku Omar (PUO) into natural, short {$language}. Keep names, acronyms and codes (PUO, SPMP, JTMK, JKM, iPayment) unchanged. Reply with ONLY a JSON array of strings, same order and same count as the input."],
+                        ['role' => 'user', 'content' => json_encode(array_values($texts), JSON_UNESCAPED_UNICODE)],
+                    ],
+                ]);
+            if ($res->failed()) {
+                return null;
+            }
+            $content = (string) $res->json('choices.0.message.content');
+            if (preg_match('/\[.*\]/s', $content, $m)) {
+                $arr = json_decode($m[0], true);
+                if (is_array($arr) && count($arr) === count($texts)) {
+                    return array_map(fn ($x) => Str::limit(trim((string) $x), 70, '…'), array_values($arr));
+                }
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Marquee translate failed: ' . $e->getMessage());
+        }
+
+        return null;
     }
 
     /** @return array<int, string> */

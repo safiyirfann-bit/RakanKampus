@@ -116,7 +116,7 @@ Route::middleware('auth')->group(function () {
         return view('chat', [
             'user' => $request->user(),
             'quickQuestions' => \App\Services\PopularQuestions::top(4),
-            'marqueeQuestions' => \App\Services\PopularQuestions::marquee(12),
+            'marqueeQuestions' => \App\Services\PopularQuestions::marqueeFor(app()->getLocale(), 12),
         ]);
     })->name('student.chat');
 
