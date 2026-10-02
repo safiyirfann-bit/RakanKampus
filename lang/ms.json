@@ -686,5 +686,13 @@
     "The end date cannot be before the start date.": "Tarikh tamat tak boleh sebelum tarikh mula.",
     "End time must be after the start time.": "Masa tamat mesti selepas masa mula.",
     "Tomorrow": "Esok",
-    "You might also ask": "Anda mungkin juga ingin bertanya"
+    "You might also ask": "Anda mungkin juga ingin bertanya",
+    "From the PUO knowledge base": "Dari pangkalan data PUO",
+    "Quick answer": "Jawapan ringkas",
+    "Related topics": "Topik berkaitan",
+    "Actions": "Tindakan",
+    "Set a reminder": "Set peringatan",
+    "Set reminder": "Set peringatan",
+    "Copy answer": "Salin jawapan",
+    "Info panel": "Panel info"
 }

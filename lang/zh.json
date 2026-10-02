@@ -483,5 +483,13 @@
     "The end date cannot be before the start date.": "结束日期不能早于开始日期。",
     "End time must be after the start time.": "结束时间必须晚于开始时间。",
     "Tomorrow": "明天",
-    "You might also ask": "你可能还想问"
+    "You might also ask": "你可能还想问",
+    "From the PUO knowledge base": "来自 PUO 知识库",
+    "Quick answer": "简要回答",
+    "Related topics": "相关主题",
+    "Actions": "操作",
+    "Set a reminder": "设置提醒",
+    "Set reminder": "设置提醒",
+    "Copy answer": "复制回答",
+    "Info panel": "信息面板"
 }

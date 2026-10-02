@@ -1585,6 +1585,17 @@ function checkDueReminders() {
   });
 }
 
+// Opened from the chat's "Set reminder" button: start a new reminder with the topic filled in
+(function () {
+  const q = new URLSearchParams(location.search);
+  if (q.get('add') !== '1') return;
+  openAddModal();
+  const subject = (q.get('subject') || '').slice(0, 120);
+  if (subject) document.getElementById('subjectInput').value = subject;
+  if (['Exam', 'Assignment', 'Quiz', 'Other'].includes(q.get('type'))) selectType(q.get('type'));
+  history.replaceState(null, '', location.pathname);
+})();
+
 updateNotifyBanner();
 ensurePushSubscription().then(checkDueReminders);
 setInterval(checkDueReminders, 30000);

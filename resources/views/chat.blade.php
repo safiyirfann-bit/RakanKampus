@@ -361,6 +361,77 @@
   .disclaimer { text-align: center; font-size: 11.5px; color: var(--faint); margin-top: 8px; }
 
 
+
+  /* =====================================================================
+     Aurora Split look: soft teal/cyan light behind the chat, glass answer
+     cards, navy question bubbles, and an info panel on wide screens.
+     ===================================================================== */
+  .main { background: #f7fafc; overflow: hidden; }
+  .aurora { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .aurora i { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; animation: auroraDrift 18s ease-in-out infinite alternate; }
+  .aurora i:nth-child(1) { width: 520px; height: 420px; left: -120px; top: -140px; background: #99f6e4; }
+  .aurora i:nth-child(2) { width: 460px; height: 380px; right: -120px; top: 10%; background: #bae6fd; animation-delay: -6s; }
+  .aurora i:nth-child(3) { width: 480px; height: 360px; left: 30%; bottom: -200px; background: #c7f2ee; animation-delay: -12s; }
+  @keyframes auroraDrift { to { transform: translate(50px, -30px) scale(1.12); } }
+  .topbar, .chat-area, .composer, .empty-state { position: relative; z-index: 1; }
+  .topbar { background: rgba(255,255,255,.55); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom-color: rgba(255,255,255,.8); }
+  .topbar-title .topic-chip { margin-left: 8px; font-size: 11px; font-weight: 700; color: #0f766e; background: #ccfbf1; border-radius: 99px; padding: 3px 9px; vertical-align: 2px; }
+  .composer { background: linear-gradient(to top, rgba(247,250,252,.95) 55%, rgba(247,250,252,0)); }
+  .composer-box, .empty-state .composer-box {
+    background: rgba(255,255,255,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border-color: #fff; box-shadow: 0 14px 36px rgba(15,29,46,.12);
+  }
+  .composer-box:focus-within { border-color: #99f6e4; box-shadow: 0 14px 36px rgba(20,184,166,.18); }
+  .send-btn { background: linear-gradient(135deg, #14213d, #14b8a6); }
+  .send-btn:hover { background: linear-gradient(135deg, #1d3149, #0d9488); }
+  .suggestion { background: rgba(255,255,255,.75); border-color: #fff; backdrop-filter: blur(8px); box-shadow: 0 6px 18px rgba(15,29,46,.06); }
+
+  .message-row.user .message {
+    background: linear-gradient(120deg, #14213d, #1e3a5f); color: #fff; border-radius: 18px 18px 4px 18px;
+    box-shadow: 0 10px 22px rgba(20,33,61,.18);
+  }
+  .bot-avatar { background: #fff; border-color: #fff; box-shadow: 0 6px 14px rgba(20,184,166,.25); }
+  .message-row.bot .bot-body { padding-top: 0; }
+  .message-row.bot .message {
+    display: inline-block; max-width: 100%; background: rgba(255,255,255,.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid #fff; border-radius: 4px 18px 18px 18px; padding: 12px 16px; box-shadow: 0 10px 28px rgba(15,29,46,.07);
+  }
+  .src-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 700; color: #0f766e; background: #ccfbf1; border-radius: 99px; padding: 3px 9px; margin-bottom: 6px; }
+  .src-badge svg { width: 12px; height: 12px; }
+  .steps li::before { background: linear-gradient(135deg, #14b8a6, #0ea5e9); color: #fff; border: none; box-shadow: 0 4px 10px rgba(14,165,233,.25); }
+
+  /* ---------- Info panel (wide screens) ---------- */
+  .info-panel { display: none; }
+  .panel-toggle { display: none; }
+  @media (min-width: 1180px) {
+    .panel-toggle { display: flex; }
+    .app:not(.is-empty):not(.panel-off) .info-panel {
+      display: flex; flex-direction: column; gap: 12px; width: 290px; min-width: 290px; padding: 16px 14px; overflow-y: auto;
+      background: linear-gradient(180deg, #eefbf8, #eef6fb); border-left: 1px solid #e3eef0;
+    }
+    .app:not(.is-empty):not(.panel-off) .panel-toggle { color: #0d9488; background: #e6f7f5; }
+    /* the panel already lists the follow-up questions */
+    .app:not(.panel-off) .suggest { display: none; }
+  }
+  .ip-card { background: rgba(255,255,255,.88); border: 1px solid #fff; border-radius: 18px; padding: 13px 14px; box-shadow: 0 8px 22px rgba(15,29,46,.06); animation: ipIn .35s ease; }
+  @keyframes ipIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .ip-card h5 { margin: 0 0 8px; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .ip-card h5 svg { width: 13px; height: 13px; flex-shrink: 0; }
+  .ip-big { font-size: 24px; font-weight: 900; color: #0f766e; line-height: 1.15; word-break: break-word; }
+  .ip-big small { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .ip-sum { font-size: 13px; color: #334155; line-height: 1.5; margin: 6px 0 0; }
+  .ip-rel { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; text-align: left; border: none; background: none; padding: 9px 2px; border-bottom: 1px solid #eef2f5; font-size: 13px; color: var(--ink); cursor: pointer; font-family: inherit; }
+  .ip-rel:last-child { border-bottom: none; }
+  .ip-rel:hover { color: #0d9488; }
+  .ip-rel span:last-child { color: var(--faint); }
+  .ip-btn { display: flex; align-items: center; justify-content: center; gap: 7px; width: 100%; border: none; border-radius: 12px; padding: 10px; font-size: 12.5px; font-weight: 800; cursor: pointer; font-family: inherit; text-decoration: none; margin-top: 7px; background: #f1f5f9; color: var(--navy); }
+  .ip-btn:first-of-type { margin-top: 0; }
+  .ip-btn svg { width: 15px; height: 15px; }
+  .ip-btn.primary { background: linear-gradient(120deg, #14213d, #1f6f7a); color: #fff; }
+  .ip-btn:hover { filter: brightness(1.05); }
+  .ip-empty { font-size: 12.5px; color: var(--faint); }
+  @media (prefers-reduced-motion: reduce) { .aurora i, .ip-card { animation: none; } }
+  @media (max-width: 860px) { .aurora i { opacity: .45; } .message-row.bot .message { padding: 11px 14px; } }
   /* ---------- Collapsed icon rail (desktop, like ChatGPT) ---------- */
   .rail { display: none; }
   @media (min-width: 861px) {
@@ -539,6 +610,24 @@ html[data-theme="dark"] .sm-item .sm-when { color: #ced3d9; }
 html[data-theme="dark"] .sm-new svg { color: #6cefe1; }
 html[data-theme="dark"] .sm-empty { color: #ced3d9; }
 html[data-theme="dark"] mark { background: #22473f; }
+html[data-theme="dark"] .main { background: #0f1722; }
+html[data-theme="dark"] .aurora i { opacity: .22; }
+html[data-theme="dark"] .topbar { background: rgba(15,23,34,.6); border-bottom-color: rgba(42,51,65,.8); }
+html[data-theme="dark"] .composer { background: linear-gradient(to top, rgba(15,23,34,.95) 55%, rgba(15,23,34,0)); }
+html[data-theme="dark"] .composer-box, html[data-theme="dark"] .empty-state .composer-box { background: rgba(23,32,45,.85); border-color: #2a3341; box-shadow: 0 14px 36px rgba(0,0,0,.35); }
+html[data-theme="dark"] .suggestion { background: rgba(23,32,45,.75); border-color: #2a3341; }
+html[data-theme="dark"] .message-row.user .message { background: linear-gradient(120deg, #1e3a5f, #155e63); color: #fff; }
+html[data-theme="dark"] .bot-avatar { background: #e8f7f5; border-color: #e8f7f5; }
+html[data-theme="dark"] .message-row.bot .message { background: rgba(23,32,45,.78); border-color: #2a3341; box-shadow: 0 10px 28px rgba(0,0,0,.3); }
+html[data-theme="dark"] .src-badge, html[data-theme="dark"] .topbar-title .topic-chip { background: #134e4a; color: #99f6e4; }
+html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .info-panel { background: linear-gradient(180deg, #121c27, #111a26); border-left-color: #2a3341; }
+html[data-theme="dark"] .ip-card { background: rgba(23,32,45,.9); border-color: #2a3341; }
+html[data-theme="dark"] .ip-big { color: #5eead4; }
+html[data-theme="dark"] .ip-sum, html[data-theme="dark"] .ip-rel { color: #dee2e8; }
+html[data-theme="dark"] .ip-rel { border-bottom-color: #2a3341; }
+html[data-theme="dark"] .ip-btn { background: #10161f; color: #dee2e8; }
+html[data-theme="dark"] .ip-btn.primary { background: linear-gradient(120deg, #14b8a6, #0e7490); color: #fff; }
+html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { background: #134e4a; color: #99f6e4; }
 @media (max-width: 860px) {
   html[data-theme="dark"] .sidebar { box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); }
 }
@@ -609,6 +698,7 @@ html[data-theme="dark"] mark { background: #22473f; }
 
   <!-- Main -->
   <div class="main">
+    <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
     <div class="topbar">
       <button class="icon-btn" id="menuBtn" aria-label="{{ __('Toggle sidebar') }}" title="{{ __('Toggle sidebar') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M9 4v16"></path></svg>
@@ -616,6 +706,9 @@ html[data-theme="dark"] mark { background: #22473f; }
       <div class="topbar-title" id="topbarTitle">RakanKampus AI<span>· {{ __('Politeknik Assistant') }}</span></div>
       <button class="icon-btn mobile-only" id="topNewChatBtn" aria-label="{{ __('New Chat') }}" title="{{ __('New Chat') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+      </button>
+      <button class="icon-btn panel-toggle" id="panelToggle" aria-label="{{ __('Info panel') }}" title="{{ __('Info panel') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M15 4v16"></path></svg>
       </button>
       <a class="icon-btn mobile-only" href="{{ route('student.home') }}" aria-label="{{ __('Home') }}" title="{{ __('Home') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
@@ -657,6 +750,9 @@ html[data-theme="dark"] mark { background: #22473f; }
       <div class="disclaimer">{{ __('RakanKampus AI can make mistakes. Check important info with PUO.') }}</div>
     </div>
   </div>
+
+  <!-- Info panel for the latest answer (wide screens) -->
+  <aside class="info-panel" id="infoPanel" aria-label="{{ __('Info panel') }}"></aside>
 </div>
 
 {{-- Search chats pop-up --}}
@@ -737,6 +833,7 @@ html[data-theme="dark"] mark { background: #22473f; }
 <script>
 const app = document.getElementById('app');
 const chatArea = document.getElementById('chatArea');
+let currentTopic = null; // knowledge-base topic of the latest answer (topbar chip)
 const recentList = document.getElementById('recentList');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
@@ -901,6 +998,7 @@ function showEmptyState() {
   node.getElementById('greeting').textContent = greetingText();
   chatArea.appendChild(node);
   topbarTitle.innerHTML = DEFAULT_TITLE;
+  currentTopic = null;
 
   const heroInput = document.getElementById('heroInput');
   heroInput.addEventListener('input', () => autoResize(heroInput));
@@ -926,6 +1024,8 @@ const ICONS = {
   down: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 14V3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-3Z"></path><path d="M17 14l-4.2 7.2a1.9 1.9 0 0 1-3.5-1.3L10 15H4.7a2 2 0 0 1-2-2.4l1.5-7.5A2.5 2.5 0 0 1 6.6 3H17"></path></svg>',
   share: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3"></path><path d="m7 8 5-5 5 5"></path><path d="M20 14v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5"></path></svg>',
   regen: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.6-6.4L21 8"></path><path d="M21 3v5h-5"></path></svg>',
+  bell: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>',
+  book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2Z"></path><path d="M8 7h6"></path></svg>',
   more: '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"></circle><circle cx="12" cy="12" r="1.8"></circle><circle cx="19" cy="12" r="1.8"></circle></svg>',
   speak: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5Z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>',
   stop: '<svg viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"></rect></svg>',
@@ -1190,6 +1290,7 @@ function buildActions(row, text, meta) {
     btn('down', ICONS.down, 'Bad response') +
     btn('share', ICONS.share, 'Share') +
     btn('regen', ICONS.regen, 'Regenerate') +
+    btn('remind', ICONS.bell, 'Set reminder') +
     (TTS_OK ? btn('more', ICONS.more, 'More') : '');
 
   const copyBtn = actions.querySelector('[data-copy]');
@@ -1235,6 +1336,7 @@ function buildActions(row, text, meta) {
   });
 
   actions.querySelector('[data-regen]').addEventListener('click', e => regenerate(row, e.currentTarget));
+  actions.querySelector('[data-remind]').addEventListener('click', () => { location.href = reminderUrl(questionFor(row)); });
 
   const moreBtn = actions.querySelector('[data-more]');
   if (moreBtn) moreBtn.addEventListener('click', () => {
@@ -1277,7 +1379,7 @@ function addMessage(text, sender, meta = {}) {
     body.className = 'bot-body';
     const msg = document.createElement('div');
     msg.className = 'message';
-    msg.innerHTML = formatBotText(text);
+    msg.innerHTML = (meta.fromKb ? SRC_BADGE() : '') + formatBotText(text);
     body.appendChild(msg);
     if (meta.actions !== false) body.appendChild(buildActions(row, text, meta));
     row.appendChild(body);
@@ -1302,9 +1404,11 @@ function regenerate(row, btn) {
     .then(res => res.json())
     .then(data => {
       if (!data.reply) throw new Error('no reply');
-      const fresh = addMessage(data.reply, 'bot', { id: data.message_id });
+      const meta = { id: data.message_id, fromKb: !!data.from_kb, topic: data.topic || null };
+      const fresh = addMessage(data.reply, 'bot', meta);
       row.replaceWith(fresh);
       showSuggestions(fresh, data.suggestions);
+      showAnswerExtras(fresh, data.reply, meta, data.suggestions);
       fresh.querySelector('.message').animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
     })
     .catch(() => { btn.classList.remove('spin'); flashNote(btn.parentElement, t('Could not regenerate. Try again.')); })
@@ -1366,6 +1470,88 @@ function showSuggestions(row, list) {
   scrollToBottom();
 }
 
+
+// ---------- Aurora Split: source badge, topic chip and the info panel ----------
+const SRC_BADGE = () => `<span class="src-badge">${ICONS.book}${escapeHtml(t('From the PUO knowledge base'))}</span><br>`;
+const REMINDERS_URL = @json(route('student.reminders'));
+function reminderUrl(subject) {
+  return `${REMINDERS_URL}?add=1&type=Other&subject=${encodeURIComponent(String(subject || '').slice(0, 100))}`;
+}
+// The student's question that a bot answer replies to
+function questionFor(row) {
+  let q = row && row.previousElementSibling;
+  while (q && !q.classList.contains('user')) q = q.previousElementSibling;
+  return q ? q.textContent.trim() : '';
+}
+function setTopicChip(topic) {
+  currentTopic = topic || null;
+  topbarTitle.querySelector('.topic-chip')?.remove();
+  if (!topic) return;
+  const chip = document.createElement('span');
+  chip.className = 'topic-chip';
+  chip.textContent = topic;
+  topbarTitle.appendChild(chip);
+}
+// Pull the headline fact out of an answer: an amount, a date, a time or a count
+function keyFigure(text) {
+  const months = 'jan(?:uari|uary)?|feb(?:ruari|ruary)?|mac|mar(?:ch)?|apr(?:il)?|mei|may|jun(?:e)?|jul(?:ai|y)?|ogo(?:s)?|aug(?:ust)?|sep(?:t(?:ember)?)?|okt(?:ober)?|oct(?:ober)?|nov(?:ember)?|dis(?:ember)?|dec(?:ember)?';
+  const tests = [
+    /RM\s?\d[\d,]*(?:\.\d{1,2})?/i,
+    new RegExp(`\\b\\d{1,2}(?:\\s*(?:–|-|hingga|sampai|to)\\s*\\d{1,2})?\\s+(?:${months})\\b(?:\\s+\\d{4})?`, 'i'),
+    /\b\d{1,2}[:.]\d{2}\s?(?:am|pm|pagi|petang|malam)?\b/i,
+    /\b\d+(?:\.\d+)?\s?%/,
+    /\b\d+\s+(?:hari|minggu|bulan|tahun|jam|minit|days?|weeks?|months?|years?|hours?|semester|kredit|credits?)\b/i,
+  ];
+  for (const re of tests) { const m = text.match(re); if (m) return m[0].trim(); }
+  return null;
+}
+function firstSentence(text) {
+  const clean = text.replace(/https?:\/\/\S+/g, '').replace(/\s+/g, ' ').trim();
+  const m = clean.match(/^.{10,180}?[.!?](\s|$)/);
+  const s = (m ? m[0] : clean).trim();
+  return s.length > 160 ? s.slice(0, 157) + '…' : s;
+}
+function renderInfoPanel(row, text, meta = {}, suggestions = []) {
+  const panel = document.getElementById('infoPanel');
+  if (!panel) return;
+  if (!row || !text) { panel.innerHTML = ''; return; }
+  const fig = keyFigure(text);
+  const q = questionFor(row);
+  let html = `<div class="ip-card"><h5>${ICONS.book}${escapeHtml(t('Quick answer'))}</h5>
+      ${fig ? `<div class="ip-big">${escapeHtml(fig)}</div>` : ''}
+      <p class="ip-sum">${escapeHtml(firstSentence(text))}</p></div>`;
+  if (suggestions && suggestions.length) {
+    html += `<div class="ip-card"><h5>${escapeHtml(t('Related topics'))}</h5>` +
+      suggestions.slice(0, 4).map((s, i) => `<button type="button" class="ip-rel" data-i="${i}"><span>${escapeHtml(s)}</span><span>›</span></button>`).join('') + '</div>';
+  }
+  html += `<div class="ip-card"><h5>${escapeHtml(t('Actions'))}</h5>
+      <a class="ip-btn primary" href="${reminderUrl(q || meta.topic || '')}">${ICONS.bell}${escapeHtml(t('Set a reminder'))}</a>
+      <button type="button" class="ip-btn" data-act="copy">${ICONS.copy}<span>${escapeHtml(t('Copy answer'))}</span></button>
+      ${TTS_OK ? `<button type="button" class="ip-btn" data-act="speak">${ICONS.speak}<span>${escapeHtml(t('Read aloud'))}</span></button>` : ''}
+    </div>`;
+  panel.innerHTML = html;
+  panel.querySelectorAll('.ip-rel').forEach(b => b.addEventListener('click', () => { clearSuggestions(); sendMessage(suggestions[+b.dataset.i]); }));
+  const copyB = panel.querySelector('[data-act=copy]');
+  copyB.addEventListener('click', () => copyText(text).then(() => {
+    copyB.querySelector('span').textContent = t('Copied');
+    setTimeout(() => { copyB.querySelector('span').textContent = t('Copy answer'); }, 1500);
+  }).catch(() => {}));
+  const speakB = panel.querySelector('[data-act=speak]');
+  if (speakB) speakB.addEventListener('click', () => speak(text, speakB, row.querySelector('.msg-actions')));
+}
+function showAnswerExtras(row, text, meta, suggestions) {
+  setTopicChip(meta && meta.topic);
+  renderInfoPanel(row, text, meta, suggestions);
+}
+(function () {
+  const btn = document.getElementById('panelToggle');
+  try { if (localStorage.getItem('rk_chat_panel') === 'off') app.classList.add('panel-off'); } catch (e) {}
+  if (btn) btn.addEventListener('click', () => {
+    const off = app.classList.toggle('panel-off');
+    try { localStorage.setItem('rk_chat_panel', off ? 'off' : 'on'); } catch (e) {}
+  });
+})();
+
 function sendMessage(textArg) {
   const text = (typeof textArg === 'string' ? textArg : messageInput.value).trim();
   if (text === '' || busy) return;
@@ -1392,8 +1578,10 @@ function sendMessage(textArg) {
     .then(data => {
       removeSearching();
       if (data.reply) {
-        const botRow = addMessage(data.reply, 'bot', { id: data.message_id });
+        const meta = { id: data.message_id, fromKb: !!data.from_kb, topic: data.topic || null };
+        const botRow = addMessage(data.reply, 'bot', meta);
         showSuggestions(botRow, data.suggestions);
+        showAnswerExtras(botRow, data.reply, meta, data.suggestions);
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
@@ -1620,6 +1808,7 @@ async function deleteConversation(id, title) {
 
 function setTitle(title) {
   topbarTitle.innerHTML = `${escapeHtml(title)}<span>· RakanKampus AI</span>`;
+  setTopicChip(currentTopic);
 }
 
 function openConversation(id) {
@@ -1630,9 +1819,16 @@ function openConversation(id) {
       app.classList.remove('is-empty');
       chatArea.innerHTML = '';
       currentConversationId = id;
-      messages.forEach(m => addMessage(m.message, m.sender, { id: m.id, rating: m.rating }));
+      let lastBot = null;
+      messages.forEach(m => {
+        const meta = { id: m.id, rating: m.rating, fromKb: !!m.from_kb, topic: m.topic || null };
+        const r = addMessage(m.message, m.sender, meta);
+        if (m.sender === 'bot') lastBot = { r, m, meta };
+      });
       const conv = conversationsCache.find(c => c.id === id);
       if (conv) setTitle(conv.title);
+      if (lastBot) showAnswerExtras(lastBot.r, lastBot.m.message, lastBot.meta, []);
+      else renderInfoPanel(null);
       renderRecentList();
       if (isMobile()) setSidebarOpen(false);
     });
@@ -1641,6 +1837,7 @@ function openConversation(id) {
 function startNewChat() {
   stopSpeaking();
   clearSuggestions();
+  renderInfoPanel(null);
   if (currentController) currentController.abort();
   currentConversationId = null;
   showEmptyState();

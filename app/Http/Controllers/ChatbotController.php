@@ -196,6 +196,9 @@ $reply = trim($reply);;
             'conversation_id' => $conversation->id,
             'message_id' => $botMessage->id,
             'suggestions' => $this->suggestQuestions($entries, $conversation, $message),
+            // shown as "From the PUO knowledge base" + the topic chip in the chat
+            'from_kb' => $entries->isNotEmpty(),
+            'topic' => $entries->isNotEmpty() ? ($entries->first()->category ?: null) : null,
         ]);
     }
 
@@ -323,7 +326,23 @@ $reply = trim($reply);;
         $messages = $conversation->messages()
             ->orderBy('created_at')
             ->orderBy('id')
-            ->get(['id', 'sender', 'message', 'rating']);
+            ->get(['id', 'sender', 'message', 'rating', 'knowledge_base_id']);
+
+        // A bot answer came from the knowledge base when the question before it matched an entry
+        $topics = KnowledgeBase::whereIn('id', $messages->pluck('knowledge_base_id')->filter()->unique())->pluck('category', 'id');
+        $lastKb = null;
+        $messages = $messages->map(function ($m) use (&$lastKb, $topics) {
+            if ($m->sender === 'user') {
+                $lastKb = $m->knowledge_base_id;
+            }
+            $row = ['id' => $m->id, 'sender' => $m->sender, 'message' => $m->message, 'rating' => $m->rating];
+            if ($m->sender === 'bot') {
+                $row['from_kb'] = (bool) $lastKb;
+                $row['topic'] = $lastKb ? ($topics[$lastKb] ?? null) : null;
+            }
+
+            return $row;
+        });
 
         return response()->json($messages);
     }

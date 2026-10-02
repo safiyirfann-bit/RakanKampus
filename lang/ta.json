@@ -483,5 +483,13 @@
     "The end date cannot be before the start date.": "முடிவுத் தேதி தொடக்கத்துக்கு முன் இருக்கக்கூடாது.",
     "End time must be after the start time.": "முடிவு நேரம் தொடக்கத்துக்குப் பின் இருக்க வேண்டும்.",
     "Tomorrow": "நாளை",
-    "You might also ask": "நீங்கள் இதையும் கேட்கலாம்"
+    "You might also ask": "நீங்கள் இதையும் கேட்கலாம்",
+    "From the PUO knowledge base": "PUO அறிவுத் தளத்திலிருந்து",
+    "Quick answer": "சுருக்கமான பதில்",
+    "Related topics": "தொடர்புடைய தலைப்புகள்",
+    "Actions": "செயல்கள்",
+    "Set a reminder": "நினைவூட்டல் அமை",
+    "Set reminder": "நினைவூட்டல் அமை",
+    "Copy answer": "பதிலை நகலெடு",
+    "Info panel": "தகவல் பலகை"
 }
