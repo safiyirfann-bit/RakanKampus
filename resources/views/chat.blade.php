@@ -408,7 +408,8 @@
   body { background: #f7fafc; }
   .main { background: transparent; }
   .aurora i:nth-child(4) { width: 440px; height: 360px; right: 8%; bottom: -160px; background: #fbcfe8; opacity: .4; animation-delay: -9s; }
-  .sidebar, .rail { position: relative; z-index: 2; }
+  /* desktop only: on phones the sidebar is a fixed drawer above its backdrop */
+  @media (min-width: 861px) { .sidebar, .rail { position: relative; z-index: 2; } }
   .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 6px; }
   .online-pill { display: none; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: #0f766e; background: rgba(255,255,255,.75); border: 1px solid #fff; border-radius: 99px; padding: 5px 11px; white-space: nowrap; }
   .online-pill i { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; box-shadow: 0 0 0 3px rgba(34,197,94,.2); }
@@ -759,9 +760,6 @@ html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { back
       </button>
       <div class="topbar-title" id="topbarTitle">RakanKampus AI<span>· {{ __('Politeknik Assistant') }}</span></div>
       <span class="online-pill"><i></i>RakanKampus AI · {{ __('online') }}</span>
-      <button class="icon-btn mobile-only" id="topNewChatBtn" aria-label="{{ __('New Chat') }}" title="{{ __('New Chat') }}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
-      </button>
       <a class="icon-btn mobile-only" href="{{ route('student.home') }}" aria-label="{{ __('Home') }}" title="{{ __('Home') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11.5 12 4l9 7.5"></path><path d="M5 10v9a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1v-9"></path></svg>
       </a>
@@ -1394,7 +1392,7 @@ function addMessage(text, sender, meta = {}) {
     body.className = 'bot-body';
     const msg = document.createElement('div');
     msg.className = 'message';
-    msg.innerHTML = (meta.fromKb ? SRC_BADGE() : '') + formatBotText(text);
+    msg.innerHTML = formatBotText(text);
     body.appendChild(msg);
     if (meta.actions !== false) body.appendChild(buildActions(row, text, meta));
     row.appendChild(body);
@@ -1860,7 +1858,7 @@ function startNewChat() {
   if (isMobile()) setSidebarOpen(false);
 }
 document.getElementById('newChatBtn').addEventListener('click', startNewChat);
-document.getElementById('topNewChatBtn').addEventListener('click', startNewChat);
+document.getElementById('topNewChatBtn')?.addEventListener('click', startNewChat);
 
 /* ---------- Collapsed rail, Chats flyout & Search pop-up ---------- */
 const SVG_BUBBLE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.8 8.8 0 0 1-3.8-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.5 8.5 0 0 1 9 8.5z"></path></svg>`;
