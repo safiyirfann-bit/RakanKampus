@@ -329,6 +329,58 @@
   .suggestion:hover { border-color: #b7e4dd; background: #f7fcfb; transform: translateY(-1px); }
   .suggestion small { display: block; color: var(--faint); font-size: 12px; margin-top: 2px; }
 
+
+  /* ---------- New-chat welcome: glass blobs, greeting, sliding question rows ---------- */
+  .empty-state.welcome { justify-content: center; padding: 6px 0 24px; gap: 0; }
+  .wl-blobs { position: relative; width: min(520px, 100%); height: 210px; margin-bottom: 4px; }
+  .wl-g {
+    position: absolute; border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%;
+    background:
+      radial-gradient(circle at 30% 28%, rgba(255,255,255,.95) 0 6%, rgba(255,255,255,0) 18%),
+      radial-gradient(circle at 70% 75%, rgba(20,184,166,.55), rgba(20,184,166,0) 45%),
+      radial-gradient(circle at 25% 80%, rgba(14,165,233,.45), rgba(14,165,233,0) 45%),
+      radial-gradient(circle at 50% 50%, rgba(226,232,240,.9), rgba(148,163,184,.55) 70%, rgba(100,116,139,.5));
+    box-shadow: inset -14px -18px 40px rgba(15,29,46,.18), inset 12px 14px 30px rgba(255,255,255,.85), 0 26px 40px rgba(15,29,46,.12);
+    animation: wlMorph 9s ease-in-out infinite, wlFloat 6s ease-in-out infinite;
+  }
+  .wl-g::after { content: ""; position: absolute; inset: 14% 20% auto auto; width: 28%; height: 16%; border-radius: 50%; background: rgba(255,255,255,.75); filter: blur(4px); transform: rotate(-25deg); }
+  .wl-g1 { width: 46%; height: 82%; left: 4%; top: 12%; }
+  .wl-g2 { width: 42%; height: 76%; right: 2%; top: 2%; animation-delay: -3s, -2s; animation-duration: 11s, 7s; }
+  .wl-g3 { width: 24%; height: 46%; left: 40%; top: 52%; animation-delay: -6s, -4s; opacity: .9; }
+  .wl-bot { position: absolute; left: 50%; top: 50%; width: 76px; height: 84px; margin: -48px 0 0 -38px; filter: drop-shadow(0 12px 18px rgba(15,29,46,.25)); animation: wlFloat 4s ease-in-out infinite; }
+  @keyframes wlMorph {
+    0%, 100% { border-radius: 42% 58% 63% 37% / 45% 40% 60% 55%; transform: rotate(0); }
+    33% { border-radius: 58% 42% 38% 62% / 55% 62% 38% 45%; transform: rotate(8deg); }
+    66% { border-radius: 48% 52% 56% 44% / 38% 52% 48% 62%; transform: rotate(-6deg); }
+  }
+  @keyframes wlFloat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -12px; } }
+  .wl-pill { background: #fff; border-radius: 99px; padding: 6px 16px; font-size: 12.5px; font-weight: 700; color: var(--navy); box-shadow: 0 6px 16px rgba(15,29,46,.08); }
+  .empty-state h2.wl-title { font-size: 30px; line-height: 1.28; font-weight: 800; margin: 12px 0 18px; color: var(--navy); }
+  .wl-title em { font-style: normal; background: linear-gradient(90deg, #0d9488, #0ea5e9); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .wl-rows {
+    width: min(100%, 920px); display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+  .wl-row { display: flex; gap: 10px; width: max-content; animation: wlSlide 42s linear infinite; }
+  .wl-row.wl-r2 { animation-direction: reverse; animation-duration: 50s; }
+  .wl-row.wl-r3 { animation-duration: 46s; }
+  .wl-rows:hover .wl-row, .wl-rows:focus-within .wl-row { animation-play-state: paused; }
+  @keyframes wlSlide { to { transform: translateX(-50%); } }
+  .suggestion.wl-chip {
+    display: flex; align-items: center; gap: 9px; flex-shrink: 0; white-space: nowrap; transform: none;
+    padding: 9px 15px 9px 9px; border-radius: 16px; font-size: 13.5px; color: var(--navy);
+    background: rgba(255,255,255,.85); border: 1px solid #fff; box-shadow: 0 6px 14px rgba(15,29,46,.06);
+  }
+  .suggestion.wl-chip:hover { transform: translateY(-2px); background: #fff; border-color: #99f6e4; }
+  .wl-chip i { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; font-style: normal; font-size: 15px; flex-shrink: 0; }
+  .wl-composer { width: min(100%, var(--col)); }
+  @media (max-width: 860px) {
+    .wl-blobs { height: 180px; }
+    .empty-state h2.wl-title { font-size: 24px; margin: 10px 4px 14px; }
+    .suggestion.wl-chip { font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .wl-g, .wl-bot, .wl-row { animation: none; } }
   /* ---------- Composer ---------- */
   .composer { padding: 0 16px calc(14px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(to top, #fff 75%, rgba(255,255,255,0)); }
   .app.is-empty .composer { display: none; }
@@ -683,6 +735,11 @@ html[data-theme="dark"] .ip-rel { border-bottom-color: #2a3341; }
 html[data-theme="dark"] .ip-btn { background: #10161f; color: #dee2e8; }
 html[data-theme="dark"] .ip-btn.primary { background: linear-gradient(120deg, #14b8a6, #0e7490); color: #fff; }
 html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { background: #134e4a; color: #99f6e4; }
+html[data-theme="dark"] .wl-g { background: radial-gradient(circle at 30% 28%, rgba(255,255,255,.55) 0 6%, rgba(255,255,255,0) 18%), radial-gradient(circle at 70% 75%, rgba(20,184,166,.5), rgba(20,184,166,0) 45%), radial-gradient(circle at 25% 80%, rgba(14,165,233,.4), rgba(14,165,233,0) 45%), radial-gradient(circle at 50% 50%, rgba(51,65,85,.9), rgba(30,41,59,.75) 70%, rgba(15,23,42,.7)); box-shadow: inset -14px -18px 40px rgba(0,0,0,.35), inset 12px 14px 30px rgba(255,255,255,.12), 0 26px 40px rgba(0,0,0,.35); }
+html[data-theme="dark"] .wl-pill { background: #17202d; color: #dee2e8; }
+html[data-theme="dark"] .empty-state h2.wl-title { color: #e5e7eb; }
+html[data-theme="dark"] .suggestion.wl-chip { background: rgba(23,32,45,.85); border-color: #2a3341; color: #dee2e8; }
+html[data-theme="dark"] .suggestion.wl-chip:hover { background: #1f2a37; border-color: #2c6463; }
 @media (max-width: 860px) {
   html[data-theme="dark"] .sidebar { box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); }
 }
@@ -816,11 +873,49 @@ html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { back
 
 {{-- Empty state (new chat) --}}
 <template id="emptyTpl">
-  <div class="empty-state" id="emptyState">
-    <div class="hero-bot"><x-brand-logo size="34" /></div>
-    <h2 id="greeting"></h2>
-    <p>{{ __('What can I help you with today?') }}</p>
-    <div class="composer-box" style="width:100%">
+  @php
+    $topicIcons = [
+      'iPayment' => ['💳', '#e0f2fe'], 'SPMP' => ['💻', '#ede9fe'], 'Kantin' => ['🍛', '#ffedd5'], 'Surau' => ['🕌', '#dcfce7'],
+      'Sejarah' => ['🏛️', '#fef3c7'], 'Visi & Misi' => ['🎯', '#fce7f3'], 'Singkatan' => ['🔤', '#e0f2fe'], 'Program' => ['🎓', '#ede9fe'],
+      'Diploma' => ['🎓', '#ede9fe'], 'Asasi' => ['📘', '#e0f2fe'], 'Ijazah Sarjana Muda' => ['🎓', '#ede9fe'], 'Umum' => ['💡', '#fef3c7'],
+    ];
+    $iconFor = function ($topic) use ($topicIcons) {
+      if (isset($topicIcons[$topic])) return $topicIcons[$topic];
+      $t = mb_strtolower((string) $topic);
+      if (str_contains($t, 'lokasi') || str_contains($t, 'dewan')) return ['📍', '#dcfce7'];
+      if (str_contains($t, 'kelab') || str_contains($t, 'persatuan')) return ['🏆', '#fce7f3'];
+      if (str_contains($t, 'ketua') || str_contains($t, 'pengurusan')) return ['👤', '#ccfbf1'];
+      return $topic ? ['📚', '#fef3c7'] : ['🔥', '#ffedd5'];
+    };
+    $mq = collect($marqueeQuestions ?? [])->values();
+    $rows = [$mq->slice(0, 4), $mq->slice(4, 4), $mq->slice(8, 4)];
+  @endphp
+  <div class="empty-state welcome" id="emptyState">
+    <div class="wl-blobs" aria-hidden="true">
+      <span class="wl-g wl-g1"></span><span class="wl-g wl-g2"></span><span class="wl-g wl-g3"></span>
+      <x-brand-logo size="80" class="wl-bot" />
+    </div>
+    <span class="wl-pill">🤖 RakanKampus AI</span>
+    <h2 class="wl-title" id="greeting"></h2>
+
+    <div class="wl-rows" role="list" aria-label="{{ __('Suggested questions') }}">
+      @foreach($rows as $r => $row)
+        @if($row->isNotEmpty())
+        <div class="wl-row wl-r{{ $r + 1 }}">
+          @for($dup = 0; $dup < 2; $dup++)
+            @foreach($row as $q)
+              @php([$emoji, $bg] = $iconFor($q['topic']))
+              <button type="button" class="suggestion wl-chip" data-question="{{ $q['text'] }}" @if($dup) tabindex="-1" aria-hidden="true" @endif>
+                <i style="background: {{ $bg }}">{{ $emoji }}</i><span>{{ $q['text'] }}</span>
+              </button>
+            @endforeach
+          @endfor
+        </div>
+        @endif
+      @endforeach
+    </div>
+
+    <div class="composer-box wl-composer">
       <textarea class="hero-input" id="heroInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
       <button type="button" class="round-btn mic-btn hidden" id="heroMicBtn" aria-label="{{ __('Voice input') }}">
         <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path><path d="M19 11a7 7 0 0 1-14 0"></path><line x1="12" y1="18" x2="12" y2="22"></line></svg>
@@ -828,15 +923,6 @@ html[data-theme="dark"] .app:not(.is-empty):not(.panel-off) .panel-toggle { back
       <button class="round-btn send-btn" id="heroSendBtn" aria-label="{{ __('Send') }}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"></path><path d="m5 12 7-7 7 7"></path></svg>
       </button>
-    </div>
-    <div class="suggestions">
-      @foreach($quickQuestions as $i => $q)
-        @php($label = $q['popular'] ? $q['text'] : __($q['text']))
-        <button type="button" class="suggestion" data-question="{{ $label }}">
-          <span>{{ $suggestIcons[$i % count($suggestIcons)] }}</span>
-          <span>{{ $label }}@if($q['popular'])<small>🔥 {{ __('Popular') }}</small>@endif</span>
-        </button>
-      @endforeach
     </div>
   </div>
 </template>
@@ -1037,12 +1123,19 @@ function greetingText() {
   return FIRST_NAME ? `${g}, ${FIRST_NAME} 👋` : `${g} 👋`;
 }
 
+// "Hi, <Safiy>! / What can I help you with <today>?" with the name and last word in gradient
+function greetingHtml() {
+  const hi = FIRST_NAME ? `${escapeHtml(t('Hi'))}, <em>${escapeHtml(FIRST_NAME)}!</em>` : `${escapeHtml(t('Hi'))}! 👋`;
+  const line2 = `${escapeHtml(t('What can I help you with'))} <em>${escapeHtml(t('today'))}</em>?`;
+  return `${hi}<br>${line2}`;
+}
+
 function showEmptyState() {
   if (isListening) stopVoice();
   app.classList.add('is-empty');
   chatArea.innerHTML = '';
   const node = document.getElementById('emptyTpl').content.cloneNode(true);
-  node.getElementById('greeting').textContent = greetingText();
+  node.getElementById('greeting').innerHTML = greetingHtml();
   chatArea.appendChild(node);
   topbarTitle.innerHTML = DEFAULT_TITLE;
   currentTopic = null;

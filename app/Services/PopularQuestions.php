@@ -64,6 +64,57 @@ class PopularQuestions
         return $chips;
     }
 
+    /**
+     * Questions for the sliding rows on the new-chat screen: what students ask most,
+     * topped up with short knowledge-base questions from many different topics
+     * (so every chip is something the bot can answer). Cached for an hour.
+     *
+     * @return array<int, array{text: string, topic: ?string}>
+     */
+    public static function marquee(int $limit = 12): array
+    {
+        return Cache::remember('chat.marquee_questions.' . $limit, now()->addHour(), function () use ($limit) {
+            $out = [];
+            $seen = [];
+            foreach (self::compute(6) as $q) {
+                $out[] = ['text' => $q, 'topic' => null];
+                $seen[self::normalise($q)] = true;
+            }
+
+            $kb = \App\Models\KnowledgeBase::query()
+                ->whereRaw('LENGTH(question) BETWEEN 10 AND 48')
+                ->inRandomOrder()->limit(200)->get(['question', 'category']);
+            $perTopic = [];
+            foreach ($kb as $row) {
+                if (count($out) >= $limit) {
+                    break;
+                }
+                $topic = (string) $row->category;
+                if (($perTopic[$topic] ?? 0) >= 2) {
+                    continue; // keep the rows varied
+                }
+                $key = self::normalise($row->question);
+                if (isset($seen[$key])) {
+                    continue;
+                }
+                $seen[$key] = true;
+                $perTopic[$topic] = ($perTopic[$topic] ?? 0) + 1;
+                $out[] = ['text' => trim($row->question), 'topic' => $topic ?: null];
+            }
+
+            foreach (self::DEFAULTS as $q) {
+                if (count($out) >= $limit) {
+                    break;
+                }
+                if (! isset($seen[self::normalise($q)])) {
+                    $out[] = ['text' => __($q), 'topic' => null];
+                }
+            }
+
+            return $out;
+        });
+    }
+
     /** @return array<int, string> */
     private static function compute(int $limit): array
     {
