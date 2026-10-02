@@ -5,138 +5,139 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create Account - RakanKampus</title>
 {{--
-  Create Account — same glass look as the Login page.
-  Desktop: one wide card, brand panel on the left, the form two fields per row
-           on the right, so everything fits on one screen.
-  Mobile:  the same form split into 2 short steps
-           (1: name, email, matric → 2: password), no long scrolling.
+  Create Account — same look as the Login page (theme gradient + white glass sheet).
+  Top: a glass "student card" that fills in live as the student types
+       (name → initials avatar, matric number → programme name, password → "secured").
+  Phones: card on top, form below in 2 short steps (details → password).
+  Wider screens: split card, student card on the left, the whole form on the right.
 --}}
 <style>
 :root{
   --purple:#a78bfa; --pink:#f472b6; --blue:#60a5fa; --amber:#f59e0b;
-  --field-bg:rgba(255,255,255,.16); --field-border:rgba(255,255,255,.34);
-  --muted:#f3e8ff; --ph:rgba(255,255,255,.62);
+  --ink:#2e1065; --muted:#7c6aa8; --soft:#a596c9; --field:#f5f0ff; --link:#7c3aed; --link2:#db2777;
 }
 *{margin:0;padding:0;box-sizing:border-box}
+html,body{min-height:100%}
 body{
-  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:28px 16px;overflow-x:hidden;position:relative;color:#fff;
+  min-height:100vh;overflow-x:hidden;color:var(--ink);
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  background:linear-gradient(120deg,#a78bfa,#f472b6,#60a5fa,#a78bfa);background-size:300% 300%;
+  background:linear-gradient(120deg,var(--purple),var(--pink),var(--blue),var(--purple));background-size:300% 300%;
   animation:gradientShift 15s ease infinite;
 }
-@keyframes gradientShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
-.blob{position:fixed;border-radius:50%;filter:blur(50px);opacity:.45;pointer-events:none;z-index:0}
-.blob-1{width:320px;height:320px;background:var(--amber);top:-60px;left:-80px;animation:floatA 14s ease-in-out infinite}
-.blob-2{width:260px;height:260px;background:var(--blue);bottom:-60px;right:-60px;animation:floatB 18s ease-in-out infinite}
-@keyframes floatA{50%{transform:translate(40px,60px) scale(1.15)}}
-@keyframes floatB{50%{transform:translate(-30px,-40px) scale(1.1)}}
+@keyframes gradientShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+.blob{position:fixed;border-radius:50%;filter:blur(50px);opacity:.55;pointer-events:none;z-index:0}
+.blob-1{width:300px;height:300px;background:var(--amber);top:-80px;left:-90px;animation:floatA 12s ease-in-out infinite alternate}
+.blob-2{width:280px;height:280px;background:var(--blue);top:30%;right:-110px;animation:floatA 15s ease-in-out infinite alternate-reverse}
+@keyframes floatA{to{transform:translate(40px,50px) scale(1.15)}}
 
-.card{
-  position:relative;z-index:1;width:100%;max-width:900px;display:grid;grid-template-columns:300px 1fr;
-  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);border-radius:26px;overflow:hidden;
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 24px 60px rgba(0,0,0,.25);
-}
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+.shell{display:flex;flex-direction:column;flex:1}
 
-/* ---- left: brand panel ---- */
-.side{
-  padding:34px 26px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-  background:linear-gradient(160deg,rgba(255,255,255,.26),rgba(255,255,255,.05));border-right:1px solid rgba(255,255,255,.28);
-}
-.mascot-wrap{position:relative;animation:bob 4s ease-in-out infinite}
-@keyframes bob{50%{transform:translateY(-8px)}}
-.mascot{width:96px;height:96px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.22))}
-.bubble{position:absolute;top:-4px;right:-26px;background:#fff;border-radius:12px;padding:5px 8px;display:flex;gap:3px;box-shadow:0 6px 14px rgba(0,0,0,.18)}
-.bubble span{width:5px;height:5px;border-radius:50%;background:var(--purple);animation:dots 1.2s infinite ease-in-out}
-.bubble span:nth-child(2){animation-delay:.15s}.bubble span:nth-child(3){animation-delay:.3s}
-@keyframes dots{0%,60%,100%{transform:translateY(0);opacity:.6}30%{transform:translateY(-3px);opacity:1}}
-.brand{font-size:24px;font-weight:800;margin-top:10px}
-.tagline{font-size:13.5px;color:var(--muted);margin-top:2px}
-.perks{margin-top:24px;display:grid;gap:10px;width:100%;text-align:left}
-.perks div{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.18);padding:9px 12px;border-radius:12px}
-.perks svg{width:28px;height:28px;padding:6px;border-radius:9px;background:#fff;color:#c026d3;flex-shrink:0}
+/* ---------- live student card ---------- */
+.hero{display:flex;align-items:center;justify-content:center;padding:46px 22px 30px;min-height:250px}
+.idcard{position:relative;width:min(330px,100%);aspect-ratio:1.62;border-radius:22px;padding:16px 18px;color:#fff;overflow:hidden;
+  background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(255,255,255,.12));border:1px solid rgba(255,255,255,.55);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 20px 40px rgba(46,16,101,.25);
+  transform:rotate(-3deg);animation:cardFloat 4.5s ease-in-out infinite}
+@keyframes cardFloat{50%{transform:rotate(-1deg) translateY(-6px)}}
+.idcard:after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-100%);animation:shine 4s ease-in-out infinite}
+@keyframes shine{55%,100%{transform:translateX(100%)}}
+.idc-top{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:1.2px}
+.idc-top svg{width:34px;height:34px;filter:drop-shadow(0 3px 6px rgba(46,16,101,.3))}
+.idc-body{display:flex;gap:14px;margin-top:12px;align-items:center}
+.idc-ph{width:66px;height:80px;border-radius:14px;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.45);
+  display:grid;place-items:center;font-size:26px;font-weight:800;flex:none;transition:transform .25s}
+.idc-ph.pop{animation:phPop .35s ease}
+@keyframes phPop{50%{transform:scale(1.12)}}
+.idc-info{min-width:0;flex:1}
+.idc-lbl{font-size:9px;opacity:.85;letter-spacing:.8px;text-transform:uppercase}
+.idc-val{font-size:16px;font-weight:800;min-height:21px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.idc-val.dim{opacity:.55;font-weight:600}
+.idc-chip{position:absolute;right:18px;top:58px;width:34px;height:26px;border-radius:6px;background:linear-gradient(135deg,#fde68a,#f59e0b);opacity:.9}
+.idc-foot{position:absolute;left:18px;right:18px;bottom:13px;display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:700;gap:10px}
+.idc-foot span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.idc-lock{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.25);flex:none;transition:background .2s}
+.idc-lock.ok{background:#22c55e}
 
-/* ---- right: form ---- */
-.main{padding:30px 34px 26px}
-.head h1{font-size:25px;font-weight:800;letter-spacing:-.01em}
-.head p{font-size:13.5px;color:var(--muted);margin:3px 0 18px}
-.head .mini{display:none}
+/* ---------- form sheet ---------- */
+.sheet{flex:1;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+  border-radius:30px 30px 0 0;padding:26px 22px 22px;box-shadow:0 -12px 34px rgba(46,16,101,.18)}
+.head h1{font-size:25px;font-weight:800;letter-spacing:-.4px}
+.head p{font-size:13.5px;color:var(--muted);margin:3px 0 16px}
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.field{margin-bottom:13px;min-width:0}
-label{display:block;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
-.input{
-  width:100%;height:46px;padding:0 14px;border-radius:12px;border:1px solid var(--field-border);background:var(--field-bg);
-  color:#fff;font-size:15px;outline:none;font-family:inherit;transition:border-color .15s,background .15s,box-shadow .15s;
-}
-.input::placeholder{color:var(--ph)}
-.input:focus{border-color:rgba(255,255,255,.75);background:rgba(255,255,255,.22);box-shadow:0 0 0 3px rgba(255,255,255,.14)}
-.pw-wrap{position:relative}
-.pw-wrap .input{padding-right:44px}
-.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;background:none;color:rgba(255,255,255,.85);cursor:pointer;border-radius:8px;display:grid;place-items:center}
-.eye svg{width:19px;height:19px}.eye .off{display:none}.eye.on .on{display:none}.eye.on .off{display:block}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field{margin-bottom:11px;min-width:0}
+.box{position:relative;display:flex;align-items:center;height:50px;border-radius:25px;background:var(--field);border:1.5px solid transparent;
+  padding:0 16px;gap:10px;transition:border-color .2s,box-shadow .2s,background .2s}
+.box:focus-within{background:#fff;border-color:var(--purple);box-shadow:0 0 0 4px rgba(167,139,250,.2)}
+.box > svg{width:18px;height:18px;flex:none;color:var(--soft)}
+.box:focus-within > svg{color:var(--purple)}
+.input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;font-size:15px;color:var(--ink);font-family:inherit}
+.input::placeholder{color:var(--soft)}
+.box:has(.matric-input-err){border-color:#f87171;box-shadow:0 0 0 4px rgba(248,113,113,.18)}
+.box:has(.matric-input-ok){border-color:#86efac}
+.eye{width:34px;height:34px;border:0;background:none;color:var(--soft);cursor:pointer;border-radius:50%;display:grid;place-items:center;flex:none;margin-right:-8px}
+.eye svg{width:19px;height:19px}.eye .off{display:none}.eye.on .on{display:none}.eye.on .off{display:block}.eye.on{color:var(--purple)}
 
-/* password strength box: header + bar + the 5 requirements with ✕ / ✓ */
-.pw-box{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);border-radius:16px;padding:12px 16px 12px;margin:2px 0 14px}
-.pw-head{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
-.strength{font-size:11.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;transition:color .2s}
-.bar-track{height:6px;border-radius:9px;background:rgba(255,255,255,.28);margin:9px 0 10px;overflow:hidden}
+/* password strength */
+.pw-box{background:var(--field);border-radius:18px;padding:12px 16px;margin:2px 0 12px}
+.pw-head{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.strength{font-size:11.5px;font-weight:800;text-transform:uppercase;transition:color .2s}
+.bar-track{height:6px;border-radius:9px;background:#e9e1fb;margin:9px 0 10px;overflow:hidden}
 .bar-fill{height:100%;width:0;border-radius:9px;transition:width .25s ease,background .25s ease}
-.req-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 18px}
-.req-list li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:#fff;transition:color .2s}
-.req-list .icon{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:rgba(254,202,202,.9);color:#dc2626;transition:background .2s,color .2s}
+.req-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
+.req-list li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.req-list .icon{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;background:#fee2e2;color:#dc2626;transition:background .2s,color .2s}
 .req-list .icon svg{width:10px;height:10px}
 .req-list .icon-check{display:none}
-.req-list li.valid .icon{background:#bbf7d0;color:#15803d}
+.req-list li.valid{color:var(--ink)}
+.req-list li.valid .icon{background:#dcfce7;color:#15803d}
 .req-list li.valid .icon-cross{display:none}
 .req-list li.valid .icon-check{display:block}
-.req-list li.valid span.txt{opacity:.85}
-@media (max-width:760px){.req-list{grid-template-columns:1fr}}
 
-/* matric + inline messages */
-.matric-msg{font-size:12px;margin-top:6px;line-height:1.35}
+.matric-msg{font-size:12px;margin:6px 6px 0;line-height:1.35}
 .matric-msg:empty{display:none}
-.matric-hint{color:var(--muted)}
-.matric-ok{color:#bbf7d0;font-weight:700}
-.matric-err,.password-error{color:#fff;background:rgba(220,38,38,.28);border:1px solid rgba(254,202,202,.55);border-radius:10px;padding:6px 10px;font-weight:600}
+.matric-hint{color:var(--soft)}
+.matric-ok{color:#15803d;font-weight:700}
+.matric-err,.password-error{color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:6px 10px;font-weight:600}
 .password-error{display:none;font-size:12.5px;margin:2px 0 10px}
-.matric-input-err{border-color:#fecaca !important;box-shadow:0 0 0 3px rgba(248,113,113,.3) !important}
-.matric-input-ok{border-color:#bbf7d0 !important}
-.error-banner{background:rgba(239,68,68,.2);border:1px solid rgba(254,202,202,.55);border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:13.5px}
+.error-banner{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;border-radius:14px;padding:10px 14px;margin-bottom:14px;font-size:13.5px}
 .error-banner ul{list-style:none;display:grid;gap:3px}
 
-.btn{
-  width:100%;height:48px;border:0;border-radius:12px;cursor:pointer;font-family:inherit;
-  font-size:15.5px;font-weight:800;color:#fff;background:linear-gradient(120deg,var(--purple),var(--pink));
-  box-shadow:0 8px 20px rgba(120,40,140,.25);transition:transform .1s,box-shadow .15s;
-}
-.btn:hover{box-shadow:0 10px 24px rgba(0,0,0,.25)}.btn:active{transform:translateY(1px)}
-.btn.ghost{background:rgba(255,255,255,.2);box-shadow:none;border:1px solid rgba(255,255,255,.3)}
+.btn{width:100%;height:50px;border:0;border-radius:25px;cursor:pointer;font-family:inherit;font-size:15.5px;font-weight:800;color:#fff;
+  background:linear-gradient(90deg,var(--purple),var(--pink));box-shadow:0 10px 24px rgba(244,114,182,.35);transition:transform .15s,box-shadow .15s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(1px)}
+.btn.ghost{background:var(--field);color:var(--link);box-shadow:none}
 .actions{margin-top:6px}
 .btn-next,.btn-back{display:none}
-.signin{text-align:center;font-size:14px;color:var(--muted);margin-top:14px}
-.signin a{color:#fff;font-weight:800;text-decoration:underline}
+.signin{text-align:center;font-size:14px;color:var(--muted);margin-top:16px}
+.signin a{color:var(--link2);font-weight:800;text-decoration:none}
+.copy{text-align:center;font-size:11.5px;color:var(--soft);margin-top:14px}
 
-/* stepper (mobile only) */
-.steps{display:none;align-items:center;gap:8px;margin:0 0 16px}
-.steps .dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;background:rgba(255,255,255,.25);flex-shrink:0;transition:background .2s,color .2s}
-.steps .dot.on{background:#fff;color:#c026d3}
-.steps small{font-size:12px;font-weight:700;white-space:nowrap}
-.steps .ln{flex:1;height:3px;border-radius:9px;background:rgba(255,255,255,.3);transition:background .2s}
-.steps .ln.on{background:#fff}
+/* stepper (phones) */
+.steps{display:none;align-items:center;gap:8px;margin:0 0 16px;font-size:12px;font-weight:700;color:var(--soft)}
+.steps .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;background:#ede9fe;color:var(--link);flex-shrink:0;transition:all .2s}
+.steps .dot.on{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff}
+.steps small{font-size:12px;white-space:nowrap}
+.steps small.on{color:var(--ink)}
+.steps .ln{flex:1;height:3px;border-radius:9px;background:#ede9fe;overflow:hidden}
+.steps .ln i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .35s}
 
-footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
-
-/* ================= mobile: 2 steps ================= */
-@media (max-width:760px){
-  body{justify-content:flex-start;padding-top:22px}
-  .card{grid-template-columns:1fr;max-width:460px}
-  .side{display:none}
-  .main{padding:24px 22px 22px}
-  .head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-  .head .mini{display:block;width:58px;height:58px;flex-shrink:0;filter:drop-shadow(0 6px 10px rgba(0,0,0,.18))}
-  .head h1{font-size:22px}
-  .head p{margin:2px 0 0;font-size:12.5px}
+/* ================= wider screens: split card ================= */
+@media (min-width:861px){
+  .wrap{align-items:center;justify-content:center;padding:32px}
+  .shell{flex:none;flex-direction:row;width:100%;max-width:1000px;min-height:600px;border-radius:32px;overflow:hidden;
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(46,16,101,.3)}
+  .hero{flex:.9;padding:48px 40px}
+  .sheet{flex:1.1;border-radius:0;padding:40px 44px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
+}
+/* ================= phones: 2 steps ================= */
+@media (max-width:860px){
+  .blob{filter:blur(38px)}
+  .blob-1{width:62vw;height:62vw;top:-40px;left:-50px}
+  .blob-2{width:64vw;height:64vw;top:170px;right:-80px}
   .steps{display:flex}
   .row.split{grid-template-columns:1fr}
   .form[data-step="1"] .s2{display:none}
@@ -149,7 +150,8 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
   .form .step-in{animation:stepIn .25s ease}
   @keyframes stepIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 }
-@media (prefers-reduced-motion:reduce){body,.blob,.mascot-wrap,.bubble span{animation:none !important}}
+@media (max-width:380px){ .row{grid-template-columns:1fr} .req-list{grid-template-columns:1fr} }
+@media (prefers-reduced-motion:reduce){body,.blob,.idcard,.idcard:after{animation:none !important}}
 </style>
 </head>
 <body>
@@ -157,37 +159,49 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 
-<div class="card">
+@php
+  $ic = [
+    'user' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></svg>',
+    'mail' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg>',
+    'id'   => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="9" cy="11" r="2"/><path d="M14 10h4M14 14h4M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2"/></svg>',
+    'lock' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>',
+    'eye'  => '<svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>',
+    'x'    => '<svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg>',
+  ];
+@endphp
 
-  <!-- Brand panel (desktop) -->
-  <aside class="side">
-    <div class="mascot-wrap">
-      <x-brand-logo size="96" class="mascot" />
-      <div class="bubble"><span></span><span></span><span></span></div>
+<div class="wrap">
+ <div class="shell">
+
+  <!-- Live student card -->
+  <div class="hero" aria-hidden="true">
+    <div class="idcard">
+      <div class="idc-top"><span>{{ __('STUDENT CARD') }} · PUO</span><x-brand-logo size="34" /></div>
+      <div class="idc-chip"></div>
+      <div class="idc-body">
+        <div class="idc-ph" id="cardInit">?</div>
+        <div class="idc-info">
+          <div class="idc-lbl">{{ __('Name') }}</div>
+          <div class="idc-val dim" id="cardName">{{ __('Your name') }}</div>
+          <div class="idc-lbl">{{ __('Matric number') }}</div>
+          <div class="idc-val dim" id="cardMatric">01XXX00X0000</div>
+        </div>
+      </div>
+      <div class="idc-foot"><span id="cardProg">RakanKampus</span><span class="idc-lock" id="cardLock">🔒 <span id="cardLockTxt">{{ __('Password') }}</span></span></div>
     </div>
-    <div class="brand">RakanKampus</div>
-    <div class="tagline">{{ __('Your Politeknik AI Assistant') }}</div>
-    <div class="perks">
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>{{ __('Ask anything about PUO') }}</div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M5 3 2 6M19 3l3 3"/></svg>{{ __('Reminders for assignments & quizzes') }}</div>
-      <div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>{{ __('Your class timetable in one place') }}</div>
-    </div>
-  </aside>
+  </div>
 
   <!-- Form -->
-  <div class="main">
+  <div class="sheet">
     <div class="head">
-      <x-brand-logo size="58" class="mini" />
-      <div>
-        <h1 id="formTitle">{{ __('Create Account') }}</h1>
-        <p id="formSub">{{ __('Sign up with your PUO email & matric number') }}</p>
-      </div>
+      <h1 id="formTitle">{{ __('Create Account') }}</h1>
+      <p id="formSub">{{ __('Sign up with your email & matric number') }}</p>
     </div>
 
     <div class="steps" aria-hidden="true">
-      <span class="dot on" id="dot1">1</span><small>{{ __('Your details') }}</small>
-      <span class="ln" id="stepLine"></span>
-      <span class="dot" id="dot2">2</span><small>{{ __('Password') }}</small>
+      <span class="dot on" id="dot1">1</span><small class="on" id="lbl1">{{ __('Your details') }}</small>
+      <span class="ln"><i id="stepLine"></i></span>
+      <span class="dot" id="dot2">2</span><small id="lbl2">{{ __('Password') }}</small>
     </div>
 
     <form method="POST" action="{{ route('register') }}" class="form" id="regForm" data-step="1" novalidate>
@@ -207,22 +221,22 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
       <div class="s1">
         <div class="row">
           <div class="field">
-            <label for="firstName">{{ __('First name') }}</label>
-            <input class="input" type="text" name="first_name" id="firstName" placeholder="e.g. Ahmad" value="{{ old('first_name') }}" autocomplete="given-name" required>
+            <label class="sr" for="firstName">{{ __('First name') }}</label>
+            <div class="box">{!! $ic['user'] !!}<input class="input" type="text" name="first_name" id="firstName" placeholder="{{ __('First name') }}" value="{{ old('first_name') }}" autocomplete="given-name" required></div>
           </div>
           <div class="field">
-            <label for="lastName">{{ __('Last name') }}</label>
-            <input class="input" type="text" name="last_name" id="lastName" placeholder="e.g. Razif" value="{{ old('last_name') }}" autocomplete="family-name" required>
+            <label class="sr" for="lastName">{{ __('Last name') }}</label>
+            <div class="box"><input class="input" type="text" name="last_name" id="lastName" placeholder="{{ __('Last name') }}" value="{{ old('last_name') }}" autocomplete="family-name" required></div>
           </div>
         </div>
         <div class="row split">
           <div class="field">
-            <label for="emailInput">{{ __('Email address') }}</label>
-            <input class="input" type="email" name="email" id="emailInput" placeholder="you@student.puo.edu.my" value="{{ old('email') }}" autocomplete="email" required>
+            <label class="sr" for="emailInput">{{ __('Email address') }}</label>
+            <div class="box">{!! $ic['mail'] !!}<input class="input" type="email" name="email" id="emailInput" placeholder="you@gmail.com" value="{{ old('email') }}" autocomplete="email" required></div>
           </div>
           <div class="field">
-            <label for="matricInput">{{ __('Matric Number (PUO)') }}</label>
-            <input class="input" type="text" name="student_id" id="matricInput" placeholder="e.g. 01DKA23F0456" value="{{ old('student_id') }}" maxlength="16" autocomplete="off">
+            <label class="sr" for="matricInput">{{ __('Matric Number (PUO)') }}</label>
+            <div class="box">{!! $ic['id'] !!}<input class="input" type="text" name="student_id" id="matricInput" placeholder="{{ __('Matric number') }}" value="{{ old('student_id') }}" maxlength="16" autocomplete="off"></div>
             <p id="matricMsg" class="matric-msg"></p>
           </div>
         </div>
@@ -232,35 +246,25 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
       <div class="s2">
         <div class="row split">
           <div class="field">
-            <label for="password">{{ __('Password') }}</label>
-            <div class="pw-wrap">
-              <input class="input" type="password" name="password" id="password" placeholder="{{ __('Create a password') }}" oninput="checkPassword()" autocomplete="new-password">
-              <button type="button" class="eye" onclick="togglePw(this)" aria-label="{{ __('Show password') }}">
-                <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-              </button>
-            </div>
+            <label class="sr" for="password">{{ __('Password') }}</label>
+            <div class="box pw-wrap">{!! $ic['lock'] !!}<input class="input" type="password" name="password" id="password" placeholder="{{ __('Create a password') }}" oninput="checkPassword()" autocomplete="new-password">
+              <button type="button" class="eye" onclick="togglePw(this)" aria-label="{{ __('Show password') }}">{!! $ic['eye'] !!}</button></div>
           </div>
           <div class="field">
-            <label for="password_confirmation">{{ __('Confirm password') }}</label>
-            <div class="pw-wrap">
-              <input class="input" type="password" name="password_confirmation" id="password_confirmation" placeholder="{{ __('Re-enter your password') }}" oninput="clearError()" autocomplete="new-password">
-              <button type="button" class="eye" onclick="togglePw(this)" aria-label="{{ __('Show password') }}">
-                <svg class="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
-                <svg class="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
-              </button>
-            </div>
+            <label class="sr" for="password_confirmation">{{ __('Confirm password') }}</label>
+            <div class="box pw-wrap">{!! $ic['lock'] !!}<input class="input" type="password" name="password_confirmation" id="password_confirmation" placeholder="{{ __('Re-enter your password') }}" oninput="clearError()" autocomplete="new-password">
+              <button type="button" class="eye" onclick="togglePw(this)" aria-label="{{ __('Show password') }}">{!! $ic['eye'] !!}</button></div>
           </div>
         </div>
         <div class="pw-box">
           <div class="pw-head"><span>{{ __('Password strength') }}</span><span class="strength" id="strengthLabel">-</span></div>
           <div class="bar-track"><div class="bar-fill" id="strengthBar"></div></div>
           <ul class="req-list">
-            <li id="req-length"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('At least 6 characters') }}</span></li>
-            <li id="req-upper"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One uppercase letter (A-Z)') }}</span></li>
-            <li id="req-lower"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One lowercase letter (a-z)') }}</span></li>
-            <li id="req-number"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One number (0-9)') }}</span></li>
-            <li id="req-special"><span class="icon"><svg class="icon-cross" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 5l10 10M15 5L5 15"/></svg><svg class="icon-check" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="3"><path d="M4 10l4 4 8-8"/></svg></span><span class="txt">{{ __('One special character (!@#$%^&*)') }}</span></li>
+            <li id="req-length"><span class="icon">{!! $ic['x'] !!}</span><span class="txt">{{ __('At least 6 characters') }}</span></li>
+            <li id="req-upper"><span class="icon">{!! $ic['x'] !!}</span><span class="txt">{{ __('One uppercase letter (A-Z)') }}</span></li>
+            <li id="req-lower"><span class="icon">{!! $ic['x'] !!}</span><span class="txt">{{ __('One lowercase letter (a-z)') }}</span></li>
+            <li id="req-number"><span class="icon">{!! $ic['x'] !!}</span><span class="txt">{{ __('One number (0-9)') }}</span></li>
+            <li id="req-special"><span class="icon">{!! $ic['x'] !!}</span><span class="txt">{{ __('One special character (!@#$%^&*)') }}</span></li>
           </ul>
         </div>
         <p class="password-error" id="passwordError"></p>
@@ -274,10 +278,12 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
 
       <p class="signin">{{ __('Already have an account?') }} <a href="{{ route('login') }}">{{ __('Sign in') }}</a></p>
     </form>
-  </div>
-</div>
 
-<footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
+    <p class="copy">© {{ date('Y') }} RakanKampus · Politeknik Ungku Omar</p>
+  </div>
+
+ </div>
+</div>
 
 @php
   $matricText = [
@@ -290,7 +296,7 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
   $matricCodes = config('programs.codes');
   $T = [
     'create' => __('Create Account'),
-    'createSub' => __('Sign up with your PUO email & matric number'),
+    'createSub' => __('Sign up with your email & matric number'),
     'almost' => __('Almost there, :name!'),
     'almostSub' => __('Create a password for your account'),
     'fillAll' => __('Please fill in your name and email.'),
@@ -305,7 +311,7 @@ footer{position:relative;z-index:1;margin-top:18px;color:var(--muted);font-size:
 <script>
 const T = @json($T);
 const form = document.getElementById('regForm');
-const mobile = window.matchMedia('(max-width: 760px)');
+const mobile = window.matchMedia('(max-width: 860px)');
 
 // ---------- password strength ----------
 function pwChecks(p) {
@@ -324,9 +330,9 @@ function checkPassword() {
   const score = Object.values(c).filter(Boolean).length;
   const [pct, text, color] =
     p.length === 0 ? [0, '-', ''] :
-    score <= 2 ? [25, T.weak, '#fca5a5'] :
-    score === 3 ? [50, T.fair, '#fdba74'] :
-    score === 4 ? [75, T.good, '#fde047'] : [100, T.strong, '#86efac'];
+    score <= 2 ? [25, T.weak, '#ef4444'] :
+    score === 3 ? [50, T.fair, '#f97316'] :
+    score === 4 ? [75, T.good, '#eab308'] : [100, T.strong, '#16a34a'];
   const bar = document.getElementById('strengthBar');
   bar.style.width = pct + '%'; bar.style.background = color;
   const label = document.getElementById('strengthLabel');
@@ -351,7 +357,9 @@ function goStep(n) {
   form.dataset.step = n;
   document.getElementById('dot1').textContent = n === 2 ? '✓' : '1';
   document.getElementById('dot2').classList.toggle('on', n === 2);
-  document.getElementById('stepLine').classList.toggle('on', n === 2);
+  document.getElementById('stepLine').style.width = n === 2 ? '100%' : '0';
+  document.getElementById('lbl1').classList.toggle('on', n === 1);
+  document.getElementById('lbl2').classList.toggle('on', n === 2);
   // The friendly "Almost there" heading is for the 2-step (mobile) layout only
   const first = document.getElementById('firstName').value.trim();
   const two = mobile.matches && n === 2;
@@ -428,6 +436,34 @@ if (!mobile.matches) document.getElementById('firstName').blur();
   input.addEventListener('input', () => { input.value = input.value.toUpperCase(); show(false); });
   input.addEventListener('blur', () => { touched = true; show(false); });
   show(false);
+})();
+</script>
+<script>
+// ---------- live student card ----------
+(function () {
+  const PROG = @json($matricCodes);
+  const CT = @json(['name' => __('Your name'), 'pw' => __('Password'), 'secured' => __('Secured')]);
+  const $ = id => document.getElementById(id);
+  const first = $('firstName'), last = $('lastName'), matric = $('matricInput'), pw = $('password');
+  let lastInit = '';
+  function update() {
+    const f = first.value.trim(), l = last.value.trim();
+    const name = (f + ' ' + l).trim();
+    $('cardName').textContent = name || CT.name;
+    $('cardName').classList.toggle('dim', !name);
+    const init = ((f[0] || '') + (l[0] || '')).toUpperCase() || '?';
+    if (init !== lastInit) { const ph = $('cardInit'); ph.textContent = init; ph.classList.remove('pop'); void ph.offsetWidth; ph.classList.add('pop'); lastInit = init; }
+    const m = matric.value.replace(/[\s-]/g, '').toUpperCase();
+    $('cardMatric').textContent = m || '01XXX00X0000';
+    $('cardMatric').classList.toggle('dim', !m);
+    const code = (m.match(/^01([A-Z]{3})/) || [])[1];
+    $('cardProg').textContent = (code && PROG[code]) || 'RakanKampus';
+    const ok = Object.values(pwChecks(pw.value)).every(Boolean);
+    $('cardLock').classList.toggle('ok', ok);
+    $('cardLockTxt').textContent = ok ? CT.secured : CT.pw;
+  }
+  [first, last, matric, pw].forEach(i => i.addEventListener('input', update));
+  update();
 })();
 </script>
 </body>
