@@ -17,7 +17,7 @@
   :root{
     --lg-purple:#a78bfa; --lg-pink:#f472b6; --lg-blue:#60a5fa; --lg-amber:#f59e0b;
     --lg-ink:#2e1065; --lg-muted:#7c6aa8; --lg-soft:#a596c9;
-    --lg-sheet:rgba(255,255,255,.94); --lg-field:#f5f0ff; --lg-field-focus:#ffffff; --lg-link:#7c3aed; --lg-link2:#db2777;
+    --lg-sheet:rgba(255,255,255,.9); --lg-field:#f5f0ff; --lg-field-focus:#ffffff; --lg-link:#7c3aed; --lg-link2:#db2777;
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
@@ -26,9 +26,14 @@
     animation:lgShift 15s ease infinite;min-height:100vh;overflow-x:hidden}
   @keyframes lgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
-  .lg-blob{position:fixed;border-radius:50%;filter:blur(50px);opacity:.5;pointer-events:none;z-index:0}
+  .lg-blob{position:fixed;border-radius:50%;filter:blur(50px);opacity:.55;pointer-events:none;z-index:0}
   .lg-b1{width:300px;height:300px;background:var(--lg-amber);top:-80px;left:-90px;animation:lgFloat 12s ease-in-out infinite alternate}
   .lg-b2{width:280px;height:280px;background:var(--lg-blue);top:30%;right:-110px;animation:lgFloat 15s ease-in-out infinite alternate-reverse}
+  @media (max-width: 860px){
+    .lg-blob{filter:blur(38px)}
+    .lg-b1{width:62vw;height:62vw;top:-40px;left:-50px}
+    .lg-b2{width:64vw;height:64vw;top:170px;right:-80px}
+  }
   @keyframes lgFloat{to{transform:translate(40px,50px) scale(1.15)}}
 
   .lg{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
@@ -37,7 +42,8 @@
   /* ---- chat demo ---- */
   .lg-demo{width:100%;max-width:330px;display:flex;flex-direction:column;gap:9px;min-height:200px}
   .lg-hdr{display:flex;align-items:center;gap:10px;margin-bottom:6px}
-  .lg-hdr .lg-av{width:44px;height:44px;border-radius:15px;background:#fff;display:grid;place-items:center;box-shadow:0 6px 16px rgba(46,16,101,.2)}
+  .lg-hdr .lg-av{width:46px;height:46px;display:grid;place-items:center;filter:drop-shadow(0 6px 10px rgba(46,16,101,.3));animation:lgBob 3s ease-in-out infinite}
+  @keyframes lgBob{50%{transform:translateY(-3px)}}
   .lg-hdr b{display:block;color:#fff;font-size:16px;letter-spacing:-.2px}
   .lg-hdr span{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.9);font-size:12px}
   .lg-hdr span:before{content:"";width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.3)}
@@ -104,7 +110,7 @@
   <div class="lg-hero">
     <div class="lg-demo" id="lgDemo" aria-hidden="true">
       <div class="lg-hdr">
-        <div class="lg-av"><x-brand-logo size="36" /></div>
+        <div class="lg-av"><x-brand-logo size="46" /></div>
         <div><b>RakanKampus</b><span>{{ __('Online') }}</span></div>
       </div>
     </div>
