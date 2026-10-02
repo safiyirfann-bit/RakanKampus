@@ -11,7 +11,7 @@
   Student login. Top: the theme gradient with a small live chat demo (a question is
   asked, the robot "types", the answer appears, then the next example). Bottom: the
   form as a white glass sheet. Phones get it full screen; wider screens get it as a
-  split card (demo on the left, form on the right). Follows the device's dark setting.
+  split card (demo on the left, form on the right).
 --}}
 <style>
   :root{
@@ -19,16 +19,11 @@
     --lg-ink:#2e1065; --lg-muted:#7c6aa8; --lg-soft:#a596c9;
     --lg-sheet:rgba(255,255,255,.94); --lg-field:#f5f0ff; --lg-field-focus:#ffffff; --lg-link:#7c3aed; --lg-link2:#db2777;
   }
-  @media (prefers-color-scheme: dark){
-    :root{ --lg-ink:#f5f3ff; --lg-muted:#c4b5fd; --lg-soft:#a78bfa;
-      --lg-sheet:rgba(26,18,56,.9); --lg-field:rgba(255,255,255,.07); --lg-field-focus:rgba(255,255,255,.12); --lg-link:#c4b5fd; --lg-link2:#f9a8d4; }
-  }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--lg-ink);
     background:linear-gradient(120deg,var(--lg-purple),var(--lg-pink),var(--lg-blue),var(--lg-purple));background-size:300% 300%;
     animation:lgShift 15s ease infinite;min-height:100vh;overflow-x:hidden}
-  @media (prefers-color-scheme: dark){ body{background-image:linear-gradient(120deg,#4c1d95,#9d174d,#1e3a8a,#4c1d95)} }
   @keyframes lgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 
   .lg-blob{position:fixed;border-radius:50%;filter:blur(50px);opacity:.5;pointer-events:none;z-index:0}
@@ -67,7 +62,6 @@
   .lg-alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#b91c1c}
   .lg-alert.ok{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.35);color:#15803d}
   .lg-alert.info{background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.4);color:var(--lg-ink)}
-  @media (prefers-color-scheme: dark){ .lg-alert.err{color:#fca5a5}.lg-alert.ok{color:#86efac} }
   .lg-field{position:relative;display:flex;align-items:center;height:52px;border-radius:26px;background:var(--lg-field);
     border:1.5px solid transparent;padding:0 18px;gap:11px;margin-bottom:12px;transition:border-color .2s,box-shadow .2s,background .2s}
   .lg-field:focus-within{background:var(--lg-field-focus);border-color:var(--lg-purple);box-shadow:0 0 0 4px rgba(167,139,250,.2)}
