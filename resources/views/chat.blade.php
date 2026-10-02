@@ -216,6 +216,25 @@
   @keyframes actMenu { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 
 
+
+  /* Follow-up question buttons under the latest answer */
+  .suggest { display: flex; flex-direction: column; align-items: flex-start; gap: 7px; margin: 12px 0 2px; }
+  .suggest-label { font-size: 11.5px; font-weight: 700; color: var(--faint); display: flex; align-items: center; gap: 5px; }
+  .suggest-label svg { width: 13px; height: 13px; color: var(--teal); }
+  .suggest button {
+    display: inline-flex; align-items: center; gap: 8px; max-width: 100%; text-align: left;
+    padding: 8px 13px 8px 11px; border-radius: 14px; border: 1px solid #cdeee9; background: #f4fbfa;
+    color: var(--ink); font-size: 13.5px; line-height: 1.35; cursor: pointer; font-family: inherit;
+    opacity: 0; transform: translateY(6px); animation: sugIn .35s ease forwards;
+    transition: background .15s, border-color .15s, transform .12s;
+  }
+  .suggest button svg { width: 14px; height: 14px; flex-shrink: 0; color: var(--teal); transition: transform .15s; }
+  .suggest button:hover { background: var(--teal-soft); border-color: #99e2d8; }
+  .suggest button:hover svg { transform: translateX(2px); }
+  .suggest button:active { transform: scale(.98); }
+  .suggest button:nth-of-type(2) { animation-delay: .08s; } .suggest button:nth-of-type(3) { animation-delay: .16s; }
+  @keyframes sugIn { to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .suggest button { animation: none; opacity: 1; transform: none; } }
   /* ---------- Read aloud: floating talking mascot ---------- */
   .rk-mascot {
     position: absolute; right: 22px; bottom: 108px; z-index: 30; display: flex; align-items: flex-end;
@@ -469,6 +488,8 @@ html[data-theme="dark"] .message-row.bot .message h4 { color: #e1e6ec; }
 html[data-theme="dark"] .msg-actions button { color: #ced3d9; }
 html[data-theme="dark"] .msg-actions button:hover { background: #10161f; color: #dee2e8; }
 html[data-theme="dark"] .msg-actions button.on { color: #dee2e8; }
+html[data-theme="dark"] .suggest button { background: #142a2a; border-color: #23484a; color: #dee2e8; }
+html[data-theme="dark"] .suggest button:hover { background: #18393a; border-color: #2c6463; }
 html[data-theme="dark"] .rk-mascot .m-say { background: #1f2a37; border: 1px solid #334155; }
 html[data-theme="dark"] .rk-mascot .m-bot { filter: drop-shadow(0 10px 16px rgba(0,0,0,.5)); }
 html[data-theme="dark"] ::highlight(rk-reading) { background-color: rgba(45,212,191,.22); }
@@ -1283,6 +1304,7 @@ function regenerate(row, btn) {
       if (!data.reply) throw new Error('no reply');
       const fresh = addMessage(data.reply, 'bot', { id: data.message_id });
       row.replaceWith(fresh);
+      showSuggestions(fresh, data.suggestions);
       fresh.querySelector('.message').animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
     })
     .catch(() => { btn.classList.remove('spin'); flashNote(btn.parentElement, t('Could not regenerate. Try again.')); })
@@ -1323,11 +1345,33 @@ function removeSearching() {
   if (row) { clearInterval(row._timer); row.remove(); }
 }
 
+
+// Follow-up questions under the newest answer; tapping one asks it
+function clearSuggestions() { document.querySelectorAll('.suggest').forEach(el => el.remove()); }
+function showSuggestions(row, list) {
+  clearSuggestions();
+  if (!row || !Array.isArray(list) || !list.length) return;
+  const box = document.createElement('div');
+  box.className = 'suggest';
+  box.innerHTML = `<span class="suggest-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 4.7L18.5 9.5 13.8 11.3 12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2 2 .8-2 .8-.8 2-.8-2-2-.8 2-.8z"/></svg>${escapeHtml(t('You might also ask'))}</span>`;
+  list.slice(0, 3).forEach(q => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = `<span>${escapeHtml(q)}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`;
+    b.addEventListener('click', () => { clearSuggestions(); sendMessage(q); });
+    box.appendChild(b);
+  });
+  const body = row.querySelector('.bot-body');
+  (body || row).appendChild(box);
+  scrollToBottom();
+}
+
 function sendMessage(textArg) {
   const text = (typeof textArg === 'string' ? textArg : messageInput.value).trim();
   if (text === '' || busy) return;
   if (isListening) stopVoice();
 
+  clearSuggestions();
   addMessage(text, 'user');
   messageInput.value = '';
   autoResize(messageInput);
@@ -1348,7 +1392,8 @@ function sendMessage(textArg) {
     .then(data => {
       removeSearching();
       if (data.reply) {
-        addMessage(data.reply, 'bot', { id: data.message_id });
+        const botRow = addMessage(data.reply, 'bot', { id: data.message_id });
+        showSuggestions(botRow, data.suggestions);
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
@@ -1595,6 +1640,7 @@ function openConversation(id) {
 
 function startNewChat() {
   stopSpeaking();
+  clearSuggestions();
   if (currentController) currentController.abort();
   currentConversationId = null;
   showEmptyState();

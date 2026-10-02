@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ChatConversation;
+use App\Models\ChatMessage;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -194,7 +195,74 @@ $reply = trim($reply);;
             'reply' => $reply,
             'conversation_id' => $conversation->id,
             'message_id' => $botMessage->id,
+            'suggestions' => $this->suggestQuestions($entries, $conversation, $message),
         ]);
+    }
+
+    /**
+     * 2-3 follow-up questions shown as buttons under the answer. They come from the
+     * knowledge base itself, so every suggestion is something the bot can answer:
+     * other close matches first, then entries on the same topic, and for small talk
+     * the questions students ask most. Already-asked topics are skipped.
+     */
+    private function suggestQuestions($entries, ChatConversation $conversation, string $message, int $limit = 3): array
+    {
+        $asked = $conversation->messages()->where('sender', 'user')->whereNotNull('knowledge_base_id')
+            ->pluck('knowledge_base_id')->all();
+        $skipIds = array_flip($asked);
+        $norm = fn ($x) => preg_replace('/[^\p{L}\p{N}]+/u', '', mb_strtolower((string) $x));
+        $said = $norm($message);
+
+        $picked = collect();
+        $add = function ($pool) use (&$picked, &$skipIds, $norm, $said, $limit) {
+            foreach ($pool as $kb) {
+                if ($picked->count() >= $limit) {
+                    return;
+                }
+                $q = trim((string) $kb->question);
+                if ($q === '' || isset($skipIds[$kb->id]) || $norm($q) === $said || mb_strlen($q) > 90) {
+                    continue;
+                }
+                $skipIds[$kb->id] = true;
+                $picked->push($q);
+            }
+        };
+
+        if ($entries->isNotEmpty()) {
+            $top = $entries->first();
+            $skipIds[$top->id] = true; // just answered this one
+            $add($entries->slice(1));
+            if ($picked->count() < $limit) {
+                $sameTopic = KnowledgeBase::query()
+                    ->where(function ($q) use ($top) {
+                        $q->where('information_id', $top->information_id);
+                        if ($top->category) {
+                            $q->orWhere('category', $top->category);
+                        }
+                    })
+                    ->inRandomOrder()->take(12)->get(['id', 'question']);
+                $add($sameTopic);
+            }
+        }
+
+        if ($picked->count() < $limit) {
+            // what students ask about most in the last month
+            $popularIds = ChatMessage::query()
+                ->where('sender', 'user')->whereNotNull('knowledge_base_id')
+                ->where('created_at', '>=', now()->subDays(30))
+                ->selectRaw('knowledge_base_id, COUNT(*) as n')->groupBy('knowledge_base_id')
+                ->orderByDesc('n')->limit(15)->pluck('knowledge_base_id');
+            $popular = KnowledgeBase::whereIn('id', $popularIds)->get(['id', 'question'])
+                ->sortBy(fn ($kb) => $popularIds->search($kb->id))->values();
+            $add($popular);
+        }
+
+        if ($picked->count() < $limit) {
+            // still short (new site, no history yet): one question from a few different topics
+            $add(KnowledgeBase::query()->inRandomOrder()->take(30)->get(['id', 'question', 'category'])->unique('category'));
+        }
+
+        return $picked->values()->all();
     }
 
     /** Thumbs up (1) / thumbs down (-1) on one of the bot's answers; 0 clears it. */

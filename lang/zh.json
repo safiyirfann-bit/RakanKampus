@@ -482,5 +482,6 @@
     "Delete this programme?": "删除此活动？",
     "The end date cannot be before the start date.": "结束日期不能早于开始日期。",
     "End time must be after the start time.": "结束时间必须晚于开始时间。",
-    "Tomorrow": "明天"
+    "Tomorrow": "明天",
+    "You might also ask": "你可能还想问"
 }
