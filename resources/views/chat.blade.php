@@ -194,6 +194,8 @@
   .msg-actions button.gone { display: none; }
   .msg-actions button.pop svg { animation: actPop .35s cubic-bezier(.2,1.6,.4,1); }
   .msg-actions svg { width: 17px; height: 17px; }
+  .msg-actions [data-speak] span { display: none; }
+  .msg-actions [data-speak]:has(rect) { color: #0d9488; background: #e6f7f5; }
   .msg-actions [data-regen].spin svg { animation: actSpin .8s linear infinite; }
   .message-row.bot:not(:last-child) [data-regen] { display: none; }
   .msg-actions button[data-tip]::after {
@@ -1333,12 +1335,9 @@ function buildActions(row, text, meta) {
   const btn = (key, icon, tip) => `<button type="button" data-${key} data-tip="${escapeHtml(t(tip))}" aria-label="${escapeHtml(t(tip))}">${icon}</button>`;
   actions.innerHTML =
     btn('copy', ICONS.copy, 'Copy') +
-    btn('up', ICONS.up, 'Good response') +
-    btn('down', ICONS.down, 'Bad response') +
+    (TTS_OK ? btn('speak', ICONS.speak, 'Read aloud') : '') +
     btn('share', ICONS.share, 'Share') +
-    btn('regen', ICONS.regen, 'Regenerate') +
-    btn('remind', ICONS.bell, 'Set reminder') +
-    (TTS_OK ? btn('more', ICONS.more, 'More') : '');
+    btn('regen', ICONS.regen, 'Regenerate');
 
   const copyBtn = actions.querySelector('[data-copy]');
   copyBtn.addEventListener('click', () => {
@@ -1347,24 +1346,6 @@ function buildActions(row, text, meta) {
       setTimeout(() => { copyBtn.innerHTML = ICONS.copy; copyBtn.dataset.tip = t('Copy'); }, 1500);
     }).catch(() => {});
   });
-
-  // Thumbs up / down — saved on the message so the admin side can use it later
-  let rating = meta.rating || 0;
-  const up = actions.querySelector('[data-up]'), down = actions.querySelector('[data-down]');
-  const paint = () => {
-    up.classList.toggle('on', rating === 1); down.classList.toggle('on', rating === -1);
-    up.classList.toggle('gone', rating === -1); down.classList.toggle('gone', rating === 1);
-  };
-  paint();
-  const rate = (value, b) => {
-    rating = rating === value ? 0 : value;
-    paint();
-    if (rating) { b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop'); flashNote(actions, t('Thanks for your feedback!')); }
-    const id = row.dataset.id;
-    if (id) fetch(`/chatbot/message/${id}/rate`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' }, body: JSON.stringify({ rating }) }).catch(() => {});
-  };
-  up.addEventListener('click', () => rate(1, up));
-  down.addEventListener('click', () => rate(-1, down));
 
   // Share the question + answer (phone share sheet when there is one, otherwise copy)
   const shareBtn = actions.querySelector('[data-share]');
@@ -1383,26 +1364,13 @@ function buildActions(row, text, meta) {
   });
 
   actions.querySelector('[data-regen]').addEventListener('click', e => regenerate(row, e.currentTarget));
-  actions.querySelector('[data-remind]').addEventListener('click', () => { location.href = reminderUrl(questionFor(row)); });
 
-  const moreBtn = actions.querySelector('[data-more]');
-  if (moreBtn) moreBtn.addEventListener('click', () => {
-    const open = actions.querySelector('.act-menu');
-    closeActMenus();
-    if (open) return;
-    const menu = document.createElement('div');
-    menu.className = 'act-menu';
-    const speakBtn = document.createElement('button');
-    speakBtn.type = 'button';
-    const mine = speakingBtn && speakingFor === text;
-    speakBtn.innerHTML = (mine ? ICONS.stop : ICONS.speak) + `<span>${t(mine ? 'Stop reading' : 'Read aloud')}</span>`;
-    speakBtn.addEventListener('click', () => {
-      if (speakingBtn && speakingFor === text) stopSpeaking(); else { speak(text, speakBtn, actions); speakingFor = text; }
-      setTimeout(closeActMenus, 150);
-    });
-    menu.appendChild(speakBtn);
-    actions.classList.add('pinned');
-    actions.appendChild(menu);
+  // Read aloud straight from the bar (tap again to stop)
+  const speakBtn = actions.querySelector('[data-speak]');
+  if (speakBtn) speakBtn.addEventListener('click', () => {
+    if (speakingBtn && speakingFor === text) { stopSpeaking(); return; }
+    speak(text, speakBtn, actions);
+    speakingFor = text;
   });
 
   return actions;
