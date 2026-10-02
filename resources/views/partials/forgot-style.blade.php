@@ -112,6 +112,26 @@
     .fp-hero{flex:1;padding:48px}
     .fp-sheet{flex:1;border-radius:0;padding:44px 48px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
   }
+  @media (min-width:1100px){
+    .fp-shell{max-width:min(1280px,90vw);min-height:min(780px,86vh)}
+    .fp-hero{padding:64px}
+    .fp-chat{max-width:480px;gap:12px}
+    .fp-hdr{gap:14px;margin-bottom:10px}
+    .fp-hdr .fp-av{width:64px;height:64px}.fp-hdr .fp-av svg{width:64px;height:64px}
+    .fp-hdr b{font-size:21px}.fp-hdr span{font-size:14px}
+    .fp-bub{font-size:17px;padding:13px 18px;border-radius:22px}
+    .fp-typing{padding:15px 18px}.fp-typing i{width:9px;height:9px}
+    .fp-sheet{padding:56px 80px 36px}
+    .fp-sheet h1{font-size:40px;letter-spacing:-1px}
+    .fp-lead{font-size:16px;margin-bottom:24px}
+    .fp-stepper{margin-bottom:22px}.fp-stepper .dot{width:30px;height:30px;font-size:13px}.fp-stepper .lbl{font-size:14px}
+    .field label{font-size:13.5px}
+    .fp-sheet input[type=email],.fp-sheet input[type=password],.pw-wrap input[type=text]{height:60px;border-radius:30px;font-size:16.5px}
+    .btn-signin{height:60px;border-radius:30px;font-size:18px}
+    .otp{gap:12px}.otp input{width:62px;height:72px;font-size:30px;border-radius:18px}
+    .fp-chips span{font-size:13.5px}.fp-resend,.fp-resend button,.fp-back{font-size:15.5px}
+    .fp-copy{font-size:13px;margin-top:18px}
+  }
   @media (max-width:860px){
     .fp-blob{filter:blur(38px)}
     .fp-b1{width:62vw;height:62vw;top:-40px;left:-50px}

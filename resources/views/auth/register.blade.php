@@ -35,7 +35,7 @@ body{
 
 /* ---------- live student card ---------- */
 .hero{display:flex;align-items:center;justify-content:center;padding:46px 22px 30px;min-height:250px}
-.idcard{position:relative;width:min(330px,100%);aspect-ratio:1.62;border-radius:22px;padding:4.8cqw 5.4cqw;container-type:inline-size;color:#fff;overflow:hidden;
+.idcard{position:relative;width:min(330px,100%);aspect-ratio:1.62;border-radius:22px;padding:0;container-type:inline-size;color:#fff;overflow:hidden;
   background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(255,255,255,.12));border:1px solid rgba(255,255,255,.55);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 20px 40px rgba(46,16,101,.25);
   transform:rotate(-3deg);animation:cardFloat 4.5s ease-in-out infinite}
@@ -43,9 +43,9 @@ body{
 .idcard:after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-100%);animation:shine 4s ease-in-out infinite}
 @keyframes shine{55%,100%{transform:translateX(100%)}}
-.idc-top{display:flex;justify-content:space-between;align-items:center;font-size:3.2cqw;font-weight:800;letter-spacing:.35cqw}
+.idc-top{margin:4.8cqw 5.4cqw 0;display:flex;justify-content:space-between;align-items:center;font-size:3.2cqw;font-weight:800;letter-spacing:.35cqw}
 .idc-top svg{width:10.3cqw;height:10.3cqw;filter:drop-shadow(0 3px 6px rgba(46,16,101,.3))}
-.idc-body{display:flex;gap:4.2cqw;margin-top:3.6cqw;align-items:center}
+.idc-body{display:flex;gap:4.2cqw;margin:3.6cqw 5.4cqw 0;align-items:center}
 .idc-ph{width:20cqw;height:24cqw;border-radius:4.2cqw;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.45);
   display:grid;place-items:center;font-size:7.8cqw;font-weight:800;flex:none;transition:transform .25s}
 .idc-ph.pop{animation:phPop .35s ease}
@@ -132,6 +132,23 @@ body{
     background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(46,16,101,.3)}
   .hero{flex:.9;padding:48px 40px}
   .sheet{flex:1.1;border-radius:0;padding:40px 44px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
+}
+@media (min-width:1100px){
+  .shell{max-width:min(1320px,92vw);min-height:min(800px,90vh)}
+  .hero{padding:56px}
+  .idcard{width:min(480px,100%)}
+  .sheet{padding:48px 72px 32px}
+  .head h1{font-size:38px;letter-spacing:-1px}
+  .head p{font-size:16px;margin:6px 0 22px}
+  .field{margin-bottom:14px}
+  .row{gap:14px}
+  .box{height:56px;border-radius:28px;padding:0 20px}
+  .input{font-size:16px}.box > svg{width:20px;height:20px}
+  .pw-box{padding:14px 20px}
+  .req-list li{font-size:13.5px}
+  .btn{height:58px;border-radius:29px;font-size:17px}
+  .signin{font-size:15px;margin-top:18px}
+  .copy{font-size:12.5px}
 }
 /* ================= phones: 2 steps ================= */
 @media (max-width:860px){
