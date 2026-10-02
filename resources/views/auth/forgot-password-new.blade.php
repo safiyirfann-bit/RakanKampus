@@ -2,19 +2,13 @@
 
 @section('content')
 
-@include('partials.auth-style')
 @include('partials.forgot-style')
-
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
 
 @php
   $eye = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>';
 @endphp
 
-<div class="card fp-card">
-  @include('partials.forgot-head', ['step' => 3])
+  @include('partials.forgot-head', ['step' => 3, 'lines' => [__('Code verified! ✓'), __('Now pick a new password 🔒')]])
 
   <h1>New password</h1>
   <p class="fp-lead">Code verified! Choose a new password for your account.</p>
@@ -46,15 +40,14 @@
   </form>
 
   <div class="fp-foot"><a class="fp-back" href="{{ route('login') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Cancel</a></div>
-</div>
-
-<footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
+@include('partials.forgot-foot')
 
 <script>
 (function () {
   var p1 = document.getElementById('pw1'), p2 = document.getElementById('pw2');
   var bars = document.querySelectorAll('.pw-meter i'), hint = document.getElementById('pwHint');
   var match = document.getElementById('pwMatch'), btn = document.getElementById('pwBtn');
+  var said = false;
   var COLORS = ['#f87171', '#fbbf24', '#a3e635', '#4ade80'];
   var WORDS = ['Weak', 'Okay', 'Good', 'Strong'];
 
@@ -74,8 +67,9 @@
       : (p1.value.length < 6 ? 'Too short — at least 6 characters.' : 'Strength: ' + WORDS[s]);
     var same = p2.value && p1.value === p2.value;
     match.textContent = !p2.value ? '' : (same ? '✓ Passwords match' : 'Passwords don\'t match yet');
-    match.style.color = same ? '#bbf7d0' : '';
+    match.style.color = same ? '#15803d' : '';
     btn.disabled = !(p1.value.length >= 6 && same);
+    if (!btn.disabled && !said && window.fpSay) { said = true; fpSay({!! json_encode(__('Looks good — save it and you’re done 🎉')) !!}); }
   }
   p1.addEventListener('input', update); p2.addEventListener('input', update);
 

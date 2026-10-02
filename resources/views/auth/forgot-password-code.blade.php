@@ -2,15 +2,11 @@
 
 @section('content')
 
-@include('partials.auth-style')
 @include('partials.forgot-style')
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
-
-<div class="card fp-card">
-  @include('partials.forgot-head', ['step' => 2])
+  @include('partials.forgot-head', ['step' => 2, 'lines' => session('otp_error')
+      ? [[__('Hmm, that code didn\'t work.'), true], __('Check the latest email from me and try again.')]
+      : [__('I sent a 6-digit code to :email 📩', ['email' => $maskedEmail]), __('Type it below — it works for :min minutes.', ['min' => $minutes])]])
 
   <h1>Check your email</h1>
   <p class="fp-lead">If <b>{{ $maskedEmail }}</b> has an account, we sent it a 6-digit code. It works for {{ $minutes }} minutes. Check your spam folder too.</p>
@@ -42,9 +38,7 @@
   </form>
 
   <div class="fp-foot"><a class="fp-back" href="{{ route('password.request') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Use a different email</a></div>
-</div>
-
-<footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
+@include('partials.forgot-foot')
 
 <script>
 (function () {

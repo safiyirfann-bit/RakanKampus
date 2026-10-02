@@ -2,15 +2,11 @@
 
 @section('content')
 
-@include('partials.auth-style')
 @include('partials.forgot-style')
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
-
-<div class="card fp-card">
-  @include('partials.forgot-head', ['step' => 1])
+  @include('partials.forgot-head', ['step' => 1, 'lines' => $errors->any()
+      ? [[__('Hmm, let\'s try that again.'), true]]
+      : [__('Forgot your password? It happens 😅'), __('Just tell me the email you signed up with and I\'ll send you a code.')]])
 
   <h1>Forgot password?</h1>
   <p class="fp-lead">No worries. Enter the email you registered with and we'll send you a 6-digit code.</p>
@@ -37,9 +33,7 @@
   </div>
 
   <div class="fp-foot"><a class="fp-back" href="{{ route('login') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Back to login</a></div>
-</div>
-
-<footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
+@include('partials.forgot-foot')
 
 <script>
   document.getElementById('fpForm').addEventListener('submit', function () {

@@ -2,15 +2,11 @@
 
 @section('content')
 
-@include('partials.auth-style')
 @include('partials.forgot-style')
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
-
-<div class="card fp-card">
-  @include('partials.forgot-head', ['step' => 2, 'labels' => [1 => 'Details', 2 => 'Verify email', 3 => 'Done']])
+  @include('partials.forgot-head', ['step' => 2, 'labels' => [1 => __('Details'), 2 => __('Verify email'), 3 => __('Done')], 'lines' => session('otp_error')
+      ? [[__('Hmm, that code didn\'t work.'), true], __('Check the latest email from me and try again.')]
+      : [__('Almost done! 🎉'), __('I sent a 6-digit code to :email to make sure it\'s yours 📩', ['email' => $maskedEmail])]])
 
   <h1>Verify your email</h1>
   <p class="fp-lead">We sent a 6-digit code to <b>{{ $maskedEmail }}</b>. Type it below to finish creating your account. It works for {{ $minutes }} minutes — check your spam folder too.</p>
@@ -42,9 +38,7 @@
   </form>
 
   <div class="fp-foot"><a class="fp-back" href="{{ route('register') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg> Change my details</a></div>
-</div>
-
-<footer>© 2026 RakanKampus · Politeknik Ungku Omar</footer>
+@include('partials.forgot-foot')
 
 <script>
 (function () {
