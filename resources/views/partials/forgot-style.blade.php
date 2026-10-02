@@ -117,6 +117,29 @@
     .fp-b1{width:62vw;height:62vw;top:-40px;left:-50px}
     .fp-b2{width:64vw;height:64vw;top:170px;right:-80px}
   }
+  /* phones: fit on one screen — the chat area takes what the form leaves */
+  @media (max-width:860px){
+    .fp{min-height:100vh;min-height:100dvh}
+    .fp-hero{flex:1 1 auto;min-height:0;padding:max(18px,env(safe-area-inset-top)) 20px 14px;align-items:flex-end}
+    .fp-chat{min-height:0;gap:7px}
+    .fp-hdr .fp-av{width:42px;height:42px}
+    .fp-bub{font-size:13.5px;padding:9px 13px}
+    .fp-sheet{flex:none;padding:20px 20px 14px}
+    .fp-sheet h1{font-size:22px}
+    .fp-lead{font-size:13px;margin-bottom:14px}
+    .fp-stepper{margin-bottom:12px}
+    .fp-sheet input[type=email],.fp-sheet input[type=password],.pw-wrap input[type=text]{height:48px}
+    .btn-signin{height:48px}
+    .field{margin-bottom:10px}
+    .fp-chips{margin-top:10px}
+    .fp-foot{margin-top:8px}
+    .fp-copy{display:none}
+  }
+  @media (max-width:860px) and (max-height:700px){
+    .fp-hdr{display:none}
+    .fp-chips{display:none}
+    .fp-lead{display:none}
+  }
   @media (max-width:400px){ .otp{gap:6px} .otp .gap{width:2px} .otp input{width:40px;height:52px;font-size:21px} .fp-stepper .lbl{font-size:11px} }
   @media (prefers-reduced-motion:reduce){ body,.fp-blob,.fp-av{animation:none !important} }
   @keyframes fpShake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}

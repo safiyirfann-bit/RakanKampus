@@ -47,7 +47,7 @@
   var queue = Promise.resolve();
   function bubble(text, warn) {
     var b = chat.querySelectorAll('.fp-bub');
-    if (b.length >= 3) b[0].remove();
+    if (b.length >= (window.innerHeight < 720 ? 2 : 3)) b[0].remove();
     var d = document.createElement('div');
     d.className = 'fp-bub' + (warn ? ' warn' : '');
     d.textContent = text;

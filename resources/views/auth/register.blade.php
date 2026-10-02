@@ -35,7 +35,7 @@ body{
 
 /* ---------- live student card ---------- */
 .hero{display:flex;align-items:center;justify-content:center;padding:46px 22px 30px;min-height:250px}
-.idcard{position:relative;width:min(330px,100%);aspect-ratio:1.62;border-radius:22px;padding:16px 18px;color:#fff;overflow:hidden;
+.idcard{position:relative;width:min(330px,100%);aspect-ratio:1.62;border-radius:22px;padding:4.8cqw 5.4cqw;container-type:inline-size;color:#fff;overflow:hidden;
   background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(255,255,255,.12));border:1px solid rgba(255,255,255,.55);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 20px 40px rgba(46,16,101,.25);
   transform:rotate(-3deg);animation:cardFloat 4.5s ease-in-out infinite}
@@ -43,21 +43,21 @@ body{
 .idcard:after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-100%);animation:shine 4s ease-in-out infinite}
 @keyframes shine{55%,100%{transform:translateX(100%)}}
-.idc-top{display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:800;letter-spacing:1.2px}
-.idc-top svg{width:34px;height:34px;filter:drop-shadow(0 3px 6px rgba(46,16,101,.3))}
-.idc-body{display:flex;gap:14px;margin-top:12px;align-items:center}
-.idc-ph{width:66px;height:80px;border-radius:14px;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.45);
-  display:grid;place-items:center;font-size:26px;font-weight:800;flex:none;transition:transform .25s}
+.idc-top{display:flex;justify-content:space-between;align-items:center;font-size:3.2cqw;font-weight:800;letter-spacing:.35cqw}
+.idc-top svg{width:10.3cqw;height:10.3cqw;filter:drop-shadow(0 3px 6px rgba(46,16,101,.3))}
+.idc-body{display:flex;gap:4.2cqw;margin-top:3.6cqw;align-items:center}
+.idc-ph{width:20cqw;height:24cqw;border-radius:4.2cqw;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.45);
+  display:grid;place-items:center;font-size:7.8cqw;font-weight:800;flex:none;transition:transform .25s}
 .idc-ph.pop{animation:phPop .35s ease}
 @keyframes phPop{50%{transform:scale(1.12)}}
 .idc-info{min-width:0;flex:1}
-.idc-lbl{font-size:9px;opacity:.85;letter-spacing:.8px;text-transform:uppercase}
-.idc-val{font-size:16px;font-weight:800;min-height:21px;margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.idc-lbl{font-size:2.7cqw;opacity:.85;letter-spacing:.8px;text-transform:uppercase}
+.idc-val{font-size:4.8cqw;font-weight:800;min-height:6.4cqw;margin-bottom:1.8cqw;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .idc-val.dim{opacity:.55;font-weight:600}
-.idc-chip{position:absolute;right:18px;top:58px;width:34px;height:26px;border-radius:6px;background:linear-gradient(135deg,#fde68a,#f59e0b);opacity:.9}
-.idc-foot{position:absolute;left:18px;right:18px;bottom:13px;display:flex;justify-content:space-between;align-items:center;font-size:10.5px;font-weight:700;gap:10px}
+.idc-chip{position:absolute;right:5.4cqw;top:17.5cqw;width:10.3cqw;height:7.9cqw;border-radius:1.8cqw;background:linear-gradient(135deg,#fde68a,#f59e0b);opacity:.9}
+.idc-foot{position:absolute;left:5.4cqw;right:5.4cqw;bottom:3.9cqw;display:flex;justify-content:space-between;align-items:center;font-size:3.2cqw;font-weight:700;gap:3cqw}
 .idc-foot span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.idc-lock{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;background:rgba(255,255,255,.25);flex:none;transition:background .2s}
+.idc-lock{display:inline-flex;align-items:center;gap:1.2cqw;padding:.6cqw 2.4cqw;border-radius:999px;background:rgba(255,255,255,.25);flex:none;transition:background .2s}
 .idc-lock.ok{background:#22c55e}
 
 /* ---------- form sheet ---------- */
@@ -150,7 +150,33 @@ body{
   .form .step-in{animation:stepIn .25s ease}
   @keyframes stepIn{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
 }
-@media (max-width:380px){ .row{grid-template-columns:1fr} .req-list{grid-template-columns:1fr} }
+/* phones: everything fits on one screen — the card shrinks with the screen height */
+@media (max-width:860px){
+  .wrap{min-height:100vh;min-height:100dvh}
+  .hero{flex:1 1 auto;min-height:0;padding:max(14px,env(safe-area-inset-top)) 20px 16px}
+  .idcard{width:clamp(170px,calc((100dvh - 450px) * 1.62),330px);max-width:86vw}
+  .sheet{flex:none;padding:20px 20px 14px}
+  .head h1{font-size:22px}
+  .head p{font-size:12.5px;margin:2px 0 12px}
+  .steps{margin-bottom:12px}
+  .field{margin-bottom:9px}
+  .box{height:46px;border-radius:23px;padding:0 14px}
+  .input{font-size:15px}
+  .row{column-gap:8px;row-gap:0}
+  .matric-msg{margin-top:4px}
+  .btn{height:46px;border-radius:23px}
+  .signin{margin-top:12px;font-size:13.5px}
+  .copy{display:none}
+  .pw-box{padding:9px 14px;margin-bottom:8px}
+  .bar-track{margin:7px 0 8px}
+  .req-list{gap:4px 10px}
+  .req-list li{font-size:11.5px;gap:6px}
+  .req-list .icon{width:16px;height:16px}
+}
+@media (max-width:860px) and (max-height:700px){
+  .head p{display:none}
+  .head h1{margin-bottom:10px}
+}
 @media (prefers-reduced-motion:reduce){body,.blob,.idcard,.idcard:after{animation:none !important}}
 </style>
 </head>
