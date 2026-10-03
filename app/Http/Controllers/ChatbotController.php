@@ -540,7 +540,10 @@ public function destroy(Request $request, ChatConversation $conversation)
     {
         $lower = mb_strtolower($text);
         if (preg_match('/\p{Han}/u', $lower)) {
-            return ['lang' => 'zh', 'items' => $this->hanBigrams($lower)];
+            // Chinese pairs + any Latin words mixed in (JTMK讲堂, 注册iPayment)
+            $latin = $this->contentWords(preg_replace('/\p{Han}+/u', ' ', $lower));
+
+            return ['lang' => 'zh', 'items' => array_merge($this->hanBigrams($lower), $latin)];
         }
         $lang = preg_match('/\p{Tamil}/u', $lower) ? 'ta' : 'latin';
 
@@ -612,7 +615,8 @@ public function destroy(Request $request, ChatConversation $conversation)
         }
 
         if ($probe['lang'] === 'zh') {
-            $target = $this->hanBigrams(mb_strtolower((string) $entry->question_zh));
+            $zh = mb_strtolower((string) $entry->question_zh);
+            $target = array_merge($this->hanBigrams($zh), $this->contentWords(preg_replace('/\p{Han}+/u', ' ', $zh)));
             if (! $target) {
                 return 0;
             }
@@ -622,31 +626,30 @@ public function destroy(Request $request, ChatConversation $conversation)
             return (int) round(60 * (2 * $shared) / (count($items) + count($target)));
         }
 
-        $text = $probe['lang'] === 'ta'
-            ? (string) $entry->question_ta
-            : implode(' ', array_filter([$entry->question_en, $entry->question, $entry->question_ms]));
-        $target = $this->contentWords($text);
-        if (! $target) {
-            return 0;
-        }
+        $versions = $probe['lang'] === 'ta'
+            ? [$entry->question_ta]
+            : [$entry->question_en, $entry->question, $entry->question_ms];
 
-        $matched = 0;
-        foreach ($items as $w) {
-            foreach ($target as $t) {
-                if ($this->sameWord($w, $t)) {
-                    $matched++;
-                    break;
+        $best = 0;
+        foreach (array_filter($versions) as $text) {
+            $target = $this->contentWords((string) $text);
+            if (! $target) {
+                continue;
+            }
+            $matched = 0;
+            foreach ($items as $w) {
+                foreach ($target as $t) {
+                    if ($this->sameWord($w, $t)) {
+                        $matched++;
+                        break;
+                    }
                 }
             }
+            $entry->coverage = max($entry->coverage, $matched / count($items));
+            $best = max($best, (int) round(60 * (2 * $matched) / (count($items) + count($target))));
         }
-        $entry->coverage = $matched / count($items);
-        if ($matched === 0) {
-            return 0;
-        }
-        // English/Malay text joins several versions, so judge it on the message's words only
-        $targetCount = $probe['lang'] === 'ta' ? count($target) : min(count($target), count($items));
 
-        return (int) round(60 * (2 * $matched) / (count($items) + $targetCount));
+        return $best;
     }
 
     /** Lower-case, letters and digits only — so "What is SPMP?" equals "what is spmp". */
