@@ -27,6 +27,20 @@ class PopularQuestions
         'jimak', 'senggama', 'porno', 'sex', 'bodoh', 'babi', 'sial',
     ];
 
+    /**
+     * Small talk that isn't a real question (thanks, greetings, ok...). A message made
+     * up only of these words is never shown as a "frequently asked" question.
+     */
+    private const SMALL_TALK = [
+        'terima', 'kasih', 'thank', 'thanks', 'thankyou', 'tq', 'ty', 'tqvm', 'tenkiu', 'thx',
+        'hi', 'hai', 'hello', 'helo', 'hey', 'assalamualaikum', 'salam', 'waalaikumsalam',
+        'selamat', 'pagi', 'petang', 'malam', 'tengahari', 'good', 'morning', 'afternoon', 'evening', 'night',
+        'ok', 'okay', 'okey', 'oke', 'baik', 'faham', 'noted', 'alright', 'sure', 'yes', 'no', 'ya', 'ye', 'tak', 'tidak',
+        'bye', 'goodbye', 'jumpa', 'lagi', 'banyak', 'very', 'much', 'so', 'you', 'awak', 'bot', 'sis', 'bro',
+        'nice', 'great', 'cool', 'mantap', 'best', 'wow', 'haha', 'hehe', 'lol', 'test', 'testing',
+        'apa', 'khabar', 'how', 'are', 'what', 'up', 'sup',
+    ];
+
     public const DEFAULTS = [
         'How do I register for courses?',
         'When is the fee payment deadline?',
@@ -39,7 +53,7 @@ class PopularQuestions
      */
     public static function top(int $limit = 4): array
     {
-        $popular = Cache::remember('home.popular_questions', now()->addHour(), fn () => self::compute(8));
+        $popular = Cache::remember('home.popular_questions.v2', now()->addHour(), fn () => self::compute(8));
 
         $chips = [];
         $seen = [];
@@ -73,7 +87,7 @@ class PopularQuestions
      */
     public static function marquee(int $limit = 12): array
     {
-        return Cache::remember('chat.marquee_questions.' . $limit, now()->addHour(), function () use ($limit) {
+        return Cache::remember('chat.marquee_questions.v2.' . $limit, now()->addHour(), function () use ($limit) {
             $out = [];
             $seen = [];
             foreach (self::compute(6) as $q) {
@@ -251,6 +265,10 @@ class PopularQuestions
         $len = mb_strlen($text);
         if ($len < 8 || $len > 80 || mb_strlen($key) < 6) {
             return false;
+        }
+        $words = preg_split('/\s+/u', $key, -1, PREG_SPLIT_NO_EMPTY);
+        if (count($words) < 3 || ! array_diff($words, self::SMALL_TALK)) {
+            return false; // "Terima kasih", "Hi bot", "Ok thanks" etc. aren't real questions
         }
         if (preg_match('/\d{5,}/', $text) || preg_match('/[\w.+-]+@[\w-]+\.\w+/', $text) || preg_match('#https?://#i', $text)) {
             return false; // IC / phone / matric numbers, emails, links
