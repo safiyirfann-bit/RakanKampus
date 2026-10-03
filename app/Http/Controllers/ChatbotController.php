@@ -136,7 +136,8 @@ $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus 
     . "JANGAN mulakan SETIAP jawapan dengan 'Hai!' atau sapaan lain — guna sapaan tu HANYA pada mesej PERTAMA dalam conversation, atau bila user memang menyapa (cth 'hai', 'hello', 'apa khabar'). Untuk soalan susulan (follow-up) dalam conversation yang sama, terus jawab soalan tu tanpa ulang sapaan setiap kali. "
     . "Untuk soalan berkaitan kampus (kursus, yuran, perpustakaan, exam, dll), jawab HANYA berdasarkan 'Maklumat rujukan' di bawah jika ada. "
     . "Jika soalan berkaitan kampus tapi TIADA dalam maklumat rujukan, beritahu dengan jujur & mesra yang tiada maklumat tu buat masa ini, cadangkan hubungi pihak berkaitan — jangan reka jawapan. "
-    . "PENTING: Jangan sekali-kali guna format Markdown (jangan guna simbol seperti **, |, #, -, atau table). Tulis dalam ayat/perenggan biasa sahaja, macam berbual terus. "
+    . "FORMAT JAWAPAN: Jangan guna table, simbol |, atau heading #. Anda BOLEH guna format ringkas ini sahaja: **teks** untuk tebalkan perkara penting (nama kelab, nama jabatan, tarikh, jumlah), dan *teks* untuk nota sampingan yang kecil. "
+    . "Kalau jawapan ada senarai, mulakan dengan SATU ayat pengenalan pendek yang berakhir dengan titik bertindih (:) pada baris sendiri — ayat ni akan dipaparkan sebagai tajuk. Dalam setiap item senarai, tulis nama dalam **tebal**, kemudian ' – ' dan penerangan ringkas jika ada (cth: 1. **PSSI** – Persatuan Siswa Siswi Islam). Ayat penutup (jika ada) ditulis selepas senarai sebagai perenggan biasa. Jangan tebalkan ayat yang panjang. "
     . "Kalau jawapan ada beberapa perkara/langkah, susun dalam bentuk senarai bernombor (1. 2. 3.) dengan SETIAP nombor pada baris baru — jangan tulis semua bersambung dalam satu ayat panjang. Untuk jawapan biasa yang bukan senarai, boleh guna beberapa perenggan pendek supaya senang dibaca, bukan satu blok teks panjang. "
     . "Jika pelajar secara EKSPLISIT minta jawapan dalam bahasa tertentu dalam mesej mereka (contoh ada perkataan 'in english', 'dalam bahasa inggeris', 'speak english', 'in bahasa melayu', 'reply in malay'), WAJIB ikut arahan bahasa tu untuk jawapan — ni diutamakan berbanding bahasa perkataan/topik lain dalam mesej yang sama. "
     . "PENTING - HAD TOPIK: Anda HANYA membantu soalan berkaitan akademik/kampus/politeknik. "
@@ -187,10 +188,8 @@ if ($response->failed()) {
 $reply = $response->json('choices.0.message.content');
 
 // Buang sebarang format Markdown yang AI masih guna (jaring keselamatan tambahan)
-$reply = preg_replace('/\*\*(.*?)\*\*/s', '$1', $reply);   // buang **bold**
-$reply = preg_replace('/\*(.*?)\*/s', '$1', $reply);        // buang *italic*
-$reply = preg_replace('/^#{1,6}\s*/m', '', $reply);         // buang # heading
-$reply = preg_replace('/^[-*+]\s+/m', '', $reply);          // buang bullet - / *
+// **tebal** dan *italic* dikekalkan — chat app paparkan sebagai bold / italic.
+$reply = preg_replace('/^#{1,6}\s*(.+)$/m', '$1', $reply);  // # heading → baris biasa
 $reply = str_replace('|', '', $reply);                      // buang simbol table |
 $reply = trim($reply);;
 

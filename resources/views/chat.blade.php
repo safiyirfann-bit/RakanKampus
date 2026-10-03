@@ -179,6 +179,13 @@
   .bullets li { position: relative; padding-left: 20px; margin: 4px 0; }
   .bullets li::before { content: ''; position: absolute; left: 4px; top: .7em; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); }
   .message-row.bot .message h4 { font-size: 15.5px; font-weight: 700; color: var(--navy); margin: 12px 0 6px; }
+  /* Different text styles so answers aren't one flat block:
+     intro line above a list = title, item name = bold, description = softer, closing line = small & muted */
+  .message-row.bot .message p.lead { font-size: 17.5px; font-weight: 700; color: var(--navy); line-height: 1.4; margin: 2px 0 14px; letter-spacing: -.01em; }
+  .message-row.bot .message p.outro { font-size: 14px; color: #64748b; font-style: italic; margin-top: 4px; }
+  .steps .st .nm { font-weight: 700; color: var(--navy); }
+  .steps .st .ds { color: #64748b; font-size: 14.5px; }
+  .message-row.bot .message i { color: #64748b; }
   /* Action bar under each bot answer (copy, rate, share, regenerate, more) */
   .msg-actions { position: relative; display: flex; align-items: center; gap: 2px; margin: 6px 0 0 -6px; opacity: 0; transition: opacity .15s; }
   .message-row.bot:hover .msg-actions, .message-row.bot:last-child .msg-actions, .msg-actions.pinned { opacity: 1; }
@@ -659,6 +666,11 @@ html[data-theme="dark"] .steps .sub { background: #131a25; border: 1px solid #28
 html[data-theme="dark"] .steps .sub li { color: #d0d4da; }
 html[data-theme="dark"] .steps .note { color: #d0d4da; }
 html[data-theme="dark"] .steps b, html[data-theme="dark"] .bullets b { color: #e1e6ec; }
+html[data-theme="dark"] .message-row.bot .message p.lead { color: #f1f5f9; }
+html[data-theme="dark"] .message-row.bot .message p.outro,
+html[data-theme="dark"] .steps .st .ds,
+html[data-theme="dark"] .message-row.bot .message i { color: #9aa6b5; }
+html[data-theme="dark"] .steps .st .nm { color: #f1f5f9; }
 html[data-theme="dark"] .message-row.bot .message h4 { color: #e1e6ec; }
 html[data-theme="dark"] .msg-actions button { color: #ced3d9; }
 html[data-theme="dark"] .msg-actions button:hover { background: #10161f; color: #dee2e8; }
@@ -1324,6 +1336,7 @@ function partAtFraction(f) {
 }
 
 function speak(text, btn, actions) {
+  text = plainReply(text);
   const wasMine = speakingBtn === btn;
   stopSpeaking();
   if (wasMine) return;
@@ -1409,6 +1422,7 @@ function flashNote(actions, msg) {
   setTimeout(() => n.remove(), 2300);
 }
 function copyText(text) {
+  text = plainReply(text);
   if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
   return new Promise((ok, fail) => {
     const ta = document.createElement('textarea');
@@ -1725,7 +1739,7 @@ function linkify(safe) {
 function inline(line) {
   let html = linkify(escapeHtml(line));
   // "Label: rest" → bold label (only short labels, so normal sentences aren't touched)
-  html = html.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|\s)\*(\S[^*]*?)\*(?=\s|$)/g, '$1<i>$2</i>');
+  html = html.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|\s)\*(\S[^*]*?)\*(?=[\s.,;:!?)]|$)/g, '$1<i>$2</i>');
   if (!/^<b>/.test(html)) html = html.replace(/^([^:<]{2,40}?):\s+(?!\/\/)/, '<b>$1:</b> ');
   return html;
 }
@@ -1735,12 +1749,12 @@ function formatBotText(text) {
   let para = [], list = null;   // list = { type: 'ol', items: [{ n, text, subs: [], notes: [] }] } | { type: 'ul', items: [text] }
   let n = 0, paraSinceList = true, afterItem = false;   // afterItem: previous line was a numbered item or its note
 
-  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(l => linkify(escapeHtml(l)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')).join('<br>') + '</p>'); para = []; paraSinceList = true; } };
+  const flushPara = () => { if (para.length) { out.push('<p>' + para.map(l => linkify(escapeHtml(l)).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(^|\s)\*(\S[^*]*?)\*(?=[\s.,;:!?)]|$)/g, '$1<i>$2</i>')).join('<br>') + '</p>'); para = []; paraSinceList = true; } };
   const flushList = () => {
     if (!list) return;
     if (list.type === 'ol') {
       out.push('<ol class="steps">' + list.items.map(it =>
-        `<li data-n="${it.n}"${it.subs.length || it.notes.length ? ' class="has-sub"' : ''}><span class="st">${inline(it.text)}</span>` +
+        `<li data-n="${it.n}"${it.subs.length || it.notes.length ? ' class="has-sub"' : ''}><span class="st">${itemHtml(it.text)}</span>` +
         it.notes.map(x => `<span class="note">${inline(x)}</span>`).join('') +
         (it.subs.length ? '<ul class="sub">' + it.subs.map(x => `<li>${inline(x)}</li>`).join('') + '</ul>' : '') + '</li>').join('') + '</ol>');
     } else {
@@ -1749,9 +1763,14 @@ function formatBotText(text) {
     list = null;
   };
 
-  for (const raw of lines) {
+  let lastLine = lines.length - 1;
+  while (lastLine > 0 && lines[lastLine].trim() === '') lastLine--;
+
+  for (let li = 0; li < lines.length; li++) {
+    const raw = lines[li];
     const line = raw.trim();
-    const wasAfterItem = afterItem; afterItem = false;
+    // the reply's last line, not indented, after a list = closing sentence, not part of the last item
+    const wasAfterItem = afterItem && !(li === lastLine && !/^\s/.test(raw)); afterItem = false;
     const indented = /^\s{2,}\S/.test(raw);
     const num = line.match(/^(\d{1,2})[.)]\s+(.+)$/);
     const bul = line.match(/^[-•*]\s+(.+)$/);
@@ -1784,8 +1803,24 @@ function formatBotText(text) {
   }
   flushPara();
   flushList();
+
+  // A short paragraph ending with ":" right before a list becomes the title; the paragraph
+  // after the last list (the closing line, e.g. "Semoga membantu!") is shown small and muted.
+  for (let i = 0; i < out.length; i++) {
+    const isList = s => /^<(ol|ul) /.test(s || '');
+    if (/^<p>/.test(out[i]) && isList(out[i + 1]) && /:\s*<\/p>$/.test(out[i]) && out[i].length < 260) out[i] = out[i].replace(/^<p>/, '<p class="lead">');
+    if (i === out.length - 1 && i > 0 && /^<p>/.test(out[i]) && isList(out[i - 1]) && out[i].length < 260) out[i] = out[i].replace(/^<p>/, '<p class="outro">');
+  }
   return out.join('');
 }
+/* "**PSSI** – Persatuan Siswa Siswi Islam" or "PSSI – Persatuan ..." → bold name, softer description */
+function itemHtml(text) {
+  const m = String(text).match(/^(\*\*)?([^*–—]{1,60}?)\1?\s+[–—-]\s+(.+)$/);
+  if (m) return `<span class="nm">${inline(m[2].replace(/\*\*/g, ''))}</span> <span class="ds">– ${inline(m[3])}</span>`;
+  return inline(text);
+}
+/* Reply without the **bold** / *italic* markers — for copy and read-aloud */
+function plainReply(text) { return String(text || '').replace(/\*\*(.+?)\*\*/g, '$1').replace(/(^|\s)\*(\S[^*]*?)\*(?=[\s.,;:!?)]|$)/gm, '$1$2'); }
 
 /* ---------- Conversation list ---------- */
 function escapeHtml(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
