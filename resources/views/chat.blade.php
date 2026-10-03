@@ -905,7 +905,7 @@ html[data-theme="dark"] .suggestion.wl-chip:hover { background: #1f2a37; border-
           @for($dup = 0; $dup < 2; $dup++)
             @foreach($row as $q)
               @php([$emoji, $bg] = $iconFor($q['topic']))
-              <button type="button" class="suggestion wl-chip" data-question="{{ $q['text'] }}" @if($dup) tabindex="-1" aria-hidden="true" @endif>
+              <button type="button" class="suggestion wl-chip" data-question="{{ $q['text'] }}" @if(!empty($q['kb_id'])) data-kb-id="{{ $q['kb_id'] }}" @endif @if($dup) tabindex="-1" aria-hidden="true" @endif>
                 <i style="background: {{ $bg }}">{{ $emoji }}</i><span>{{ $q['text'] }}</span>
               </button>
             @endforeach
@@ -1147,7 +1147,7 @@ function showEmptyState() {
   });
   document.getElementById('heroSendBtn').addEventListener('click', () => sendMessage(heroInput.value));
   wireMic(document.getElementById('heroMicBtn'));
-  chatArea.querySelectorAll('.suggestion').forEach(b => b.addEventListener('click', () => sendMessage(b.dataset.question)));
+  chatArea.querySelectorAll('.suggestion').forEach(b => b.addEventListener('click', () => sendMessage(b.dataset.question, b.dataset.kbId)));
   if (!isMobile()) heroInput.focus();
 }
 
@@ -1658,7 +1658,7 @@ function showAnswerExtras(row, text, meta, suggestions) {
   });
 })();
 
-function sendMessage(textArg) {
+function sendMessage(textArg, kbId) {
   const text = (typeof textArg === 'string' ? textArg : messageInput.value).trim();
   if (text === '' || busy) return;
   if (isListening) stopVoice();
@@ -1677,7 +1677,8 @@ function sendMessage(textArg) {
   fetch('/chatbot', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
-    body: JSON.stringify({ message: text, conversation_id: currentConversationId }),
+    // kb_id: the chip came from this knowledge-base entry (its text may be translated), so the server answers from it directly
+    body: JSON.stringify({ message: text, conversation_id: currentConversationId, kb_id: kbId ? Number(kbId) : null }),
     signal: currentController.signal,
   })
     .then(res => res.json())

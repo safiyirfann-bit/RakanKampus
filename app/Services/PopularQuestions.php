@@ -83,21 +83,21 @@ class PopularQuestions
      * topped up with short knowledge-base questions from many different topics
      * (so every chip is something the bot can answer). Cached for an hour.
      *
-     * @return array<int, array{text: string, topic: ?string}>
+     * @return array<int, array{text: string, topic: ?string, kb_id: ?int}>
      */
     public static function marquee(int $limit = 12): array
     {
-        return Cache::remember('chat.marquee_questions.v2.' . $limit, now()->addHour(), function () use ($limit) {
+        return Cache::remember('chat.marquee_questions.v4.' . $limit, now()->addHour(), function () use ($limit) {
             $out = [];
             $seen = [];
             foreach (self::compute(6) as $q) {
-                $out[] = ['text' => $q, 'topic' => null];
+                $out[] = ['text' => $q, 'topic' => null, 'kb_id' => null];
                 $seen[self::normalise($q)] = true;
             }
 
-            $kb = \App\Models\KnowledgeBase::query()
+            $kb = \App\Models\KnowledgeBase::query()->suggestable()
                 ->whereRaw('LENGTH(question) BETWEEN 10 AND 48')
-                ->inRandomOrder()->limit(200)->get(['question', 'category']);
+                ->inRandomOrder()->limit(200)->get(['id', 'question', 'category']);
             $perTopic = [];
             foreach ($kb as $row) {
                 if (count($out) >= $limit) {
@@ -113,7 +113,7 @@ class PopularQuestions
                 }
                 $seen[$key] = true;
                 $perTopic[$topic] = ($perTopic[$topic] ?? 0) + 1;
-                $out[] = ['text' => trim($row->question), 'topic' => $topic ?: null];
+                $out[] = ['text' => trim($row->question), 'topic' => $topic ?: null, 'kb_id' => $row->id];
             }
 
             foreach (self::DEFAULTS as $q) {
@@ -121,7 +121,7 @@ class PopularQuestions
                     break;
                 }
                 if (! isset($seen[self::normalise($q)])) {
-                    $out[] = ['text' => $q, 'topic' => null];
+                    $out[] = ['text' => $q, 'topic' => null, 'kb_id' => null];
                 }
             }
 
@@ -156,7 +156,7 @@ class PopularQuestions
     {
         $items = self::marquee($limit);
         if ($locale === 'ms') {
-            return array_map(fn ($q) => ['text' => __($q['text']), 'topic' => $q['topic']], $items);
+            return array_map(fn ($q) => ['text' => __($q['text']), 'topic' => $q['topic'], 'kb_id' => $q['kb_id'] ?? null], $items);
         }
 
         $texts = array_column($items, 'text');
@@ -178,7 +178,7 @@ class PopularQuestions
         }
 
         // No translation available: questions we know the bot can answer, in the UI language
-        return array_map(fn ($q) => ['text' => __($q), 'topic' => null], array_slice(self::FALLBACK_EN, 0, $limit));
+        return array_map(fn ($q) => ['text' => __($q), 'topic' => null, 'kb_id' => null], array_slice(self::FALLBACK_EN, 0, $limit));
     }
 
     /** @return array<int, string>|null */

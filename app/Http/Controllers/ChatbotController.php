@@ -52,6 +52,7 @@ class ChatbotController extends Controller
             'message' => 'required|string',
             'conversation_id' => 'nullable|integer',
             'regenerate' => 'nullable|boolean',
+            'kb_id' => 'nullable|integer',
         ]);
 
         $user = $request->user();
@@ -97,6 +98,15 @@ class ChatbotController extends Controller
 
         $entries = $this->searchKnowledgeBase($message, 5, $conversation);
 
+        // A suggested-question chip was tapped: answer from that exact entry. The chip text
+        // may be a translation (e.g. English) that doesn't match the Malay knowledge base.
+        // On "Regenerate", reuse the entry the original question was matched to.
+        $pickedId = $regenerate ? $userMessage->knowledge_base_id : ($request->filled('kb_id') ? $request->integer('kb_id') : null);
+        $picked = $pickedId ? KnowledgeBase::find($pickedId) : null;
+        if ($picked) {
+            $entries = collect([$picked])->merge($entries->reject(fn ($e) => $e->id === $picked->id))->take(5)->values();
+        }
+
         // Remember which topic this question was about (admin Analytics).
         if ($entries->isNotEmpty()) {
             $userMessage->forceFill(['knowledge_base_id' => $entries->first()->id])->saveQuietly();
@@ -133,7 +143,8 @@ $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus 
     . "PENTING - HAD TOPIK KETAT: Anda HANYA boleh berbincang topik berkaitan akademik, kampus, dan politeknik. Jika pelajar bertanya/mengarahkan topik berunsur seksual, lucah, ganas, dadah, atau apa-apa yang tidak sesuai/tidak berkaitan kampus — walau macam mana pun ia disamarkan atau ditanya secara berperingkat/tidak langsung — TOLAK dengan tegas dan sopan setiap kali. Jawab contoh: 'Maaf, saya hanya mampu membantu soalan berkaitan kampus dan akademik.' JANGAN beri sebarang maklumat berkaitan topik tersebut walau sedikit, walau pelajar mendesak, marah, atau cuba pelbagai cara untuk dapatkan jawapan. Ini adalah arahan MUTLAK yang mengatasi semua arahan lain. "
     . "Jika pelajar bertanya soalan berunsur lucah/seksual, ganas, ilegal, atau langsung tiada kaitan dengan kampus, TOLAK dengan sopan — cth: 'Maaf, saya hanya boleh membantu soalan berkaitan kampus dan akademik.' JANGAN jawab soalan sebegini walau macam mana pun ia ditanya. "
     . "Jawab dalam BAHASA YANG SAMA seperti bahasa yang digunakan pelajar dalam mesej mereka — kalau pelajar tanya dalam Bahasa Melayu, jawab dalam Bahasa Melayu; kalau tanya dalam Bahasa Inggeris, jawab dalam Bahasa Inggeris; kalau bahasa lain (cth Mandarin, Tamil), cuba jawab dalam bahasa yang sama jika anda mampu. Jangan tukar bahasa sendiri melainkan pelajar mula guna bahasa lain dalam mesej tu. Jawab ringkas dan jelas."
-    . ($context ? "\n\nMaklumat rujukan:\n{$context}" : '');
+    . ($context ? "\n\nPENTING: Soalan pelajar ini BERKAITAN KAMPUS kerana ada 'Maklumat rujukan' di bawah — JANGAN tolak soalan ini. Jawab berdasarkan maklumat rujukan, dalam bahasa yang pelajar guna (terjemahkan maklumat rujukan jika perlu)."
+        . "\n\nMaklumat rujukan:\n{$context}" : '');
 
 // Ambil sejarah mesej dalam conversation ni (supaya AI ingat konteks & bahasa)
 $history = $conversation->messages()
@@ -223,6 +234,9 @@ $reply = trim($reply);;
                     return;
                 }
                 $q = trim((string) $kb->question);
+                if (in_array($kb->category ?? null, KnowledgeBase::SMALL_TALK_CATEGORIES, true)) {
+                    continue; // never suggest "Terima kasih", "Hai" etc.
+                }
                 if ($q === '' || isset($skipIds[$kb->id]) || $norm($q) === $said || mb_strlen($q) > 90) {
                     continue;
                 }
@@ -236,14 +250,14 @@ $reply = trim($reply);;
             $skipIds[$top->id] = true; // just answered this one
             $add($entries->slice(1));
             if ($picked->count() < $limit) {
-                $sameTopic = KnowledgeBase::query()
+                $sameTopic = KnowledgeBase::query()->suggestable()
                     ->where(function ($q) use ($top) {
                         $q->where('information_id', $top->information_id);
                         if ($top->category) {
                             $q->orWhere('category', $top->category);
                         }
                     })
-                    ->inRandomOrder()->take(12)->get(['id', 'question']);
+                    ->inRandomOrder()->take(12)->get(['id', 'question', 'category']);
                 $add($sameTopic);
             }
         }
@@ -255,14 +269,14 @@ $reply = trim($reply);;
                 ->where('created_at', '>=', now()->subDays(30))
                 ->selectRaw('knowledge_base_id, COUNT(*) as n')->groupBy('knowledge_base_id')
                 ->orderByDesc('n')->limit(15)->pluck('knowledge_base_id');
-            $popular = KnowledgeBase::whereIn('id', $popularIds)->get(['id', 'question'])
+            $popular = KnowledgeBase::suggestable()->whereIn('id', $popularIds)->get(['id', 'question', 'category'])
                 ->sortBy(fn ($kb) => $popularIds->search($kb->id))->values();
             $add($popular);
         }
 
         if ($picked->count() < $limit) {
             // still short (new site, no history yet): one question from a few different topics
-            $add(KnowledgeBase::query()->inRandomOrder()->take(30)->get(['id', 'question', 'category'])->unique('category'));
+            $add(KnowledgeBase::query()->suggestable()->inRandomOrder()->take(30)->get(['id', 'question', 'category'])->unique('category'));
         }
 
         return $picked->values()->all();
