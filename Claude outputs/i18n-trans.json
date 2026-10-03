@@ -1,0 +1,1802 @@
+{
+"+ Add class": [
+"+ Tambah kelas",
+"+ 添加课程",
+"+ வகுப்பைச் சேர்"
+],
+"1 day ago": [
+"1 hari lalu",
+"1 天前",
+"1 நாள் முன்பு"
+],
+"1 day before": [
+"1 hari sebelum",
+"提前 1 天",
+"1 நாள் முன்"
+],
+"1 hour": [
+"1 jam",
+"1 小时",
+"1 மணி நேரம்"
+],
+"1 hour before": [
+"1 jam sebelum",
+"提前 1 小时",
+"1 மணி நேரம் முன்"
+],
+"3 days before": [
+"3 hari sebelum",
+"提前 3 天",
+"3 நாட்கள் முன்"
+],
+"3 hours before": [
+"3 jam sebelum",
+"提前 3 小时",
+"3 மணி நேரம் முன்"
+],
+"30 min before": [
+"30 minit sebelum",
+"提前 30 分钟",
+"30 நிமிடம் முன்"
+],
+":count Days": [
+":count Hari",
+":count 天",
+":count நாட்கள்"
+],
+":count classes saved to your timetable!": [
+":count kelas disimpan ke jadual anda!",
+"已将 :count 节课保存到您的课表！",
+":count வகுப்புகள் உங்கள் கால அட்டவணையில் சேமிக்கப்பட்டன!"
+],
+":count days ago": [
+":count hari lalu",
+":count 天前",
+":count நாட்கள் முன்பு"
+],
+":count hours": [
+":count jam",
+":count 小时",
+":count மணி நேரம்"
+],
+":day's Classes": [
+"Kelas :day",
+":day的课程",
+":day வகுப்புகள்"
+],
+":h h :m m left": [
+":h j :m m lagi",
+"剩余 :h 小时 :m 分钟",
+":h ம :m நி மீதம்"
+],
+":type due in :time": [
+":type dalam :time",
+":type 将在 :time 后到期",
+":type :time இல் உள்ளது"
+],
+"AI & chat privacy": [
+"Privasi AI & sembang",
+"AI 与聊天隐私",
+"AI & அரட்டை தனியுரிமை"
+],
+"AI Assistant": [
+"Pembantu AI",
+"AI 助手",
+"AI உதவியாளர்"
+],
+"AI Chatbot": [
+"Chatbot AI",
+"AI 聊天机器人",
+"AI அரட்டைபாட்"
+],
+"AI could not process that image right now (error :status).": [
+"AI tidak dapat memproses gambar itu sekarang (ralat :status).",
+"AI 目前无法处理该图片（错误 :status）。",
+"AI இப்போது அந்தப் படத்தைச் செயலாக்க முடியவில்லை (பிழை :status)."
+],
+"AI could not process that image right now. Please try again shortly.": [
+"AI tidak dapat memproses gambar itu sekarang. Sila cuba sebentar lagi.",
+"AI 目前无法处理该图片，请稍后再试。",
+"AI இப்போது அந்தப் படத்தைச் செயலாக்க முடியவில்லை. சிறிது நேரம் கழித்து முயற்சிக்கவும்."
+],
+"AI could not read the code clearly and matched it to :code — make sure the subject is correct.": [
+"AI kurang jelas membaca kod dan memadankannya dengan :code — pastikan subjek betul.",
+"AI 未能清楚识别代码，已匹配为 :code —— 请确认科目是否正确。",
+"AI குறியீட்டைத் தெளிவாகப் படிக்க முடியவில்லை, :code உடன் பொருத்தியது — பாடம் சரியானதா என உறுதிசெய்யவும்."
+],
+"AI returned nothing for that image. Try another picture or upload the timetable PDF.": [
+"AI tidak memberikan apa-apa untuk gambar itu. Cuba gambar lain atau muat naik PDF jadual.",
+"AI 未能从该图片返回任何内容。请换一张图片或上传课表 PDF。",
+"அந்தப் படத்திற்கு AI எதையும் தரவில்லை. வேறு படத்தை முயற்சிக்கவும் அல்லது கால அட்டவணை PDF ஐப் பதிவேற்றவும்."
+],
+"About": [
+"Perihal",
+"关于",
+"பற்றி"
+],
+"Academic": [
+"Akademik",
+"学业",
+"கல்வி"
+],
+"Account Protected": [
+"Akaun Dilindungi",
+"账户已受保护",
+"கணக்கு பாதுகாக்கப்பட்டது"
+],
+"Accurate information from campus sources": [
+"Maklumat tepat daripada sumber kampus",
+"来自校园来源的准确信息",
+"வளாக மூலங்களிலிருந்து துல்லியமான தகவல்"
+],
+"Active": [
+"Aktif",
+"活跃",
+"செயலில்"
+],
+"Active Device": [
+"Peranti Aktif",
+"活跃设备",
+"செயலில் உள்ள சாதனம்"
+],
+"Add Class": [
+"Tambah Kelas",
+"添加课程",
+"வகுப்பைச் சேர்"
+],
+"Add Reminder": [
+"Tambah Peringatan",
+"添加提醒",
+"நினைவூட்டலைச் சேர்"
+],
+"Allow other students to find your profile": [
+"Benarkan pelajar lain mencari profil anda",
+"允许其他学生找到您的个人资料",
+"மற்ற மாணவர்கள் உங்கள் சுயவிவரத்தைக் கண்டறிய அனுமதிக்கவும்"
+],
+"Also remind me at (pick as many as you like)": [
+"Ingatkan saya juga pada (pilih seberapa banyak)",
+"同时在以下时间提醒我（可多选）",
+"இந்த நேரங்களிலும் நினைவூட்டவும் (எத்தனை வேண்டுமானாலும் தேர்வு செய்யவும்)"
+],
+"An error occurred during upload.": [
+"Ralat berlaku semasa muat naik.",
+"上传时发生错误。",
+"பதிவேற்றத்தின் போது பிழை ஏற்பட்டது."
+],
+"Anonymous analytics": [
+"Analitik tanpa nama",
+"匿名分析",
+"அநாமதேய பகுப்பாய்வு"
+],
+"Application information": [
+"Maklumat aplikasi",
+"应用信息",
+"பயன்பாட்டுத் தகவல்"
+],
+"April": [
+"April",
+"四月",
+"ஏப்ரல்"
+],
+"Ask campus-related questions anytime": [
+"Tanya soalan berkaitan kampus bila-bila masa",
+"随时提问与校园相关的问题",
+"வளாகம் தொடர்பான கேள்விகளை எப்போது வேண்டுமானாலும் கேளுங்கள்"
+],
+"Ask me anything about Politeknik...": [
+"Tanya apa sahaja tentang Politeknik...",
+"问我任何关于理工学院的问题...",
+"பாலிடெக்னிக் பற்றி எதையும் கேளுங்கள்..."
+],
+"Ask me anything about courses, campus services, fees, library resources, and more.": [
+"Tanya apa sahaja tentang kursus, perkhidmatan kampus, yuran, sumber perpustakaan dan banyak lagi.",
+"问我任何关于课程、校园服务、学费、图书馆资源等问题。",
+"பாடநெறிகள், வளாக சேவைகள், கட்டணங்கள், நூலக வளங்கள் மற்றும் பலவற்றைப் பற்றி எதையும் கேளுங்கள்."
+],
+"Assignment": [
+"Tugasan",
+"作业",
+"ஒப்படைப்பு"
+],
+"At least 6 characters": [
+"Sekurang-kurangnya 6 aksara",
+"至少 6 个字符",
+"குறைந்தது 6 எழுத்துகள்"
+],
+"August": [
+"Ogos",
+"八月",
+"ஆகஸ்ட்"
+],
+"Back": [
+"Kembali",
+"返回",
+"பின் செல்"
+],
+"Back to Reminders": [
+"Kembali ke Peringatan",
+"返回提醒",
+"நினைவூட்டல்களுக்குத் திரும்பு"
+],
+"Biometric Login": [
+"Log Masuk Biometrik",
+"生物识别登录",
+"பயோமெட்ரிக் உள்நுழைவு"
+],
+"Break": [
+"Rehat",
+"休息",
+"இடைவேளை"
+],
+"Camera unavailable": [
+"Kamera tidak tersedia",
+"相机不可用",
+"கேமரா கிடைக்கவில்லை"
+],
+"Campus AI Assistant for Students": [
+"Pembantu AI Kampus untuk Pelajar",
+"面向学生的校园 AI 助手",
+"மாணவர்களுக்கான வளாக AI உதவியாளர்"
+],
+"Campus activities and special announcements": [
+"Aktiviti kampus dan pengumuman khas",
+"校园活动和特别公告",
+"வளாக நடவடிக்கைகள் மற்றும் சிறப்பு அறிவிப்புகள்"
+],
+"Chatbot Replies": [
+"Balasan Chatbot",
+"聊天机器人回复",
+"அரட்டைபாட் பதில்கள்"
+],
+"Chatbot issue": [
+"Masalah chatbot",
+"聊天机器人问题",
+"அரட்டைபாட் சிக்கல்"
+],
+"Check the classes below. Fix anything that is wrong, remove what you don't need, then press Save.": [
+"Semak senarai kelas di bawah. Betulkan apa-apa yang salah, buang yang tidak perlu, kemudian tekan Simpan.",
+"请检查以下课程。修正错误、删除不需要的，然后点击保存。",
+"கீழே உள்ள வகுப்புகளைச் சரிபார்க்கவும். தவறானவற்றைத் திருத்தி, தேவையற்றவற்றை நீக்கி, பின் சேமி அழுத்தவும்."
+],
+"Choose a photo for your account.": [
+"Pilih foto untuk akaun anda.",
+"为您的账户选择一张照片。",
+"உங்கள் கணக்கிற்கு ஒரு புகைப்படத்தைத் தேர்வு செய்யவும்."
+],
+"Choose a strong password to keep your account secure.": [
+"Pilih kata laluan yang kuat untuk memastikan akaun anda selamat.",
+"请选择一个强密码以保护您的账户安全。",
+"உங்கள் கணக்கைப் பாதுகாப்பாக வைத்திருக்க வலுவான கடவுச்சொல்லைத் தேர்வு செய்யவும்."
+],
+"Choose photo": [
+"Pilih foto",
+"选择照片",
+"புகைப்படத்தைத் தேர்வு செய்"
+],
+"Clear chat history": [
+"Kosongkan sejarah sembang",
+"清除聊天记录",
+"அரட்டை வரலாற்றை அழி"
+],
+"Close": [
+"Tutup",
+"关闭",
+"மூடு"
+],
+"Close sidebar": [
+"Tutup bar sisi",
+"关闭侧边栏",
+"பக்கப்பட்டியை மூடு"
+],
+"Completed": [
+"Selesai",
+"已完成",
+"முடிந்தது"
+],
+"Confirm New Password": [
+"Sahkan Kata Laluan Baharu",
+"确认新密码",
+"புதிய கடவுச்சொல்லை உறுதிசெய்"
+],
+"Connection problem. Please try again.": [
+"Ada masalah sambungan. Sila cuba lagi.",
+"连接出现问题，请重试。",
+"இணைப்புச் சிக்கல். மீண்டும் முயற்சிக்கவும்."
+],
+"Contains uppercase and lowercase letters": [
+"Mengandungi huruf besar dan huruf kecil",
+"包含大写和小写字母",
+"பெரிய மற்றும் சிறிய எழுத்துகள் உள்ளன"
+],
+"Control your data and account safety": [
+"Kawal data dan keselamatan akaun anda",
+"管理您的数据和账户安全",
+"உங்கள் தரவு மற்றும் கணக்குப் பாதுகாப்பைக் கட்டுப்படுத்தவும்"
+],
+"Control your data and visibility": [
+"Kawal data dan keterlihatan anda",
+"管理您的数据和可见性",
+"உங்கள் தரவு மற்றும் தெரிவுநிலையைக் கட்டுப்படுத்தவும்"
+],
+"Could not delete the selected classes right now. Please try again.": [
+"Tidak dapat memadam kelas yang dipilih sekarang. Sila cuba lagi.",
+"目前无法删除所选课程，请重试。",
+"தேர்ந்தெடுத்த வகுப்புகளை இப்போது நீக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+],
+"Could not delete this class right now. Please try again.": [
+"Tidak dapat memadam kelas ini sekarang. Sila cuba lagi.",
+"目前无法删除该课程，请重试。",
+"இந்த வகுப்பை இப்போது நீக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+],
+"Could not delete your classes right now. Please try again.": [
+"Tidak dapat memadam kelas anda sekarang. Sila cuba lagi.",
+"目前无法删除您的课程，请重试。",
+"உங்கள் வகுப்புகளை இப்போது நீக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+],
+"Could not detect a date/subject in that image. Try a clearer picture, or fill it in manually.": [
+"Tidak dapat mengesan tarikh/subjek dalam gambar itu. Cuba gambar yang lebih jelas, atau isi secara manual.",
+"无法在该图片中识别日期/科目。请尝试更清晰的图片，或手动填写。",
+"அந்தப் படத்தில் தேதி/பாடத்தைக் கண்டறிய முடியவில்லை. தெளிவான படத்தை முயற்சிக்கவும், அல்லது கைமுறையாக நிரப்பவும்."
+],
+"Could not find the day labels (ISNIN, SELASA, ...) in this PDF.": [
+"Tidak menjumpai label hari (ISNIN, SELASA, ...) dalam PDF ini.",
+"在此 PDF 中找不到星期标签（ISNIN、SELASA……）。",
+"இந்த PDF இல் நாள் லேபிள்கள் (ISNIN, SELASA, ...) கிடைக்கவில்லை."
+],
+"Could not find the time row (8:00, 9:00, ...) in this PDF.": [
+"Tidak menjumpai baris masa (8:00, 9:00, ...) dalam PDF ini.",
+"在此 PDF 中找不到时间行（8:00、9:00……）。",
+"இந்த PDF இல் நேர வரிசை (8:00, 9:00, ...) கிடைக்கவில்லை."
+],
+"Could not process that file (error :status). Please try again.": [
+"Tidak dapat memproses fail itu (ralat :status). Sila cuba lagi.",
+"无法处理该文件（错误 :status），请重试。",
+"அந்தக் கோப்பைச் செயலாக்க முடியவில்லை (பிழை :status). மீண்டும் முயற்சிக்கவும்."
+],
+"Could not process that image. Please try again.": [
+"Tidak dapat memproses gambar itu. Sila cuba lagi.",
+"无法处理该图片，请重试。",
+"அந்தப் படத்தைச் செயலாக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+],
+"Could not read that PDF.": [
+"Tidak dapat membaca PDF itu.",
+"无法读取该 PDF。",
+"அந்த PDF ஐப் படிக்க முடியவில்லை."
+],
+"Could not save. Check all fields and try again.": [
+"Tidak dapat menyimpan. Semak semua medan dan cuba lagi.",
+"无法保存。请检查所有字段后重试。",
+"சேமிக்க முடியவில்லை. அனைத்து புலங்களையும் சரிபார்த்து மீண்டும் முயற்சிக்கவும்."
+],
+"Course Announcements": [
+"Pengumuman Kursus",
+"课程公告",
+"பாடநெறி அறிவிப்புகள்"
+],
+"Course name for code :code was not found — please type the subject name.": [
+"Nama kursus untuk kod :code tidak dijumpai — sila taip nama subjek.",
+"未找到代码 :code 的课程名称 —— 请输入科目名称。",
+":code குறியீட்டிற்கான பாடநெறிப் பெயர் கிடைக்கவில்லை — பாடப் பெயரைத் தட்டச்சு செய்யவும்."
+],
+"Current Password": [
+"Kata Laluan Semasa",
+"当前密码",
+"தற்போதைய கடவுச்சொல்"
+],
+"Dashboard": [
+"Papan Pemuka",
+"仪表板",
+"டாஷ்போர்டு"
+],
+"Data control": [
+"Kawalan data",
+"数据管理",
+"தரவுக் கட்டுப்பாடு"
+],
+"Day": [
+"Hari",
+"星期",
+"நாள்"
+],
+"December": [
+"Disember",
+"十二月",
+"டிசம்பர்"
+],
+"Delete": [
+"Padam",
+"删除",
+"நீக்கு"
+],
+"Delete :count selected class(es)? This cannot be undone.": [
+"Padam :count kelas yang dipilih? Tindakan ini tidak boleh dibatalkan.",
+"删除所选的 :count 节课？此操作无法撤销。",
+"தேர்ந்தெடுத்த :count வகுப்பு(களை) நீக்கவா? இதைத் திரும்பப் பெற முடியாது."
+],
+"Delete All": [
+"Padam Semua",
+"全部删除",
+"அனைத்தையும் நீக்கு"
+],
+"Delete Class": [
+"Padam Kelas",
+"删除课程",
+"வகுப்பை நீக்கு"
+],
+"Delete all :count class(es) from your timetable? This cannot be undone.": [
+"Padam kesemua :count kelas daripada jadual anda? Tindakan ini tidak boleh dibatalkan.",
+"从您的课表中删除全部 :count 节课？此操作无法撤销。",
+"உங்கள் கால அட்டவணையிலிருந்து அனைத்து :count வகுப்பு(களையும்) நீக்கவா? இதைத் திரும்பப் பெற முடியாது."
+],
+"Delete this class?": [
+"Padam kelas ini?",
+"删除该课程？",
+"இந்த வகுப்பை நீக்கவா?"
+],
+"Delete this conversation?": [
+"Padam perbualan ini?",
+"删除此对话？",
+"இந்த உரையாடலை நீக்கவா?"
+],
+"Delete ·": [
+"Padam ·",
+"删除 ·",
+"நீக்கு ·"
+],
+"Deleted": [
+"Dipadam",
+"已删除",
+"நீக்கப்பட்டது"
+],
+"Deleted :count items": [
+"Memadam :count item",
+"已删除 :count 项",
+":count உருப்படிகள் நீக்கப்பட்டன"
+],
+"Delivery": [
+"Penghantaran",
+"发送方式",
+"விநியோகம்"
+],
+"Department": [
+"Jabatan",
+"系别",
+"துறை"
+],
+"Describe the issue": [
+"Terangkan masalah",
+"描述问题",
+"சிக்கலை விவரிக்கவும்"
+],
+"Detected \":subject\" — reminder added automatically!": [
+"\":subject\" dikesan — peringatan ditambah secara automatik!",
+"已识别 \":subject\" —— 提醒已自动添加！",
+"\":subject\" கண்டறியப்பட்டது — நினைவூட்டல் தானாகச் சேர்க்கப்பட்டது!"
+],
+"Developed by": [
+"Dibangunkan oleh",
+"开发者",
+"உருவாக்கியவர்"
+],
+"Dismiss": [
+"Tutup",
+"关闭",
+"மூடு"
+],
+"Display academic information publicly": [
+"Paparkan maklumat akademik secara umum",
+"公开显示学业信息",
+"கல்வித் தகவலைப் பொதுவில் காட்டு"
+],
+"Do Not Disturb Until": [
+"Jangan Ganggu Sehingga",
+"勿扰模式直到",
+"இது வரை தொந்தரவு செய்ய வேண்டாம்"
+],
+"Download my data": [
+"Muat turun data saya",
+"下载我的数据",
+"எனது தரவைப் பதிவிறக்கு"
+],
+"Edit": [
+"Edit",
+"编辑",
+"திருத்து"
+],
+"Edit Class": [
+"Edit Kelas",
+"编辑课程",
+"வகுப்பைத் திருத்து"
+],
+"Edit Reminder": [
+"Edit Peringatan",
+"编辑提醒",
+"நினைவூட்டலைத் திருத்து"
+],
+"Email": [
+"E-mel",
+"电子邮件",
+"மின்னஞ்சல்"
+],
+"Email only": [
+"E-mel sahaja",
+"仅电子邮件",
+"மின்னஞ்சல் மட்டும்"
+],
+"Enable": [
+"Aktifkan",
+"启用",
+"இயக்கு"
+],
+"Enter current password": [
+"Masukkan kata laluan semasa",
+"输入当前密码",
+"தற்போதைய கடவுச்சொல்லை உள்ளிடவும்"
+],
+"Enter new password": [
+"Masukkan kata laluan baharu",
+"输入新密码",
+"புதிய கடவுச்சொல்லை உள்ளிடவும்"
+],
+"Error": [
+"Ralat",
+"错误",
+"பிழை"
+],
+"Events & Promotions": [
+"Acara & Promosi",
+"活动与推广",
+"நிகழ்வுகள் & விளம்பரங்கள்"
+],
+"Exam": [
+"Peperiksaan",
+"考试",
+"தேர்வு"
+],
+"Exam Alerts": [
+"Makluman Peperiksaan",
+"考试提醒",
+"தேர்வு எச்சரிக்கைகள்"
+],
+"Explain what happened and when it occurred...": [
+"Terangkan apa yang berlaku dan bila ia berlaku...",
+"说明发生了什么以及发生的时间...",
+"என்ன நடந்தது, எப்போது நடந்தது என்பதை விளக்கவும்..."
+],
+"Extra verification when signing in": [
+"Pengesahan tambahan semasa log masuk",
+"登录时进行额外验证",
+"உள்நுழையும்போது கூடுதல் சரிபார்ப்பு"
+],
+"Faculty": [
+"Fakulti",
+"学院",
+"பீடம்"
+],
+"Failed": [
+"Gagal",
+"失败",
+"தோல்வி"
+],
+"Failed to upload image.": [
+"Gagal memuat naik gambar.",
+"图片上传失败。",
+"படத்தைப் பதிவேற்ற முடியவில்லை."
+],
+"Fair": [
+"Sederhana",
+"一般",
+"நடுத்தரம்"
+],
+"February": [
+"Februari",
+"二月",
+"பிப்ரவரி"
+],
+"Fee Payment Reminders": [
+"Peringatan Bayaran Yuran",
+"学费缴纳提醒",
+"கட்டணச் செலுத்தல் நினைவூட்டல்கள்"
+],
+"File is too large.": [
+"Fail terlalu besar.",
+"文件太大。",
+"கோப்பு மிகப் பெரியது."
+],
+"Final Year Project Team": [
+"Pasukan Projek Tahun Akhir",
+"毕业设计团队",
+"இறுதியாண்டுத் திட்டக் குழு"
+],
+"First Name": [
+"Nama Pertama",
+"名字",
+"முதல் பெயர்"
+],
+"For exams, assignments & deadlines": [
+"Untuk peperiksaan, tugasan & tarikh akhir",
+"用于考试、作业和截止日期",
+"தேர்வுகள், ஒப்படைப்புகள் & காலக்கெடுகளுக்கு"
+],
+"Frequently asked questions": [
+"Soalan lazim",
+"常见问题",
+"அடிக்கடி கேட்கப்படும் கேள்விகள்"
+],
+"Fri": [
+"Jum",
+"周五",
+"வெள்ளி"
+],
+"Friday": [
+"Jumaat",
+"星期五",
+"வெள்ளிக்கிழமை"
+],
+"Get a copy of your profile and chats": [
+"Dapatkan salinan profil dan sembang anda",
+"获取您的个人资料和聊天记录副本",
+"உங்கள் சுயவிவரம் மற்றும் அரட்டைகளின் நகலைப் பெறுங்கள்"
+],
+"Get help and report issues": [
+"Dapatkan bantuan dan laporkan masalah",
+"获取帮助并报告问题",
+"உதவி பெறுங்கள் மற்றும் சிக்கல்களைப் புகாரளிக்கவும்"
+],
+"Get notified about new sign-ins": [
+"Terima makluman tentang log masuk baharu",
+"新登录时通知我",
+"புதிய உள்நுழைவுகள் குறித்து அறிவிப்பு பெறுங்கள்"
+],
+"Get reminded before payment deadlines": [
+"Diingatkan sebelum tarikh akhir bayaran",
+"在缴费截止前收到提醒",
+"கட்டணக் காலக்கெடுவுக்கு முன் நினைவூட்டப்படுங்கள்"
+],
+"Go to Profile & Settings → Change Password and enter your current and new password.": [
+"Pergi ke Profil & Tetapan → Tukar Kata Laluan dan masukkan kata laluan semasa dan baharu anda.",
+"前往 个人资料与设置 → 更改密码，然后输入当前密码和新密码。",
+"சுயவிவரம் & அமைப்புகள் → கடவுச்சொல்லை மாற்று என்பதற்குச் சென்று தற்போதைய மற்றும் புதிய கடவுச்சொல்லை உள்ளிடவும்."
+],
+"Good afternoon": [
+"Selamat petang",
+"下午好",
+"மதிய வணக்கம்"
+],
+"Good evening": [
+"Selamat malam",
+"晚上好",
+"மாலை வணக்கம்"
+],
+"Good morning": [
+"Selamat pagi",
+"早上好",
+"காலை வணக்கம்"
+],
+"Good night": [
+"Selamat malam",
+"晚安",
+"இனிய இரவு"
+],
+"Help improve chatbot responses": [
+"Bantu tingkatkan jawapan chatbot",
+"帮助改进聊天机器人的回答",
+"அரட்டைபாட் பதில்களை மேம்படுத்த உதவுங்கள்"
+],
+"High": [
+"Tinggi",
+"高",
+"உயர்"
+],
+"History": [
+"Sejarah",
+"历史记录",
+"வரலாறு"
+],
+"How can I change my password?": [
+"Bagaimana saya boleh menukar kata laluan?",
+"如何更改我的密码？",
+"எனது கடவுச்சொல்லை எப்படி மாற்றுவது?"
+],
+"How can I help you today?": [
+"Apa yang boleh saya bantu hari ini?",
+"今天我能帮您什么？",
+"இன்று நான் உங்களுக்கு எப்படி உதவ முடியும்?"
+],
+"How do I access library resources?": [
+"Bagaimana saya mengakses sumber perpustakaan?",
+"如何使用图书馆资源？",
+"நூலக வளங்களை எப்படி அணுகுவது?"
+],
+"How do I clear chat history?": [
+"Bagaimana saya mengosongkan sejarah sembang?",
+"如何清除聊天记录？",
+"அரட்டை வரலாற்றை எப்படி அழிப்பது?"
+],
+"How do I register for courses?": [
+"Bagaimana saya mendaftar kursus?",
+"如何注册课程？",
+"பாடநெறிகளுக்கு எப்படிப் பதிவு செய்வது?"
+],
+"How do I use the AI chatbot?": [
+"Bagaimana saya menggunakan chatbot AI?",
+"如何使用 AI 聊天机器人？",
+"AI அரட்டைபாட்டை எப்படிப் பயன்படுத்துவது?"
+],
+"Includes a number and special character": [
+"Mengandungi nombor dan aksara khas",
+"包含数字和特殊字符",
+"எண் மற்றும் சிறப்பு எழுத்து உள்ளது"
+],
+"Ipoh, Perak • Just now": [
+"Ipoh, Perak • Baru sahaja",
+"怡保，霹雳 • 刚刚",
+"ஈப்போ, பேராக் • இப்போது தான்"
+],
+"Issue type": [
+"Jenis masalah",
+"问题类型",
+"சிக்கல் வகை"
+],
+"January": [
+"Januari",
+"一月",
+"ஜனவரி"
+],
+"July": [
+"Julai",
+"七月",
+"ஜூலை"
+],
+"June": [
+"Jun",
+"六月",
+"ஜூன்"
+],
+"Keep conversations for future reference": [
+"Simpan perbualan untuk rujukan akan datang",
+"保留对话以供日后参考",
+"எதிர்காலக் குறிப்பிற்காக உரையாடல்களை வைத்திருக்கவும்"
+],
+"Keep this device signed in": [
+"Kekalkan peranti ini log masuk",
+"保持此设备登录",
+"இந்தச் சாதனத்தை உள்நுழைந்தபடியே வைத்திருக்கவும்"
+],
+"Knowledge Base": [
+"Pangkalan Pengetahuan",
+"知识库",
+"அறிவுத் தளம்"
+],
+"Last Name": [
+"Nama Akhir",
+"姓氏",
+"கடைசிப் பெயர்"
+],
+"Learn more about this application": [
+"Ketahui lebih lanjut tentang aplikasi ini",
+"了解有关此应用的更多信息",
+"இந்தப் பயன்பாட்டைப் பற்றி மேலும் அறிக"
+],
+"Lecturer": [
+"Pensyarah",
+"讲师",
+"விரிவுரையாளர்"
+],
+"Lecturer (optional)": [
+"Pensyarah (pilihan)",
+"讲师（可选）",
+"விரிவுரையாளர் (விருப்பத்தேர்வு)"
+],
+"Log Out Other Devices": [
+"Log Keluar Peranti Lain",
+"登出其他设备",
+"பிற சாதனங்களிலிருந்து வெளியேறு"
+],
+"Login Alerts": [
+"Makluman Log Masuk",
+"登录提醒",
+"உள்நுழைவு எச்சரிக்கைகள்"
+],
+"Login problem": [
+"Masalah log masuk",
+"登录问题",
+"உள்நுழைவுச் சிக்கல்"
+],
+"Made for students": [
+"Dibina untuk pelajar",
+"为学生打造",
+"மாணவர்களுக்காக உருவாக்கப்பட்டது"
+],
+"Main features": [
+"Ciri-ciri utama",
+"主要功能",
+"முக்கிய அம்சங்கள்"
+],
+"Manage how RakanKampus keeps you informed": [
+"Urus cara RakanKampus memaklumkan anda",
+"管理 RakanKampus 如何通知您",
+"RakanKampus உங்களுக்குத் தகவல் தெரிவிக்கும் முறையை நிர்வகிக்கவும்"
+],
+"Manage your account protection": [
+"Urus perlindungan akaun anda",
+"管理您的账户保护",
+"உங்கள் கணக்குப் பாதுகாப்பை நிர்வகிக்கவும்"
+],
+"March": [
+"Mac",
+"三月",
+"மார்ச்"
+],
+"May": [
+"Mei",
+"五月",
+"மே"
+],
+"Mon": [
+"Isn",
+"周一",
+"திங்"
+],
+"Monday": [
+"Isnin",
+"星期一",
+"திங்கட்கிழமை"
+],
+"More options": [
+"Lagi pilihan",
+"更多选项",
+"மேலும் விருப்பங்கள்"
+],
+"New Chat": [
+"Sembang Baharu",
+"新聊天",
+"புதிய அரட்டை"
+],
+"New Conversation": [
+"Perbualan Baharu",
+"新对话",
+"புதிய உரையாடல்"
+],
+"New Password": [
+"Kata Laluan Baharu",
+"新密码",
+"புதிய கடவுச்சொல்"
+],
+"New features and maintenance alerts": [
+"Ciri baharu dan makluman penyelenggaraan",
+"新功能和维护通知",
+"புதிய அம்சங்கள் மற்றும் பராமரிப்பு எச்சரிக்கைகள்"
+],
+"No class timetable was detected in that image. Try a clearer picture, or fill it in manually.": [
+"Tiada jadual kelas dikesan dalam gambar itu. Cuba gambar yang lebih jelas, atau isi secara manual.",
+"未在该图片中检测到课表。请尝试更清晰的图片，或手动填写。",
+"அந்தப் படத்தில் வகுப்பு கால அட்டவணை கண்டறியப்படவில்லை. தெளிவான படத்தை முயற்சிக்கவும், அல்லது கைமுறையாக நிரப்பவும்."
+],
+"No classes": [
+"Tiada kelas",
+"没有课程",
+"வகுப்புகள் இல்லை"
+],
+"No classes on :day": [
+"Tiada kelas pada hari :day",
+":day没有课程",
+":day அன்று வகுப்புகள் இல்லை"
+],
+"No classes today": [
+"Tiada kelas hari ini",
+"今天没有课",
+"இன்று வகுப்புகள் இல்லை"
+],
+"No conversations yet. Start your first chat! 💬": [
+"Belum ada perbualan. Mulakan sembang pertama anda! 💬",
+"还没有对话。开始您的第一次聊天吧！💬",
+"இன்னும் உரையாடல்கள் இல்லை. உங்கள் முதல் அரட்டையைத் தொடங்குங்கள்! 💬"
+],
+"No photo": [
+"Tiada foto",
+"无照片",
+"புகைப்படம் இல்லை"
+],
+"No reminder history yet.": [
+"Tiada sejarah peringatan lagi.",
+"暂无提醒记录。",
+"இன்னும் நினைவூட்டல் வரலாறு இல்லை."
+],
+"No reminders yet — tap \"Add Reminder\" to add your first exam, assignment or deadline.": [
+"Belum ada peringatan — tekan \"Tambah Peringatan\" untuk menambah peperiksaan, tugasan atau tarikh akhir pertama anda.",
+"还没有提醒 —— 点击“添加提醒”来添加您的第一个考试、作业或截止日期。",
+"இன்னும் நினைவூட்டல்கள் இல்லை — உங்கள் முதல் தேர்வு, ஒப்படைப்பு அல்லது காலக்கெடுவைச் சேர்க்க \"நினைவூட்டலைச் சேர்\" என்பதைத் தட்டவும்."
+],
+"Notice": [
+"Makluman",
+"提示",
+"அறிவிப்பு"
+],
+"Notification settings updated!": [
+"Tetapan pemberitahuan dikemas kini!",
+"通知设置已更新！",
+"அறிவிப்பு அமைப்புகள் புதுப்பிக்கப்பட்டன!"
+],
+"Notified": [
+"Dimaklumkan",
+"已通知",
+"அறிவிக்கப்பட்டது"
+],
+"Notify me how many hours before?": [
+"Maklumkan saya berapa jam sebelum?",
+"提前多少小时通知我？",
+"எத்தனை மணி நேரம் முன் அறிவிக்க வேண்டும்?"
+],
+"Notify when new AI responses arrive": [
+"Maklumkan apabila ada jawapan AI baharu",
+"收到新的 AI 回复时通知",
+"புதிய AI பதில்கள் வரும்போது அறிவிக்கவும்"
+],
+"November": [
+"November",
+"十一月",
+"நவம்பர்"
+],
+"Now": [
+"Kini",
+"现在",
+"இப்போது"
+],
+"October": [
+"Oktober",
+"十月",
+"அக்டோபர்"
+],
+"On top of the main notification above.": [
+"Sebagai tambahan kepada pemberitahuan utama di atas.",
+"在上方主要通知之外额外提醒。",
+"மேலே உள்ள முதன்மை அறிவிப்புடன் கூடுதலாக."
+],
+"Ongoing now": [
+"Sedang berlangsung",
+"正在进行",
+"இப்போது நடைபெறுகிறது"
+],
+"Open Privacy Settings and choose “Clear chat history” to remove saved conversations.": [
+"Buka Tetapan Privasi dan pilih “Kosongkan sejarah sembang” untuk membuang perbualan yang disimpan.",
+"打开隐私设置，选择“清除聊天记录”以删除已保存的对话。",
+"சேமித்த உரையாடல்களை நீக்க, தனியுரிமை அமைப்புகளைத் திறந்து “அரட்டை வரலாற்றை அழி” என்பதைத் தேர்வு செய்யவும்."
+],
+"Open the chat page, type your question, and the chatbot will answer based on campus information provided by the system.": [
+"Buka halaman sembang, taip soalan anda, dan chatbot akan menjawab berdasarkan maklumat kampus yang disediakan oleh sistem.",
+"打开聊天页面，输入您的问题，聊天机器人会根据系统提供的校园信息作答。",
+"அரட்டைப் பக்கத்தைத் திறந்து, உங்கள் கேள்வியைத் தட்டச்சு செய்யுங்கள்; அமைப்பு வழங்கும் வளாகத் தகவலின் அடிப்படையில் அரட்டைபாட் பதிலளிக்கும்."
+],
+"Or upload the timetable PDF.": [
+"Atau muat naik PDF jadual.",
+"或上传课表 PDF。",
+"அல்லது கால அட்டவணை PDF ஐப் பதிவேற்றவும்."
+],
+"Other": [
+"Lain-lain",
+"其他",
+"மற்றவை"
+],
+"Overlaps with another class — check the times.": [
+"Bertindih dengan kelas lain — semak masa.",
+"与其他课程时间重叠 —— 请检查时间。",
+"மற்றொரு வகுப்புடன் நேரம் மோதுகிறது — நேரங்களைச் சரிபார்க்கவும்."
+],
+"PDF (recommended)": [
+"PDF (disyorkan)",
+"PDF（推荐）",
+"PDF (பரிந்துரைக்கப்படுகிறது)"
+],
+"Passed": [
+"Telah lepas",
+"已过期",
+"கடந்துவிட்டது"
+],
+"Password Strength": [
+"Kekuatan Kata Laluan",
+"密码强度",
+"கடவுச்சொல் வலிமை"
+],
+"Password changed": [
+"Kata laluan ditukar",
+"密码已更改",
+"கடவுச்சொல் மாற்றப்பட்டது"
+],
+"Password updated successfully!": [
+"Kata laluan berjaya dikemas kini!",
+"密码已成功更新！",
+"கடவுச்சொல் வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது!"
+],
+"Passwords do not match.": [
+"Kata laluan tidak sepadan.",
+"两次输入的密码不一致。",
+"கடவுச்சொற்கள் பொருந்தவில்லை."
+],
+"Past exams, assignments & deadlines": [
+"Peperiksaan, tugasan & tarikh akhir lepas",
+"过去的考试、作业和截止日期",
+"கடந்த தேர்வுகள், ஒப்படைப்புகள் & காலக்கெடுகள்"
+],
+"Permanently delete :count record(s)?": [
+"Padam :count rekod secara kekal?",
+"永久删除 :count 条记录？",
+":count பதிவு(களை) நிரந்தரமாக நீக்கவா?"
+],
+"Phone Number": [
+"Nombor Telefon",
+"电话号码",
+"தொலைபேசி எண்"
+],
+"Photo / screenshot": [
+"Foto / tangkapan skrin",
+"照片 / 截图",
+"புகைப்படம் / திரைப்பிடிப்பு"
+],
+"Platform": [
+"Platform",
+"平台",
+"தளம்"
+],
+"Please allow microphone access to use voice input.": [
+"Sila benarkan akses mikrofon untuk menggunakan input suara.",
+"请允许使用麦克风以启用语音输入。",
+"குரல் உள்ளீட்டைப் பயன்படுத்த மைக்ரோஃபோன் அணுகலை அனுமதிக்கவும்."
+],
+"Please choose an image first.": [
+"Sila pilih gambar dahulu.",
+"请先选择一张图片。",
+"முதலில் ஒரு படத்தைத் தேர்வு செய்யவும்."
+],
+"Please fill in a subject and date.": [
+"Sila isi subjek dan tarikh.",
+"请填写科目和日期。",
+"பாடம் மற்றும் தேதியை நிரப்பவும்."
+],
+"Please fill in subject, day and time.": [
+"Sila isi subjek, hari dan masa.",
+"请填写科目、星期和时间。",
+"பாடம், நாள் மற்றும் நேரத்தை நிரப்பவும்."
+],
+"Please fulfill all password requirements above.": [
+"Sila penuhi semua syarat kata laluan di atas.",
+"请满足上述所有密码要求。",
+"மேலே உள்ள அனைத்து கடவுச்சொல் தேவைகளையும் பூர்த்தி செய்யவும்."
+],
+"Preferred Method": [
+"Kaedah Pilihan",
+"首选方式",
+"விருப்பமான முறை"
+],
+"Preview": [
+"Pratonton",
+"预览",
+"முன்னோட்டம்"
+],
+"Privacy & Security": [
+"Privasi & Keselamatan",
+"隐私与安全",
+"தனியுரிமை & பாதுகாப்பு"
+],
+"Privacy Protected": [
+"Privasi Dilindungi",
+"隐私已受保护",
+"தனியுரிமை பாதுகாக்கப்பட்டது"
+],
+"Privacy level": [
+"Tahap privasi",
+"隐私级别",
+"தனியுரிமை நிலை"
+],
+"Profile photo": [
+"Foto profil",
+"头像",
+"சுயவிவரப் படம்"
+],
+"Profile problem": [
+"Masalah profil",
+"个人资料问题",
+"சுயவிவரச் சிக்கல்"
+],
+"Profile updated successfully!": [
+"Profil berjaya dikemas kini!",
+"个人资料已成功更新！",
+"சுயவிவரம் வெற்றிகரமாகப் புதுப்பிக்கப்பட்டது!"
+],
+"Profile visibility": [
+"Keterlihatan profil",
+"个人资料可见性",
+"சுயவிவரத் தெரிவுநிலை"
+],
+"Project information": [
+"Maklumat projek",
+"项目信息",
+"திட்டத் தகவல்"
+],
+"Protection": [
+"Perlindungan",
+"保护",
+"பாதுகாப்பு"
+],
+"Purpose of the application": [
+"Tujuan aplikasi",
+"应用的用途",
+"பயன்பாட்டின் நோக்கம்"
+],
+"Push + Email": [
+"Push + E-mel",
+"推送 + 电子邮件",
+"புஷ் + மின்னஞ்சல்"
+],
+"Push notifications": [
+"Pemberitahuan push",
+"推送通知",
+"புஷ் அறிவிப்புகள்"
+],
+"Quiz": [
+"Kuiz",
+"测验",
+"வினாடி வினா"
+],
+"RECENT": [
+"TERKINI",
+"最近",
+"சமீபத்தியவை"
+],
+"RECENT CONVERSATIONS": [
+"PERBUALAN TERKINI",
+"最近的对话",
+"சமீபத்திய உரையாடல்கள்"
+],
+"RakanKampus - History": [
+"RakanKampus - Sejarah",
+"RakanKampus - 历史记录",
+"RakanKampus - வரலாறு"
+],
+"RakanKampus - Home": [
+"RakanKampus - Utama",
+"RakanKampus - 主页",
+"RakanKampus - முகப்பு"
+],
+"RakanKampus - New Conversation": [
+"RakanKampus - Perbualan Baharu",
+"RakanKampus - 新对话",
+"RakanKampus - புதிய உரையாடல்"
+],
+"RakanKampus - Reminders": [
+"RakanKampus - Peringatan",
+"RakanKampus - 提醒",
+"RakanKampus - நினைவூட்டல்கள்"
+],
+"RakanKampus - Timetable": [
+"RakanKampus - Jadual Waktu",
+"RakanKampus - 课表",
+"RakanKampus - கால அட்டவணை"
+],
+"RakanKampus AI · Politeknik Assistant": [
+"RakanKampus AI · Pembantu Politeknik",
+"RakanKampus AI · 理工学院助手",
+"RakanKampus AI · பாலிடெக்னிக் உதவியாளர்"
+],
+"RakanKampus is a student support application developed to help students access campus information quickly and efficiently. The system combines an AI-powered chatbot with a structured knowledge base to provide accurate answers related to campus services, academic matters, and student activities.": [
+"RakanKampus ialah aplikasi sokongan pelajar yang dibangunkan untuk membantu pelajar mendapatkan maklumat kampus dengan cepat dan cekap. Sistem ini menggabungkan chatbot berkuasa AI dengan pangkalan pengetahuan berstruktur untuk memberikan jawapan tepat berkaitan perkhidmatan kampus, hal akademik dan aktiviti pelajar.",
+"RakanKampus 是一款学生支持应用，旨在帮助学生快速高效地获取校园信息。系统将 AI 聊天机器人与结构化知识库相结合，为校园服务、学业事务和学生活动提供准确的解答。",
+"RakanKampus என்பது மாணவர்கள் வளாகத் தகவல்களை விரைவாகவும் திறமையாகவும் அணுக உதவும் வகையில் உருவாக்கப்பட்ட மாணவர் ஆதரவுப் பயன்பாடு ஆகும். வளாக சேவைகள், கல்வி விஷயங்கள் மற்றும் மாணவர் நடவடிக்கைகள் தொடர்பான துல்லியமான பதில்களை வழங்க, இந்த அமைப்பு AI அரட்டைபாட்டையும் கட்டமைக்கப்பட்ட அறிவுத் தளத்தையும் இணைக்கிறது."
+],
+"Re-enter new password": [
+"Masukkan semula kata laluan baharu",
+"再次输入新密码",
+"புதிய கடவுச்சொல்லை மீண்டும் உள்ளிடவும்"
+],
+"Receive lecturer and course updates": [
+"Terima kemas kini pensyarah dan kursus",
+"接收讲师和课程动态",
+"விரிவுரையாளர் மற்றும் பாடநெறிப் புதுப்பிப்புகளைப் பெறுங்கள்"
+],
+"Recent Activity": [
+"Aktiviti Terkini",
+"最近活动",
+"சமீபத்திய செயல்பாடு"
+],
+"Registration Number": [
+"Nombor Pendaftaran",
+"注册号码",
+"பதிவு எண்"
+],
+"Release": [
+"Keluaran",
+"发布",
+"வெளியீடு"
+],
+"Remind me more than once": [
+"Ingatkan saya lebih daripada sekali",
+"多次提醒我",
+"ஒன்றுக்கு மேற்பட்ட முறை நினைவூட்டவும்"
+],
+"Remove": [
+"Buang",
+"移除",
+"அகற்று"
+],
+"Remove all saved conversations": [
+"Buang semua perbualan yang disimpan",
+"删除所有已保存的对话",
+"சேமித்த அனைத்து உரையாடல்களையும் அகற்று"
+],
+"Rename conversation:": [
+"Namakan semula perbualan:",
+"重命名对话：",
+"உரையாடலின் பெயரை மாற்று:"
+],
+"Report a problem": [
+"Laporkan masalah",
+"报告问题",
+"ஒரு சிக்கலைப் புகாரளி"
+],
+"Room": [
+"Bilik",
+"教室",
+"அறை"
+],
+"Room (optional)": [
+"Bilik (pilihan)",
+"教室（可选）",
+"அறை (விருப்பத்தேர்வு)"
+],
+"Sat": [
+"Sab",
+"周六",
+"சனி"
+],
+"Saturday": [
+"Sabtu",
+"星期六",
+"சனிக்கிழமை"
+],
+"Save": [
+"Simpan",
+"保存",
+"சேமி"
+],
+"Save :count classes": [
+"Simpan :count kelas",
+"保存 :count 节课",
+":count வகுப்புகளைச் சேமி"
+],
+"Save Changes": [
+"Simpan Perubahan",
+"保存更改",
+"மாற்றங்களைச் சேமி"
+],
+"Save Notification Settings": [
+"Simpan Tetapan Pemberitahuan",
+"保存通知设置",
+"அறிவிப்பு அமைப்புகளைச் சேமி"
+],
+"Save Privacy Settings": [
+"Simpan Tetapan Privasi",
+"保存隐私设置",
+"தனியுரிமை அமைப்புகளைச் சேமி"
+],
+"Save Reminder": [
+"Simpan Peringatan",
+"保存提醒",
+"நினைவூட்டலைச் சேமி"
+],
+"Save chat history": [
+"Simpan sejarah sembang",
+"保存聊天记录",
+"அரட்டை வரலாற்றைச் சேமி"
+],
+"Saving...": [
+"Menyimpan...",
+"正在保存...",
+"சேமிக்கிறது..."
+],
+"Search conversation...": [
+"Cari perbualan...",
+"搜索对话...",
+"உரையாடலைத் தேடு..."
+],
+"Search history...": [
+"Cari sejarah...",
+"搜索历史记录...",
+"வரலாற்றில் தேடு..."
+],
+"Search reminders...": [
+"Cari peringatan...",
+"搜索提醒...",
+"நினைவூட்டல்களைத் தேடு..."
+],
+"Security Settings": [
+"Tetapan Keselamatan",
+"安全设置",
+"பாதுகாப்பு அமைப்புகள்"
+],
+"Security score": [
+"Skor keselamatan",
+"安全评分",
+"பாதுகாப்பு மதிப்பெண்"
+],
+"Security settings updated": [
+"Tetapan keselamatan dikemas kini",
+"安全设置已更新",
+"பாதுகாப்பு அமைப்புகள் புதுப்பிக்கப்பட்டன"
+],
+"Select": [
+"Pilih",
+"选择",
+"தேர்ந்தெடு"
+],
+"Select All": [
+"Pilih Semua",
+"全选",
+"அனைத்தையும் தேர்ந்தெடு"
+],
+"Select all": [
+"Pilih semua",
+"全选",
+"அனைத்தையும் தேர்ந்தெடு"
+],
+"Send": [
+"Hantar",
+"发送",
+"அனுப்பு"
+],
+"September": [
+"September",
+"九月",
+"செப்டம்பர்"
+],
+"Show faculty and course": [
+"Tunjukkan fakulti dan kursus",
+"显示学院和课程",
+"பீடம் மற்றும் பாடநெறியைக் காட்டு"
+],
+"Show my profile": [
+"Tunjukkan profil saya",
+"显示我的个人资料",
+"எனது சுயவிவரத்தைக் காட்டு"
+],
+"Snap photo": [
+"Ambil foto",
+"拍照",
+"புகைப்படம் எடு"
+],
+"Some classes have no subject or end before they start. Please fix them first.": [
+"Ada kelas yang tiada subjek atau masa tamat sebelum masa mula. Sila betulkan dahulu.",
+"有些课程没有科目，或结束时间早于开始时间。请先修正。",
+"சில வகுப்புகளுக்குப் பாடம் இல்லை அல்லது தொடங்கும் முன்பே முடிகின்றன. முதலில் அவற்றைத் திருத்தவும்."
+],
+"Sorry, there was a problem getting a response. Please try again.": [
+"Maaf, ada masalah mendapatkan jawapan. Sila cuba lagi.",
+"抱歉，获取回复时出现问题，请重试。",
+"மன்னிக்கவும், பதிலைப் பெறுவதில் சிக்கல் ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்."
+],
+"Sorry, unable to connect to the server. Please try again.": [
+"Maaf, tidak dapat menyambung ke pelayan. Sila cuba lagi.",
+"抱歉，无法连接到服务器，请重试。",
+"மன்னிக்கவும், சேவையகத்துடன் இணைக்க முடியவில்லை. மீண்டும் முயற்சிக்கவும்."
+],
+"Start New Chat": [
+"Mulakan Sembang Baharu",
+"开始新聊天",
+"புதிய அரட்டையைத் தொடங்கு"
+],
+"Stop": [
+"Henti",
+"停止",
+"நிறுத்து"
+],
+"Stopped": [
+"Dihentikan",
+"已停止",
+"நிறுத்தப்பட்டது"
+],
+"Strong": [
+"Kuat",
+"强",
+"வலிமையானது"
+],
+"Subject": [
+"Subjek",
+"科目",
+"பாடம்"
+],
+"Submit Report": [
+"Hantar Laporan",
+"提交报告",
+"புகாரைச் சமர்ப்பி"
+],
+"Submit a technical issue or feedback about the system.": [
+"Hantar masalah teknikal atau maklum balas tentang sistem.",
+"提交关于系统的技术问题或反馈。",
+"அமைப்பைப் பற்றிய தொழில்நுட்பச் சிக்கல் அல்லது கருத்தைச் சமர்ப்பிக்கவும்."
+],
+"Successful login": [
+"Log masuk berjaya",
+"登录成功",
+"வெற்றிகரமான உள்நுழைவு"
+],
+"Sun": [
+"Ahd",
+"周日",
+"ஞாயி"
+],
+"Sunday": [
+"Ahad",
+"星期日",
+"ஞாயிற்றுக்கிழமை"
+],
+"System Updates": [
+"Kemas Kini Sistem",
+"系统更新",
+"கணினிப் புதுப்பிப்புகள்"
+],
+"Take selfie": [
+"Ambil swafoto",
+"自拍",
+"செல்ஃபி எடு"
+],
+"Tell us what happened": [
+"Beritahu kami apa yang berlaku",
+"告诉我们发生了什么",
+"என்ன நடந்தது என்று எங்களிடம் சொல்லுங்கள்"
+],
+"Text": [
+"Teks",
+"文本",
+"உரை"
+],
+"The AI model could not be found.": [
+"Model AI tidak dijumpai.",
+"找不到 AI 模型。",
+"AI மாதிரி கிடைக்கவில்லை."
+],
+"The AI server is busy right now. Please try again in a minute.": [
+"Pelayan AI sedang sibuk. Sila cuba lagi dalam seminit.",
+"AI 服务器当前繁忙，请一分钟后再试。",
+"AI சேவையகம் இப்போது பிஸியாக உள்ளது. ஒரு நிமிடத்தில் மீண்டும் முயற்சிக்கவும்."
+],
+"The AI service key is invalid.": [
+"Kunci perkhidmatan AI tidak sah.",
+"AI 服务密钥无效。",
+"AI சேவை விசை செல்லாது."
+],
+"The chatbot uses information stored in the RakanKampus knowledge base and campus guideline dataset.": [
+"Chatbot menggunakan maklumat yang disimpan dalam pangkalan pengetahuan RakanKampus dan set data garis panduan kampus.",
+"聊天机器人使用存储在 RakanKampus 知识库和校园指南数据集中的信息。",
+"அரட்டைபாட் RakanKampus அறிவுத் தளம் மற்றும் வளாக வழிகாட்டுதல் தரவுத்தொகுப்பில் சேமிக்கப்பட்ட தகவல்களைப் பயன்படுத்துகிறது."
+],
+"The date in that image is not clear. Please fill it in manually.": [
+"Tarikh dalam gambar itu tidak jelas. Sila isi secara manual.",
+"该图片中的日期不清晰，请手动填写。",
+"அந்தப் படத்தில் உள்ள தேதி தெளிவாக இல்லை. கைமுறையாக நிரப்பவும்."
+],
+"The file is too large (maximum 6MB).": [
+"Fail terlalu besar (maksimum 6MB).",
+"文件太大（最大 6MB）。",
+"கோப்பு மிகப் பெரியது (அதிகபட்சம் 6MB)."
+],
+"The file must be an image (JPG/PNG) or a timetable PDF.": [
+"Fail mesti gambar (JPG/PNG) atau PDF jadual.",
+"文件必须是图片（JPG/PNG）或课表 PDF。",
+"கோப்பு ஒரு படம் (JPG/PNG) அல்லது கால அட்டவணை PDF ஆக இருக்க வேண்டும்."
+],
+"The free AI usage limit has been reached. Please try again in a minute.": [
+"Had penggunaan AI percuma telah dicapai. Sila cuba lagi dalam seminit.",
+"已达到免费 AI 使用上限，请一分钟后再试。",
+"இலவச AI பயன்பாட்டு வரம்பை எட்டியுள்ளது. ஒரு நிமிடத்தில் மீண்டும் முயற்சிக்கவும்."
+],
+"The server cannot read PDFs yet. Please upload a photo/screenshot of your timetable for now.": [
+"Pelayan belum boleh membaca PDF. Sila muat naik foto/tangkapan skrin jadual anda buat masa ini.",
+"服务器暂时无法读取 PDF。请先上传课表的照片/截图。",
+"சேவையகத்தால் இன்னும் PDF களைப் படிக்க முடியாது. இப்போதைக்கு உங்கள் கால அட்டவணையின் புகைப்படம்/திரைப்பிடிப்பைப் பதிவேற்றவும்."
+],
+"This PDF has no text (it may be a scan). Upload a photo/screenshot of the timetable instead.": [
+"PDF ini tiada teks (mungkin hasil imbasan). Muat naik foto/tangkapan skrin jadual sebagai ganti.",
+"此 PDF 没有文字（可能是扫描件）。请改为上传课表的照片/截图。",
+"இந்த PDF இல் உரை இல்லை (இது ஸ்கேன் செய்யப்பட்டதாக இருக்கலாம்). பதிலாக கால அட்டவணையின் புகைப்படம்/திரைப்பிடிப்பைப் பதிவேற்றவும்."
+],
+"This class is unusually long (over 4 hours) — check the end time.": [
+"Kelas ini luar biasa panjang (lebih 4 jam) — semak masa tamat.",
+"该课程时长异常（超过 4 小时）—— 请检查结束时间。",
+"இந்த வகுப்பு வழக்கத்திற்கு மாறாக நீளமானது (4 மணி நேரத்திற்கு மேல்) — முடிவு நேரத்தைச் சரிபார்க்கவும்."
+],
+"This device is currently signed in": [
+"Peranti ini sedang log masuk",
+"此设备当前已登录",
+"இந்தச் சாதனம் தற்போது உள்நுழைந்துள்ளது"
+],
+"Thu": [
+"Kha",
+"周四",
+"வியா"
+],
+"Thursday": [
+"Khamis",
+"星期四",
+"வியாழக்கிழமை"
+],
+"Time": [
+"Masa",
+"时间",
+"நேரம்"
+],
+"Timetable and reminder notifications": [
+"Pemberitahuan jadual waktu dan peringatan",
+"课表和提醒通知",
+"கால அட்டவணை மற்றும் நினைவூட்டல் அறிவிப்புகள்"
+],
+"Today": [
+"Hari ini",
+"今天",
+"இன்று"
+],
+"Today's Classes": [
+"Kelas Hari Ini",
+"今天的课程",
+"இன்றைய வகுப்புகள்"
+],
+"Toggle sidebar": [
+"Buka/tutup bar sisi",
+"切换侧边栏",
+"பக்கப்பட்டியை மாற்று"
+],
+"Tomorrow's Classes": [
+"Kelas Esok",
+"明天的课程",
+"நாளைய வகுப்புகள்"
+],
+"Total Reminders": [
+"Jumlah Peringatan",
+"提醒总数",
+"மொத்த நினைவூட்டல்கள்"
+],
+"Tue": [
+"Sel",
+"周二",
+"செவ்"
+],
+"Tuesday": [
+"Selasa",
+"星期二",
+"செவ்வாய்க்கிழமை"
+],
+"Turn on notifications to get alerted before your deadlines.": [
+"Hidupkan pemberitahuan untuk dimaklumkan sebelum tarikh akhir anda.",
+"开启通知，在截止日期前收到提醒。",
+"உங்கள் காலக்கெடுவுக்கு முன் எச்சரிக்கை பெற அறிவிப்புகளை இயக்கவும்."
+],
+"Two-Factor Authentication": [
+"Pengesahan Dua Faktor",
+"双重身份验证",
+"இரு-காரணி அங்கீகாரம்"
+],
+"Type": [
+"Jenis",
+"类型",
+"வகை"
+],
+"Type any number of hours — use 0.5 for 30 minutes.": [
+"Taip sebarang bilangan jam — guna 0.5 untuk 30 minit.",
+"输入任意小时数 —— 30 分钟请输入 0.5。",
+"எத்தனை மணி நேரம் வேண்டுமானாலும் தட்டச்சு செய்யவும் — 30 நிமிடங்களுக்கு 0.5 ஐப் பயன்படுத்தவும்."
+],
+"Typing...": [
+"Sedang menaip...",
+"正在输入...",
+"தட்டச்சு செய்கிறது..."
+],
+"UPCOMING (:count)": [
+"AKAN DATANG (:count)",
+"即将到来（:count）",
+"வரவிருப்பவை (:count)"
+],
+"Unable to access the camera. Please allow camera permission, or use Choose photo instead.": [
+"Tidak dapat mengakses kamera. Sila benarkan kebenaran kamera, atau guna Pilih foto.",
+"无法访问相机。请允许相机权限，或改用“选择照片”。",
+"கேமராவை அணுக முடியவில்லை. கேமரா அனுமதியை வழங்கவும், அல்லது பதிலாக புகைப்படத்தைத் தேர்வு செய் என்பதைப் பயன்படுத்தவும்."
+],
+"Upcoming": [
+"Akan datang",
+"即将到来",
+"வரவிருக்கிறது"
+],
+"Update Password": [
+"Kemas Kini Kata Laluan",
+"更新密码",
+"கடவுச்சொல்லைப் புதுப்பி"
+],
+"Update Your Password": [
+"Kemas Kini Kata Laluan Anda",
+"更新您的密码",
+"உங்கள் கடவுச்சொல்லைப் புதுப்பிக்கவும்"
+],
+"Upload PDF / Photo": [
+"Muat Naik PDF / Foto",
+"上传 PDF / 照片",
+"PDF / புகைப்படத்தைப் பதிவேற்று"
+],
+"Upload Photo": [
+"Muat Naik Foto",
+"上传照片",
+"புகைப்படத்தைப் பதிவேற்று"
+],
+"Upload a photo of your exam slip, timetable or assignment brief — AI will read it and add the reminder automatically.": [
+"Muat naik foto slip peperiksaan, jadual atau taklimat tugasan anda — AI akan membacanya dan menambah peringatan secara automatik.",
+"上传考试单、课表或作业说明的照片 —— AI 会读取并自动添加提醒。",
+"உங்கள் தேர்வுச் சீட்டு, கால அட்டவணை அல்லது ஒப்படைப்பு விவரத்தின் புகைப்படத்தைப் பதிவேற்றவும் — AI அதைப் படித்து நினைவூட்டலைத் தானாகச் சேர்க்கும்."
+],
+"Upload photo": [
+"Muat naik foto",
+"上传照片",
+"புகைப்படத்தைப் பதிவேற்று"
+],
+"Upload your class timetable and we'll fill in your classes for you.": [
+"Muat naik jadual kelas anda dan kami akan isikan kelas anda.",
+"上传您的课表，我们会为您填好课程。",
+"உங்கள் வகுப்பு கால அட்டவணையைப் பதிவேற்றுங்கள், உங்கள் வகுப்புகளை நாங்கள் நிரப்புவோம்."
+],
+"Use fingerprint or Face ID": [
+"Guna cap jari atau Face ID",
+"使用指纹或面容 ID",
+"கைரேகை அல்லது Face ID ஐப் பயன்படுத்தவும்"
+],
+"Version": [
+"Versi",
+"版本",
+"பதிப்பு"
+],
+"View all": [
+"Lihat semua",
+"查看全部",
+"அனைத்தையும் காண்க"
+],
+"View all →": [
+"Lihat semua →",
+"查看全部 →",
+"அனைத்தையும் காண்க →"
+],
+"Voice input": [
+"Input suara",
+"语音输入",
+"குரல் உள்ளீடு"
+],
+"Weak": [
+"Lemah",
+"弱",
+"பலவீனமானது"
+],
+"Wed": [
+"Rab",
+"周三",
+"புத"
+],
+"Wednesday": [
+"Rabu",
+"星期三",
+"புதன்கிழமை"
+],
+"What's the exam timetable?": [
+"Bagaimana jadual peperiksaan?",
+"考试时间表是什么？",
+"தேர்வு கால அட்டவணை என்ன?"
+],
+"When is the fee payment deadline?": [
+"Bilakah tarikh akhir bayaran yuran?",
+"学费缴纳截止日期是什么时候？",
+"கட்டணம் செலுத்துவதற்கான காலக்கெடு எப்போது?"
+],
+"Where does the chatbot get information?": [
+"Dari mana chatbot mendapatkan maklumat?",
+"聊天机器人的信息从哪里来？",
+"அரட்டைபாட் தகவலை எங்கிருந்து பெறுகிறது?"
+],
+"Yellow cards need checking.": [
+"Kad kuning perlu disemak.",
+"黄色卡片需要检查。",
+"மஞ்சள் அட்டைகளைச் சரிபார்க்க வேண்டும்."
+],
+"Yesterday's Classes": [
+"Kelas Semalam",
+"昨天的课程",
+"நேற்றைய வகுப்புகள்"
+],
+"You are in control of your personal data": [
+"Anda mengawal data peribadi anda",
+"您可以掌控自己的个人数据",
+"உங்கள் தனிப்பட்ட தரவு உங்கள் கட்டுப்பாட்டில் உள்ளது"
+],
+"You'll get a preview to check and edit before anything is saved.": [
+"Anda akan mendapat pratonton untuk disemak dan diedit sebelum apa-apa disimpan.",
+"保存前，您会看到预览以便检查和编辑。",
+"எதுவும் சேமிக்கப்படும் முன், சரிபார்த்துத் திருத்த ஒரு முன்னோட்டம் கிடைக்கும்."
+],
+"You're logged in!": [
+"Anda telah log masuk!",
+"您已登录！",
+"நீங்கள் உள்நுழைந்துள்ளீர்கள்!"
+],
+"Your security settings are up to date": [
+"Tetapan keselamatan anda terkini",
+"您的安全设置是最新的",
+"உங்கள் பாதுகாப்பு அமைப்புகள் புதுப்பித்த நிலையில் உள்ளன"
+],
+"Your session has expired. Please refresh the page and try again.": [
+"Sesi anda telah tamat. Sila muat semula halaman dan cuba lagi.",
+"您的会话已过期，请刷新页面后重试。",
+"உங்கள் அமர்வு காலாவதியாகிவிட்டது. பக்கத்தைப் புதுப்பித்து மீண்டும் முயற்சிக்கவும்."
+],
+"Your weekly class schedule": [
+"Jadual kelas mingguan anda",
+"您的每周课表",
+"உங்கள் வாராந்திர வகுப்பு அட்டவணை"
+],
+"e.g. Bilik Kuliah 3": [
+"cth. Bilik Kuliah 3",
+"例如：Bilik Kuliah 3",
+"எ.கா. Bilik Kuliah 3"
+],
+"e.g. Database Systems": [
+"cth. Sistem Pangkalan Data",
+"例如：数据库系统",
+"எ.கா. தரவுத்தள அமைப்புகள்"
+],
+"e.g. En. Ahmad": [
+"cth. En. Ahmad",
+"例如：En. Ahmad",
+"எ.கா. En. Ahmad"
+],
+"e.g. Software Engineering Assignment 2": [
+"cth. Tugasan 2 Kejuruteraan Perisian",
+"例如：软件工程作业 2",
+"எ.கா. மென்பொருள் பொறியியல் ஒப்படைப்பு 2"
+],
+"h": [
+"j",
+"小时",
+"ம"
+],
+"in :count d": [
+"dalam :count hari",
+":count 天后",
+":count நாளில்"
+],
+"in :count h": [
+"dalam :count jam",
+":count 小时后",
+":count மணி நேரத்தில்"
+],
+"min": [
+"minit",
+"分钟",
+"நிமி"
+],
+"notify :time before": [
+"maklum :time sebelum",
+"提前 :time 通知",
+":time முன் அறிவிக்கவும்"
+],
+"— read by AI, so a few details may need fixing.": [
+"— dibaca oleh AI, jadi beberapa butiran mungkin perlu dibetulkan.",
+"—— 由 AI 读取，部分细节可能需要修改。",
+"— AI ஆல் படிக்கப்படுகிறது, எனவே சில விவரங்களைத் திருத்த வேண்டியிருக்கலாம்."
+],
+"— the official timetable PDF is read exactly, 100% accurate.": [
+"— PDF jadual rasmi dibaca tepat, 100% betul.",
+"—— 官方课表 PDF 会被精确读取，100% 准确。",
+"— அதிகாரப்பூர்வ கால அட்டவணை PDF துல்லியமாகப் படிக்கப்படுகிறது, 100% சரியானது."
+],
+"🔎 Reading image and detecting details...": [
+"🔎 Membaca gambar dan mengesan butiran...",
+"🔎 正在读取图片并识别详情...",
+"🔎 படத்தைப் படித்து விவரங்களைக் கண்டறிகிறது..."
+],
+"🔎 Reading timetable and detecting classes...": [
+"🔎 Membaca jadual dan mengesan kelas...",
+"🔎 正在读取课表并识别课程...",
+"🔎 கால அட்டவணையைப் படித்து வகுப்புகளைக் கண்டறிகிறது..."
+]
+}
