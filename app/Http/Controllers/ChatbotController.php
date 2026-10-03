@@ -41,6 +41,47 @@ class ChatbotController extends Controller
         'student' => ['pelajar'], 'lecturer' => ['pensyarah'], 'campus' => ['kampus'], 'election' => ['pilihan raya'],
     ];
 
+    /**
+     * Tamil and Chinese words → the Malay words used in the knowledge base. Matched as
+     * substrings of the message, because Chinese has no spaces and Tamil adds endings to
+     * words (பாடம் / பாடங்களுக்கு), so the Tamil entries are word stems.
+     */
+    private const OTHER_TO_MALAY = [
+        // Tamil
+        'பாட' => ['kursus'], 'பதிவ' => ['daftar', 'pendaftaran'], 'கட்டண' => ['yuran', 'bayaran'], 'செலுத்த' => ['bayar', 'bayaran'],
+        'விடுதி' => ['asrama', 'kamsis'], 'நூலக' => ['perpustakaan'], 'தேர்வ' => ['peperiksaan'], 'முடிவ' => ['keputusan'],
+        'அட்டவணை' => ['jadual'], 'கழக' => ['kelab'], 'சங்க' => ['persatuan'], 'விளையாட்ட' => ['sukan'],
+        'கடவுச்சொல' => ['kata laluan'], 'உள்நுழை' => ['log masuk'], 'கணக்க' => ['akaun'], 'கேன்டீன' => ['kantin'], 'உணவ' => ['makan', 'kantin'],
+        'தொழுகை' => ['surau', 'solat'], 'சுராவ' => ['surau'], 'விரிவுரை' => ['kuliah'], 'மண்டப' => ['dewan'], 'இயக்குந' => ['pengarah'],
+        'துறை' => ['jabatan'], 'ஆலோசனை' => ['kaunseling'], 'பயிற்சி' => ['latihan'], 'விண்ணப்ப' => ['permohonan', 'mohon'], 'படிவ' => ['borang'],
+        'ஆடை' => ['pakaian'], 'வாகன' => ['kenderaan', 'parkir'], 'நிறுத்த' => ['parkir', 'meletak kenderaan'], 'ஒத்திவைப்ப' => ['penangguhan'],
+        'விலக' => ['berhenti'], 'மாற்ற' => ['tukar', 'pertukaran'], 'தேர்தல' => ['pilihan raya'], 'உதவித்தொகை' => ['biasiswa'],
+        'டிப்ளோமா' => ['diploma'], 'பட்டப்படிப்ப' => ['ijazah'], 'வளாக' => ['kampus'], 'மாணவர' => ['pelajar'], 'இளங்கலை' => ['ijazah sarjana muda'],
+        'புத்தக' => ['buku'], 'இரவல' => ['pinjam', 'pinjaman'], 'அபராத' => ['denda'], 'வருகை' => ['kehadiran'],
+        // Chinese
+        '注册' => ['daftar', 'pendaftaran'], '报名' => ['daftar', 'pendaftaran'], '报到' => ['pendaftaran', 'lapor diri'], '科目' => ['kursus'], '课程' => ['kursus', 'program'],
+        '学费' => ['yuran', 'bayaran'], '缴' => ['bayar', 'bayaran'], '付款' => ['bayar', 'bayaran'], '宿舍' => ['asrama', 'kamsis'], '图书馆' => ['perpustakaan'],
+        '考试' => ['peperiksaan'], '成绩' => ['keputusan'], '时间表' => ['jadual'], '学会' => ['kelab'], '协会' => ['persatuan'], '运动' => ['sukan'], '体育' => ['sukan'],
+        '密码' => ['kata laluan'], '登录' => ['log masuk'], '账户' => ['akaun'], '食堂' => ['kantin'], '祈祷' => ['surau', 'solat'], '讲堂' => ['dewan', 'kuliah'],
+        '院长' => ['pengarah'], '辅导' => ['kaunseling'], '实习' => ['latihan industri'], '申请' => ['permohonan', 'mohon'], '表格' => ['borang'],
+        '服装' => ['pakaian'], '停车' => ['parkir', 'kenderaan'], '延期' => ['penangguhan'], '退学' => ['berhenti'], '转' => ['pertukaran', 'tukar'],
+        '选举' => ['pilihan raya'], '奖学金' => ['biasiswa'], '文凭' => ['diploma'], '学士' => ['ijazah'], '校园' => ['kampus'], '学生' => ['pelajar'],
+        '书' => ['buku'], '借' => ['pinjam', 'pinjaman'], '罚款' => ['denda'], '出席' => ['kehadiran'],
+    ];
+
+    /** Question and filler words ignored when searching (Malay, English, Tamil). */
+    private const FILLER_WORDS = [
+            'mana', 'manakah', 'dimana', 'dmana', 'kat', 'kt', 'dekat', 'dkt', 'kan', 'ke', 'tu', 'ni', 'nak', 'tak', 'x',
+            'apakah', 'siapa', 'siapakah', 'bila', 'bilakah', 'berapa', 'berapakah', 'bagaimana', 'bagaimanakah', 'camne', 'camana',
+            'boleh', 'ada', 'adakah', 'ialah', 'itu', 'ini', 'pun', 'je', 'ja', 'la', 'lah', 'ye', 'ya', 'eh', 'ne', 'tau', 'tahu',
+            'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg',
+            'where', 'who', 'when', 'which', 'why', 'does', 'did', 'about', 'tell', 'me', 'you', 'your', 'there', 'this', 'that', 'and', 'with', 'in', 'on', 'at',
+            'do', 'my', 'get', 'is', 'it', 'be', 'if', 'or', 'we', 'us', 'any', 'have', 'has', 'need', 'should', 'will', 'would', 'could', 'from', 'into', 'our', 'am', 'was', 'were', 'go', 'know',
+            // Tamil question / filler words
+            'என்ன', 'என்றால்', 'யார்', 'எங்கே', 'எப்படி', 'எப்படிச்', 'எப்போது', 'எத்தனை', 'எவ்வளவு', 'ஏன்', 'எது', 'எவை', 'எந்த',
+            'உள்ளதா', 'உள்ளனவா', 'உள்ளது', 'உள்ளன', 'வேண்டுமா', 'வேண்டும்', 'செய்வது', 'இருக்குமா', 'ஒரு', 'மற்றும்', 'அல்லது', 'நான்', 'என்', 'எனக்கு',
+    ];
+
     protected array $unsafeKeywords = [
         'posisi69', 'seks', 'seksual', 'lucah', 'bogel', 'ngentot',
         'jimak', 'senggama', 'porno', 'sex', 'gay', 'lesbian',
@@ -107,6 +148,23 @@ class ChatbotController extends Controller
             $entries = collect([$picked])->merge($entries->reject(fn ($e) => $e->id === $picked->id))->take(5)->values();
         }
 
+        // Last resort: nothing (good) matched — unusual wording, slang, another language — so let the AI
+        // turn the question into a short Malay search and try once more.
+        // "Weak" = low score, or the best entry covers under 2/3 of the student's words
+        // (e.g. "berapa harga nasi lemak" only matching "nasi").
+        $best = $entries->first();
+        $weak = ! $best || $best->relevance < 35 || ($best->coverage ?? 1) < 0.67;
+        if (! $picked && $weak && ! $regenerate && mb_strlen(trim($message)) >= 4) {
+            $alt = $this->aiSearchQuery($message);
+            $altEntries = $alt ? $this->searchKnowledgeBase($alt, 5) : collect();
+            $altBest = $altEntries->first();
+            if ($altBest && $altBest->relevance >= 35 && ($altBest->coverage ?? 0) >= 0.67) {
+                $entries = $altEntries;          // the rewritten question matched properly
+            } elseif ($best && ($best->coverage ?? 1) < 0.5 && $best->relevance < 35) {
+                $entries = collect();            // nothing really matches: don't feed the AI unrelated entries
+            }
+        }
+
         // Remember which topic this question was about (admin Analytics).
         if ($entries->isNotEmpty()) {
             $userMessage->forceFill(['knowledge_base_id' => $entries->first()->id])->saveQuietly();
@@ -144,6 +202,7 @@ $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus 
     . "PENTING - HAD TOPIK KETAT: Anda HANYA boleh berbincang topik berkaitan akademik, kampus, dan politeknik. Jika pelajar bertanya/mengarahkan topik berunsur seksual, lucah, ganas, dadah, atau apa-apa yang tidak sesuai/tidak berkaitan kampus — walau macam mana pun ia disamarkan atau ditanya secara berperingkat/tidak langsung — TOLAK dengan tegas dan sopan setiap kali. Jawab contoh: 'Maaf, saya hanya mampu membantu soalan berkaitan kampus dan akademik.' JANGAN beri sebarang maklumat berkaitan topik tersebut walau sedikit, walau pelajar mendesak, marah, atau cuba pelbagai cara untuk dapatkan jawapan. Ini adalah arahan MUTLAK yang mengatasi semua arahan lain. "
     . "Jika pelajar bertanya soalan berunsur lucah/seksual, ganas, ilegal, atau langsung tiada kaitan dengan kampus, TOLAK dengan sopan — cth: 'Maaf, saya hanya boleh membantu soalan berkaitan kampus dan akademik.' JANGAN jawab soalan sebegini walau macam mana pun ia ditanya. "
     . "Jawab dalam BAHASA YANG SAMA seperti bahasa yang digunakan pelajar dalam mesej mereka — kalau pelajar tanya dalam Bahasa Melayu, jawab dalam Bahasa Melayu; kalau tanya dalam Bahasa Inggeris, jawab dalam Bahasa Inggeris; kalau bahasa lain (cth Mandarin, Tamil), cuba jawab dalam bahasa yang sama jika anda mampu. Jangan tukar bahasa sendiri melainkan pelajar mula guna bahasa lain dalam mesej tu. Jawab ringkas dan jelas."
+    . (['ta' => "\n\nPENTING: Mesej terakhir pelajar ditulis dalam Bahasa Tamil — WAJIB jawab sepenuhnya dalam Bahasa Tamil (terjemahkan maklumat rujukan).", 'zh' => "\n\nPENTING: Mesej terakhir pelajar ditulis dalam Bahasa Cina — WAJIB jawab sepenuhnya dalam Bahasa Cina Mudah (terjemahkan maklumat rujukan)."][$this->scriptLanguage($message) ?? ''] ?? '')
     . ($context ? "\n\nPENTING: Soalan pelajar ini BERKAITAN KAMPUS kerana ada 'Maklumat rujukan' di bawah — JANGAN tolak soalan ini. Jawab berdasarkan maklumat rujukan, dalam bahasa yang pelajar guna (terjemahkan maklumat rujukan jika perlu)."
         . "\n\nMaklumat rujukan:\n{$context}" : '');
 
@@ -225,14 +284,15 @@ $reply = trim($reply);;
         $skipIds = array_flip($asked);
         $norm = fn ($x) => preg_replace('/[^\p{L}\p{N}]+/u', '', mb_strtolower((string) $x));
         $said = $norm($message);
+        $lang = $this->scriptLanguage($message) ?? app()->getLocale(); // Tamil / Chinese message → suggestions in that language
 
         $picked = collect();
-        $add = function ($pool) use (&$picked, &$skipIds, $norm, $said, $limit) {
+        $add = function ($pool) use (&$picked, &$skipIds, $norm, $said, $limit, $lang) {
             foreach ($pool as $kb) {
                 if ($picked->count() >= $limit) {
                     return;
                 }
-                $q = $kb instanceof KnowledgeBase ? $kb->questionFor() : trim((string) $kb->question);
+                $q = $kb instanceof KnowledgeBase ? $kb->questionFor($lang) : trim((string) $kb->question);
                 if (in_array($kb->category ?? null, KnowledgeBase::SMALL_TALK_CATEGORIES, true)) {
                     continue; // never suggest "Terima kasih", "Hai" etc.
                 }
@@ -416,7 +476,10 @@ public function destroy(Request $request, ChatConversation $conversation)
         // Chinese / Tamil text, which has no spaces between words to split on).
         $exact = $this->normaliseQuestion($message);
 
-        if ($words->isEmpty() && mb_strlen($exact) < 2) {
+        // The message as compared against the stored translations (see translationScore).
+        $probe = $this->probeFor($message);
+
+        if ($words->isEmpty() && mb_strlen($exact) < 2 && ! $probe['items']) {
             return collect();
         }
 
@@ -428,7 +491,7 @@ public function destroy(Request $request, ChatConversation $conversation)
 
         return KnowledgeBase::query()
             ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords'])
-            ->map(function ($entry) use ($tokens, $phrases, $exact) {
+            ->map(function ($entry) use ($tokens, $phrases, $exact, $probe) {
                 $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
                 $q = mb_strtolower($entry->allQuestions());
                 $ans = mb_strtolower((string) $entry->answer);
@@ -453,6 +516,8 @@ public function destroy(Request $request, ChatConversation $conversation)
                         break;
                     }
                 }
+                // How close the message is to the entry's question in the student's own language.
+                $score += $this->translationScore($probe, $entry);
                 // Reward entries that cover more of the student's words.
                 $entry->relevance = $score + $hits * 2;
 
@@ -464,6 +529,126 @@ public function destroy(Request $request, ChatConversation $conversation)
             ->values();
     }
 
+    /**
+     * Breaks the message into comparable pieces for its script:
+     * Chinese → pairs of characters (Chinese has no spaces), Tamil → word stems
+     * (Tamil adds endings: பாடம் / பாடங்களுக்கு), English/Malay → words without filler.
+     *
+     * @return array{lang: string, items: array<int, string>}
+     */
+    private function probeFor(string $text): array
+    {
+        $lower = mb_strtolower($text);
+        if (preg_match('/\p{Han}/u', $lower)) {
+            return ['lang' => 'zh', 'items' => $this->hanBigrams($lower)];
+        }
+        $lang = preg_match('/\p{Tamil}/u', $lower) ? 'ta' : 'latin';
+
+        return ['lang' => $lang, 'items' => $this->contentWords($lower)];
+    }
+
+    /** @return array<int, string> unique pairs of neighbouring Chinese characters (single chars for very short text) */
+    private function hanBigrams(string $text): array
+    {
+        $out = [];
+        foreach (preg_split('/[^\p{Han}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY) as $run) {
+            $chars = mb_str_split($run);
+            if (count($chars) === 1) {
+                $out[] = $chars[0];
+            }
+            for ($i = 0; $i < count($chars) - 1; $i++) {
+                $out[] = $chars[$i] . $chars[$i + 1];
+            }
+        }
+        // question-word pairs say nothing about the topic
+        return array_values(array_diff(array_unique($out), ['什么', '如何', '怎样', '怎么', '哪里', '哪些', '是什', '么是', '可以', '需要', '要怎', '么做', '多少', '的是', '是谁', '谁是']));
+    }
+
+    /** @return array<int, string> lower-case words that carry meaning (filler and question words removed) */
+    private function contentWords(string $text): array
+    {
+        static $filler = null;
+        $filler ??= array_flip(array_merge($this->stopwords, self::FILLER_WORDS));
+        $words = preg_split('/[^\p{L}\p{N}\p{M}]+/u', mb_strtolower($text), -1, PREG_SPLIT_NO_EMPTY);
+
+        return array_values(array_unique(array_filter($words, fn ($w) => mb_strlen($w) >= 2 && ! isset($filler[$w]))));
+    }
+
+    /** Two words are "the same" if one is a prefix of the other once endings are allowed for (courses/course, பாடம்/பாடங்களுக்கு). */
+    private function sameWord(string $a, string $b): bool
+    {
+        if ($a === $b) {
+            return true;
+        }
+        $la = mb_strlen($a);
+        $lb = mb_strlen($b);
+        $min = min($la, $lb);
+        if ($min < 3) {
+            return false;
+        }
+        $common = 0;
+        while ($common < $min && mb_substr($a, $common, 1) === mb_substr($b, $common, 1)) {
+            $common++;
+        }
+        // Tamil endings are long and can change the stem's last letter: allow 2 letters of difference.
+        if (preg_match('/\p{Tamil}/u', $a)) {
+            return $common >= max(3, $min - 2);
+        }
+        // English / Malay: only small endings (course/courses, kursus/kursusnya) — so "sem" ≠ "semula", "benda" ≠ "bendahari"
+        return $common >= max(4, $min - 1) && $min / max($la, $lb) >= 0.6;
+    }
+
+    /**
+     * 0–60 points: how much of the message matches the entry's question in the same language
+     * (Chinese → question_zh, Tamil → question_ta, English/Malay → question_en + question + question_ms).
+     * Works for every entry automatically, because it uses the stored translations.
+     */
+    private function translationScore(array $probe, KnowledgeBase $entry): int
+    {
+        $items = $probe['items'];
+        $entry->coverage = $items ? 0.0 : 1.0; // share of the student's words found in this entry's question
+        if (! $items) {
+            return 0;
+        }
+
+        if ($probe['lang'] === 'zh') {
+            $target = $this->hanBigrams(mb_strtolower((string) $entry->question_zh));
+            if (! $target) {
+                return 0;
+            }
+            $shared = count(array_intersect($items, $target));
+            $entry->coverage = $shared / count($items);
+
+            return (int) round(60 * (2 * $shared) / (count($items) + count($target)));
+        }
+
+        $text = $probe['lang'] === 'ta'
+            ? (string) $entry->question_ta
+            : implode(' ', array_filter([$entry->question_en, $entry->question, $entry->question_ms]));
+        $target = $this->contentWords($text);
+        if (! $target) {
+            return 0;
+        }
+
+        $matched = 0;
+        foreach ($items as $w) {
+            foreach ($target as $t) {
+                if ($this->sameWord($w, $t)) {
+                    $matched++;
+                    break;
+                }
+            }
+        }
+        $entry->coverage = $matched / count($items);
+        if ($matched === 0) {
+            return 0;
+        }
+        // English/Malay text joins several versions, so judge it on the message's words only
+        $targetCount = $probe['lang'] === 'ta' ? count($target) : min(count($target), count($items));
+
+        return (int) round(60 * (2 * $matched) / (count($items) + $targetCount));
+    }
+
     /** Lower-case, letters and digits only — so "What is SPMP?" equals "what is spmp". */
     private function normaliseQuestion(string $text): string
     {
@@ -473,17 +658,7 @@ public function destroy(Request $request, ChatConversation $conversation)
     /** Lower-cased topic words from a message, without question/filler words. */
     private function topicWords(string $text)
     {
-        $filler = array_merge($this->stopwords, [
-            'mana', 'manakah', 'dimana', 'dmana', 'kat', 'kt', 'dekat', 'dkt', 'kan', 'ke', 'tu', 'ni', 'nak', 'tak', 'x',
-            'apakah', 'siapa', 'siapakah', 'bila', 'bilakah', 'berapa', 'berapakah', 'bagaimana', 'bagaimanakah', 'camne', 'camana',
-            'boleh', 'ada', 'adakah', 'ialah', 'itu', 'ini', 'pun', 'je', 'ja', 'la', 'lah', 'ye', 'ya', 'eh', 'ne', 'tau', 'tahu',
-            'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg',
-            'where', 'who', 'when', 'which', 'why', 'does', 'did', 'about', 'tell', 'me', 'you', 'your', 'there', 'this', 'that', 'and', 'with', 'in', 'on', 'at',
-            'do', 'my', 'get', 'is', 'it', 'be', 'if', 'or', 'we', 'us', 'any', 'have', 'has', 'need', 'should', 'will', 'would', 'could', 'from', 'into', 'our', 'am', 'was', 'were', 'go', 'know',
-            // Tamil question / filler words
-            'என்ன', 'என்றால்', 'யார்', 'எங்கே', 'எப்படி', 'எப்படிச்', 'எப்போது', 'எத்தனை', 'எவ்வளவு', 'ஏன்', 'எது', 'எவை', 'எந்த',
-            'உள்ளதா', 'உள்ளனவா', 'உள்ளது', 'உள்ளன', 'வேண்டுமா', 'வேண்டும்', 'செய்வது', 'இருக்குமா', 'ஒரு', 'மற்றும்', 'அல்லது', 'நான்', 'என்', 'எனக்கு',
-        ]);
+        $filler = array_merge($this->stopwords, self::FILLER_WORDS);
 
         $words = collect(preg_split('/\s+/u', mb_strtolower($text)))
             ->map(fn ($w) => trim($w, " \t\n\r\0\x0B.,?!:;\"'()[]"))
@@ -508,6 +683,62 @@ public function destroy(Request $request, ChatConversation $conversation)
             }
         }
 
+        // Tamil words take endings (பாடம் → பாடங்களுக்கு): also search with a shorter stem.
+        foreach ($words as $w) {
+            if (preg_match('/\p{Tamil}/u', $w) && mb_strlen($w) >= 5) {
+                $expanded[] = mb_substr($w, 0, mb_strlen($w) - 2);
+            }
+        }
+        // Tamil / Chinese → the Malay words the knowledge base uses.
+        $lower = mb_strtolower($text);
+        foreach (self::OTHER_TO_MALAY as $term => $malay) {
+            if (str_contains($lower, $term)) {
+                array_push($expanded, ...$malay);
+            }
+        }
+
         return collect($expanded)->unique()->values();
+    }
+
+    /** The question rewritten by the AI as a short Malay search query (cached for a day), or null. */
+    private function aiSearchQuery(string $message): ?string
+    {
+        $key = (string) config('services.groq.key');
+        if ($key === '') {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Cache::remember('kb.aiquery.' . md5(mb_strtolower(trim($message))), now()->addDay(), function () use ($key, $message) {
+            try {
+                $res = Http::withToken($key)->timeout(6)->post('https://api.groq.com/openai/v1/chat/completions', [
+                    'model' => 'openai/gpt-oss-20b',
+                    'temperature' => 0,
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'Tukar soalan pelajar Politeknik Ungku Omar (PUO) kepada SATU soalan Bahasa Melayu formal yang ringkas, guna istilah rasmi (cth: daftar kursus, yuran pengajian, asrama/kamsis, peperiksaan, SPMP, iPayment). Kekalkan nama dan singkatan (PUO, JTMK, MPP). Balas dengan soalan itu SAHAJA. Jika ia bukan soalan berkaitan kampus, balas: TIADA'],
+                        ['role' => 'user', 'content' => Str::limit($message, 300, '')],
+                    ],
+                ]);
+                $out = trim((string) $res->json('choices.0.message.content'));
+
+                return ($res->successful() && $out !== '' && stripos($out, 'TIADA') === false) ? Str::limit($out, 200, '') : null;
+            } catch (\Throwable $e) {
+                Log::warning('KB search rewrite failed: ' . $e->getMessage());
+
+                return null;
+            }
+        });
+    }
+
+    /** 'ta' / 'zh' when the message is written in Tamil or Chinese script, else null. */
+    private function scriptLanguage(string $text): ?string
+    {
+        if (preg_match('/\p{Tamil}/u', $text)) {
+            return 'ta';
+        }
+        if (preg_match('/\p{Han}/u', $text)) {
+            return 'zh';
+        }
+
+        return null;
     }
 }
