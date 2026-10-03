@@ -233,7 +233,7 @@ $reply = trim($reply);;
                 if ($picked->count() >= $limit) {
                     return;
                 }
-                $q = trim((string) $kb->question);
+                $q = $kb instanceof KnowledgeBase ? $kb->questionFor() : trim((string) $kb->question);
                 if (in_array($kb->category ?? null, KnowledgeBase::SMALL_TALK_CATEGORIES, true)) {
                     continue; // never suggest "Terima kasih", "Hai" etc.
                 }
@@ -257,7 +257,7 @@ $reply = trim($reply);;
                             $q->orWhere('category', $top->category);
                         }
                     })
-                    ->inRandomOrder()->take(12)->get(['id', 'question', 'category']);
+                    ->inRandomOrder()->take(12)->get(['id', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'category']);
                 $add($sameTopic);
             }
         }
@@ -269,14 +269,14 @@ $reply = trim($reply);;
                 ->where('created_at', '>=', now()->subDays(30))
                 ->selectRaw('knowledge_base_id, COUNT(*) as n')->groupBy('knowledge_base_id')
                 ->orderByDesc('n')->limit(15)->pluck('knowledge_base_id');
-            $popular = KnowledgeBase::suggestable()->whereIn('id', $popularIds)->get(['id', 'question', 'category'])
+            $popular = KnowledgeBase::suggestable()->whereIn('id', $popularIds)->get(['id', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'category'])
                 ->sortBy(fn ($kb) => $popularIds->search($kb->id))->values();
             $add($popular);
         }
 
         if ($picked->count() < $limit) {
             // still short (new site, no history yet): one question from a few different topics
-            $add(KnowledgeBase::query()->suggestable()->inRandomOrder()->take(30)->get(['id', 'question', 'category'])->unique('category'));
+            $add(KnowledgeBase::query()->suggestable()->inRandomOrder()->take(30)->get(['id', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'category'])->unique('category'));
         }
 
         return $picked->values()->all();
@@ -413,7 +413,11 @@ public function destroy(Request $request, ChatConversation $conversation)
             $words = $words->merge($this->topicWords($previous))->unique()->values();
         }
 
-        if ($words->isEmpty()) {
+        // The exact question in any of the 4 languages (e.g. a tapped suggestion, or
+        // Chinese / Tamil text, which has no spaces between words to split on).
+        $exact = $this->normaliseQuestion($message);
+
+        if ($words->isEmpty() && mb_strlen($exact) < 2) {
             return collect();
         }
 
@@ -424,10 +428,10 @@ public function destroy(Request $request, ChatConversation $conversation)
         }
 
         return KnowledgeBase::query()
-            ->get(['id', 'information_id', 'intent', 'question', 'answer', 'category', 'keywords'])
-            ->map(function ($entry) use ($tokens, $phrases) {
+            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords'])
+            ->map(function ($entry) use ($tokens, $phrases, $exact) {
                 $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
-                $q = mb_strtolower((string) $entry->question);
+                $q = mb_strtolower($entry->allQuestions());
                 $ans = mb_strtolower((string) $entry->answer);
 
                 $score = 0;
@@ -444,6 +448,12 @@ public function destroy(Request $request, ChatConversation $conversation)
                         $score += 4;
                     }
                 }
+                foreach ([$entry->question, $entry->question_ms, $entry->question_en, $entry->question_zh, $entry->question_ta] as $variant) {
+                    if ($exact !== '' && $variant && $this->normaliseQuestion($variant) === $exact) {
+                        $score += 100; // same question, word for word
+                        break;
+                    }
+                }
                 // Reward entries that cover more of the student's words.
                 $entry->relevance = $score + $hits * 2;
 
@@ -453,6 +463,12 @@ public function destroy(Request $request, ChatConversation $conversation)
             ->sortByDesc('relevance')
             ->take($limit)
             ->values();
+    }
+
+    /** Lower-case, letters and digits only — so "What is SPMP?" equals "what is spmp". */
+    private function normaliseQuestion(string $text): string
+    {
+        return preg_replace('/[^\p{L}\p{N}\p{M}]+/u', '', mb_strtolower($text));
     }
 
     /** Lower-cased topic words from a message, without question/filler words. */
@@ -465,6 +481,9 @@ public function destroy(Request $request, ChatConversation $conversation)
             'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg',
             'where', 'who', 'when', 'which', 'why', 'does', 'did', 'about', 'tell', 'me', 'you', 'your', 'there', 'this', 'that', 'and', 'with', 'in', 'on', 'at',
             'do', 'my', 'get', 'is', 'it', 'be', 'if', 'or', 'we', 'us', 'any', 'have', 'has', 'need', 'should', 'will', 'would', 'could', 'from', 'into', 'our', 'am', 'was', 'were', 'go', 'know',
+            // Tamil question / filler words
+            'என்ன', 'என்றால்', 'யார்', 'எங்கே', 'எப்படி', 'எப்படிச்', 'எப்போது', 'எத்தனை', 'எவ்வளவு', 'ஏன்', 'எது', 'எவை', 'எந்த',
+            'உள்ளதா', 'உள்ளனவா', 'உள்ளது', 'உள்ளன', 'வேண்டுமா', 'வேண்டும்', 'செய்வது', 'இருக்குமா', 'ஒரு', 'மற்றும்', 'அல்லது', 'நான்', 'என்', 'எனக்கு',
         ]);
 
         $words = collect(preg_split('/\s+/u', mb_strtolower($text)))

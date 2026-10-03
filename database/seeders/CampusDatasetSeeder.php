@@ -12,7 +12,8 @@ use Illuminate\Support\Str;
  * into `information` (one row per main_topic) and `knowledge_bases`
  * (one row per question/answer).
  *
- * CSV columns: id, main_topic, intent, question, answer, category, keywords
+ * CSV columns: id, main_topic, intent, question, answer, category, keywords,
+ *              question_ms, question_en, question_zh, question_ta (optional translations)
  *
  * Safe to run again and again (it runs on every deploy): a topic is matched by
  * its main_topic and an entry by topic + intent, so re-running updates the
@@ -53,9 +54,17 @@ class CampusDatasetSeeder extends Seeder
                     ['description' => $this->describe($mainTopic, $rows)]
                 );
 
+                $translations = [];
+                if (array_key_exists('question_en', $row)) {
+                    foreach (KnowledgeBase::LOCALES as $locale) {
+                        $text = trim($row["question_{$locale}"] ?? '');
+                        $translations["question_{$locale}"] = $text !== '' ? Str::limit($text, 255, '') : null;
+                    }
+                }
+
                 $entry = KnowledgeBase::updateOrCreate(
                     ['information_id' => $topics[$mainTopic]->id, 'intent' => $intent],
-                    [
+                    $translations + [
                         'question' => Str::limit($question, 255, ''),
                         'answer' => $answer,
                         'category' => trim($row['category'] ?? '') ?: null,

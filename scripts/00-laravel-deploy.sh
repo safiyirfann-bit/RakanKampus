@@ -12,6 +12,9 @@ php artisan migrate --force
 echo "Importing campus datasets into the knowledge base..."
 php artisan db:seed --class=CampusDatasetSeeder --force
 
+echo "Adding question translations (EN / ZH / TA)..."
+php artisan db:seed --class=KbTranslationSeeder --force
+
 echo "Tagging chat questions with their knowledge-base topic..."
 php artisan chat:tag-topics || true
 

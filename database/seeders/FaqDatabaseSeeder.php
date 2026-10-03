@@ -54,5 +54,7 @@ class FaqDatabaseSeeder extends Seeder
                 count($rows)
             ));
         }
+
+        $this->call(KbTranslationSeeder::class); // English / Chinese / Tamil questions
     }
 }

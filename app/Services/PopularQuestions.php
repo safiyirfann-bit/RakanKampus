@@ -87,7 +87,7 @@ class PopularQuestions
      */
     public static function marquee(int $limit = 12): array
     {
-        return Cache::remember('chat.marquee_questions.v4.' . $limit, now()->addHour(), function () use ($limit) {
+        return Cache::remember('chat.marquee_questions.v5.' . $limit, now()->addHour(), function () use ($limit) {
             $out = [];
             $seen = [];
             foreach (self::compute(6) as $q) {
@@ -97,7 +97,7 @@ class PopularQuestions
 
             $kb = \App\Models\KnowledgeBase::query()->suggestable()
                 ->whereRaw('LENGTH(question) BETWEEN 10 AND 48')
-                ->inRandomOrder()->limit(200)->get(['id', 'question', 'category']);
+                ->inRandomOrder()->limit(200)->get(['id', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'category']);
             $perTopic = [];
             foreach ($kb as $row) {
                 if (count($out) >= $limit) {
@@ -155,30 +155,45 @@ class PopularQuestions
     public static function marqueeFor(string $locale, int $limit = 12): array
     {
         $items = self::marquee($limit);
-        if ($locale === 'ms') {
-            return array_map(fn ($q) => ['text' => __($q['text']), 'topic' => $q['topic'], 'kb_id' => $q['kb_id'] ?? null], $items);
+
+        // Knowledge-base chips: use the stored translation of the question (no AI needed).
+        $kb = \App\Models\KnowledgeBase::whereIn('id', array_filter(array_column($items, 'kb_id')))->get()->keyBy('id');
+        $todo = [];
+        foreach ($items as $i => $q) {
+            $entry = $q['kb_id'] ? ($kb[$q['kb_id']] ?? null) : null;
+            $hasOwn = $entry && ($locale === 'ms' ? true : filled($entry->{"question_{$locale}"}));
+            if ($hasOwn) {
+                $items[$i]['text'] = $entry->questionFor($locale);
+            } elseif ($locale === 'ms') {
+                $items[$i]['text'] = __($q['text']);
+            } else {
+                $todo[$i] = $q['text']; // a student's own question, or an entry not translated yet
+            }
+        }
+        if (! $todo) {
+            return $items;
         }
 
-        $texts = array_column($items, 'text');
-        $key = 'chat.marquee_tr.' . $locale . '.' . md5(json_encode($texts));
+        // The rest are translated once with the AI and cached for a day.
+        $key = 'chat.marquee_tr.' . $locale . '.' . md5(json_encode(array_values($todo)));
         $translated = Cache::get($key);
         if (! is_array($translated)) {
-            $translated = self::translate($texts, $locale);
+            $translated = self::translate(array_values($todo), $locale);
             if ($translated) {
                 Cache::put($key, $translated, now()->addDay());
             }
         }
 
-        if ($translated && count($translated) === count($items)) {
-            foreach ($items as $i => $q) {
-                $items[$i]['text'] = $translated[$i];
+        $translated = is_array($translated) && count($translated) === count($todo) ? array_values($translated) : null;
+        foreach (array_keys($todo) as $n => $i) {
+            if ($translated) {
+                $items[$i]['text'] = $translated[$n];
+            } else {
+                unset($items[$i]); // can't show it in this language: leave it out
             }
-
-            return $items;
         }
 
-        // No translation available: questions we know the bot can answer, in the UI language
-        return array_map(fn ($q) => ['text' => __($q), 'topic' => null, 'kb_id' => null], array_slice(self::FALLBACK_EN, 0, $limit));
+        return array_values($items) ?: array_map(fn ($q) => ['text' => __($q), 'topic' => null, 'kb_id' => null], array_slice(self::FALLBACK_EN, 0, $limit));
     }
 
     /** @return array<int, string>|null */
