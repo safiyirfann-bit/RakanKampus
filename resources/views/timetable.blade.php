@@ -443,7 +443,7 @@
 
   @media (min-width: 861px) {
     body { background: #f0fafa; }
-    .container { max-width: 1080px; margin: 0; padding: 36px 44px 90px; }
+    .container { max-width: none; margin: 0; padding: 32px 40px 90px; }
     .header-title { color: #14213d; }
     .header-sub { color: #64748b; }
     .add-btn { width: auto; padding: 12px 22px; }

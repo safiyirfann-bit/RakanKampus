@@ -575,7 +575,7 @@
   @media (min-width: 861px) {
     body { background: #f0fafa; }
 
-    .container { max-width: 1080px; margin: 0; padding: 36px 44px 90px; }
+    .container { max-width: none; margin: 0; padding: 32px 40px 90px; }
 
     .header { padding: 0 0 18px; }
     .header-title { color: #14213d; font-size: 22px; }
@@ -804,7 +804,7 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #d0d4da; }
 .rm-cal-legend span::before { content: "●"; color: var(--c); margin-right: 3px; }
 
 @media (min-width: 861px) {
-  .rm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
+  .rm-layout { display: grid; grid-template-columns: minmax(0, 1fr) clamp(320px, 26vw, 420px); gap: 26px; align-items: start; }
   .rm-side { display: block; position: sticky; top: 24px; }
   .rm-next-m, .rm-week { display: none; }
   .rm-type { border-color: #dbeeee; background: #fff; color: #0f766e; }
