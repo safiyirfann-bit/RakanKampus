@@ -1,76 +1,62 @@
+@props(['hint' => null])
 {{--
-  Floating "RakanKampus" button (Reminders / Timetable → opens the AI capture modal).
-  - The robot strolls from one end of the button to the other, passing
-    behind the word "RakanKampus", turning round at each end.
-  - A beam of light runs round the border like a loading ring, with a soft
-    pulsing glow outside it.
+  Floating AI button (Reminders / Timetable → opens the AI capture modal), shaped like a
+  chat bubble: the robot in a round badge, a short line from it ("Need help adding
+  dates?") and "typing" dots, bobbing gently. Pass hint="…" to change the line.
   Positioning (fixed, bottom-right) still comes from the page's own .ai-fab rules.
 --}}
 @once
 <style>
   html body button.ai-fab.rkfab {
-    background: transparent !important; border: none; padding: 0; overflow: visible;
-    border-radius: 999px; cursor: pointer; isolation: isolate;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
-    animation: rkfabGlow 2.4s ease-in-out infinite;
+    background: transparent !important; border: 0; padding: 0; overflow: visible; cursor: pointer;
+    border-radius: 22px 22px 6px 22px; box-shadow: none; animation: rkfabBob 3s ease-in-out infinite;
   }
-  /* the spinning light, clipped to a thin ring */
-  .rkfab .rkfab-ring {
-    position: relative; display: block; border-radius: 999px; padding: 2.5px; overflow: hidden;
-    background: rgba(46, 196, 198, 0.25);
+  .rkfab .rkfab-bubble {
+    position: relative; display: flex; align-items: center; gap: 10px; padding: 9px 16px 9px 9px; text-align: left;
+    border-radius: 22px 22px 6px 22px; background: #fff; border: 2px solid #ccfbf1;
+    box-shadow: 0 12px 26px rgba(15, 39, 71, .2); transition: border-color .2s, box-shadow .2s, transform .15s;
   }
-  .rkfab .rkfab-ring::before {
-    content: ''; position: absolute; left: 50%; top: 50%; width: 170%; aspect-ratio: 1;
-    transform: translate(-50%, -50%) rotate(0deg);
-    background: conic-gradient(from 0deg, transparent 0 58%, #22d3ee 70%, #34d399 80%, #facc15 90%, #ffffff 95%, transparent 100%);
-    animation: rkfabSpin 2.4s linear infinite;
+  html body button.ai-fab.rkfab:hover .rkfab-bubble { border-color: #5eead4; box-shadow: 0 14px 30px rgba(20, 184, 166, .3); }
+  html body button.ai-fab.rkfab:active .rkfab-bubble { transform: scale(.97); }
+  html body button.ai-fab.rkfab:focus-visible { outline: none; }
+  html body button.ai-fab.rkfab:focus-visible .rkfab-bubble { box-shadow: 0 0 0 3px #2ec4c6, 0 12px 26px rgba(15, 39, 71, .2); }
+  .rkfab .rkfab-av {
+    position: relative; width: 42px; height: 42px; flex: none; border-radius: 50%; display: grid; place-items: center;
+    background: linear-gradient(135deg, #0f2747, #14b8a6);
   }
-  .rkfab .rkfab-body {
-    position: relative; z-index: 1; display: block; overflow: hidden;
-    border-radius: 999px; background: #ffffff;
-    width: 176px; height: 42px;
+  .rkfab .rkfab-av::after {   /* little "online" dot */
+    content: ""; position: absolute; right: 0; bottom: 1px; width: 10px; height: 10px; border-radius: 50%;
+    background: #4ade80; border: 2px solid #fff;
   }
-  .rkfab .rkfab-label {
-    position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
-    font-size: 13px; font-weight: 800; letter-spacing: 0.01em; color: #14213d; pointer-events: none;
-    text-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 0 2px #fff;
-  }
-  /* the robot's lane — it walks the full width, underneath the label */
-  html body .rkfab .rkfab-bot {
-    position: absolute; z-index: 1; bottom: 3px; left: 4px;
-    width: 46px; height: 32px; opacity: .95;
-    animation: rkfabWalk 7s ease-in-out infinite;
-  }
-  .rkfab .rkfab-bot .rb-walk { animation: none; }            /* the lane does the walking */
-  .rkfab .rkfab-bot .rb-face { animation-duration: 7s; }       /* turn round at each end */
+  html body .rkfab .rkfab-bot { width: 34px !important; height: 34px !important; }
+  .rkfab .rkfab-bot .rb-walk { animation: none !important; }   /* stays in the badge, still waves & blinks */
+  .rkfab .rkfab-text { display: flex; flex-direction: column; min-width: 0; }
+  .rkfab .rkfab-text b { font-size: 13px; font-weight: 800; color: #14213d; white-space: nowrap; }
+  .rkfab .rkfab-dots { display: flex; gap: 3px; margin-top: 4px; }
+  .rkfab .rkfab-dots i { width: 6px; height: 6px; border-radius: 50%; background: #14b8a6; animation: rkfabDot 1s ease-in-out infinite; }
+  .rkfab .rkfab-dots i:nth-child(2) { animation-delay: .15s; }
+  .rkfab .rkfab-dots i:nth-child(3) { animation-delay: .3s; }
+  @keyframes rkfabBob { 50% { transform: translateY(-4px); } }
+  @keyframes rkfabDot { 50% { transform: translateY(-3px); opacity: .4; } }
+  @media (max-width: 420px) { .rkfab .rkfab-text b { font-size: 12px; } }
 
-  @keyframes rkfabWalk { 0%, 100% { left: 2px; } 46%, 54% { left: calc(100% - 48px); } }
-  @keyframes rkfabSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
-  @keyframes rkfabGlow {
-    0%, 100% { box-shadow: 0 8px 18px rgba(0,0,0,.22), 0 0 10px rgba(34, 211, 238, .45); }
-    50%      { box-shadow: 0 8px 18px rgba(0,0,0,.22), 0 0 18px rgba(250, 204, 21, .45); }
-  }
-
-  html body button.ai-fab.rkfab:hover .rkfab-ring::before { animation-duration: 1s; }
-  html body button.ai-fab.rkfab:active { transform: scale(.97); }
-  html body button.ai-fab.rkfab:focus-visible { outline: 3px solid #2ec4c6; outline-offset: 3px; }
-
-  html[data-theme="dark"] .rkfab .rkfab-body { background: #172233; }
-  html[data-theme="dark"] .rkfab .rkfab-label { color: #e2e8f0; text-shadow: 0 0 4px #172233, 0 0 8px #172233, 0 0 2px #172233; }
-  /* navy robot on a dark button: give it a light outline + teal glow so it still reads */
-  html[data-theme="dark"] .rkfab .rkfab-bot { background: none !important; padding: 0 !important; filter: drop-shadow(0 0 0.6px #e2e8f0) drop-shadow(0 0 0.6px #e2e8f0) drop-shadow(0 0 4px rgba(46,196,198,.55)); }
-  html[data-theme="dark"] .rkfab .rkfab-bot .rb-shadow { fill: #000; }
+  html[data-theme="dark"] .rkfab .rkfab-bubble { background: #172233; border-color: #1f5f59; box-shadow: 0 12px 26px rgba(0,0,0,.5); }
+  html[data-theme="dark"] .rkfab .rkfab-text b { color: #e2e8f0; }
+  html[data-theme="dark"] .rkfab .rkfab-av::after { border-color: #172233; }
+  html[data-theme="dark"] .rkfab .rkfab-dots i { background: #41eedf; }
 
   @media (prefers-reduced-motion: reduce) {
-    html body button.ai-fab.rkfab, .rkfab .rkfab-ring::before, html body .rkfab .rkfab-bot { animation: none !important; }
+    html body button.ai-fab.rkfab, .rkfab .rkfab-dots i { animation: none !important; }
   }
 </style>
 @endonce
-<button type="button" {{ $attributes->merge(['class' => 'ai-fab rkfab', 'aria-label' => 'RakanKampus']) }}>
-  <span class="rkfab-ring">
-    <span class="rkfab-body">
-      <x-brand-bot-animated :size="32" class="rkfab-bot" />
-      <span class="rkfab-label">RakanKampus</span>
+@php($hintText = $hint ?? __('Need help adding dates?'))
+<button type="button" {{ $attributes->merge(['class' => 'ai-fab rkfab', 'aria-label' => $hintText . ' — ' . __('RakanKampus AI')]) }}>
+  <span class="rkfab-bubble">
+    <span class="rkfab-av"><x-brand-bot-animated :size="34" class="rkfab-bot" /></span>
+    <span class="rkfab-text">
+      <b>{{ $hintText }}</b>
+      <span class="rkfab-dots" aria-hidden="true"><i></i><i></i><i></i></span>
     </span>
   </span>
 </button>

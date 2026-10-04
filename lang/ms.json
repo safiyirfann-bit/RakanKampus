@@ -796,5 +796,8 @@
     "Last class ends at :time": "Kelas terakhir tamat :time",
     "class": "kelas",
     "classes": "kelas",
-    ":n classes · :h hours": ":n kelas · :h jam"
+    ":n classes · :h hours": ":n kelas · :h jam",
+    "Need help adding dates?": "Perlu bantuan tambah tarikh?",
+    "Add classes from a photo?": "Tambah kelas dari gambar?",
+    "RakanKampus AI": "RakanKampus AI"
 }

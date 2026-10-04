@@ -603,5 +603,8 @@
     "Last class ends at :time": "கடைசி வகுப்பு :time-க்கு முடிகிறது",
     "class": "வகுப்பு",
     "classes": "வகுப்புகள்",
-    ":n classes · :h hours": ":n வகுப்புகள் · :h மணி"
+    ":n classes · :h hours": ":n வகுப்புகள் · :h மணி",
+    "Need help adding dates?": "தேதிகளைச் சேர்க்க உதவி வேண்டுமா?",
+    "Add classes from a photo?": "புகைப்படத்திலிருந்து வகுப்புகளைச் சேர்க்கவா?",
+    "RakanKampus AI": "RakanKampus AI"
 }

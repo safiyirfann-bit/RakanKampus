@@ -603,5 +603,8 @@
     "Last class ends at :time": "最后一节课 :time 结束",
     "class": "节课",
     "classes": "节课",
-    ":n classes · :h hours": ":n 节课 · :h 小时"
+    ":n classes · :h hours": ":n 节课 · :h 小时",
+    "Need help adding dates?": "需要帮忙添加日期吗？",
+    "Add classes from a photo?": "从照片添加课程？",
+    "RakanKampus AI": "RakanKampus AI"
 }

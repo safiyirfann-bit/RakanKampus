@@ -723,7 +723,7 @@ html[data-theme="dark"] .timeline-card.ty-t { background: #2c1a26; } html[data-t
   </div>
 </div>
 
-<x-rakankampus-fab onclick="openAiModal()" />
+<x-rakankampus-fab onclick="openAiModal()" :hint="__('Add classes from a photo?')" />
 
 <div class="overlay" id="overlay" onclick="closeModals()"></div>
 
