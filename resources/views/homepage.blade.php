@@ -638,6 +638,77 @@ html[data-theme="dark"] .conv-meta svg { stroke: #ced3d9; }
 html[data-theme="dark"] .conv-action-btn { color: #ced3d9; }
 html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c3b39; }
 </style>
+<style id="sky-greeting">
+/* ---------- Greeting card: sky that follows the time of day ---------- */
+.greeting-card.sky-card { padding: 26px 30px 70px; transition: background .8s ease, color .4s; min-height: 200px; }
+.greeting-card.sky-card::before, .greeting-card.sky-card::after { display: none; }
+.sky { position: absolute; inset: 0; pointer-events: none; overflow: hidden; border-radius: inherit; }
+.sky-orb { position: absolute; right: 230px; top: 26px; width: 66px; height: 66px; border-radius: 50%; transition: all .8s ease; animation: skyBob 6s ease-in-out infinite; }
+@keyframes skyBob { 50% { transform: translateY(-6px); } }
+.sky-cloud { position: absolute; height: 24px; border-radius: 20px; background: #fff; opacity: .9; animation: skyDrift 32s linear infinite; }
+.sky-cloud::before { content: ""; position: absolute; left: 20%; top: -13px; width: 44%; height: 28px; border-radius: 50%; background: inherit; }
+.sky-cloud.k1 { top: 30px; width: 90px; animation-delay: -6s; }
+.sky-cloud.k2 { top: 78px; width: 64px; animation-duration: 42s; animation-delay: -24s; }
+.sky-cloud.k3 { top: 46px; width: 74px; animation-duration: 38s; animation-delay: -15s; }
+@keyframes skyDrift { from { left: 38%; opacity: 0; } 12% { opacity: var(--co, .9); } 90% { opacity: var(--co, .9); } to { left: 100%; opacity: 0; } }
+.sky-stars { position: absolute; inset: 0 0 40% 0; opacity: 0; transition: opacity .8s;
+  background-image: radial-gradient(1.5px 1.5px at 8% 30%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 18% 70%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 30% 20%, #fff 50%, transparent 51%),
+    radial-gradient(1px 1px at 42% 55%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 55% 25%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 63% 65%, #fff 50%, transparent 51%),
+    radial-gradient(1.5px 1.5px at 72% 15%, #fff 50%, transparent 51%), radial-gradient(1px 1px at 84% 45%, #fff 50%, transparent 51%), radial-gradient(1.5px 1.5px at 93% 22%, #fff 50%, transparent 51%);
+  animation: skyTwinkle 3s ease-in-out infinite alternate; }
+@keyframes skyTwinkle { from { filter: brightness(.6); } to { filter: brightness(1.3); } }
+.sky-city { position: absolute; left: 0; right: 0; bottom: 0; width: 100%; height: 52px; fill: #0f2747; opacity: .88; transition: fill .8s; }
+.sky-win rect { fill: transparent; transition: fill .8s; }
+.sky-bot { position: absolute; right: 44px; bottom: 6px; width: 116px; height: auto; z-index: 2; filter: drop-shadow(0 12px 16px rgba(15,39,71,.3)); animation: skyBob 3.4s ease-in-out infinite; }
+.sky-card .greeting-top, .sky-card .greeting-hello, .sky-card .greeting-question { position: relative; z-index: 2; }
+.sky-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 800; }
+.sky-dot { opacity: .6; }
+.sky-card .greeting-question { font-size: 24px; letter-spacing: -.4px; }
+
+/* morning */
+.sky-morning { background: linear-gradient(180deg, #7dd3fc 0%, #bae6fd 55%, #fef9c3 100%) !important; }
+.sky-morning .sky-orb { right: 320px; top: 46px; background: radial-gradient(#fffbea, #fde047); box-shadow: 0 0 50px 16px rgba(253,224,71,.55); }
+/* afternoon */
+.sky-afternoon { background: linear-gradient(180deg, #38bdf8 0%, #7dd3fc 45%, #fde68a 100%) !important; }
+.sky-afternoon .sky-orb { background: radial-gradient(#fff7cc, #fbbf24); box-shadow: 0 0 60px 20px rgba(253,224,71,.55); }
+/* evening */
+.sky-evening { background: linear-gradient(180deg, #6d28d9 0%, #db2777 55%, #fb923c 100%) !important; }
+.sky-evening .sky-orb { right: 300px; top: 70px; background: radial-gradient(#fed7aa, #f97316); box-shadow: 0 0 60px 18px rgba(249,115,22,.55); }
+.sky-evening .sky-cloud { background: #fbcfe8; --co: .55; }
+.sky-evening .sky-city { fill: #2e1065; }
+/* night */
+.sky-night { background: linear-gradient(180deg, #0b1026 0%, #1e1b4b 60%, #312e81 100%) !important; }
+.sky-night .sky-stars { opacity: 1; }
+.sky-night .sky-orb { width: 54px; height: 54px; background: #f8fafc; box-shadow: inset -14px -6px 0 0 #cbd5e1, 0 0 36px 8px rgba(226,232,240,.35); }
+.sky-night .sky-cloud { background: #475569; --co: .35; }
+.sky-night .sky-city { fill: #050816; opacity: 1; }
+.sky-night .sky-win rect, .sky-evening .sky-win rect { fill: #fde68a; }
+
+/* text colours: dark on the day sky, white on evening / night */
+.sky-morning, .sky-afternoon { color: #0f2747 !important; }
+.sky-morning .greeting-programme, .sky-afternoon .greeting-programme { color: #1e3a5f; }
+.sky-morning .greeting-meta, .sky-afternoon .greeting-meta { color: #334155; }
+.sky-morning .greeting-avatar, .sky-afternoon .greeting-avatar { background: #0f2747; color: #fff; border-color: rgba(255,255,255,.7); }
+.sky-morning .sky-badge, .sky-afternoon .sky-badge { background: rgba(255,255,255,.78); color: #0f2747; }
+.sky-evening .sky-badge, .sky-night .sky-badge { background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(255,255,255,.25); }
+.sky-evening .greeting-programme, .sky-night .greeting-programme { color: #f5f3ff; }
+.sky-evening .greeting-meta, .sky-night .greeting-meta { color: #ddd6fe; }
+.sky-card .greeting-hello { color: inherit; margin-bottom: 8px; }
+
+@media (max-width: 600px) {
+  .greeting-card.sky-card { padding: 20px 20px 62px; }
+  .sky-bot { width: 74px; right: 14px; top: 16px; bottom: auto; }
+  .sky-orb, .sky-morning .sky-orb, .sky-evening .sky-orb { right: 26px; top: 104px; width: 38px; height: 38px; }
+  .sky-night .sky-orb { width: 34px; height: 34px; box-shadow: inset -9px -4px 0 0 #cbd5e1, 0 0 24px 6px rgba(226,232,240,.35); }
+  .sky-cloud.k3 { display: none; }
+  @keyframes skyDrift { from { left: 58%; opacity: 0; } 15% { opacity: var(--co, .9); } 85% { opacity: var(--co, .9); } to { left: 100%; opacity: 0; } }
+  .sky-card .greeting-top { padding-right: 70px; }
+  .sky-card .greeting-question { font-size: 19px; }
+  .sky-city { height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .sky-cloud, .sky-orb, .sky-bot, .sky-stars { animation: none; } }
+html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0,0,0,.55); }
+</style>
 </head>
 <body>
 
@@ -665,7 +736,19 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
   <div class="container">
 
     <!-- Greeting card -->
-    <div class="greeting-card">
+    @php
+        $h = now()->hour;
+        $skyPhase = ($h < 5 || $h >= 20) ? 'night' : ($h < 12 ? 'morning' : ($h < 18 ? 'afternoon' : 'evening'));
+    @endphp
+    <div class="greeting-card sky-card sky-{{ $skyPhase }}" id="skyCard">
+      {{-- Sky that follows the time of day: morning / afternoon / evening / night --}}
+      <div class="sky" aria-hidden="true">
+        <div class="sky-stars"></div>
+        <div class="sky-orb"></div>
+        <span class="sky-cloud k1"></span><span class="sky-cloud k2"></span><span class="sky-cloud k3"></span>
+        <svg class="sky-city" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 60V36h50v-12h36v12h28V18h46v18h36V28h64V12h18v16h56v8h46V20h74v16h38V28h56V10h28v18h64v8h56V22h46v14h38v-8h84v8h46V16h36v20h56v-6h40v-14h22v14h60v12h44V24h40v12h52v24z"/><g class="sky-win"><rect x="164" y="22" width="4" height="4"/><rect x="176" y="30" width="4" height="4"/><rect x="460" y="26" width="4" height="4"/><rect x="476" y="34" width="4" height="4"/><rect x="694" y="16" width="4" height="4"/><rect x="706" y="26" width="4" height="4"/><rect x="980" y="22" width="4" height="4"/><rect x="996" y="32" width="4" height="4"/></g></svg>
+      </div>
+      <x-brand-logo size="120" class="sky-bot" />
       <div class="greeting-top">
         <div class="greeting-avatar">
             @if($user->photo_data)
@@ -698,7 +781,7 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
               $greeting = 'Good evening';
           }
       @endphp
-      <p class="greeting-hello"><span id="greetingHello">{{ __($greeting) }}</span>!</p>
+      <p class="greeting-hello"><span class="sky-badge"><span id="skyIcon">{{ ["morning" => "☀️", "afternoon" => "🌤️", "evening" => "🌇", "night" => "🌙"][$skyPhase] }}</span> <span id="greetingHello">{{ __($greeting) }}</span><span class="sky-dot">·</span><span id="skyTime">{{ now()->format('g:i A') }}</span></span></p>
       <p class="greeting-question">{{ __('How can I help you today?') }}</p>
     </div>
 
@@ -953,6 +1036,21 @@ function updateGreeting() {
 }
 updateGreeting();
 setInterval(updateGreeting, 60000);
+
+// Greeting card sky: colours, sun/moon and the little clock follow the device time
+function updateSky() {
+    const card = document.getElementById('skyCard');
+    if (!card) return;
+    const d = new Date(), h = d.getHours();
+    const phase = (h < 5 || h >= 20) ? 'night' : (h < 12 ? 'morning' : (h < 18 ? 'afternoon' : 'evening'));
+    ['morning', 'afternoon', 'evening', 'night'].forEach(p => card.classList.toggle('sky-' + p, p === phase));
+    const icon = document.getElementById('skyIcon');
+    if (icon) icon.textContent = { morning: '☀️', afternoon: '🌤️', evening: '🌇', night: '🌙' }[phase];
+    const tm = document.getElementById('skyTime');
+    if (tm) tm.textContent = d.toLocaleTimeString(window.APP_LOCALE === 'en' ? 'en-US' : (window.APP_LOCALE || 'en-US'), { hour: 'numeric', minute: '2-digit' });
+}
+updateSky();
+setInterval(updateSky, 30000);
 
 // Conversation cards: swipe right to reveal "Delete", tap Delete to remove it,
 // tap the card (or swipe back) to close. A mostly-vertical drag is left to the
