@@ -576,5 +576,21 @@
     "days": "நாட்கள்",
     "hrs": "மணி",
     "sec": "வினா",
-    "Showing :day": ":day காட்டுகிறது"
+    "Showing :day": ":day காட்டுகிறது",
+    "Remind me": "எனக்கு நினைவூட்டு",
+    "before": "முன்",
+    "Spin the wheels and tap Add. You can add up to 9 reminders.": "சக்கரங்களைச் சுழற்றி சேர் அழுத்தவும். 9 நினைவூட்டல்கள் வரை சேர்க்கலாம்.",
+    "minutes": "நிமிடங்கள்",
+    "hours": "மணி",
+    "weeks": "வாரங்கள்",
+    ":n weeks before": ":n வாரங்கள் முன்",
+    "1 week": "1 வாரம்",
+    ":n days before": ":n நாட்கள் முன்",
+    ":n hours before": ":n மணி முன்",
+    ":h h :m min before": ":h ம :m நிமி முன்",
+    ":n min before": ":n நிமி முன்",
+    "Maximum 9 reminders": "அதிகபட்சம் 9 நினைவூட்டல்கள்",
+    "Already added": "ஏற்கனவே சேர்க்கப்பட்டது",
+    "Add “:label”": "“:label” சேர்",
+    "No reminder yet — add at least one below.": "இன்னும் நினைவூட்டல் இல்லை — கீழே குறைந்தது ஒன்றைச் சேர்க்கவும்."
 }

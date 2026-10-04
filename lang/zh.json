@@ -576,5 +576,21 @@
     "days": "天",
     "hrs": "小时",
     "sec": "秒",
-    "Showing :day": "显示 :day"
+    "Showing :day": "显示 :day",
+    "Remind me": "提醒我",
+    "before": "之前",
+    "Spin the wheels and tap Add. You can add up to 9 reminders.": "转动滚轮并点击添加。最多可添加 9 个提醒。",
+    "minutes": "分钟",
+    "hours": "小时",
+    "weeks": "周",
+    ":n weeks before": "提前 :n 周",
+    "1 week": "1 周",
+    ":n days before": "提前 :n 天",
+    ":n hours before": "提前 :n 小时",
+    ":h h :m min before": "提前 :h 小时 :m 分钟",
+    ":n min before": "提前 :n 分钟",
+    "Maximum 9 reminders": "最多 9 个提醒",
+    "Already added": "已添加",
+    "Add “:label”": "添加“:label”",
+    "No reminder yet — add at least one below.": "还没有提醒 — 请在下方至少添加一个。"
 }

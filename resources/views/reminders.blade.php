@@ -824,6 +824,29 @@ html[data-theme="dark"] .rm-cal-grid button.today { background: #41eedf; color: 
 }
 html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41eedf; }
 </style>
+<style id="rw-wheel">
+.rw-chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
+.rw-chip { display: inline-flex; align-items: center; gap: 6px; background: #f0fdfa; border: 1.5px solid #14b8a6; color: #0f766e; font-size: 12.5px; font-weight: 700; padding: 6px 6px 6px 11px; border-radius: 999px; }
+.rw-chip button { width: 20px; height: 20px; border: 0; border-radius: 50%; background: rgba(15,118,110,.12); color: #0f766e; font-size: 14px; line-height: 1; cursor: pointer; padding: 0; }
+.rw-empty { font-size: 12px; color: #94a3b8; }
+.rw-wheel { position: relative; display: flex; justify-content: center; gap: 6px; height: 200px; background: #f8fafc; border-radius: 18px; overflow: hidden; margin-bottom: 10px; }
+.rw-wheel::before { content: ""; position: absolute; left: 10px; right: 10px; top: 80px; height: 40px; border-radius: 12px; background: #f0fdfa; border: 1.5px solid #99f6e4; pointer-events: none; }
+.rw-wheel::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(#f8fafc, rgba(248,250,252,0) 34%, rgba(248,250,252,0) 66%, #f8fafc); }
+.rw-col { position: relative; width: 104px; height: 200px; overflow-y: auto; scroll-snap-type: y mandatory; scrollbar-width: none; overscroll-behavior: contain; }
+.rw-col::-webkit-scrollbar { display: none; }
+.rw-pad { height: 80px; }
+.rw-item { height: 40px; line-height: 40px; text-align: center; scroll-snap-align: center; font-size: 15px; font-weight: 700; color: #94a3b8; cursor: pointer; user-select: none; transition: color .15s, font-size .15s; }
+.rw-item.on { color: #0f2747; font-size: 19px; font-weight: 800; }
+.rw-fixed { overflow: hidden; width: 80px; } .rw-fixed .rw-item.on { font-size: 15px; color: #0f766e; }
+.rw-add { width: 100%; border: 0; border-radius: 14px; padding: 12px; font: 800 13.5px inherit; font-family: inherit; color: #fff; cursor: pointer; background: linear-gradient(120deg, #0f2747, #14b8a6); box-shadow: 0 8px 18px rgba(20,184,166,.25); }
+.rw-add:disabled { background: #e2e8f0; color: #64748b; box-shadow: none; cursor: default; }
+html[data-theme="dark"] .rw-wheel { background: #111a26; }
+html[data-theme="dark"] .rw-wheel::after { background: linear-gradient(#111a26, rgba(17,26,38,0) 34%, rgba(17,26,38,0) 66%, #111a26); }
+html[data-theme="dark"] .rw-wheel::before { background: #13302e; border-color: #1f5f59; }
+html[data-theme="dark"] .rw-item.on { color: #f1f5f9; } html[data-theme="dark"] .rw-fixed .rw-item.on { color: #41eedf; }
+html[data-theme="dark"] .rw-chip { background: #13302e; border-color: #1f8f86; color: #5eead4; }
+html[data-theme="dark"] .rw-add:disabled { background: #1f2a39; color: #8a94a3; }
+</style>
 </head>
 <body>
 
@@ -990,27 +1013,19 @@ html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41ee
     <span><small>{{ __('Due') }}</small><b id="dueFieldText">{{ __('Pick date & time') }}</b></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg>
   </button>
-  <p class="field-label">{{ __('Notify me how many hours before?') }}</p>
-  <input type="number" id="leadInput" min="0" step="0.5" value="1">
-  <p class="hint">{{ __('Type any number of hours — use 0.5 for 30 minutes.') }}</p>
-
-  <div class="repeat-toggle-row">
-    <label class="repeat-toggle-label">
-      <input type="checkbox" id="repeatToggle" onchange="toggleRepeatOptions()">
-      {{ __('Remind me more than once') }}
-    </label>
+  {{-- When to notify: spin the wheels (number + unit), tap Add → a chip. All chips are sent:
+       the closest one to the due time is the main notification, the rest are extra reminders. --}}
+  <p class="field-label">{{ __('Remind me') }}</p>
+  <div class="rw-chips" id="rwChips"></div>
+  <div class="rw-wheel" id="rwWheel">
+    <div class="rw-col" id="rwNum"></div>
+    <div class="rw-col" id="rwUnit"></div>
+    <div class="rw-col rw-fixed"><div class="rw-pad"></div><div class="rw-item on">{{ __('before') }}</div><div class="rw-pad"></div></div>
   </div>
-  <div class="repeat-options-wrap hidden" id="repeatOptionsWrap">
-    <p class="field-label">{{ __('Also remind me at (pick as many as you like)') }}</p>
-    <div class="repeat-chip-row" id="repeatChipRow">
-      <button type="button" class="repeat-chip" data-hours="72" onclick="toggleRepeatChip(this)">{{ __('3 days before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="24" onclick="toggleRepeatChip(this)">{{ __('1 day before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="3" onclick="toggleRepeatChip(this)">{{ __('3 hours before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="1" onclick="toggleRepeatChip(this)">{{ __('1 hour before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="0.5" onclick="toggleRepeatChip(this)">{{ __('30 min before') }}</button>
-    </div>
-    <p class="hint">{{ __('On top of the main notification above.') }}</p>
-  </div>
+  <button type="button" class="rw-add" id="rwAdd" onclick="rwAddChip()"></button>
+  <p class="hint" id="rwHint">{{ __('Spin the wheels and tap Add. You can add up to 9 reminders.') }}</p>
+  <input type="hidden" id="leadInput" value="1">
+  <input type="checkbox" id="repeatToggle" hidden>
 
   <p id="formError" style="color:#e11d48; font-size: 11.5px; display:none; margin: -6px 0 10px;">{{ __('Please fill in a subject and date.') }}</p>
   <button type="button" class="modal-save" onclick="saveReminder()">{{ __('Save Reminder') }}</button>
@@ -1360,6 +1375,78 @@ function selectType(type) {
   });
 }
 
+// ---------- reminder time wheel ----------
+const RW_UNITS = [
+  { key: 'minutes', label: t('minutes'), hours: 1 / 60, max: 59 },
+  { key: 'hours', label: t('hours'), hours: 1, max: 23 },
+  { key: 'days', label: t('days'), hours: 24, max: 30 },
+  { key: 'weeks', label: t('weeks'), hours: 168, max: 8 },
+];
+const RW_H = 40;
+let rwChipsHours = [];
+function rwBuild() {
+  const num = document.getElementById('rwNum'), unit = document.getElementById('rwUnit');
+  if (!num || num.dataset.ready) return;
+  num.innerHTML = '<div class="rw-pad"></div>' + Array.from({ length: 59 }, (_, i) => `<div class="rw-item" data-v="${i + 1}">${i + 1}</div>`).join('') + '<div class="rw-pad"></div>';
+  unit.innerHTML = '<div class="rw-pad"></div>' + RW_UNITS.map((u, i) => `<div class="rw-item" data-v="${i}">${u.label}</div>`).join('') + '<div class="rw-pad"></div>';
+  num.dataset.ready = '1';
+  [num, unit].forEach(col => {
+    let tm;
+    col.addEventListener('scroll', () => { rwMark(col); clearTimeout(tm); tm = setTimeout(() => { rwClamp(); rwSync(); }, 90); });
+    col.addEventListener('click', e => { const it = e.target.closest('.rw-item'); if (it) col.scrollTo({ top: (Array.from(col.querySelectorAll('.rw-item')).indexOf(it)) * RW_H, behavior: 'smooth' }); });
+  });
+}
+function rwIndex(col) { return Math.max(0, Math.round(col.scrollTop / RW_H)); }
+function rwMark(col) { const i = rwIndex(col); col.querySelectorAll('.rw-item').forEach((el, k) => el.classList.toggle('on', k === i)); }
+function rwValue() {
+  const n = rwIndex(document.getElementById('rwNum')) + 1, u = RW_UNITS[Math.min(RW_UNITS.length - 1, rwIndex(document.getElementById('rwUnit')))];
+  return { n, u };
+}
+function rwClamp() {
+  const { n, u } = rwValue();
+  if (n > u.max) document.getElementById('rwNum').scrollTo({ top: (u.max - 1) * RW_H, behavior: 'smooth' });
+}
+function rwSet(n, unitIdx) {
+  const num = document.getElementById('rwNum'), unit = document.getElementById('rwUnit');
+  num.scrollTop = (n - 1) * RW_H; unit.scrollTop = unitIdx * RW_H; rwMark(num); rwMark(unit); rwSync();
+}
+function rwLabel(hours) {
+  const r = v => Math.round(v * 100) / 100;
+  if (hours % 168 === 0) return t(':n weeks before', { n: hours / 168 }).replace(/^1 weeks/, t('1 week'));
+  if (hours % 24 === 0) return hours === 24 ? t('1 day before') : t(':n days before', { n: hours / 24 });
+  if (hours >= 1 && Math.abs(hours - Math.round(hours)) < 1e-6) return hours === 1 ? t('1 hour before') : t(':n hours before', { n: hours });
+  const mins = Math.round(hours * 60);
+  if (mins >= 60) { const h = Math.floor(mins / 60), m = mins % 60; return t(':h h :m min before', { h, m }); }
+  return t(':n min before', { n: mins });
+}
+function rwSync() {
+  const { n, u } = rwValue(), h = Math.round(Math.min(n, u.max) * u.hours * 10000) / 10000;
+  const btn = document.getElementById('rwAdd');
+  const dup = rwChipsHours.some(x => Math.abs(x - h) < 1e-4), full = rwChipsHours.length >= 9;
+  btn.disabled = dup || full;
+  btn.textContent = full ? t('Maximum 9 reminders') : (dup ? t('Already added') : '＋ ' + t('Add “:label”', { label: rwLabel(h) }));
+}
+function rwRender() {
+  rwChipsHours.sort((a, b) => b - a);
+  document.getElementById('rwChips').innerHTML = rwChipsHours.length
+    ? rwChipsHours.map((h, i) => `<span class="rw-chip">🔔 ${escapeHtml(rwLabel(h))}<button type="button" aria-label="${t('Remove')}" onclick="rwRemove(${i})">×</button></span>`).join('')
+    : `<span class="rw-empty">${t('No reminder yet — add at least one below.')}</span>`;
+  rwSync();
+}
+function rwAddChip() {
+  const { n, u } = rwValue(), h = Math.round(Math.min(n, u.max) * u.hours * 10000) / 10000;
+  if (rwChipsHours.some(x => Math.abs(x - h) < 1e-4) || rwChipsHours.length >= 9) return;
+  rwChipsHours.push(h); rwRender();
+}
+function rwRemove(i) { rwChipsHours.splice(i, 1); rwRender(); }
+function rwLoad(lead, extra) {
+  rwBuild();
+  rwChipsHours = [];
+  [lead, ...(extra || [])].forEach(h => { h = parseFloat(h); if (!isNaN(h) && h > 0 && !rwChipsHours.some(x => Math.abs(x - h) < 1e-4)) rwChipsHours.push(h); });
+  rwRender();
+  requestAnimationFrame(() => rwSet(1, 2)); // wheel starts at "1 day before"
+}
+
 function toggleRepeatOptions() {
   document.getElementById('repeatOptionsWrap').classList.toggle('hidden', !document.getElementById('repeatToggle').checked);
 }
@@ -1376,12 +1463,6 @@ function toggleRepeatChip(btn) {
 
 function resetRepeatOptions(presetHours) {
   selectedRepeatHours = Array.isArray(presetHours) ? presetHours.slice() : [];
-  document.getElementById('repeatToggle').checked = selectedRepeatHours.length > 0;
-  document.getElementById('repeatOptionsWrap').classList.toggle('hidden', selectedRepeatHours.length === 0);
-  document.querySelectorAll('.repeat-chip').forEach(chip => {
-    const hours = parseFloat(chip.getAttribute('data-hours'));
-    chip.classList.toggle('active', selectedRepeatHours.includes(hours));
-  });
 }
 
 function openAddModal() {
@@ -1393,6 +1474,7 @@ function openAddModal() {
   document.getElementById('leadInput').value = '1';
   selectType('Exam');
   resetRepeatOptions([]);
+  rwLoad(1, []);
   syncDueField();
   showModal('modal');
 }
@@ -1409,6 +1491,7 @@ function openEditModal(id) {
   document.getElementById('leadInput').value = r.lead_hours;
   selectType(r.type);
   resetRepeatOptions(r.repeat_lead_hours || []);
+  rwLoad(r.lead_hours, r.repeat_lead_hours || []);
   syncDueField();
   showModal('modal');
 }
@@ -1457,7 +1540,9 @@ function saveReminder() {
   const subject = document.getElementById('subjectInput').value.trim();
   const date = document.getElementById('dateInput').value;
   const time = document.getElementById('timeInput').value || '09:00';
-  const lead = parseFloat(document.getElementById('leadInput').value) || 1;
+  if (!rwChipsHours.length) { const e = document.getElementById('rwHint'); e.style.color = '#e11d48'; e.textContent = t('No reminder yet — add at least one below.'); return; }
+  const sortedChips = rwChipsHours.slice().sort((a, b) => a - b);
+  const lead = sortedChips[0];
 
   if (!subject || !date) {
     document.getElementById('formError').style.display = 'block';
@@ -1468,7 +1553,7 @@ function saveReminder() {
   const url = id ? `/reminders/${id}` : '/reminders';
   const method = id ? 'PUT' : 'POST';
 
-  const repeatLeadHours = document.getElementById('repeatToggle').checked ? selectedRepeatHours : [];
+  const repeatLeadHours = sortedChips.slice(1);
 
   fetch(url, {
     method,
