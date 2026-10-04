@@ -799,5 +799,15 @@
     ":n classes · :h hours": ":n kelas · :h jam",
     "Need help adding dates?": "Perlu bantuan tambah tarikh?",
     "Add classes from a photo?": "Tambah kelas dari gambar?",
-    "RakanKampus AI": "RakanKampus AI"
+    "RakanKampus AI": "RakanKampus AI",
+    "Notify me": "Ingatkan saya",
+    "max 3": "maks 3",
+    "Add alert": "Tambah peringatan",
+    "Max 3 alerts": "Maksimum 3 peringatan",
+    "hour": "jam",
+    "hours": "jam",
+    "day": "hari",
+    "before": "sebelum",
+    "Unit": "Unit",
+    "No alerts for this class.": "Tiada peringatan untuk kelas ini."
 }

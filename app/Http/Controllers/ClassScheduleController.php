@@ -630,7 +630,15 @@ class ClassScheduleController extends Controller
             'end_time' => 'required|date_format:H:i',
             'room' => 'nullable|string|max:100',
             'lecturer' => 'nullable|string|max:150',
+            'notify_offsets' => 'sometimes|array|max:' . ClassSchedule::MAX_NOTIFY_OFFSETS,
+            'notify_offsets.*' => 'integer|distinct|min:1|max:' . ClassSchedule::MAX_NOTIFY_MINUTES,
         ]);
+
+        if (array_key_exists('notify_offsets', $data)) {
+            $offsets = array_values(array_unique(array_map('intval', $data['notify_offsets'] ?? [])));
+            rsort($offsets);
+            $data['notify_offsets'] = $offsets;
+        }
 
         return $data;
     }
@@ -645,6 +653,7 @@ class ClassScheduleController extends Controller
             'end_time' => $schedule->end_time,
             'room' => $schedule->room,
             'lecturer' => $schedule->lecturer,
+            'notify_offsets' => $schedule->notifyOffsets(),
         ];
     }
 

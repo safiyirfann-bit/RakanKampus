@@ -20,7 +20,13 @@ class ClassStartingSoon extends Notification
 
     public function toWebPush(object $notifiable, Notification $notification): WebPushMessage
     {
-        $left = $this->minutesLeft <= 1 ? 'now' : "{$this->minutesLeft} min";
+        $m = $this->minutesLeft;
+        $left = match (true) {
+            $m <= 1 => 'now',
+            $m < 60 => "{$m} min",
+            $m < 1440 => ($h = intdiv($m + 30, 60)) . ' ' . ($h === 1 ? 'hour' : 'hours'),
+            default => ($d = intdiv($m + 720, 1440)) . ' ' . ($d === 1 ? 'day' : 'days'),
+        };
 
         $meta = collect([$this->schedule->room, $this->schedule->lecturer])
             ->filter()

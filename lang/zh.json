@@ -606,5 +606,15 @@
     ":n classes · :h hours": ":n 节课 · :h 小时",
     "Need help adding dates?": "需要帮忙添加日期吗？",
     "Add classes from a photo?": "从照片添加课程？",
-    "RakanKampus AI": "RakanKampus AI"
+    "RakanKampus AI": "RakanKampus AI",
+    "Notify me": "提醒我",
+    "max 3": "最多 3 个",
+    "Add alert": "添加提醒",
+    "Max 3 alerts": "最多 3 个提醒",
+    "hour": "小时",
+    "hours": "小时",
+    "day": "天",
+    "before": "之前",
+    "Unit": "单位",
+    "No alerts for this class.": "此课程没有提醒。"
 }

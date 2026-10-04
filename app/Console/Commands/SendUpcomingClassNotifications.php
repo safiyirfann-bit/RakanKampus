@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\ClassSchedule;
 use App\Notifications\ClassStartingSoon;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Throwable;
 
@@ -11,73 +12,118 @@ class SendUpcomingClassNotifications extends Command
 {
     protected $signature = 'classes:send-upcoming';
 
-    protected $description = 'Send push notifications for classes starting soon today';
+    protected $description = 'Send the "Notify me" push alerts for upcoming classes';
 
     /**
-     * How many minutes before a class starts to send the "starting soon" push.
+     * How long after an alert's time it may still go out (covers cron gaps on hosts
+     * like Render). Past this, a missed long-range alert is skipped instead of firing
+     * late, e.g. an "18 hours before" alert won't arrive 2 hours before class.
      */
-    private const LEAD_MINUTES = 15;
+    private const GRACE_MINUTES = 30;
 
     public function handle(): int
     {
-        $today = now()->startOfDay();
-        $todayName = now()->format('l'); // e.g. "Monday" — matches ClassSchedule::DAYS
-
+        $now = now();
         $sent = 0;
         $failed = 0;
 
-        ClassSchedule::with('user')
-            ->where('day_of_week', $todayName)
-            ->where(function ($query) use ($today) {
-                $query->whereNull('last_notified_date')
-                    ->orWhere('last_notified_date', '<', $today->toDateString());
-            })
-            ->each(function (ClassSchedule $schedule) use ($today, &$sent, &$failed) {
-                if (! $schedule->user) {
-                    return;
-                }
+        ClassSchedule::with('user')->each(function (ClassSchedule $schedule) use ($now, &$sent, &$failed) {
+            $user = $schedule->user;
+            if (! $user) {
+                return;
+            }
 
-                $startAt = $today->copy()->setTimeFromTimeString($schedule->start_time.':00');
-                $notifyAt = $startAt->copy()->subMinutes(self::LEAD_MINUTES);
+            $due = $this->dueAlerts($schedule, $now);
+            if ($due === []) {
+                return;
+            }
 
-                // Only notify once we've reached the lead window, and only while the
-                // class hasn't started yet (mirrors SendDueReminders' due_at > now() guard
-                // so a cron gap doesn't fire a stale "starting soon" for a class already over).
-                if ($notifyAt->isFuture() || $startAt->isPast()) {
-                    return;
-                }
+            // Profile → Notification Settings → "Class starting soon"
+            $settings = $user->notification_settings ?? [];
+            $dnd = $settings['dnd_until'] ?? null;
+            $muted = ! ($settings['class_notifications'] ?? true)
+                || ($dnd && $now->lt($dnd))
+                || $user->pushSubscriptions()->doesntExist();
 
-                // Profile → Notification Settings → "Class starting soon"
-                if (! ($schedule->user->notification_settings['class_notifications'] ?? true)) {
-                    return;
-                }
+            $keys = $this->recentKeys($schedule, $now);
 
-                $dnd = $schedule->user->notification_settings['dnd_until'] ?? null;
-                if ($dnd && now()->lt($dnd)) {
-                    return;
-                }
+            // Several alerts due in the same run (e.g. after a cron gap): send just the
+            // one closest to the class, and mark the rest as handled.
+            $send = $muted ? null : end($due);
 
-                if ($schedule->user->pushSubscriptions()->doesntExist()) {
-                    return;
-                }
-
-                $minutesLeft = max(0, (int) round(now()->diffInMinutes($startAt, false)));
-
-                try {
-                    $schedule->user->notify(new ClassStartingSoon($schedule, $minutesLeft));
-                    $schedule->forceFill(['last_notified_date' => $today->toDateString()])->save();
+            try {
+                if ($send) {
+                    $user->notify(new ClassStartingSoon($schedule, max(0, (int) round($now->diffInMinutes($send['start'], false)))));
                     $sent++;
-                } catch (Throwable $e) {
-                    // Same defensive handling as SendDueReminders: one bad subscription or
-                    // transient failure shouldn't crash the whole cron run.
-                    $failed++;
-                    report($e);
-                    $this->error("Failed to notify class #{$schedule->id}: {$e->getMessage()}");
                 }
-            });
+                foreach ($due as $alert) {
+                    $keys[] = $alert['key'];
+                }
+                $schedule->forceFill(['notified_keys' => array_values(array_unique($keys))])->save();
+            } catch (Throwable $e) {
+                // One bad subscription or transient failure shouldn't crash the whole cron run.
+                $failed++;
+                report($e);
+                $this->error("Failed to notify class #{$schedule->id}: {$e->getMessage()}");
+            }
+        });
 
         $this->info("Sent {$sent} class notification(s)." . ($failed ? " {$failed} failed (see logs)." : ''));
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Alerts of this class whose time has come (within the grace window), whose class
+     * hasn't started yet, and that haven't been sent. Ordered furthest-from-class first.
+     *
+     * @return array<int, array{key: string, start: Carbon}>
+     */
+    private function dueAlerts(ClassSchedule $schedule, Carbon $now): array
+    {
+        $offsets = $schedule->notifyOffsets();
+        if ($offsets === [] || ! preg_match('/^\d{2}:\d{2}/', (string) $schedule->start_time)) {
+            return [];
+        }
+
+        $sentKeys = (array) ($schedule->notified_keys ?? []);
+        $due = [];
+
+        // The next class within the longest alert window (alerts go up to 7 days ahead).
+        for ($i = 0; $i <= 7; $i++) {
+            $date = $now->copy()->startOfDay()->addDays($i);
+            if ($date->format('l') !== $schedule->day_of_week) {
+                continue;
+            }
+
+            $start = $date->copy()->setTimeFromTimeString(substr($schedule->start_time, 0, 5) . ':00');
+            if ($start->lte($now)) {
+                continue;
+            }
+
+            foreach ($offsets as $minutes) {
+                $notifyAt = $start->copy()->subMinutes($minutes);
+                $key = $start->toDateString() . '|' . $minutes;
+
+                if ($notifyAt->gt($now) || $notifyAt->lt($now->copy()->subMinutes(self::GRACE_MINUTES)) || in_array($key, $sentKeys, true)) {
+                    continue;
+                }
+
+                $due[] = ['key' => $key, 'start' => $start];
+            }
+        }
+
+        return $due;
+    }
+
+    /** Sent-alert keys still worth remembering (classes from yesterday onwards). */
+    private function recentKeys(ClassSchedule $schedule, Carbon $now): array
+    {
+        $cutoff = $now->copy()->subDay()->toDateString();
+
+        return array_values(array_filter(
+            (array) ($schedule->notified_keys ?? []),
+            fn ($k) => is_string($k) && substr($k, 0, 10) >= $cutoff
+        ));
     }
 }

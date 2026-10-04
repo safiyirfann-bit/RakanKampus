@@ -606,5 +606,15 @@
     ":n classes · :h hours": ":n வகுப்புகள் · :h மணி",
     "Need help adding dates?": "தேதிகளைச் சேர்க்க உதவி வேண்டுமா?",
     "Add classes from a photo?": "புகைப்படத்திலிருந்து வகுப்புகளைச் சேர்க்கவா?",
-    "RakanKampus AI": "RakanKampus AI"
+    "RakanKampus AI": "RakanKampus AI",
+    "Notify me": "எனக்கு நினைவூட்டு",
+    "max 3": "அதிகபட்சம் 3",
+    "Add alert": "நினைவூட்டலைச் சேர்",
+    "Max 3 alerts": "அதிகபட்சம் 3 நினைவூட்டல்கள்",
+    "hour": "மணி",
+    "hours": "மணி",
+    "day": "நாள்",
+    "before": "முன்",
+    "Unit": "அலகு",
+    "No alerts for this class.": "இந்த வகுப்பிற்கு நினைவூட்டல் இல்லை."
 }
