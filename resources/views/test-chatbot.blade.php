@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+@include('partials.font')
     <title>RakanKampus - Grok Test</title>
 </head>
 

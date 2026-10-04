@@ -20,7 +20,7 @@
 <style>
   #rki{position:fixed;inset:0;z-index:9999;overflow:hidden;
     background:linear-gradient(180deg,#6fb7e6 0%,#b9def4 29%,#fff1d6 46%,#9fc4c9 58%,#8cc265 64%,#6aa84f 100%);
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;transition:opacity .2s}
+    font-family:'Plus Jakarta Sans', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;transition:opacity .2s}
   #rki-stage{position:absolute;left:50%;top:50%;width:360px;height:640px;transform-origin:50% 50%}
   /* the sky, hills and grass run on past the 360×640 scene, so any screen shape is filled edge to edge */
   #rki-art{position:absolute;inset:0;width:360px;height:640px;transform-origin:50% 60%;overflow:visible}

@@ -6,7 +6,7 @@
     --fp-ink:#2e1065; --fp-muted:#7c6aa8; --fp-soft:#a596c9; --fp-field:#f5f0ff; --fp-link:#7c3aed; }
   *{box-sizing:border-box}
   html,body{min-height:100%;margin:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--fp-ink);min-height:100vh;overflow-x:hidden;
+  body{font-family:'Plus Jakarta Sans', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--fp-ink);min-height:100vh;overflow-x:hidden;
     background:linear-gradient(120deg,var(--fp-purple),var(--fp-pink),var(--fp-blue),var(--fp-purple));background-size:300% 300%;animation:fpShift 15s ease infinite}
   @keyframes fpShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
   .fp-blob{position:fixed;border-radius:50%;filter:blur(50px);opacity:.55;pointer-events:none;z-index:0}
@@ -38,7 +38,7 @@
   /* ---- sheet ---- */
   .fp-sheet{flex:1;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:30px 30px 0 0;
     padding:24px 22px 20px;box-shadow:0 -12px 34px rgba(46,16,101,.18)}
-  .fp-sheet h1{margin:0 0 4px;font-size:25px;letter-spacing:-.4px;color:var(--fp-ink)}
+  .fp-sheet h1{margin:0 0 4px;font-weight:800;font-size:25px;letter-spacing:-.4px;color:var(--fp-ink)}
   .fp-lead{color:var(--fp-muted);font-size:14px;line-height:1.55;margin:0 0 18px}
   .fp-lead b{color:var(--fp-ink)}
 

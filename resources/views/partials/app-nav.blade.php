@@ -27,7 +27,7 @@
     background: linear-gradient(175deg, #14213d, #1b3a5c 55%, #1c4f57);
     display: none;
     flex-direction: column;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     z-index: 38;
   }
   .rk-sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 22px 20px 18px; flex-shrink: 0; }
@@ -67,7 +67,7 @@
     justify-content: space-around;
     box-shadow: 0 14px 30px rgba(20, 33, 61, 0.2);
     z-index: 38;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
   .rk-tab-link { display: flex; flex-direction: column; flex: 1; align-items: center; justify-content: center; gap: 3px; text-decoration: none; color: #94a3b8; }
   .rk-tab-link svg { width: 20px; height: 20px; stroke: currentColor; }

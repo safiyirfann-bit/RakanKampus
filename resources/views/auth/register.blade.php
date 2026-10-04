@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+@include('partials.font')
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Create Account - RakanKampus</title>
@@ -20,7 +21,7 @@
 html,body{min-height:100%}
 body{
   min-height:100vh;overflow-x:hidden;color:var(--ink);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-family:'Plus Jakarta Sans', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   background:linear-gradient(120deg,var(--purple),var(--pink),var(--blue),var(--purple));background-size:300% 300%;
   animation:gradientShift 15s ease infinite;
 }

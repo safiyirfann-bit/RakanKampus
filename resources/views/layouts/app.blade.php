@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+@include('partials.font')
 
 <meta charset="UTF-8">
 

@@ -21,7 +21,7 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--lg-ink);
+  body{font-family:'Plus Jakarta Sans', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--lg-ink);
     background:linear-gradient(120deg,var(--lg-purple),var(--lg-pink),var(--lg-blue),var(--lg-purple));background-size:300% 300%;
     animation:lgShift 15s ease infinite;min-height:100vh;overflow-x:hidden}
   @keyframes lgShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
@@ -75,7 +75,7 @@
   /* ---- form sheet ---- */
   .lg-sheet{position:relative;background:var(--lg-sheet);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
     border-radius:30px 30px 0 0;padding:28px 24px 22px;box-shadow:0 -12px 34px rgba(46,16,101,.18)}
-  .lg-sheet h1{margin:0;font-size:26px;letter-spacing:-.5px;color:var(--lg-ink)}
+  .lg-sheet h1{margin:0;font-weight:800;font-size:26px;letter-spacing:-.5px;color:var(--lg-ink)}
   .lg-sub{margin:4px 0 20px;font-size:14px;color:var(--lg-muted)}
   .lg-alert{padding:11px 14px;border-radius:14px;font-size:13.5px;margin-bottom:14px;line-height:1.45}
   .lg-alert.err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35);color:#b91c1c}
