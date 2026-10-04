@@ -27,7 +27,7 @@ class ChatbotController extends Controller
         'hostel' => ['asrama', 'kamsis'], 'dorm' => ['asrama', 'kamsis'], 'college' => ['kolej'],
         'library' => ['perpustakaan'], 'club' => ['kelab'], 'society' => ['persatuan'], 'sport' => ['sukan'],
         'password' => ['kata laluan'], 'login' => ['log masuk'], 'forgot' => ['lupa', 'terlupa'], 'account' => ['akaun'],
-        'canteen' => ['kantin'], 'cafe' => ['kantin', 'cafe'], 'food' => ['makan', 'kantin'], 'prayer' => ['surau', 'solat'], 'mosque' => ['surau', 'pusat islam'],
+        'canteen' => ['kantin'], 'cafe' => ['kantin', 'kafe'], 'kafe' => ['kantin', 'cafe'], 'kantin' => ['cafe', 'kafe'], 'food' => ['makan', 'kantin'], 'prayer' => ['surau', 'solat'], 'mosque' => ['surau', 'pusat islam'],
         'lecture' => ['kuliah'], 'hall' => ['dewan'], 'location' => ['lokasi'], 'building' => ['bangunan'],
         'director' => ['pengarah'], 'deputy' => ['timbalan'], 'head' => ['ketua'], 'department' => ['jabatan'], 'faculty' => ['fakulti'],
         'counselling' => ['kaunseling'], 'counseling' => ['kaunseling'], 'counsellor' => ['kaunselor'],
@@ -74,7 +74,7 @@ class ChatbotController extends Controller
             'mana', 'manakah', 'dimana', 'dmana', 'kat', 'kt', 'dekat', 'dkt', 'kan', 'ke', 'tu', 'ni', 'nak', 'tak', 'x',
             'apakah', 'siapa', 'siapakah', 'bila', 'bilakah', 'berapa', 'berapakah', 'bagaimana', 'bagaimanakah', 'camne', 'camana',
             'boleh', 'ada', 'adakah', 'ialah', 'itu', 'ini', 'pun', 'je', 'ja', 'la', 'lah', 'ye', 'ya', 'eh', 'ne', 'tau', 'tahu',
-            'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg',
+            'saya', 'aku', 'kau', 'awak', 'please', 'tolong', 'nk', 'utk', 'dgn', 'yg', 'ade', 'ape', 'cane', 'mcm', 'kot',
             'where', 'who', 'when', 'which', 'why', 'does', 'did', 'about', 'tell', 'me', 'you', 'your', 'there', 'this', 'that', 'and', 'with', 'in', 'on', 'at',
             'do', 'my', 'get', 'is', 'it', 'be', 'if', 'or', 'we', 'us', 'any', 'have', 'has', 'need', 'should', 'will', 'would', 'could', 'from', 'into', 'our', 'am', 'was', 'were', 'go', 'know',
             // Tamil question / filler words
@@ -489,9 +489,13 @@ public function destroy(Request $request, ChatConversation $conversation)
             $phrases[] = $tokens[$i] . ' ' . $tokens[$i + 1];
         }
 
+        // Places named with a letter: "kafe b", "kampus a", "blok c". The single letter is
+        // what tells them apart, so a match on the whole name counts a lot.
+        $named = $this->letterNames($message);
+
         return KnowledgeBase::query()
             ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords'])
-            ->map(function ($entry) use ($tokens, $phrases, $exact, $probe) {
+            ->map(function ($entry) use ($tokens, $phrases, $exact, $probe, $named) {
                 $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
                 $q = mb_strtolower($entry->allQuestions());
                 $ans = mb_strtolower((string) $entry->answer);
@@ -499,6 +503,9 @@ public function destroy(Request $request, ChatConversation $conversation)
                 $score = 0;
                 $hits = 0;
                 foreach ($tokens as $w) {
+                    if (mb_strlen($w) < 2) {
+                        continue; // a lone "a"/"b" is in almost every text; it only counts as part of a name (below)
+                    }
                     $hit = false;
                     if (str_contains($kw, $w)) { $score += 3; $hit = true; }
                     if (str_contains($q, $w)) { $score += 2; $hit = true; }
@@ -518,6 +525,18 @@ public function destroy(Request $request, ChatConversation $conversation)
                 }
                 // How close the message is to the entry's question in the student's own language.
                 $score += $this->translationScore($probe, $entry);
+                // "kafe b" → the entry about Kantin/Cafe B (keywords "kafe b" or question "… Cafe B")
+                $kwQ = str_replace('/', ' ', $kw . ' ' . $q);
+                foreach ($named as $variants) {
+                    foreach ($variants as $name) {
+                        if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($name, '/') . '(?![\p{L}\p{N}])/u', $kwQ)) {
+                            $score += 45;
+                            $hits++;
+                            $entry->coverage = max($entry->coverage ?? 0, 0.67);
+                            break;
+                        }
+                    }
+                }
                 // Reward entries that cover more of the student's words.
                 $entry->relevance = $score + $hits * 2;
 
@@ -650,6 +669,32 @@ public function destroy(Request $request, ChatConversation $conversation)
         }
 
         return $best;
+    }
+
+    /**
+     * Names made of a word + one letter in the message ("kafe b", "kampus a", "blok c"),
+     * each with its spellings: "kafe b" → ["kafe b", "cafe b", "kantin b", "canteen b"].
+     *
+     * @return array<int, array<int, string>>
+     */
+    private function letterNames(string $text): array
+    {
+        $same = [['kafe', 'cafe', 'kantin', 'canteen'], ['kampus', 'campus'], ['blok', 'block'], ['dewan', 'hall'], ['pintu', 'gate'], ['surau', 'musolla']];
+        preg_match_all('/(?<![\p{L}\p{N}])(\p{L}{3,})\s+([a-e])(?![\p{L}\p{N}])/u', mb_strtolower($text), $m, PREG_SET_ORDER);
+
+        $out = [];
+        foreach ($m as [, $word, $letter]) {
+            $group = [$word];
+            foreach ($same as $g) {
+                if (in_array($word, $g, true)) {
+                    $group = $g;
+                    break;
+                }
+            }
+            $out[] = array_map(fn ($w) => "{$w} {$letter}", $group);
+        }
+
+        return $out;
     }
 
     /** Lower-case, letters and digits only — so "What is SPMP?" equals "what is spmp". */
