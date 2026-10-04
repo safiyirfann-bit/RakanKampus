@@ -805,6 +805,43 @@ html[data-theme="dark"] #todayClassesBody .today-class-row.is-ongoing .today-cla
 html[data-theme="dark"] .reminders-banner.rem-card { box-shadow: none; }
 html[data-theme="dark"] .qc-ic { filter: saturate(.8) brightness(.9); }
 </style>
+<style id="start-chat-btn">
+.start-chat-btn.scb { position: relative; overflow: hidden; display: flex; align-items: center; justify-content: flex-start; gap: 14px; padding: 14px 16px 14px 14px; border-radius: 22px; text-align: left;
+  background: linear-gradient(120deg, #0f2747, #155e75 55%, #14b8a6); animation: fadeInUp .5s ease both; }
+.start-chat-btn.scb::after { content: ""; position: absolute; top: 0; left: -40%; width: 30%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.28), transparent); transform: skewX(-20deg); animation: scbShine 4.5s ease-in-out infinite; }
+@keyframes scbShine { 0%, 65% { left: -40%; } 100% { left: 130%; } }
+.scb-bot { width: 54px; height: 54px; flex: none; border-radius: 18px; background: rgba(255,255,255,.95); display: grid; place-items: center; box-shadow: 0 6px 14px rgba(0,0,0,.18); }
+.scb-bot svg { width: 40px !important; height: 40px !important; animation: scbWave 2.8s ease-in-out infinite; }
+@keyframes scbWave { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-10deg); } 86% { transform: rotate(8deg); } }
+.scb-text { flex: 1; min-width: 0; }
+.scb-text b { display: block; font-size: 17px; font-weight: 800; color: #fff; }
+.scb-text small { display: block; font-size: 12.5px; color: rgba(255,255,255,.82); font-weight: 500; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.scb-go { width: 42px; height: 42px; flex: none; border-radius: 50%; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.3); display: grid; place-items: center; color: #fff; transition: transform .2s, background .2s; }
+.scb-go svg { width: 18px !important; height: 18px !important; }
+.start-chat-btn.scb:hover .scb-go { transform: translateX(4px); background: rgba(255,255,255,.28); }
+.start-chat-btn.scb:active { transform: scale(.985); }
+
+/* tap animation */
+.scb-fx { position: fixed; inset: 0; z-index: 9999; pointer-events: none; visibility: hidden; }
+.scb-fx.on { visibility: visible; pointer-events: auto; }
+.scb-fill { position: absolute; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #0f2747, #155e75 55%, #14b8a6); transform: translate(-50%, -50%) scale(0); }
+.scb-fx.on .scb-fill { animation: scbFill .75s cubic-bezier(.6,0,.4,1) .25s forwards; }
+@keyframes scbFill { to { transform: translate(-50%, -50%) scale(var(--scb-s, 60)); } }
+.scb-fly { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; transform: translate(-50%, -50%) scale(.35); opacity: 0; }
+.scb-fly svg { filter: drop-shadow(0 16px 24px rgba(0,0,0,.35)); }
+.scb-fx.on .scb-fly { animation: scbFly .95s cubic-bezier(.3,1.3,.5,1) forwards; }
+@keyframes scbFly {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(.35); }
+  45% { opacity: 1; left: 50vw; top: 46vh; transform: translate(-50%, -50%) scale(1.05) rotate(-6deg); }
+  70% { transform: translate(-50%, -50%) scale(1) rotate(4deg); }
+  100% { opacity: 1; left: 50vw; top: 46vh; transform: translate(-50%, -50%) scale(1) rotate(0); }
+}
+.scb-say { background: #fff; color: #0f2747; font-weight: 800; font-size: 15px; padding: 8px 16px; border-radius: 999px; box-shadow: 0 10px 22px rgba(0,0,0,.2); opacity: 0; transform: translateY(8px) scale(.8); }
+.scb-fx.on .scb-say { animation: scbSay .35s ease .55s forwards; }
+@keyframes scbSay { to { opacity: 1; transform: none; } }
+@media (max-width: 600px) { .scb-text b { font-size: 15.5px; } .scb-text small { font-size: 11.5px; } .scb-bot { width: 48px; height: 48px; border-radius: 16px; } }
+@media (prefers-reduced-motion: reduce) { .start-chat-btn.scb::after, .scb-bot svg { animation: none; } }
+</style>
 </head>
 <body>
 
@@ -981,16 +1018,16 @@ html[data-theme="dark"] .qc-ic { filter: saturate(.8) brightness(.9); }
       @endforeach
     </div>
 
-    <a href="{{ route('student.chat') }}" class="start-chat-btn">
-
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-
-    {{ __('Start New Chat') }}
-
-</a>
+    {{-- Start chat: robot + text + arrow; on tap the robot flies up and the screen fills before opening the chat --}}
+    <a href="{{ route('student.chat') }}" class="start-chat-btn scb" id="startChatBtn">
+      <span class="scb-bot"><x-brand-logo size="40" /></span>
+      <span class="scb-text"><b>{{ __('Start New Chat') }}</b><small>{{ __('Ask anything about PUO — classes, fees, places…') }}</small></span>
+      <span class="scb-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    </a>
+    <div class="scb-fx" id="scbFx" aria-hidden="true">
+      <div class="scb-fill" id="scbFill"></div>
+      <div class="scb-fly" id="scbFly"><x-brand-logo size="120" /><span class="scb-say">{{ __("Let's chat!") }} 💬</span></div>
+    </div>
 
     <p class="section-label">{{ __('RECENT CONVERSATIONS') }}</p>
 
@@ -1353,6 +1390,29 @@ async function deleteHomeConversation(id) {
     })
     .catch(err => console.error('Delete failed', err));
 }
+
+// "Start New Chat": robot flies from the button to the middle, the gradient fills the screen, then the chat opens
+(function () {
+    const btn = document.getElementById('startChatBtn'), fx = document.getElementById('scbFx');
+    if (!btn || !fx) return;
+    document.body.appendChild(fx); // out of the container's stacking context so it covers the bottom bar too
+    btn.addEventListener('click', function (e) {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0) return;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        e.preventDefault();
+        const r = btn.querySelector('.scb-bot').getBoundingClientRect();
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        const fill = document.getElementById('scbFill'), fly = document.getElementById('scbFly');
+        fill.style.left = cx + 'px'; fill.style.top = cy + 'px';
+        fly.style.left = cx + 'px'; fly.style.top = cy + 'px';
+        const far = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
+        fill.style.setProperty('--scb-s', Math.ceil(far * 2 / 60) + 1);
+        fx.classList.add('on');
+        setTimeout(function () { window.location.href = btn.href; }, 1150);
+    });
+    // coming back with the browser Back button: hide the overlay again
+    window.addEventListener('pageshow', function (ev) { if (ev.persisted) fx.classList.remove('on'); });
+})();
 </script>
 
 </body>
