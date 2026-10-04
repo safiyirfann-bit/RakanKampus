@@ -88,7 +88,7 @@ class PopularQuestions
      */
     public static function marquee(int $limit = 12): array
     {
-        return Cache::remember('chat.marquee_questions.v6.' . $limit, now()->addHour(), function () use ($limit) {
+        return Cache::remember('chat.marquee_questions.v7.' . $limit, now()->addHour(), function () use ($limit) {
             $out = [];
             $seen = [];
             foreach (self::compute(6) as $q) {
@@ -98,13 +98,16 @@ class PopularQuestions
 
             $kb = \App\Models\KnowledgeBase::query()->suggestable()
                 ->whereRaw('LENGTH(question) BETWEEN 10 AND 48')
-                ->inRandomOrder()->limit(200)->get(['id', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'category']);
+                ->inRandomOrder()->limit(200)->get(['id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'category']);
             $perTopic = [];
             foreach ($kb as $row) {
                 if (count($out) >= $limit) {
                     break;
                 }
                 $topic = (string) $row->category;
+                if (! self::goodChip($row->question, $row->intent)) {
+                    continue; // needs context ("Apakah borang ini?") or a sensitive topic
+                }
                 if (($perTopic[$topic] ?? 0) >= 2) {
                     continue; // keep the rows varied
                 }
@@ -128,6 +131,34 @@ class PopularQuestions
 
             return $out;
         });
+    }
+
+    /**
+     * Knowledge-base questions that are fine to answer but bad as a suggestion chip:
+     * election details that don't say "MPP" / "Pilihan Raya Kampus", and sensitive topics.
+     */
+    private const HIDDEN_CHIP_INTENTS = [
+        // Pilihan Raya Kampus: the question doesn't say what election it's about
+        'nomination', 'campaign', 'campaign_period', 'campaign_guidelines', 'campaign_rules', 'campaign_restrictions',
+        'candidate_verification', 'candidate_manifesto', 'vote_counting', 'secret_ballot', 'manual_voting', 'voting_method',
+        'system_voting', 'voting_statistics', 'polling_station', 'doubtful_votes', 'recount', 'election_report',
+        'document_record', 'nydp_role',
+        // sensitive topics
+        'bahan_lucah', 'menyimpan_bahan_lucah', 'dadah', 'dadah_racun', 'minuman_keras', 'judi', 'perjudian',
+        'senjata', 'senjata_bahaya', 'larangan_senjata_asrama', 'curi_rompak', 'ugutan', 'ugutan_buli',
+        // no context
+        'shirt_buttons', 'workshop_attire', 'definisi_pelajar', 'student_information',
+    ];
+
+    /** A knowledge-base question that makes sense on its own as a chip. */
+    private static function goodChip(string $question, ?string $intent): bool
+    {
+        if ($intent !== null && in_array($intent, self::HIDDEN_CHIP_INTENTS, true)) {
+            return false;
+        }
+
+        // "Apakah borang ini?", "Apakah tujuan pelan ini?", "Apakah yang perlu disertakan bersama borang?"
+        return ! preg_match('/\b(ini|borang(?! (penangguhan|pencalonan|berhenti))|pelan|dokumen|surat rasmi|slip keputusan|penyelia asrama|ulasan akademik|sokongan akademik)\b/iu', $question);
     }
 
     /** Short English questions the knowledge base can answer (used if translating fails). */
