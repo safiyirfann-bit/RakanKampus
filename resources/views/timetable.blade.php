@@ -257,27 +257,6 @@
   .time-row { display: flex; gap: 10px; }
   .time-row > div { flex: 1; }
 
-  /* "Notify me": up to 3 alerts per class, each a stepper row (n + unit before) */
-  .nt-head { display: flex; align-items: center; justify-content: space-between; margin: 14px 0 6px; }
-  .nt-head .field-label { margin: 0; }
-  .nt-head small { font-size: 11px; font-weight: 700; color: #94a3b8; }
-  .nt-row { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border: 1.5px solid #e2e8f0; border-radius: 13px; margin-bottom: 7px; }
-  .nt-bell { width: 30px; height: 30px; flex: none; border-radius: 9px; background: linear-gradient(135deg, #14213d, #2ec4c6); display: grid; place-items: center; color: #fff; }
-  .nt-bell svg { width: 15px; height: 15px; }
-  .nt-stp { display: flex; align-items: center; flex: none; border: 1.5px solid #e2e8f0; border-radius: 10px; overflow: hidden; }
-  .nt-stp button { width: 26px; height: 32px; border: 0; background: transparent; color: #64748b; font-size: 16px; font-weight: 800; cursor: pointer; font-family: inherit; }
-  .nt-stp button:active { background: #f1f5f9; }
-  .modal .nt-stp input[type="text"] { width: 34px; padding: 0; border: 0; border-radius: 0; text-align: center; font-weight: 800; font-size: 14px; }
-  .modal .nt-row select { width: auto; flex: none; padding: 7px 8px; font-size: 13px; font-weight: 600; border-radius: 10px; }
-  .nt-when { flex: 1; min-width: 0; font-size: 12px; color: #64748b; line-height: 1.25; }
-  .nt-when b { display: block; font-size: 11px; color: #0f766e; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .nt-del { width: 26px; height: 26px; flex: none; border: 0; border-radius: 8px; background: transparent; color: #ef4444; font-size: 15px; cursor: pointer; }
-  .nt-del:hover { background: #fef2f2; }
-  .nt-add { width: 100%; padding: 9px; border: 1.5px dashed #cbd5e1; border-radius: 13px; background: transparent; color: #64748b; font-weight: 700; font-size: 12.5px; cursor: pointer; font-family: inherit; }
-  .nt-add:hover:not(:disabled) { border-color: #2ec4c6; color: #0f766e; }
-  .nt-add:disabled { color: #cbd5e1; border-color: #e2e8f0; cursor: default; }
-  .nt-empty { font-size: 12px; color: #94a3b8; margin: 0 0 7px; }
-  @media (max-width: 420px) { .nt-bell { display: none; } .nt-row { gap: 6px; padding: 7px 6px 7px 8px; } }
 
   .save-btn {
     width: 100%; margin-top: 18px; background: linear-gradient(120deg, #14213d, #2ec4c6);
@@ -530,14 +509,6 @@ html[data-theme="dark"] .modal { background: #17202d; box-shadow: 0 24px 60px rg
 html[data-theme="dark"] .modal-icon.rk-brand { background: #1e3d39; border: 1px solid #284843; }
 html[data-theme="dark"] .modal-title { color: #dee1e9; }
 html[data-theme="dark"] .modal-close { background: #10161f; color: #b0b6be; }
-html[data-theme="dark"] .nt-row, html[data-theme="dark"] .nt-stp { border-color: #283648; }
-html[data-theme="dark"] .nt-stp button { color: #b0b6be; }
-html[data-theme="dark"] .modal .nt-stp input[type="text"] { background: transparent; }
-html[data-theme="dark"] .nt-when { color: #94a3b8; }
-html[data-theme="dark"] .nt-when b { color: #41eedf; }
-html[data-theme="dark"] .nt-add { border-color: #283648; color: #94a3b8; }
-html[data-theme="dark"] .nt-add:disabled { color: #3b4a5e; }
-html[data-theme="dark"] .nt-del:hover { background: #2a1a1f; }
 html[data-theme="dark"] .field-label { color: #b0b6be; }
 html[data-theme="dark"] .modal input[type="text"], html[data-theme="dark"] .modal input[type="time"], html[data-theme="dark"] .modal select { border: 1.5px solid #283648; color: #dee1e9; }
 html[data-theme="dark"] .delete-btn { background: #371a1a; color: #ef9e9e; border: 1.5px solid #482828; }
@@ -840,7 +811,7 @@ html[data-theme="dark"] .timeline-card.ty-t { background: #2c1a26; } html[data-t
 
   <div class="nt-head"><p class="field-label">🔔 {{ __('Notify me') }}</p><small>{{ __('max 3') }}</small></div>
   <div id="notifyRows"></div>
-  <button type="button" class="nt-add" id="notifyAdd" onclick="addNotify()">+ {{ __('Add alert') }}</button>
+  <button type="button" class="nt-add" id="notifyAdd">+ {{ __('Add alert') }}</button>
   </div>
 
   <div id="programFields" hidden>
@@ -887,6 +858,7 @@ html[data-theme="dark"] .timeline-card.ty-t { background: #2c1a26; } html[data-t
 
 
 @include('partials.rk-picker')
+@include('partials.notify-rows')
 
 <script>
 let schedules = @json($schedules);
@@ -1589,29 +1561,11 @@ function openClassTimePicker() {
   });
 }
 
-// "Notify me" — up to 3 alerts per class, stored as minutes before the start.
-const NT_MAX = 3;
-const NT_UNITS = { min: 1, hour: 60, day: 1440 };
-const NT_LIMIT = { min: 59, hour: 23, day: 7 };
-let notifyList = []; // [{ n, u }]
-
-function setNotify(minutesList) {
-  notifyList = (minutesList || []).slice(0, NT_MAX).map((m) => {
-    m = parseInt(m, 10) || 15;
-    if (m % 1440 === 0) return { n: m / 1440, u: 'day' };
-    if (m % 60 === 0) return { n: m / 60, u: 'hour' };
-    if (m < 60) return { n: m, u: 'min' };
-    return { n: Math.round(m / 60), u: 'hour' };
-  });
-  renderNotify();
-}
-
-function notifyMinutes() {
-  const seen = new Set();
-  return notifyList.map(a => a.n * NT_UNITS[a.u])
-    .filter(m => m > 0 && !seen.has(m) && seen.add(m))
-    .sort((a, b) => b - a);
-}
+// "Notify me" — up to 3 alerts per class (partials/notify-rows), stored as minutes before the start.
+const notify = RKNotify.create({ rows: 'notifyRows', add: 'notifyAdd', maxDays: 7, when: notifyWhen });
+function setNotify(list) { notify.set(list); }
+function renderNotify() { notify.render(); }
+function notifyMinutes() { return notify.minutes(); }
 
 // When the alert will fire, e.g. "Sun 4:00 PM" for 18 hours before Mon 10:00 AM.
 function notifyWhen(minutes) {
@@ -1625,46 +1579,6 @@ function notifyWhen(minutes) {
   const dayName = t(DAYS[Math.floor(at / 1440)].slice(0, 3));
   const mins = at % 1440;
   return `${dayName} ${RKPicker.formatTime(pad(Math.floor(mins / 60)) + ':' + pad(mins % 60))}`;
-}
-
-function renderNotify() {
-  const wrap = document.getElementById('notifyRows');
-  if (!wrap) return;
-  const bell = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>';
-  const unitLabel = (u, n) => ({ min: t('min'), hour: n === 1 ? t('hour') : t('hours'), day: n === 1 ? t('day') : t('days') })[u];
-  wrap.innerHTML = notifyList.length ? notifyList.map((a, i) => {
-    const when = notifyWhen(a.n * NT_UNITS[a.u]);
-    return `<div class="nt-row">
-      <span class="nt-bell">${bell}</span>
-      <span class="nt-stp">
-        <button type="button" aria-label="−" onclick="stepNotify(${i},-1)">−</button>
-        <input type="text" inputmode="numeric" value="${a.n}" aria-label="${t('Notify me')}" onchange="typeNotify(${i},this.value)">
-        <button type="button" aria-label="+" onclick="stepNotify(${i},1)">+</button>
-      </span>
-      <select aria-label="${t('Unit')}" onchange="unitNotify(${i},this.value)">
-        ${Object.keys(NT_UNITS).map(u => `<option value="${u}" ${u === a.u ? 'selected' : ''}>${unitLabel(u, a.n)}</option>`).join('')}
-      </select>
-      <span class="nt-when">${t('before')}${when ? `<b>${when}</b>` : ''}</span>
-      <button type="button" class="nt-del" aria-label="${t('Remove')}" onclick="removeNotify(${i})">✕</button>
-    </div>`;
-  }).join('') : `<p class="nt-empty">${t('No alerts for this class.')}</p>`;
-  const add = document.getElementById('notifyAdd');
-  add.disabled = notifyList.length >= NT_MAX;
-  add.textContent = add.disabled ? t('Max 3 alerts') : '+ ' + t('Add alert');
-}
-
-function clampNotify(a) { a.n = Math.min(NT_LIMIT[a.u], Math.max(1, Math.round(a.n) || 1)); }
-function stepNotify(i, d) { const a = notifyList[i]; a.n += d; clampNotify(a); renderNotify(); }
-function typeNotify(i, v) { const a = notifyList[i]; a.n = parseInt(v, 10); clampNotify(a); renderNotify(); }
-function unitNotify(i, u) { const a = notifyList[i]; a.u = u; clampNotify(a); renderNotify(); }
-function removeNotify(i) { notifyList.splice(i, 1); renderNotify(); }
-function addNotify() {
-  if (notifyList.length >= NT_MAX) return;
-  // Suggest something not already used: 15 min → 1 hour → 1 day
-  const used = new Set(notifyMinutes());
-  const next = [[15, 'min'], [1, 'hour'], [1, 'day'], [30, 'min'], [2, 'hour']].find(([n, u]) => !used.has(n * NT_UNITS[u])) || [5, 'min'];
-  notifyList.push({ n: next[0], u: next[1] });
-  renderNotify();
 }
 
 // Custom confirm (partials/rk-dialog): the robot carries the class card to the bin.

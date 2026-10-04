@@ -616,5 +616,6 @@
     "day": "天",
     "before": "之前",
     "Unit": "单位",
-    "No alerts for this class.": "此课程没有提醒。"
+    "No alerts for this class.": "此课程没有提醒。",
+    ":count days": ":count 天"
 }

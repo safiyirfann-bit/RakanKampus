@@ -531,42 +531,6 @@
 
   .hint { font-size: 10.5px; color: #94a3b8; margin: -6px 0 12px; }
 
-  .repeat-toggle-row { margin: 4px 0 12px; }
-
-  .repeat-toggle-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12.5px;
-    font-weight: 700;
-    color: #334155;
-    cursor: pointer;
-  }
-
-  .repeat-toggle-label input { width: 16px; height: 16px; accent-color: #2ec4c6; cursor: pointer; }
-
-  .repeat-options-wrap { margin: -2px 0 12px; }
-
-  .repeat-options-wrap.hidden { display: none; }
-
-  .repeat-chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
-
-  .repeat-chip {
-    background: #fff;
-    border: 1px solid #dbe4ea;
-    color: #334155;
-    border-radius: 999px;
-    padding: 7px 12px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .repeat-chip.active {
-    background: linear-gradient(120deg, #14213d, #2ec4c6);
-    color: #fff;
-    border-color: transparent;
-  }
 
   @media (max-width: 860px) {
     .ai-fab { bottom: 88px; }
@@ -718,8 +682,6 @@ html[data-theme="dark"] .field-label { color: #b0b6be; }
 html[data-theme="dark"] .modal input[type="text"], html[data-theme="dark"] .modal input[type="date"], html[data-theme="dark"] .modal input[type="time"], html[data-theme="dark"] .modal input[type="number"] { border: 1px solid #283b48; color: #dee1e9; }
 html[data-theme="dark"] .type-opt { background: #17202d; border: 1px solid #283b48; color: #d6dae1; }
 html[data-theme="dark"] .hint { color: #ced3d9; }
-html[data-theme="dark"] .repeat-toggle-label { color: #d6dae1; }
-html[data-theme="dark"] .repeat-chip { background: #17202d; border: 1px solid #283b48; color: #d6dae1; }
 @media (min-width: 861px) {
   html[data-theme="dark"] body { background: #10161f; }
   html[data-theme="dark"] .header-title { color: #dee1e9; }
@@ -1006,33 +968,16 @@ html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41ee
     <span><small>{{ __('Due') }}</small><b id="dueFieldText">{{ __('Pick date & time') }}</b></span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M3 9h18M8 2v4M16 2v4"></path></svg>
   </button>
-  <p class="field-label">{{ __('Notify me how many hours before?') }}</p>
-  <input type="number" id="leadInput" min="0" step="0.5" value="1">
-  <p class="hint">{{ __('Type any number of hours — use 0.5 for 30 minutes.') }}</p>
-
-  <div class="repeat-toggle-row">
-    <label class="repeat-toggle-label">
-      <input type="checkbox" id="repeatToggle" onchange="toggleRepeatOptions()">
-      {{ __('Remind me more than once') }}
-    </label>
-  </div>
-  <div class="repeat-options-wrap hidden" id="repeatOptionsWrap">
-    <p class="field-label">{{ __('Also remind me at (pick as many as you like)') }}</p>
-    <div class="repeat-chip-row" id="repeatChipRow">
-      <button type="button" class="repeat-chip" data-hours="72" onclick="toggleRepeatChip(this)">{{ __('3 days before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="24" onclick="toggleRepeatChip(this)">{{ __('1 day before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="3" onclick="toggleRepeatChip(this)">{{ __('3 hours before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="1" onclick="toggleRepeatChip(this)">{{ __('1 hour before') }}</button>
-      <button type="button" class="repeat-chip" data-hours="0.5" onclick="toggleRepeatChip(this)">{{ __('30 min before') }}</button>
-    </div>
-    <p class="hint">{{ __('On top of the main notification above.') }}</p>
-  </div>
+  <div class="nt-head"><p class="field-label">🔔 {{ __('Notify me') }}</p><small>{{ __('max 3') }}</small></div>
+  <div id="notifyRows"></div>
+  <button type="button" class="nt-add" id="notifyAdd" style="margin-bottom:14px">+ {{ __('Add alert') }}</button>
 
   <p id="formError" style="color:#e11d48; font-size: 11.5px; display:none; margin: -6px 0 10px;">{{ __('Please fill in a subject and date.') }}</p>
   <button type="button" class="modal-save" onclick="saveReminder()">{{ __('Save Reminder') }}</button>
 </div>
 
 @include('partials.rk-picker')
+@include('partials.notify-rows')
 
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -1048,7 +993,6 @@ let dragId = null;
 let dragStartX = null;
 let dragOffset = 0;
 let pageDragStartX = null;
-let selectedRepeatHours = [];
 let typeFilter = '';
 let dayFilter = null; // 'YYYY-MM-DD'
 let calMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
@@ -1077,6 +1021,7 @@ function computeStatus(dueMs, leadHours) {
 function leadLabel(hours) {
   if (hours < 1) return Math.round(hours * 60) + ' ' + t('min');
   if (hours === 1) return t('1 hour');
+  if (hours >= 24 && hours % 24 === 0) return hours === 24 ? t('1 day') : t(':count days', {count: hours / 24});
   return t(':count hours', {count: Math.round(hours * 10) / 10});
 }
 
@@ -1399,29 +1344,16 @@ function selectType(type) {
   });
 }
 
-function toggleRepeatOptions() {
-  document.getElementById('repeatOptionsWrap').classList.toggle('hidden', !document.getElementById('repeatToggle').checked);
-}
-
-function toggleRepeatChip(btn) {
-  const hours = parseFloat(btn.getAttribute('data-hours'));
-  btn.classList.toggle('active');
-  if (btn.classList.contains('active')) {
-    if (!selectedRepeatHours.includes(hours)) selectedRepeatHours.push(hours);
-  } else {
-    selectedRepeatHours = selectedRepeatHours.filter(h => h !== hours);
-  }
-}
-
-function resetRepeatOptions(presetHours) {
-  selectedRepeatHours = Array.isArray(presetHours) ? presetHours.slice() : [];
-  document.getElementById('repeatToggle').checked = selectedRepeatHours.length > 0;
-  document.getElementById('repeatOptionsWrap').classList.toggle('hidden', selectedRepeatHours.length === 0);
-  document.querySelectorAll('.repeat-chip').forEach(chip => {
-    const hours = parseFloat(chip.getAttribute('data-hours'));
-    chip.classList.toggle('active', selectedRepeatHours.includes(hours));
-  });
-}
+// "Notify me" rows (partials/notify-rows). A reminder always keeps at least one alert.
+var notify = RKNotify.create({
+  rows: 'notifyRows', add: 'notifyAdd', minRows: 1, allowZero: true, maxDays: 14,
+  when(minutes) {
+    const d = document.getElementById('dateInput').value;
+    if (!d) return '';
+    const due = new Date(d + 'T' + (document.getElementById('timeInput').value || '09:00'));
+    return formatWhen(due.getTime() - minutes * 60000);
+  },
+});
 
 function openAddModal() {
   document.getElementById('modalTitle').textContent = t('Add Reminder');
@@ -1429,10 +1361,9 @@ function openAddModal() {
   document.getElementById('subjectInput').value = '';
   document.getElementById('dateInput').value = '';
   document.getElementById('timeInput').value = '';
-  document.getElementById('leadInput').value = '1';
   selectType('Exam');
-  resetRepeatOptions([]);
   syncDueField();
+  notify.set([60]);
   showModal('modal');
 }
 
@@ -1445,10 +1376,9 @@ function openEditModal(id) {
   document.getElementById('subjectInput').value = r.subject;
   document.getElementById('dateInput').value = toDateStr(dueMs);
   document.getElementById('timeInput').value = toTimeStr(dueMs);
-  document.getElementById('leadInput').value = r.lead_hours;
   selectType(r.type);
-  resetRepeatOptions(r.repeat_lead_hours || []);
   syncDueField();
+  notify.set([r.lead_hours, ...(r.repeat_lead_hours || [])].map(h => Math.round(h * 60)));
   showModal('modal');
 }
 
@@ -1461,6 +1391,7 @@ function syncDueField() {
   document.getElementById('dueFieldText').textContent = d
     ? `${RKPicker.formatDate(d, true)} · ${RKPicker.formatTime(tm || '09:00')}`
     : t('Pick date & time');
+  if (window.notify) notify.render();
 }
 
 function openDuePicker() {
@@ -1496,7 +1427,6 @@ function saveReminder() {
   const subject = document.getElementById('subjectInput').value.trim();
   const date = document.getElementById('dateInput').value;
   const time = document.getElementById('timeInput').value || '09:00';
-  const lead = parseFloat(document.getElementById('leadInput').value) || 1;
 
   if (!subject || !date) {
     document.getElementById('formError').style.display = 'block';
@@ -1507,7 +1437,10 @@ function saveReminder() {
   const url = id ? `/reminders/${id}` : '/reminders';
   const method = id ? 'PUT' : 'POST';
 
-  const repeatLeadHours = document.getElementById('repeatToggle').checked ? selectedRepeatHours : [];
+  // Closest alert = the main notification (lead_hours); the others go out as extra reminders.
+  const alertHours = notify.minutes().map(m => m / 60).sort((a, b) => a - b);
+  const lead = alertHours.length ? alertHours[0] : 1;
+  const repeatLeadHours = alertHours.slice(1);
 
   fetch(url, {
     method,

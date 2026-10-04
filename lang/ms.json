@@ -809,5 +809,6 @@
     "day": "hari",
     "before": "sebelum",
     "Unit": "Unit",
-    "No alerts for this class.": "Tiada peringatan untuk kelas ini."
+    "No alerts for this class.": "Tiada peringatan untuk kelas ini.",
+    ":count days": ":count hari"
 }

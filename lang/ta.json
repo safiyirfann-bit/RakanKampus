@@ -616,5 +616,6 @@
     "day": "நாள்",
     "before": "முன்",
     "Unit": "அலகு",
-    "No alerts for this class.": "இந்த வகுப்பிற்கு நினைவூட்டல் இல்லை."
+    "No alerts for this class.": "இந்த வகுப்பிற்கு நினைவூட்டல் இல்லை.",
+    ":count days": ":count நாட்கள்"
 }
