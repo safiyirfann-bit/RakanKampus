@@ -741,6 +741,19 @@ html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0
   .greeting-card.sky-card { padding-bottom: 100px; }
 }
 </style>
+<style id="tb-mobile">
+.topbar .topbar-left { gap: 10px; }
+.tb-bot { display: inline-flex; animation: tbBob 3s ease-in-out infinite; }
+@keyframes tbBob { 50% { transform: translateY(-3px); } }
+.tb-hello { line-height: 1.15; min-width: 0; }
+.tb-hello small { display: block; font-size: 12px; font-weight: 600; color: #64748b; }
+.tb-hello b { display: block; font-size: 18px; font-weight: 800; color: #14213d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 56vw; }
+.tb-avatar { width: 40px; height: 40px; flex: none; border-radius: 50%; overflow: hidden; display: grid; place-items: center; text-decoration: none;
+  background: #0f2747; color: #fff; font-size: 13px; font-weight: 800; box-shadow: 0 0 0 3px #ccfbf1; }
+.tb-avatar img { width: 100%; height: 100%; object-fit: cover; }
+html[data-theme="dark"] .tb-hello b { color: #dee1e9; } html[data-theme="dark"] .tb-hello small { color: #b0b6be; }
+html[data-theme="dark"] .tb-avatar { box-shadow: 0 0 0 3px #1d3d3b; }
+</style>
 </head>
 <body>
 
@@ -751,27 +764,46 @@ html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0
 <div class="bg-blob b3"></div>
 <div class="bg-blob b4"></div>
 
+@php
+          // Server-rendered fallback for first paint (before the client-side
+          // clock in the script below takes over and keeps this live).
+          $hour = now()->hour;
+          if ($hour < 5 || $hour >= 22) {
+              $greeting = 'Good night';
+          } elseif ($hour < 12) {
+              $greeting = 'Good morning';
+          } elseif ($hour < 18) {
+              $greeting = 'Good afternoon';
+          } else {
+              $greeting = 'Good evening';
+          }
+      @endphp
+@php
+        $h = now()->hour;
+        $skyPhase = ($h < 5 || $h >= 20) ? 'night' : ($h < 12 ? 'morning' : ($h < 18 ? 'afternoon' : 'evening'));
+    @endphp
 <div class="topbar">
-
+    {{-- Phone top bar: small robot, greeting + first name, avatar → Profile (hidden on PC) --}}
     <div class="topbar-left">
-        <div class="logo-icon">
-            <x-brand-logo size="36" />
+        <span class="tb-bot"><x-brand-logo size="34" /></span>
+        <div class="tb-hello">
+            <small><span id="tbGreet">{{ __($greeting) }}</span> <span id="tbIcon">{{ ["morning" => "☀️", "afternoon" => "🌤️", "evening" => "🌇", "night" => "🌙"][$skyPhase] }}</span></small>
+            <b>{{ $user->first_name ?: $user->name }}</b>
         </div>
-
-        <span class="brand-name">RakanKampus</span>
     </div>
-
-    </div>
-
+    <a href="{{ route('student.profile') }}" class="tb-avatar" aria-label="{{ __('Profile') }}">
+        @if($user->photo_data)
+            <img src="{{ $user->photo_data }}" alt="">
+        @else
+            {{ strtoupper(substr($user->first_name ?? $user->name ?? 'U', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
+        @endif
+    </a>
 </div>
 
   <div class="container">
 
     <!-- Greeting card -->
-    @php
-        $h = now()->hour;
-        $skyPhase = ($h < 5 || $h >= 20) ? 'night' : ($h < 12 ? 'morning' : ($h < 18 ? 'afternoon' : 'evening'));
-    @endphp
+
     <div class="greeting-card sky-card sky-{{ $skyPhase }}" id="skyCard">
       {{-- Sky that follows the time of day: morning / afternoon / evening / night --}}
       <div class="sky" aria-hidden="true">
@@ -833,20 +865,7 @@ html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0
           @endif
         </div>
       </div>
-      @php
-          // Server-rendered fallback for first paint (before the client-side
-          // clock in the script below takes over and keeps this live).
-          $hour = now()->hour;
-          if ($hour < 5 || $hour >= 22) {
-              $greeting = 'Good night';
-          } elseif ($hour < 12) {
-              $greeting = 'Good morning';
-          } elseif ($hour < 18) {
-              $greeting = 'Good afternoon';
-          } else {
-              $greeting = 'Good evening';
-          }
-      @endphp
+
       <p class="greeting-hello"><span class="sky-badge"><span id="skyIcon">{{ ["morning" => "☀️", "afternoon" => "🌤️", "evening" => "🌇", "night" => "🌙"][$skyPhase] }}</span> <span id="greetingHello">{{ __($greeting) }}</span><span class="sky-dot">·</span><span id="skyTime">{{ now()->format('g:i A') }}</span></span></p>
       <p class="greeting-question">{{ __('How can I help you today?') }}</p>
     </div>
@@ -1099,6 +1118,8 @@ function updateGreeting() {
     else greeting = t('Good evening');
 
     if (el.textContent !== greeting) el.textContent = greeting;
+    const tb = document.getElementById('tbGreet');
+    if (tb && tb.textContent !== greeting) tb.textContent = greeting;
 }
 updateGreeting();
 setInterval(updateGreeting, 60000);
@@ -1112,6 +1133,8 @@ function updateSky() {
     ['morning', 'afternoon', 'evening', 'night'].forEach(p => card.classList.toggle('sky-' + p, p === phase));
     const icon = document.getElementById('skyIcon');
     if (icon) icon.textContent = { morning: '☀️', afternoon: '🌤️', evening: '🌇', night: '🌙' }[phase];
+    const tbi = document.getElementById('tbIcon');
+    if (tbi && icon) tbi.textContent = icon.textContent;
     const tm = document.getElementById('skyTime');
     if (tm) tm.textContent = d.toLocaleTimeString(window.APP_LOCALE === 'en' ? 'en-US' : (window.APP_LOCALE || 'en-US'), { hour: 'numeric', minute: '2-digit' });
 }
