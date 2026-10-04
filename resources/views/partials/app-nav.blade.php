@@ -9,6 +9,9 @@
     ['key' => 'profile', 'route' => 'student.profile', 'label' => __('Profile'), 'icon' => '<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-4 4-6 8-6s8 2 8 6"></path>'],
   ];
 
+  // Reminders due in the next 7 days → badge on the sidebar (red dot when collapsed)
+  $navDueSoon = $navUser ? $navUser->reminders()->whereBetween('due_at', [now(), now()->addDays(7)])->count() : 0;
+
   // Mobile bottom bar keeps the same 5 destinations/icons as the desktop sidebar
   // above, just reordered so Chat sits in the middle as the raised circular button.
   $tabOrder = ['home', 'reminders', 'chat', 'timetable', 'profile'];
@@ -18,42 +21,75 @@
     ->values();
 @endphp
 <style>
+  /* Desktop sidebar: floating rounded panel that can fold into an icon rail (state remembered) */
   .rk-sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 220px;
-    background: linear-gradient(175deg, #14213d, #1b3a5c 55%, #1c4f57);
-    display: none;
-    flex-direction: column;
+    --rk-w: 224px;
+    position: fixed; left: 12px; top: 12px; bottom: 12px; width: var(--rk-w);
+    background: linear-gradient(165deg, #0f2747, #134a63 60%, #155e75);
+    border-radius: 24px; box-shadow: 0 16px 34px rgba(15, 39, 71, .28);
+    display: none; flex-direction: column;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    z-index: 38;
+    z-index: 38; transition: width .25s ease;
   }
-  .rk-sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 22px 20px 18px; flex-shrink: 0; }
-  .rk-sidebar-brand span { font-size: 15.5px; font-weight: 800; color: #fff; }
-  .rk-sidebar-nav { flex: 1; min-height: 0; overflow-y: auto; padding: 8px 12px; display: flex; flex-direction: column; gap: 3px; }
-  .rk-nav-link { display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 10px; text-decoration: none; color: #a9c2d3; font-weight: 500; }
-  .rk-nav-link svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
-  .rk-nav-link span { font-size: 13px; }
-  .rk-nav-link.active { background: rgba(255,255,255,0.14); color: #fff; font-weight: 700; }
+  html.rk-nav-mini .rk-sidebar { --rk-w: 76px; }
+  .rk-sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 10px; flex-shrink: 0; min-height: 70px; }
+  .rk-sidebar-brand svg { flex: none; }
+  .rk-sidebar-brand span { font-size: 15.5px; font-weight: 800; color: #fff; white-space: nowrap; }
+  .rk-nav-toggle {
+    position: absolute; right: -13px; top: 26px; width: 26px; height: 26px; border-radius: 50%;
+    border: 2px solid #f0fafa; background: #14b8a6; color: #fff; cursor: pointer; display: grid; place-items: center;
+    box-shadow: 0 4px 10px rgba(15,39,71,.3); padding: 0; transition: transform .25s;
+  }
+  .rk-nav-toggle svg { width: 13px; height: 13px; }
+  html.rk-nav-mini .rk-nav-toggle { transform: rotate(180deg); }
+  .rk-sidebar-nav { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 4px 12px; display: flex; flex-direction: column; gap: 3px; }
+  .rk-nav-label { font-size: 10px; font-weight: 800; letter-spacing: 1.3px; color: rgba(255,255,255,.45); margin: 14px 12px 6px; white-space: nowrap; }
+  .rk-nav-link {
+    position: relative; display: flex; align-items: center; gap: 12px; padding: 11px 13px; border-radius: 12px;
+    text-decoration: none; color: #a9c2d3; font-weight: 600; transition: background .15s, color .15s;
+  }
+  .rk-nav-link:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .rk-nav-link svg { width: 19px; height: 19px; stroke: currentColor; flex-shrink: 0; }
+  .rk-nav-link > span.rk-nav-text { font-size: 13.5px; white-space: nowrap; }
+  .rk-nav-link.active { background: rgba(255,255,255,.12); color: #fff; font-weight: 700; }
+  .rk-nav-link.active::before {
+    content: ""; position: absolute; left: -12px; top: 9px; bottom: 9px; width: 4px; border-radius: 0 4px 4px 0;
+    background: #2dd4bf; box-shadow: 0 0 12px #2dd4bf;
+  }
+  .rk-nav-link.active svg { color: #5eead4; }
+  .rk-nav-badge { margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; background: #2dd4bf; color: #053b37; font-size: 10.5px; font-weight: 800; display: grid; place-items: center; }
   .rk-nav-avatar {
-    width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
+    width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; overflow: hidden;
     display: flex; align-items: center; justify-content: center;
-    background: #2ec4c6; color: #14213d; font-size: 8px; font-weight: 700;
+    background: #2ec4c6; color: #14213d; font-size: 8.5px; font-weight: 800;
   }
   .rk-nav-avatar img { width: 100%; height: 100%; object-fit: cover; }
-  .rk-nav-link.active .rk-nav-avatar { box-shadow: 0 0 0 2px rgba(255,255,255,0.65); }
+  .rk-nav-link.active .rk-nav-avatar { box-shadow: 0 0 0 2px #5eead4; }
+  .rk-sidebar-foot { padding: 10px 12px 14px; flex-shrink: 0; }
   .rk-sidebar-logout {
-    display: flex; align-items: center; gap: 10px;
-    padding: 14px 18px;
-    flex-shrink: 0;
-    background: none; border: none; border-top: 1px solid rgba(255,255,255,0.12); width: 100%;
-    color: #fff; font-size: 13px; font-weight: 700;
-    cursor: pointer; text-align: left;
+    display: flex; align-items: center; gap: 10px; width: 100%; padding: 11px 13px; border-radius: 12px;
+    background: rgba(239, 68, 68, .14); border: 0; color: #fecaca; font-size: 13px; font-weight: 700;
+    cursor: pointer; text-align: left; font-family: inherit; white-space: nowrap; transition: background .15s;
   }
-  .rk-sidebar-logout svg { width: 17px; height: 17px; stroke: currentColor; flex-shrink: 0; }
-  .rk-sidebar-logout:hover { background: rgba(0,0,0,0.12); }
+  .rk-sidebar-logout svg { width: 18px; height: 18px; stroke: currentColor; flex-shrink: 0; }
+  .rk-sidebar-logout:hover { background: rgba(239, 68, 68, .26); color: #fff; }
+
+  /* folded: icons only, labels as hover tooltips, badge becomes a red dot */
+  html.rk-nav-mini .rk-sidebar-brand { padding: 20px 0 10px; justify-content: center; }
+  html.rk-nav-mini .rk-sidebar-brand span,
+  html.rk-nav-mini .rk-nav-text { display: none; }
+  html.rk-nav-mini .rk-nav-label { font-size: 0; height: 1px; margin: 12px 14px; background: rgba(255,255,255,.14); }
+  html.rk-nav-mini .rk-nav-link, html.rk-nav-mini .rk-sidebar-logout { justify-content: center; padding: 13px 0; }
+  html.rk-nav-mini .rk-nav-link.active { background: #14b8a6; box-shadow: 0 8px 18px rgba(20,184,166,.4); }
+  html.rk-nav-mini .rk-nav-link.active::before { display: none; }
+  html.rk-nav-mini .rk-nav-link.active svg { color: #fff; }
+  html.rk-nav-mini .rk-nav-badge { position: absolute; top: 8px; right: 14px; min-width: 0; width: 9px; height: 9px; padding: 0; font-size: 0; background: #f43f5e; border: 2px solid #134a63; }
+  html.rk-nav-mini [data-tip]:hover::after {
+    content: attr(data-tip); position: absolute; left: calc(100% + 14px); top: 50%; transform: translateY(-50%);
+    background: #0f2747; color: #fff; font-size: 12px; font-weight: 700; padding: 6px 11px; border-radius: 9px; white-space: nowrap;
+    box-shadow: 0 8px 18px rgba(15,39,71,.3); z-index: 5; pointer-events: none;
+  }
+  html.rk-nav-mini .rk-sidebar-nav { overflow: visible; }
 
   .rk-tabbar {
     display: none;
@@ -98,7 +134,8 @@
 
   @media (min-width: 861px) {
     .rk-sidebar { display: flex; }
-    body { margin-left: 220px; }
+    body { margin-left: 248px; transition: margin-left .25s ease; }
+    html.rk-nav-mini body { margin-left: 100px; }
   }
   @media (max-width: 860px) {
     .rk-tabbar { display: flex; }
@@ -110,7 +147,8 @@
    Hand-made fixes go in resources/views/partials/dark-fixes.blade.php */
 html[data-theme="dark"] .rk-nav-link { color: #cbd5dc; }
 html[data-theme="dark"] .rk-nav-avatar { color: #dee1e9; }
-html[data-theme="dark"] .rk-sidebar-logout { border-top: 1px solid rgba(42, 51, 65, 0.12); }
+html[data-theme="dark"] .rk-sidebar { background: linear-gradient(165deg, #0b1626, #0f3446 60%, #0f4a55); box-shadow: 0 16px 34px rgba(0,0,0,.5); }
+html[data-theme="dark"] .rk-nav-toggle { border-color: #10161f; }
 html[data-theme="dark"] .rk-tabbar { background: #17202d; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.41); }
 html[data-theme="dark"] .rk-tab-link { color: #ced3d9; }
 html[data-theme="dark"] .rk-tab-link.active { color: #41eedf; }
@@ -119,14 +157,20 @@ html[data-theme="dark"] .rk-tab-link.active .rk-tab-avatar { box-shadow: 0 0 0 2
 html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0, 0, 0.81); }
 </style>
 
-<nav class="rk-sidebar">
+<script>try { if (localStorage.getItem('rk_nav_mini') === '1') document.documentElement.classList.add('rk-nav-mini'); } catch (e) {}</script>
+<nav class="rk-sidebar" aria-label="{{ __('Main menu') }}">
   <div class="rk-sidebar-brand">
-    <x-brand-logo size="30" />
+    <x-brand-logo size="32" />
     <span>RakanKampus</span>
   </div>
+  <button type="button" class="rk-nav-toggle" id="rkNavToggle" aria-label="{{ __('Collapse menu') }}" title="{{ __('Collapse menu') }}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
   <div class="rk-sidebar-nav">
     @foreach($navItems as $item)
-      <a href="{{ route($item['route']) }}" class="rk-nav-link {{ $navActive === $item['key'] ? 'active' : '' }}">
+      @if($item['key'] === 'home')<p class="rk-nav-label">{{ __('MENU') }}</p>@endif
+      @if($item['key'] === 'profile')<p class="rk-nav-label">{{ __('ACCOUNT') }}</p>@endif
+      <a href="{{ route($item['route']) }}" class="rk-nav-link {{ $navActive === $item['key'] ? 'active' : '' }}" data-tip="{{ $item['label'] }}">
         @if($item['key'] === 'profile')
           <span class="rk-nav-avatar">
             @if($navUser && $navUser->photo_data)
@@ -138,19 +182,39 @@ html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0
         @else
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
         @endif
-        <span>{{ $item['label'] }}</span>
+        <span class="rk-nav-text">{{ $item['label'] }}</span>
+        @if($item['key'] === 'reminders' && $navDueSoon > 0)
+          <span class="rk-nav-badge" title="{{ __(':n due this week', ['n' => $navDueSoon]) }}">{{ $navDueSoon }}</span>
+        @endif
       </a>
     @endforeach
   </div>
-  <form method="POST" action="{{ route('logout') }}"
+  <form method="POST" action="{{ route('logout') }}" class="rk-sidebar-foot"
         onsubmit="return RKDialog.confirmForm(event, { scene: 'signout', title: @js(__('Log out?')), message: @js(__('Are you sure you want to sign out of your RakanKampus account?')), confirmText: @js(__('Log Out')) })">
     @csrf
-    <button type="submit" class="rk-sidebar-logout">
-      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
-      {{ __('Logout') }}
+    <button type="submit" class="rk-sidebar-logout" data-tip="{{ __('Logout') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M16 17l5-5-5-5"></path><path d="M21 12H9"></path></svg>
+      <span class="rk-nav-text">{{ __('Logout') }}</span>
     </button>
   </form>
 </nav>
+<script>
+(function () {
+  var btn = document.getElementById('rkNavToggle');
+  if (!btn) return;
+  var labels = [@js(__('Collapse menu')), @js(__('Expand menu'))];
+  function sync() {
+    var mini = document.documentElement.classList.contains('rk-nav-mini');
+    btn.setAttribute('aria-label', labels[mini ? 1 : 0]); btn.title = labels[mini ? 1 : 0];
+  }
+  btn.addEventListener('click', function () {
+    var mini = document.documentElement.classList.toggle('rk-nav-mini');
+    try { localStorage.setItem('rk_nav_mini', mini ? '1' : '0'); } catch (e) {}
+    sync();
+  });
+  sync();
+})();
+</script>
 
 <nav class="rk-tabbar">
   @foreach($tabItems as $item)

@@ -552,5 +552,11 @@
     "Looks good — save it and you’re done 🎉": "看起来不错，保存就完成了 🎉",
     "Almost done! 🎉": "快完成了！🎉",
     "I sent a 6-digit code to :email to make sure it's yours 📩": "我已将 6 位验证码发送到 :email，以确认这是你的邮箱 📩",
-    "Ask anything…": "问我任何问题…"
+    "Ask anything…": "问我任何问题…",
+    "MENU": "菜单",
+    "ACCOUNT": "账户",
+    "Collapse menu": "收起菜单",
+    "Expand menu": "展开菜单",
+    ":n due this week": "本周 :n 项到期",
+    "Main menu": "主菜单"
 }
