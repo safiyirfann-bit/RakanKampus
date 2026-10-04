@@ -50,6 +50,29 @@ class ProfileController extends Controller
     }
 
     /**
+     * Profile cover picture (shown on the PC profile page). Same storage as the photo:
+     * a resized JPEG data URI on the user row.
+     */
+    public function uploadCover(Request $request)
+    {
+        $request->validate([
+            'cover' => 'required|image|mimes:jpg,jpeg,png,webp|max:8192',
+        ]);
+
+        $dataUri = $this->resizeToDataUri($request->file('cover')->getRealPath(), 1600, 78);
+        $request->user()->update(['cover_data' => $dataUri]);
+
+        return response()->json(['success' => true, 'coverUrl' => $dataUri]);
+    }
+
+    public function removeCover(Request $request)
+    {
+        $request->user()->update(['cover_data' => null]);
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
      * Downscale an uploaded image to a sensible avatar size and re-encode
      * it as a compact JPEG, returned as a data: URI ready to store and to
      * drop straight into an <img src="">. Keeping this small matters here

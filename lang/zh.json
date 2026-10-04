@@ -619,5 +619,18 @@
     "before": "之前",
     "Unit": "单位",
     "No alerts for this class.": "此课程没有提醒。",
-    ":count days": ":count 天"
+    ":count days": ":count 天",
+    "Cover picture": "封面图片",
+    "Change cover": "更换封面",
+    "Remove cover": "移除封面",
+    "Remove cover picture?": "移除封面图片？",
+    "Your profile will go back to the default campus picture.": "您的个人资料将恢复为默认校园图片。",
+    "Could not upload the cover. Please try again.": "无法上传封面，请重试。",
+    "The image is too large (maximum 8MB).": "图片太大（最大 8MB）。",
+    "Something went wrong. Please try again.": "出了点问题，请重试。",
+    "Support": "支持",
+    "Keep your account safe": "保护您的账户安全",
+    "Classes, reminders and do not disturb": "课程、提醒和勿扰",
+    "English, Melayu, 中文, தமிழ்": "English, Melayu, 中文, தமிழ்",
+    "Light, dark or device setting": "浅色、深色或跟随设备"
 }

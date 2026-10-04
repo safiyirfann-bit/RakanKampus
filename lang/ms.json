@@ -812,5 +812,18 @@
     "before": "sebelum",
     "Unit": "Unit",
     "No alerts for this class.": "Tiada peringatan untuk kelas ini.",
-    ":count days": ":count hari"
+    ":count days": ":count hari",
+    "Cover picture": "Gambar muka depan",
+    "Change cover": "Tukar cover",
+    "Remove cover": "Buang cover",
+    "Remove cover picture?": "Buang gambar cover?",
+    "Your profile will go back to the default campus picture.": "Profil anda akan kembali ke gambar kampus asal.",
+    "Could not upload the cover. Please try again.": "Tak dapat muat naik cover. Sila cuba lagi.",
+    "The image is too large (maximum 8MB).": "Gambar terlalu besar (maksimum 8MB).",
+    "Something went wrong. Please try again.": "Ada masalah. Sila cuba lagi.",
+    "Support": "Sokongan",
+    "Keep your account safe": "Pastikan akaun anda selamat",
+    "Classes, reminders and do not disturb": "Kelas, peringatan dan jangan ganggu",
+    "English, Melayu, 中文, தமிழ்": "English, Melayu, 中文, தமிழ்",
+    "Light, dark or device setting": "Cerah, gelap atau ikut peranti"
 }

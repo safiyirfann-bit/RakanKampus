@@ -619,5 +619,18 @@
     "before": "முன்",
     "Unit": "அலகு",
     "No alerts for this class.": "இந்த வகுப்பிற்கு நினைவூட்டல் இல்லை.",
-    ":count days": ":count நாட்கள்"
+    ":count days": ":count நாட்கள்",
+    "Cover picture": "அட்டைப் படம்",
+    "Change cover": "அட்டையை மாற்று",
+    "Remove cover": "அட்டையை நீக்கு",
+    "Remove cover picture?": "அட்டைப் படத்தை நீக்கவா?",
+    "Your profile will go back to the default campus picture.": "உங்கள் சுயவிவரம் இயல்புநிலை வளாகப் படத்திற்குத் திரும்பும்.",
+    "Could not upload the cover. Please try again.": "அட்டையைப் பதிவேற்ற முடியவில்லை. மீண்டும் முயலவும்.",
+    "The image is too large (maximum 8MB).": "படம் மிகப் பெரியது (அதிகபட்சம் 8MB).",
+    "Something went wrong. Please try again.": "ஏதோ தவறு நடந்தது. மீண்டும் முயலவும்.",
+    "Support": "ஆதரவு",
+    "Keep your account safe": "உங்கள் கணக்கைப் பாதுகாப்பாக வைத்திருங்கள்",
+    "Classes, reminders and do not disturb": "வகுப்புகள், நினைவூட்டல்கள், தொந்தரவு செய்யாதே",
+    "English, Melayu, 中文, தமிழ்": "English, Melayu, 中文, தமிழ்",
+    "Light, dark or device setting": "ஒளி, இருள் அல்லது சாதன அமைப்பு"
 }

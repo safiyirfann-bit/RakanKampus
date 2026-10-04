@@ -65,6 +65,8 @@ Route::middleware('auth')->group(function () {
         ->name('student.profile.update');
 
     Route::post('/profile/photo', [ProfileController::class, 'uploadPhoto'])->name('profile.photo.upload');
+    Route::post('/profile/cover', [ProfileController::class, 'uploadCover'])->name('profile.cover.upload');
+    Route::delete('/profile/cover', [ProfileController::class, 'removeCover'])->name('profile.cover.remove');
 
    Route::get('/student/home', function (Illuminate\Http\Request $request) {
     $user = $request->user();

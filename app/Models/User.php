@@ -22,6 +22,7 @@ class User extends Authenticatable
         'role',
         'photo',
         'photo_data',
+        'cover_data',
         'faculty',
         'phone',
         'notification_settings',
