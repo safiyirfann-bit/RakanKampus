@@ -153,7 +153,7 @@ html body .pg-wrap .text-red-600 { color: #fecaca !important; font-weight: 700; 
 /* PC profile (≥861px): cover + tabs layout (.pfw). Phones keep the glass list (.pg-wrap cards). */
 .pfw { display: none; }
 @media (min-width: 861px) {
-  .pfw { display: block; position: relative; z-index: 1; max-width: 1100px; padding: 6px 40px 48px; }
+  .pfw { display: block; position: relative; z-index: 1; padding: 6px 40px 48px; }
   html body .pg-wrap { max-width: none !important; margin: 0 !important; padding: 0 !important; background: none !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
   .pg-wrap > .pg-card { display: none !important; }
 
@@ -164,11 +164,12 @@ html body .pg-wrap .text-red-600 { color: #fecaca !important; font-weight: 700; 
   html[data-theme="dark"] body .profile-header h1 { color: #dee1e9 !important; }
   html[data-theme="dark"] body .profile-header p { color: #41eedf !important; }
 
-  .pfw-cover { position: relative; height: 230px; border-radius: 24px; overflow: hidden; background: linear-gradient(135deg, #14213d, #2ec4c6); box-shadow: 0 14px 34px rgba(15,39,71,.16); }
+  .pfw-cover { position: relative; height: clamp(220px, 22vw, 320px); border-radius: 24px; overflow: hidden; background: linear-gradient(135deg, #14213d, #2ec4c6); box-shadow: 0 14px 34px rgba(15,39,71,.16); }
   .pfw-cover img, .pfw-cover .pfw-art { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
   .pfw-cover [hidden] { display: none; }
   .pfw-cover::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(0,0,0,0) 55%, rgba(0,0,0,.18)); }
   .pfw-cover.busy::before { content: ""; position: absolute; z-index: 3; inset: 0; background: rgba(15,39,71,.45) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 50 50'%3E%3Ccircle cx='25' cy='25' r='18' fill='none' stroke='%23fff' stroke-width='4' stroke-dasharray='80 40'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 25 25' to='360 25 25' dur='.9s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E") center / 44px no-repeat; }
+  .pfw-cover-tag { position: absolute; z-index: 2; right: 22px; bottom: 16px; color: rgba(255,255,255,.8); font-size: 14px; font-weight: 800; letter-spacing: .08em; }
   .pfw-cover-actions { position: absolute; z-index: 2; top: 14px; right: 14px; display: flex; gap: 8px; }
   .pfw-cbtn { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 14px; border-radius: 12px; cursor: pointer; border: 1px solid rgba(255,255,255,.4);
     background: rgba(15,39,71,.35); -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); color: #fff; font: 700 12.5px 'Plus Jakarta Sans', sans-serif; transition: background .15s; }
@@ -177,7 +178,7 @@ html body .pg-wrap .text-red-600 { color: #fecaca !important; font-weight: 700; 
   .pfw-cbtn-icon { width: 36px; padding: 0; justify-content: center; }
   .pfw-cbtn-icon:hover { background: rgba(220,38,38,.6); }
 
-  .pfw-who { position: relative; display: flex; align-items: flex-end; gap: 18px; padding: 0 22px; margin-top: -54px; margin-bottom: 22px; z-index: 2; }
+  .pfw-who { position: relative; display: flex; align-items: flex-end; gap: 18px; padding: 0 22px; margin-top: -54px; margin-bottom: 26px; z-index: 2; }
   .pfw-av { width: 112px; height: 112px; flex: none; border-radius: 50%; overflow: hidden; display: grid; place-items: center; text-decoration: none;
     background: linear-gradient(135deg, #0d9488, #2ec4c6); color: #fff; font-size: 38px; font-weight: 800; border: 5px solid #f0fafa; box-shadow: 0 10px 26px rgba(15,39,71,.25); transition: transform .2s; }
   .pfw-av:hover { transform: scale(1.03); }
@@ -195,13 +196,7 @@ html body .pg-wrap .text-red-600 { color: #fecaca !important; font-weight: 700; 
   .pfw-btn-out:hover { background: #fbd5d5; }
   .pfw-btn:active { transform: scale(.97); }
 
-  .pfw-tabs { display: flex; gap: 4px; border-bottom: 1.5px solid #dbeeee; margin-bottom: 16px; }
-  .pfw-tabs button { border: 0; background: none; cursor: pointer; padding: 10px 16px; font: 700 14px 'Plus Jakarta Sans', sans-serif; color: #64748b; border-radius: 10px 10px 0 0; }
-  .pfw-tabs button:hover { color: #14213d; background: rgba(46,196,198,.06); }
-  .pfw-tabs button.on { color: #0f766e; box-shadow: inset 0 -3px 0 #2ec4c6; }
-  .pfw-pane { display: none; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; animation: pfwIn .25s ease; }
-  .pfw-pane.on { display: grid; }
-  @keyframes pfwIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .pfw-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
   .pfw-card { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 18px; text-decoration: none; color: #14213d;
     background: #fff; border: 1px solid #e3eef0; box-shadow: 0 6px 16px rgba(15,39,71,.06); transition: transform .15s, box-shadow .2s, border-color .2s; }
   .pfw-card:hover { transform: translateY(-2px); border-color: #2ec4c6; box-shadow: 0 0 0 1px #2ec4c6, 0 12px 26px rgba(46,196,198,.2); }
@@ -213,15 +208,9 @@ html body .pg-wrap .text-red-600 { color: #fecaca !important; font-weight: 700; 
   html[data-theme="dark"] .pfw-av { border-color: #10161f; }
   html[data-theme="dark"] .pfw-name b { color: #dee1e9; }
   html[data-theme="dark"] .pfw-name span, html[data-theme="dark"] .pfw-card small { color: #94a3b8; }
-  html[data-theme="dark"] .pfw-tabs { border-color: #283648; }
-  html[data-theme="dark"] .pfw-tabs button { color: #94a3b8; }
-  html[data-theme="dark"] .pfw-tabs button:hover { color: #dee1e9; }
-  html[data-theme="dark"] .pfw-tabs button.on { color: #41eedf; }
   html[data-theme="dark"] .pfw-card { background: #17202d; border-color: #283648; color: #dee1e9; box-shadow: none; }
   html[data-theme="dark"] .pfw-btn-out { background: #391c1c; color: #ef9e9e; }
 }
-@media (min-width: 861px) and (max-width: 1100px) { .pfw-pane { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-@media (prefers-reduced-motion: reduce) { .pfw-pane { animation: none; } }
 </style>
 <style id="rk-dark-theme">
 /* Dark theme — generated by scripts/dark-theme/generate.py, do not edit by hand.
@@ -276,13 +265,14 @@ html[data-theme="dark"] .mi-logout { color: #ef9e9e; background: #391c1c; }
 <div class="pfw">
     <div class="pfw-cover" id="pfwCover">
         <img id="pfwCoverImg" alt="{{ __('Cover picture') }}" @if($user->cover_data) src="{{ $user->cover_data }}" @else hidden @endif>
-        <svg class="pfw-art" id="pfwCoverArt" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true" @if($user->cover_data) hidden @endif>
+        <svg class="pfw-art" id="pfwCoverArt" viewBox="0 0 1000 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" @if($user->cover_data) hidden @endif>
             <defs>
                 <linearGradient id="pfwSky" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14213d"/><stop offset=".55" stop-color="#1b5e7a"/><stop offset="1" stop-color="#2ec4c6"/></linearGradient>
                 <radialGradient id="pfwSun"><stop offset="0" stop-color="#fef3c7"/><stop offset="1" stop-color="#fde68a" stop-opacity="0"/></radialGradient>
             </defs>
-            <rect width="1000" height="220" fill="url(#pfwSky)"/>
-            <circle cx="860" cy="62" r="70" fill="url(#pfwSun)" opacity=".5"/><circle cx="860" cy="62" r="26" fill="#fde68a" opacity=".95"/>
+            <rect width="1000" height="300" fill="url(#pfwSky)"/>
+            <g transform="translate(0 80)">
+            <circle cx="800" cy="40" r="70" fill="url(#pfwSun)" opacity=".5"/><circle cx="800" cy="40" r="26" fill="#fde68a" opacity=".95"/>
             <g fill="#fff" opacity=".18"><ellipse cx="200" cy="60" rx="60" ry="14"/><ellipse cx="240" cy="50" rx="40" ry="12"/><ellipse cx="620" cy="40" rx="50" ry="11"/></g>
             <g fill="#0f2747" opacity=".55">
                 <rect x="300" y="128" width="130" height="92"/><rect x="440" y="96" width="120" height="124"/><rect x="570" y="120" width="90" height="100"/><rect x="670" y="140" width="110" height="80"/>
@@ -295,8 +285,9 @@ html[data-theme="dark"] .mi-logout { color: #ef9e9e; background: #391c1c; }
                 <rect x="586" y="138" width="14" height="10" rx="2"/><rect x="630" y="138" width="14" height="10" rx="2"/><rect x="690" y="158" width="14" height="10" rx="2"/><rect x="740" y="158" width="14" height="10" rx="2"/>
             </g>
             <rect x="0" y="212" width="1000" height="8" fill="#0f2747" opacity=".4"/>
-            <text x="975" y="200" text-anchor="end" fill="#fff" opacity=".75" font-size="15" font-weight="800" font-family="Plus Jakarta Sans, sans-serif" letter-spacing="1">{{ $pfwDept ? $pfwDept . ' · ' : '' }}POLITEKNIK UNGKU OMAR</text>
+            </g>
         </svg>
+        <span class="pfw-cover-tag" id="pfwCoverTag" @if($user->cover_data) hidden @endif>{{ $pfwDept ? $pfwDept . ' · ' : '' }}POLITEKNIK UNGKU OMAR</span>
         <div class="pfw-cover-actions">
             <label class="pfw-cbtn" id="pfwCoverBtn">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg><span>{{ __('Change cover') }}</span>
@@ -324,34 +315,19 @@ html[data-theme="dark"] .mi-logout { color: #ef9e9e; background: #391c1c; }
         </div>
     </div>
 
-    <div class="pfw-tabs" role="tablist">
-        <button type="button" class="on" data-tab="account" onclick="pfwTab('account')">{{ __('Account') }}</button>
-        <button type="button" data-tab="prefs" onclick="pfwTab('prefs')">{{ __('Preferences') }}</button>
-        <button type="button" data-tab="support" onclick="pfwTab('support')">{{ __('Support') }}</button>
-    </div>
-        <div class="pfw-pane on" data-pane="account">
+        <div class="pfw-grid">
             <a href="{{ route('student.profile.password') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2.5"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.2" fill="currentColor"/></svg></span><span><b>{{ __('Change Password') }}</b><small>{{ __('Keep your account safe') }}</small></span></a>
             <a href="{{ route('student.profile.notifications') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span><span><b>{{ __('Notification Settings') }}</b><small>{{ __('Classes, reminders and do not disturb') }}</small></span></a>
             <a href="{{ route('student.profile.language') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg></span><span><b>{{ __('Language') }}</b><small>{{ __('English, Melayu, 中文, தமிழ்') }}</small></span></a>
             <a href="{{ route('student.profile.appearance') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg></span><span><b>{{ __('Appearance') }}</b><small>{{ __('Light, dark or device setting') }}</small></span></a>
-        </div>
-        <div class="pfw-pane" data-pane="prefs">
             <a href="{{ route('student.profile.privacy-security') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-3.5 8-10V5l-8-3-8 3v7c0 6.5 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg></span><span><b>{{ __('Privacy & Security') }}</b><small>{{ __('Devices, sign-in history and your data') }}</small></span></a>
             <a href="#" onclick="openFeedbackModal(); return false;" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></svg></span><span><b>{{ __('Feedback & feature requests') }}</b><small>{{ __('Tell us what we can improve') }}</small></span></a>
-        </div>
-        <div class="pfw-pane" data-pane="support">
             <a href="{{ route('student.help-support') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><circle cx="12" cy="17" r=".8" fill="currentColor"/></svg></span><span><b>{{ __('Help & Support') }}</b><small>{{ __('Get assistance and contact support') }}</small></span></a>
             <a href="{{ route('student.about') }}" class="pfw-card"><span class="pfw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".8" fill="currentColor"/></svg></span><span><b>{{ __('About RakanKampus') }}</b><small>{{ __('App version and project information') }}</small></span></a>
         </div>
 </div>
 
 <script>
-function pfwTab(key) {
-    document.querySelectorAll('.pfw-tabs [data-tab]').forEach(b => b.classList.toggle('on', b.dataset.tab === key));
-    document.querySelectorAll('.pfw-pane').forEach(p => p.classList.toggle('on', p.dataset.pane === key));
-    try { localStorage.setItem('rk_profile_tab', key); } catch (e) {}
-}
-try { const k = localStorage.getItem('rk_profile_tab'); if (k && document.querySelector(`.pfw-pane[data-pane="${k}"]`)) pfwTab(k); } catch (e) {}
 
 // Cover picture: upload (server resizes to 1600px JPEG) or remove → back to the campus artwork.
 (function () {
@@ -386,6 +362,7 @@ function setCover(url) {
     if (url) img.src = url; else img.removeAttribute('src');
     img.toggleAttribute('hidden', !url);
     document.getElementById('pfwCoverArt').toggleAttribute('hidden', !!url);
+    document.getElementById('pfwCoverTag').toggleAttribute('hidden', !!url);
     document.getElementById('pfwCoverRemove').toggleAttribute('hidden', !url);
 }
 
