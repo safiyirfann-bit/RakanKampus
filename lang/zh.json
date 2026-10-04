@@ -558,5 +558,10 @@
     "Collapse menu": "收起菜单",
     "Expand menu": "展开菜单",
     ":n due this week": "本周 :n 项到期",
-    "Main menu": "主菜单"
+    "Main menu": "主菜单",
+    "All →": "全部 →",
+    "No upcoming reminders": "没有即将到来的提醒",
+    "Add reminder": "添加提醒",
+    "in :n min": ":n 分钟后",
+    "in :nh": ":n 小时后"
 }

@@ -754,6 +754,57 @@ html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0
 html[data-theme="dark"] .tb-hello b { color: #dee1e9; } html[data-theme="dark"] .tb-hello small { color: #b0b6be; }
 html[data-theme="dark"] .tb-avatar { box-shadow: 0 0 0 3px #1d3d3b; }
 </style>
+<style id="home-cards-a">
+/* Today's classes as a dotted timeline */
+#todayClassesBody { position: relative; padding-left: 18px; margin-top: 6px; }
+#todayClassesBody::before { content: ""; position: absolute; left: 5px; top: 14px; bottom: 14px; width: 2px; background: #ccfbf1; border-radius: 2px; }
+#todayClassesBody .today-class-row { position: relative; border-top: 0; padding: 9px 12px; border-radius: 14px; margin-bottom: 4px; }
+#todayClassesBody .today-class-row::before { content: ""; position: absolute; left: -18px; top: 50%; margin-top: -6px; width: 12px; height: 12px; border-radius: 50%; background: #fff; border: 3px solid #99f6e4; box-sizing: border-box; }
+#todayClassesBody .today-class-row.is-ongoing { background: #f0fdfa; }
+#todayClassesBody .today-class-row.is-ongoing::before { border-color: #14b8a6; box-shadow: 0 0 0 4px rgba(20,184,166,.2); }
+#todayClassesBody .today-class-row.is-ongoing .today-class-time, #todayClassesBody .today-class-row.is-ongoing .today-class-subject { color: #0f766e; }
+#todayClassesBody .today-classes-empty { margin-left: -18px; }
+#todayClassesBody:has(.today-classes-empty)::before { display: none; }
+.tc-pill { margin-left: auto; flex: none; font-size: 10.5px; font-weight: 800; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.tc-done { background: #f1f5f9; color: #64748b; } .tc-now { background: #ccfbf1; color: #0f766e; } .tc-soon { background: #e0f2fe; color: #0369a1; }
+
+/* Reminders card (replaces the dark banner) */
+.reminders-banner.rem-card { display: block; background: var(--bg-card); border: 1px solid var(--border-light); box-shadow: 0 1px 2px rgba(20,40,100,.04); color: inherit; padding: 18px 20px; border-radius: 20px; cursor: default; }
+.reminders-banner.rem-card:hover { transform: none; box-shadow: 0 1px 2px rgba(20,40,100,.04); }
+.rem-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-top: 1px dashed var(--border-light); text-decoration: none; color: inherit; }
+.rem-card .today-classes-head + .rem-row { border-top: 0; }
+.rem-ic { width: 34px; height: 34px; flex: none; border-radius: 11px; display: grid; place-items: center; font-size: 16px; background: #f1f5f9; }
+.rem-exam { background: #eef2ff; } .rem-quiz { background: #f5f3ff; } .rem-assignment { background: #f0fdfa; }
+.rem-body { flex: 1; min-width: 0; }
+.rem-body b { display: block; font-size: 13px; color: #14213d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rem-body small { font-size: 11px; color: var(--text-muted); }
+.rem-cd { flex: none; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 999px; }
+.rem-cd-hot { background: #fee2e2; color: #b91c1c; } .rem-cd-warm { background: #fef3c7; color: #b45309; } .rem-cd-cool { background: #e0f2fe; color: #0369a1; }
+.rem-empty { font-size: 12.5px; color: var(--text-muted); padding: 12px 0 4px; }
+.rem-add { display: block; text-align: center; margin-top: 10px; font-size: 12px; font-weight: 800; color: var(--blue-primary); background: #f0fdfa; border-radius: 12px; padding: 9px; text-decoration: none; transition: background .15s; }
+.rem-add:hover { background: #ccfbf1; }
+
+/* FAQ: coloured icon + arrow */
+.quick-chip { display: flex !important; align-items: center; gap: 12px; padding: 12px 14px !important; border-radius: 16px !important; color: #14213d !important; }
+.qc-ic { width: 38px; height: 38px; flex: none; border-radius: 12px; display: grid; place-items: center; font-size: 17px; }
+.qc-teal { background: #ccfbf1; } .qc-amber { background: #fef3c7; } .qc-sky { background: #e0f2fe; } .qc-violet { background: #ede9fe; } .qc-pink { background: #fce7f3; }
+.qc-text { flex: 1; min-width: 0; font-size: 13.5px; line-height: 1.35; }
+.qc-text .quick-chip-tag { margin-bottom: 1px; }
+.qc-go { width: 16px; height: 16px; flex: none; color: #94a3b8; transition: transform .15s, color .15s; }
+.quick-chip:hover .qc-go { transform: translateX(3px); color: var(--blue-primary); }
+
+html[data-theme="dark"] .reminders-banner.rem-card { background: #17202d; border-color: #284848; }
+html[data-theme="dark"] .rem-body b, html[data-theme="dark"] .quick-chip { color: #dee1e9 !important; }
+html[data-theme="dark"] .rem-row { border-color: #284848; }
+html[data-theme="dark"] .rem-ic { background: #1f2a39; }
+html[data-theme="dark"] .rem-add { background: #1d3d3b; color: #41eedf; }
+html[data-theme="dark"] #todayClassesBody::before { background: #1d3d3b; }
+html[data-theme="dark"] #todayClassesBody .today-class-row::before { background: #17202d; border-color: #2c6b66; }
+html[data-theme="dark"] #todayClassesBody .today-class-row.is-ongoing { background: #1d3d3b; }
+html[data-theme="dark"] #todayClassesBody .today-class-row.is-ongoing .today-class-time, html[data-theme="dark"] #todayClassesBody .today-class-row.is-ongoing .today-class-subject { color: #5eead4; }
+html[data-theme="dark"] .reminders-banner.rem-card { box-shadow: none; }
+html[data-theme="dark"] .qc-ic { filter: saturate(.8) brightness(.9); }
+</style>
 </head>
 <body>
 
@@ -870,16 +921,26 @@ html[data-theme="dark"] .tb-avatar { box-shadow: 0 0 0 3px #1d3d3b; }
       <p class="greeting-question">{{ __('How can I help you today?') }}</p>
     </div>
 
-    <a href="{{ route('student.reminders') }}" class="reminders-banner">
-      <div class="reminders-banner-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+    {{-- Next 3 reminders with a day countdown (same grid slot as the old banner) --}}
+    <section class="reminders-banner rem-card">
+      <div class="today-classes-head">
+        <div class="today-classes-title-row">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+          <p class="today-classes-title">{{ __('Reminders') }}</p>
+        </div>
+        <a href="{{ route('student.reminders') }}" class="today-classes-link">{{ __('All →') }}</a>
       </div>
-      <div class="reminders-banner-body">
-        <p class="reminders-banner-title">{{ __('Reminders') }}</p>
-        <p class="reminders-banner-sub">{{ __('For exams, assignments & deadlines') }}</p>
-      </div>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
-    </a>
+      @forelse($upcomingReminders as $r)
+        <a href="{{ route('student.reminders') }}" class="rem-row">
+          <span class="rem-ic rem-{{ strtolower($r['type']) }}">{{ $r['emoji'] }}</span>
+          <span class="rem-body"><b>{{ $r['subject'] }}</b><small>{{ $r['when'] }}</small></span>
+          <span class="rem-cd rem-cd-{{ $r['level'] }}">{{ $r['left'] }}</span>
+        </a>
+      @empty
+        <p class="rem-empty">{{ __('No upcoming reminders') }} 🎉</p>
+      @endforelse
+      <a href="{{ route('student.reminders') }}?add=1" class="rem-add">+ {{ __('Add reminder') }}</a>
+    </section>
 
     <div class="today-classes-card">
       <div class="today-classes-head">
@@ -898,12 +959,24 @@ html[data-theme="dark"] .tb-avatar { box-shadow: 0 0 0 3px #1d3d3b; }
     {{-- Quick questions: the most asked questions from students (see App\Services\PopularQuestions),
          topped up with default ones. Popular chips show a small "Popular" tag. --}}
     <div class="quick-grid">
-      <p class="faq-label">{{ __('FREQUENTLY ASKED QUESTIONS') }}</p>
+      <p class="faq-label">🔥 {{ __('FREQUENTLY ASKED QUESTIONS') }}</p>
       @foreach($quickQuestions as $q)
-        @php($label = $q['popular'] ? $q['text'] : __($q['text']))
+        @php
+          $label = $q['popular'] ? $q['text'] : __($q['text']);
+          $lc = mb_strtolower($q['text'] . ' ' . $label);
+          [$qe, $qc] = match (true) {
+              str_contains($lc, 'regist') || str_contains($lc, 'daftar') => ['📝', 'teal'],
+              str_contains($lc, 'fee') || str_contains($lc, 'yuran') || str_contains($lc, 'pay') || str_contains($lc, 'bayar') => ['💳', 'amber'],
+              str_contains($lc, 'librar') || str_contains($lc, 'perpustakaan') => ['📚', 'sky'],
+              str_contains($lc, 'exam') || str_contains($lc, 'peperiksaan') || str_contains($lc, 'timetable') || str_contains($lc, 'jadual') => ['🗓️', 'violet'],
+              str_contains($lc, 'surau') || str_contains($lc, 'where') || str_contains($lc, 'mana') => ['📍', 'pink'],
+              default => ['💬', ['teal', 'amber', 'sky', 'violet'][$loop->index % 4]],
+          };
+        @endphp
         <a href="{{ route('student.chat') }}?q={{ urlencode($label) }}" class="quick-chip">
-          @if($q['popular'])<span class="quick-chip-tag">🔥 {{ __('Popular') }}</span>@endif
-          {{ $label }}
+          <span class="qc-ic qc-{{ $qc }}">{{ $qe }}</span>
+          <span class="qc-text">@if($q['popular'])<span class="quick-chip-tag">🔥 {{ __('Popular') }}</span>@endif{{ $label }}</span>
+          <svg class="qc-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
         </a>
       @endforeach
     </div>
@@ -1027,12 +1100,22 @@ function renderTodayClasses() {
         const meta = [s.room, s.lecturer].filter(Boolean).map(escapeHtmlHome).join(' · ')
             || (status === 'ongoing' ? t('Ongoing now') : '');
 
+        let pill = '';
+        if (status === 'past') pill = `<span class="tc-pill tc-done">${t('Done')}</span>`;
+        else if (status === 'ongoing') pill = `<span class="tc-pill tc-now">● ${t('Now')}</span>`;
+        else if (isActualToday) {
+            const [sh, sm] = s.start_time.split(':').map(Number);
+            const mins = Math.round(((sh * 60 + sm) - (now.getHours() * 60 + now.getMinutes())));
+            pill = `<span class="tc-pill tc-soon">${mins < 60 ? t('in :n min', {n: mins}) : t('in :nh', {n: Math.round(mins / 60)})}</span>`;
+        }
+
         return `<div class="today-class-row ${status === 'past' ? 'is-past' : ''} ${status === 'ongoing' ? 'is-ongoing' : ''}">
             <div class="today-class-time">${formatClassTime(s.start_time)}</div>
             <div class="today-class-body">
               <p class="today-class-subject">${escapeHtmlHome(s.subject)}</p>
               <p class="today-class-meta">${meta}</p>
             </div>
+            ${pill}
           </div>`;
     }).join('');
 }
