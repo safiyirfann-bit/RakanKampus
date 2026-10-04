@@ -41,11 +41,12 @@ class PopularQuestions
         'apa', 'khabar', 'how', 'are', 'what', 'up', 'sup',
     ];
 
+    /** Only questions the knowledge base can answer (no fee deadline / exam timetable: that data isn't in it). */
     public const DEFAULTS = [
         'How do I register for courses?',
-        'When is the fee payment deadline?',
-        'How do I access library resources?',
-        "What's the exam timetable?",
+        'How do I pay my tuition fees online?',
+        'What clubs can I join at PUO?',
+        'Who is the director of PUO?',
     ];
 
     /**
@@ -53,7 +54,7 @@ class PopularQuestions
      */
     public static function top(int $limit = 4): array
     {
-        $popular = Cache::remember('home.popular_questions.v2', now()->addHour(), fn () => self::compute(8));
+        $popular = Cache::remember('home.popular_questions.v3', now()->addHour(), fn () => self::compute(8));
 
         $chips = [];
         $seen = [];
@@ -87,7 +88,7 @@ class PopularQuestions
      */
     public static function marquee(int $limit = 12): array
     {
-        return Cache::remember('chat.marquee_questions.v5.' . $limit, now()->addHour(), function () use ($limit) {
+        return Cache::remember('chat.marquee_questions.v6.' . $limit, now()->addHour(), function () use ($limit) {
             $out = [];
             $seen = [];
             foreach (self::compute(6) as $q) {
@@ -129,20 +130,16 @@ class PopularQuestions
         });
     }
 
-    /** Short English questions about things the knowledge base covers (used if translating fails). */
+    /** Short English questions the knowledge base can answer (used if translating fails). */
     public const FALLBACK_EN = [
         'How do I pay my tuition fees online?',
         'What is SPMP and how do I use it?',
         'Where is the surau on campus?',
         'What clubs can I join at PUO?',
-        'Where are the canteens on campus?',
         'What programmes does PUO offer?',
         'Who is the director of PUO?',
         'What does JTMK stand for?',
-        'How did PUO get its name?',
         'Where are the lecture halls?',
-        'When is the fee payment deadline?',
-        'How do I access library resources?',
     ];
 
     /**
@@ -238,6 +235,8 @@ class PopularQuestions
         $rows = ChatMessage::query()
             ->join('chat_conversations', 'chat_conversations.id', '=', 'chat_messages.chat_conversation_id')
             ->where('chat_messages.sender', 'user')
+            // only questions that matched a knowledge-base entry, so every chip is something the bot can answer
+            ->whereNotNull('chat_messages.knowledge_base_id')
             ->where('chat_messages.created_at', '>=', now()->subDays(60))
             ->latest('chat_messages.id')
             ->limit(3000)

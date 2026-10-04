@@ -381,9 +381,9 @@
 
     <div class="quick-grid">
       <button class="quick-chip">How do I register for courses?</button>
-      <button class="quick-chip">When is the fee payment deadline?</button>
-      <button class="quick-chip">How do I access library resources?</button>
-      <button class="quick-chip">What's the exam timetable?</button>
+      <button class="quick-chip">How do I pay my tuition fees online?</button>
+      <button class="quick-chip">What clubs can I join at PUO?</button>
+      <button class="quick-chip">Who is the director of PUO?</button>
     </div>
 
     <a href="{{ route('chat') }}" class="start-chat-btn">
