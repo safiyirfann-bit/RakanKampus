@@ -709,6 +709,10 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
 @media (prefers-reduced-motion: reduce) { .sky-cloud, .sky-orb, .sky-bot, .sky-stars { animation: none; } }
 html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0,0,0,.55); }
 </style>
+<style id="home-no-topbar">
+/* PC: the sidebar already shows the logo + name, so the top bar is hidden there (kept on phones) */
+@media (min-width: 861px) { .topbar { display: none; } .container { padding-top: 24px !important; } }
+</style>
 </head>
 <body>
 
