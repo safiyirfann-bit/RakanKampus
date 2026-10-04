@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
+    @include('partials.profile-bg')
     <title>{{ __('Help & Support') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>

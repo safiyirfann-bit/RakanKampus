@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @include('partials.pwa-head')
+    @include('partials.profile-bg')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ __('Appearance') }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
