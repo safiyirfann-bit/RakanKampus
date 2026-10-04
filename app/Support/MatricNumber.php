@@ -46,4 +46,20 @@ class MatricNumber
 
         return $p ? (config('programs.codes')[$p['code']] ?? null) : null;
     }
+
+    /** Department short code (e.g. "JTMK") for the matric number, or null. */
+    public static function department(?string $matric): ?string
+    {
+        $p = self::parse($matric);
+        if (! $p) {
+            return null;
+        }
+        foreach (config('programs.departments', []) as $short => $d) {
+            if (in_array($p['code'], $d['codes'], true)) {
+                return $short;
+            }
+        }
+
+        return null;
+    }
 }

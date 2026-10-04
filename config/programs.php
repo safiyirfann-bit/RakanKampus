@@ -43,4 +43,16 @@ return [
         'DTP' => 'Diploma Kejuruteraan Mekanikal (Pembuatan)',
         'DEM' => 'Diploma Kejuruteraan Mekatronik',
     ],
+
+    /*
+    | Department (jabatan) for each programme code — shown as the student's own
+    | building on the Home greeting card. Edit freely if a programme moves.
+    */
+    'departments' => [
+        'JKA' => ['name' => 'Jabatan Kejuruteraan Awam', 'codes' => ['DKA', 'DUB', 'DGE', 'BBE']],
+        'JKE' => ['name' => 'Jabatan Kejuruteraan Elektrik', 'codes' => ['DEE', 'DET', 'DTK', 'BEE']],
+        'JKM' => ['name' => 'Jabatan Kejuruteraan Mekanikal', 'codes' => ['DKM', 'DAD', 'DMR', 'DPT', 'DRE', 'DTP', 'DEM', 'BME']],
+        'JP' => ['name' => 'Jabatan Perdagangan', 'codes' => ['DAT', 'DPM', 'DPR', 'DFB']],
+        'JTMK' => ['name' => 'Jabatan Teknologi Maklumat & Komunikasi', 'codes' => ['DIT']],
+    ],
 ];

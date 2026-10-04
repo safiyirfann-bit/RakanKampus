@@ -713,6 +713,34 @@ html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0
 /* PC: the sidebar already shows the logo + name, so the top bar is hidden there (kept on phones) */
 @media (min-width: 861px) { .topbar { display: none; } .container { padding-top: 24px !important; } }
 </style>
+<style id="sky-campus">
+/* Campus skyline on the greeting card (colours follow the sky phase) */
+.sky-campus { position: absolute; left: 0; bottom: 0; width: 100%; height: 112px; z-index: 1; overflow: visible; }
+.sky-city .c-far { fill: currentColor; }
+.sky-city { color: #0f2747; opacity: .28 !important; }
+.sky-campus * { transition: fill .8s ease; }
+.sky-card { --wall: #f8fafc; --trim: #cbd5e1; --frame: #334155; --gate: #fdf2e0; --canopy: #334155; --yel: #facc15; --red: #b91c1c; --win: #93c5fd; --lit: #93c5fd; --ground: #65a30d; --gtext: #475569; --sign: #fff; }
+.sky-campus .c-wall { fill: var(--wall); } .sky-campus .c-trim { fill: var(--trim); } .sky-campus .c-frame { fill: var(--frame); }
+.sky-campus .c-gate { fill: var(--gate); } .sky-campus .c-canopy { fill: var(--canopy); } .sky-campus .c-yel rect { fill: var(--yel); }
+.sky-campus .c-red { fill: var(--red); } .sky-campus .c-win rect { fill: var(--win); } .sky-campus .c-win rect.lit { fill: var(--lit); }
+.sky-campus .c-ground { fill: var(--ground); } .sky-campus .c-accent2 { fill: var(--red); }
+.sky-campus .c-gtext { fill: var(--gtext); font: 800 7.5px 'Plus Jakarta Sans', sans-serif; letter-spacing: .5px; }
+.sky-campus .c-sign { fill: var(--sign); font: 800 12px 'Plus Jakarta Sans', sans-serif; letter-spacing: .5px; }
+.sky-campus .dept .c-accent { fill: var(--dept, #0d9488); }
+.dept-jtmk { --dept: #0d9488; } .dept-jka { --dept: #ea580c; } .dept-jke { --dept: #ca8a04; } .dept-jkm { --dept: #dc2626; } .dept-jp { --dept: #7c3aed; } .dept-puo { --dept: #0f2747; }
+.sky-campus .gate, .sky-campus .bercham, .sky-campus .dept { filter: drop-shadow(0 -2px 6px rgba(15,39,71,.12)); }
+.sky-evening { --wall: #8a3f7a; --trim: #6b2c63; --frame: #3b0d3c; --gate: #a3527f; --canopy: #3b0d3c; --yel: #c2410c; --red: #7f1d1d; --win: #5b2152; --lit: #fde68a; --ground: #3b0764; --gtext: #fbcfe8; }
+.sky-night { --wall: #1f1d52; --trim: #17153f; --frame: #0b0a24; --gate: #2a2766; --canopy: #0b0a24; --yel: #3730a3; --red: #7f1d1d; --win: #15133a; --lit: #fde68a; --ground: #050816; --gtext: #a5b4fc; }
+.sky-night .sky-campus .dept .c-accent { filter: drop-shadow(0 0 6px var(--dept)); }
+.sky-night .sky-city, .sky-evening .sky-city { opacity: .55 !important; }
+.sky-evening .sky-city { color: #2e1065; } .sky-night .sky-city { color: #050816; }
+.sky-card .sky-bot { z-index: 3; }
+.greeting-card.sky-card { padding-bottom: 122px; }
+@media (max-width: 600px) {
+  .sky-campus { left: -50px; width: 640px; height: 88px; }
+  .greeting-card.sky-card { padding-bottom: 100px; }
+}
+</style>
 </head>
 <body>
 
@@ -750,7 +778,41 @@ html[data-theme="dark"] .greeting-card.sky-card { box-shadow: 0 16px 40px rgba(0
         <div class="sky-stars"></div>
         <div class="sky-orb"></div>
         <span class="sky-cloud k1"></span><span class="sky-cloud k2"></span><span class="sky-cloud k3"></span>
-        <svg class="sky-city" viewBox="0 0 1200 60" preserveAspectRatio="none"><path d="M0 60V36h50v-12h36v12h28V18h46v18h36V28h64V12h18v16h56v8h46V20h74v16h38V28h56V10h28v18h64v8h56V22h46v14h38v-8h84v8h46V16h36v20h56v-6h40v-14h22v14h60v12h44V24h40v12h52v24z"/><g class="sky-win"><rect x="164" y="22" width="4" height="4"/><rect x="176" y="30" width="4" height="4"/><rect x="460" y="26" width="4" height="4"/><rect x="476" y="34" width="4" height="4"/><rect x="694" y="16" width="4" height="4"/><rect x="706" y="26" width="4" height="4"/><rect x="980" y="22" width="4" height="4"/><rect x="996" y="32" width="4" height="4"/></g></svg>
+        @php $dept = \App\Support\MatricNumber::department($user->student_id); @endphp
+        {{-- Campus skyline: the student's department block, the PUO main gate and Kampus Bercham --}}
+        <svg class="sky-city" viewBox="0 0 1200 60" preserveAspectRatio="none"><path class="c-far" d="M0 60V36h50v-12h36v12h28V18h46v18h36V28h64V12h18v16h56v8h46V20h74v16h38V28h56V10h28v18h64v8h56V22h46v14h38v-8h84v8h46V16h36v20h56v-6h40v-14h22v14h60v12h44V24h40v12h52v24z"/></svg>
+        <svg class="sky-campus" viewBox="0 0 1000 130" preserveAspectRatio="xMaxYMax meet">
+          {{-- department block --}}
+          <g transform="translate(-40 0)" class="dept dept-{{ strtolower($dept ?? 'puo') }}">
+            <rect class="c-wall" x="150" y="44" width="150" height="86"/>
+            <rect class="c-trim" x="146" y="38" width="158" height="8" rx="2"/>
+            <rect class="c-accent" x="196" y="16" width="58" height="22" rx="4"/>
+            <text x="225" y="31.5" text-anchor="middle" class="c-sign">{{ $dept ?? 'PUO' }}</text>
+            <g class="c-win">@for($r = 0; $r < 3; $r++)@for($c = 0; $c < 6; $c++)<rect x="{{ 160 + $c * 23 }}" y="{{ 54 + $r * 22 }}" width="13" height="12" rx="1.5" class="{{ ($r * 6 + $c) % 3 === 1 ? 'lit' : '' }}"/>@endfor @endfor</g>
+            <rect class="c-trim" x="208" y="112" width="34" height="18"/>
+          </g>
+          {{-- PUO main gate ("Selamat Datang" arches) --}}
+          <g class="gate" transform="translate(-50 0)">
+            <path class="c-gate" d="M372 130V70q0-24 45-24t45 24v60h-14V74q0-14-31-14t-31 14v56z"/>
+            <path class="c-gate" d="M538 130V70q0-24 45-24t45 24v60h-14V74q0-14-31-14t-31 14v56z"/>
+            <path class="c-gate" d="M462 130V40q0-16 38-16t38 16v90z"/>
+            <rect class="c-trim" x="478" y="96" width="44" height="22" rx="2"/>
+            <rect class="c-accent2" x="486" y="44" width="28" height="12" rx="2"/>
+            <rect class="c-canopy" x="430" y="80" width="40" height="5" rx="2"/><rect class="c-canopy" x="530" y="80" width="40" height="5" rx="2"/>
+            <text x="417" y="56" text-anchor="middle" class="c-gtext">SELAMAT DATANG</text>
+          </g>
+          {{-- Kampus Bercham: tower + yellow-panelled block --}}
+          <g class="bercham" transform="translate(-60 0)">
+            <rect class="c-wall" x="672" y="22" width="46" height="108"/>
+            <rect class="c-red" x="676" y="28" width="38" height="9" rx="1.5"/>
+            <rect class="c-frame" x="668" y="18" width="54" height="5"/>
+            <rect class="c-wall" x="718" y="52" width="170" height="78"/>
+            <g class="c-yel"><rect x="736" y="52" width="16" height="78"/><rect x="800" y="52" width="16" height="78"/><rect x="852" y="52" width="16" height="78"/><rect x="684" y="40" width="10" height="90"/></g>
+            <g class="c-win">@for($r = 0; $r < 4; $r++)@foreach([722, 758, 778, 822, 870] as $i => $x)<rect x="{{ $x }}" y="{{ 58 + $r * 17 }}" width="12" height="9" rx="1" class="{{ ($r + $i) % 3 === 0 ? 'lit' : '' }}"/>@endforeach @endfor
+              @for($r = 0; $r < 5; $r++)<rect x="700" y="{{ 46 + $r * 16 }}" width="12" height="9" rx="1" class="{{ $r % 2 ? 'lit' : '' }}"/>@endfor</g>
+          </g>
+          <rect class="c-ground" x="-2000" y="124" width="5000" height="6"/>
+        </svg>
       </div>
       <x-brand-logo size="120" class="sky-bot" />
       <div class="greeting-top">
