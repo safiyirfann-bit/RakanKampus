@@ -827,18 +827,39 @@ html[data-theme="dark"] .qc-ic { filter: saturate(.8) brightness(.9); }
 .scb-fill { position: absolute; width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, #0f2747, #155e75 55%, #14b8a6); transform: translate(-50%, -50%) scale(0); }
 .scb-fx.on .scb-fill { animation: scbFill .75s cubic-bezier(.6,0,.4,1) .25s forwards; }
 @keyframes scbFill { to { transform: translate(-50%, -50%) scale(var(--scb-s, 60)); } }
-.scb-fly { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 10px; transform: translate(-50%, -50%) scale(.35); opacity: 0; }
-.scb-fly svg { filter: drop-shadow(0 16px 24px rgba(0,0,0,.35)); }
-.scb-fx.on .scb-fly { animation: scbFly .95s cubic-bezier(.3,1.3,.5,1) forwards; }
-@keyframes scbFly {
-  0% { opacity: 1; transform: translate(-50%, -50%) scale(.35); }
-  45% { opacity: 1; left: 50vw; top: 46vh; transform: translate(-50%, -50%) scale(1.05) rotate(-6deg); }
-  70% { transform: translate(-50%, -50%) scale(1) rotate(4deg); }
-  100% { opacity: 1; left: 50vw; top: 46vh; transform: translate(-50%, -50%) scale(1) rotate(0); }
-}
-.scb-say { background: #fff; color: #0f2747; font-weight: 800; font-size: 15px; padding: 8px 16px; border-radius: 999px; box-shadow: 0 10px 22px rgba(0,0,0,.2); opacity: 0; transform: translateY(8px) scale(.8); }
-.scb-fx.on .scb-say { animation: scbSay .35s ease .55s forwards; }
-@keyframes scbSay { to { opacity: 1; transform: none; } }
+.scb-fx.on .scb-fill { animation-duration: .5s; animation-delay: 0s; }
+.scb-cv { position: absolute; inset: 0; width: 100%; height: 100%; }
+.scb-fly { position: absolute; left: 50vw; top: 46vh; display: flex; flex-direction: column; align-items: center; gap: 14px; transform: translate(-50%, -50%); opacity: 0; }
+.scb-bod { position: relative; display: block; }
+.scb-bod svg { position: relative; z-index: 2; filter: drop-shadow(0 14px 22px rgba(0,0,0,.3)); }
+.scb-aura { position: absolute; left: 50%; top: 50%; width: 190px; height: 190px; margin: -95px; border-radius: 50%; z-index: 1;
+  background: radial-gradient(circle, rgba(94,234,212,.75), rgba(56,189,248,.35) 45%, transparent 70%); opacity: 0; }
+.scb-big { position: absolute; left: 50%; top: 50%; width: 200px; height: 200px; margin: -100px; border-radius: 50%; z-index: 3; opacity: 0; transform: scale(.3);
+  background: radial-gradient(circle at 32% 28%, rgba(255,255,255,.85) 0 7%, rgba(255,255,255,.12) 18%, transparent 46%), radial-gradient(circle at 50% 50%, transparent 58%, rgba(167,243,208,.35) 68%, rgba(125,211,252,.55) 78%, rgba(244,114,182,.4) 88%, rgba(255,255,255,.7) 97%);
+  box-shadow: inset 0 0 22px rgba(255,255,255,.45), 0 0 24px rgba(125,211,252,.35); }
+.scb-ring { position: absolute; left: 50vw; top: 46vh; width: 140px; height: 140px; margin: -70px; border-radius: 50%; border: 2px solid rgba(255,255,255,.7); opacity: 0; }
+.scb-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+.scb-say { position: relative; height: 38px; min-width: 170px; }
+.scb-say span { position: absolute; left: 50%; top: 0; transform: translateX(-50%) scale(.8); white-space: nowrap; background: #fff; color: #0f2747; font-weight: 800; font-size: 15px; padding: 9px 18px; border-radius: 999px; box-shadow: 0 0 0 3px rgba(94,234,212,.5), 0 10px 22px rgba(0,0,0,.25); opacity: 0; }
+
+.scb-fx.on .scb-fly { animation: scbIn .45s cubic-bezier(.3,1.5,.5,1) .15s forwards, scbLaunch .6s cubic-bezier(.5,0,.75,.3) 1.5s forwards; }
+.scb-fx.on .scb-bod { animation: scbHop .42s ease-in-out .55s 2; }
+.scb-fx.on .scb-aura { animation: scbAura .5s ease-in-out .5s 3 alternate forwards; }
+.scb-fx.on .scb-big { animation: scbBig .45s cubic-bezier(.3,1.6,.5,1) 1.2s forwards, scbPop .2s ease-out 2s forwards; }
+.scb-fx.on .scb-ring.r1 { animation: scbRing .7s ease-out .55s; }
+.scb-fx.on .scb-ring.r2 { animation: scbRing .7s ease-out .85s; }
+.scb-fx.on .scb-ring.r3 { animation: scbRing .7s ease-out 1.15s; }
+.scb-fx.on .scb-say .s2 { animation: scbPill2 .3s cubic-bezier(.3,1.6,.5,1) .6s forwards, scbOut .25s ease 1.45s forwards; } @keyframes scbOut { to { opacity: 0; transform: translateX(-50%) scale(.5); } }
+.scb-fx.on .scb-flash { animation: scbFlash .3s ease-in 2s forwards; }
+@keyframes scbIn { from { opacity: 0; transform: translate(-50%, -50%) scale(.2) rotate(-25deg); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+@keyframes scbLaunch { 0% { opacity: 1; transform: translate(-50%, -50%); } 30% { transform: translate(-46%, -70%); } 60% { transform: translate(-54%, -95%); } 100% { opacity: 1; transform: translate(-50%, -75vh); } }
+@keyframes scbHop { 0%, 100% { transform: none; } 30% { transform: translateY(-26px) scale(.96, 1.06); } 55% { transform: translateY(0) scale(1.08, .9); } 75% { transform: translateY(-6px); } }
+@keyframes scbAura { from { opacity: .35; transform: scale(.8); } to { opacity: 1; transform: scale(1.25); } }
+@keyframes scbBig { to { opacity: 1; transform: scale(1); } } @keyframes scbPop { to { opacity: 0; transform: scale(1.5); } }
+@keyframes scbRing { from { opacity: .9; transform: scale(.6); } to { opacity: 0; transform: scale(2.6); } }
+@keyframes scbPill { 0% { opacity: 0; transform: translateX(-50%) scale(.7); } 20%, 85% { opacity: 1; transform: translateX(-50%) scale(1); } 100% { opacity: 0; transform: translateX(-50%) scale(.9); } }
+@keyframes scbPill2 { from { opacity: 0; transform: translateX(-50%) scale(.6); } to { opacity: 1; transform: translateX(-50%) scale(1.05); } }
+@keyframes scbFlash { 0% { opacity: 0; } 60% { opacity: .9; } 100% { opacity: 1; background: #f0fafa; } }
 @media (max-width: 600px) { .scb-text b { font-size: 15.5px; } .scb-text small { font-size: 11.5px; } .scb-bot { width: 48px; height: 48px; border-radius: 16px; } }
 @media (prefers-reduced-motion: reduce) { .start-chat-btn.scb::after, .scb-bot svg { animation: none; } }
 </style>
@@ -1026,7 +1047,11 @@ html[data-theme="dark"] .qc-ic { filter: saturate(.8) brightness(.9); }
     </a>
     <div class="scb-fx" id="scbFx" aria-hidden="true">
       <div class="scb-fill" id="scbFill"></div>
-      <div class="scb-fly" id="scbFly"><x-brand-logo size="120" /><span class="scb-say">{{ __("Let's chat!") }} 💬</span></div>
+      <canvas class="scb-cv" id="scbCv"></canvas>
+      <div class="scb-ring r1"></div><div class="scb-ring r2"></div><div class="scb-ring r3"></div>
+      <div class="scb-fly" id="scbFly"><span class="scb-bod"><span class="scb-aura"></span><x-brand-logo size="120" /><span class="scb-big"></span></span>
+        <span class="scb-say"><span class="s2">{{ __("Let's chat!") }} 💬</span></span></div>
+      <div class="scb-flash"></div>
     </div>
 
     <p class="section-label">{{ __('RECENT CONVERSATIONS') }}</p>
@@ -1404,12 +1429,70 @@ async function deleteHomeConversation(id) {
         const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
         const fill = document.getElementById('scbFill'), fly = document.getElementById('scbFly');
         fill.style.left = cx + 'px'; fill.style.top = cy + 'px';
-        fly.style.left = cx + 'px'; fly.style.top = cy + 'px';
+
         const far = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
         fill.style.setProperty('--scb-s', Math.ceil(far * 2 / 60) + 1);
         fx.classList.add('on');
-        setTimeout(function () { window.location.href = btn.href; }, 1150);
+        sparkFx();
+        setTimeout(function () { window.location.href = btn.href; }, 2250);
     });
+    // Bubbles: glassy soap bubbles rise from the bottom, and chat bubbles pop out of the robot and float up
+    function sparkFx() {
+        const cv = document.getElementById('scbCv'), ctx = cv.getContext('2d');
+        const dpr = Math.min(window.devicePixelRatio || 1, 2), W = innerWidth, H = innerHeight;
+        cv.width = W * dpr; cv.height = H * dpr; ctx.scale(dpr, dpr);
+        const cx = W / 2, cy = H * .46, t0 = performance.now();
+        const words = ['Hi! 👋', '?', '💬', '📅', '💳', '🕌', '📚', '🔔', 'Hello!', '✨'];
+        const soap = [], chats = [], pops = [];
+        for (let i = 0; i < 26; i++) soap.push({ x: Math.random() * W, y: H + Math.random() * H * .6, r: 6 + Math.random() * 26, v: 1.4 + Math.random() * 2.6, ph: Math.random() * 6, life: 1 });
+        function addChat(i) {
+            const a = -Math.PI / 2 + (Math.random() - .5) * 2.6;
+            chats.push({ x: cx, y: cy, vx: Math.cos(a) * (2.5 + Math.random() * 2.5), vy: Math.sin(a) * (2.5 + Math.random() * 2.5) - 1, s: 0, txt: words[i % words.length], born: performance.now(), dark: i % 3 === 0 });
+        }
+        for (let i = 0; i < 9; i++) setTimeout(() => addChat(i), 520 + i * 90);
+        function soapDraw(b) {
+            const g = ctx.createRadialGradient(b.x - b.r * .35, b.y - b.r * .4, b.r * .1, b.x, b.y, b.r);
+            g.addColorStop(0, 'rgba(255,255,255,.55)'); g.addColorStop(.55, 'rgba(255,255,255,.06)');
+            g.addColorStop(.85, 'rgba(125,211,252,.28)'); g.addColorStop(1, 'rgba(244,114,182,.38)');
+            ctx.fillStyle = g; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,.55)'; ctx.lineWidth = 1.2; ctx.stroke();
+            ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.beginPath(); ctx.ellipse(b.x - b.r * .4, b.y - b.r * .45, b.r * .18, b.r * .1, -.6, 0, Math.PI * 2); ctx.fill();
+        }
+        function chatDraw(c) {
+            ctx.save(); ctx.translate(c.x, c.y); ctx.scale(c.s, c.s);
+            ctx.font = '800 15px "Plus Jakarta Sans", sans-serif';
+            const w = Math.max(40, ctx.measureText(c.txt).width + 24), h = 34;
+            ctx.fillStyle = c.dark ? '#0f2747' : '#fff'; ctx.shadowColor = 'rgba(0,0,0,.2)'; ctx.shadowBlur = 12; ctx.shadowOffsetY = 4;
+            ctx.beginPath(); ctx.roundRect(-w / 2, -h / 2, w, h, 17); ctx.fill();
+            ctx.beginPath(); ctx.moveTo(-6, h / 2 - 2); ctx.lineTo(-12, h / 2 + 8); ctx.lineTo(4, h / 2 - 2); ctx.fill();
+            ctx.shadowColor = 'transparent'; ctx.fillStyle = c.dark ? '#fff' : '#0f766e'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(c.txt, 0, 1); ctx.restore();
+        }
+        function frame(now) {
+            const t = now - t0;
+            ctx.clearRect(0, 0, W, H);
+            soap.forEach(b => {
+                if (t < 250) return;
+                b.y -= b.v * (t > 1500 ? 2.2 : 1); b.ph += .05; b.x += Math.sin(b.ph) * .6;
+                if (b.life > 0) soapDraw(b);
+                if (b.y < H * .12 && b.life > 0 && Math.random() < .04) { b.life = 0; pops.push({ x: b.x, y: b.y, r: b.r, a: 1 }); }
+            });
+            chats.forEach(c => {
+                const age = now - c.born;
+                c.s = Math.min(1, age / 180) * (age > 1300 ? Math.max(0, 1 - (age - 1300) / 200) : 1);
+                c.x += c.vx; c.y += c.vy; c.vx *= .985; c.vy = c.vy * .985 - .02;
+                if (c.s > 0) chatDraw(c);
+                if (age > 1300 && !c.popped) { c.popped = true; pops.push({ x: c.x, y: c.y, r: 18, a: 1 }); }
+            });
+            pops.forEach(p => {
+                p.a -= .06; p.r += 2.2; if (p.a <= 0) return;
+                ctx.strokeStyle = `rgba(255,255,255,${p.a})`; ctx.lineWidth = 2;
+                for (let k = 0; k < 8; k++) { const a = k * Math.PI / 4; ctx.beginPath(); ctx.moveTo(p.x + Math.cos(a) * p.r * .7, p.y + Math.sin(a) * p.r * .7); ctx.lineTo(p.x + Math.cos(a) * p.r, p.y + Math.sin(a) * p.r); ctx.stroke(); }
+            });
+            if (t < 2400) requestAnimationFrame(frame);
+        }
+        requestAnimationFrame(frame);
+    }
     // coming back with the browser Back button: hide the overlay again
     window.addEventListener('pageshow', function (ev) { if (ev.persisted) fx.classList.remove('on'); });
 })();
