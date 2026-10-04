@@ -35,13 +35,18 @@
   .rk-sidebar-brand { display: flex; align-items: center; gap: 10px; padding: 20px 18px 10px; flex-shrink: 0; min-height: 70px; }
   .rk-sidebar-brand svg { flex: none; }
   .rk-sidebar-brand span { font-size: 15.5px; font-weight: 800; color: #fff; white-space: nowrap; }
+  /* Fold button: a small panel icon inside the header (ChatGPT style). When folded, the logo turns into it on hover. */
   .rk-nav-toggle {
-    position: absolute; right: -13px; top: 26px; width: 26px; height: 26px; border-radius: 50%;
-    border: 2px solid #f0fafa; background: #14b8a6; color: #fff; cursor: pointer; display: grid; place-items: center;
-    box-shadow: 0 4px 10px rgba(15,39,71,.3); padding: 0; transition: transform .25s;
+    margin-left: auto; width: 32px; height: 32px; flex: none; border: 0; border-radius: 9px; padding: 0; cursor: pointer;
+    background: transparent; color: #a9c2d3; display: grid; place-items: center; transition: background .15s, color .15s;
   }
-  .rk-nav-toggle svg { width: 13px; height: 13px; }
-  html.rk-nav-mini .rk-nav-toggle { transform: rotate(180deg); }
+  .rk-nav-toggle:hover { background: rgba(255,255,255,.1); color: #fff; }
+  .rk-nav-toggle svg { width: 19px; height: 19px; }
+  .rk-brand-logo { position: relative; width: 32px; height: 32px; flex: none; display: grid; place-items: center; }
+  html.rk-nav-mini .rk-sidebar-brand { position: relative; }
+  html.rk-nav-mini .rk-nav-toggle { position: absolute; left: 50%; top: 19px; margin-left: -16px; opacity: 0; background: rgba(255,255,255,.12); color: #fff; }
+  html.rk-nav-mini .rk-sidebar-brand:hover .rk-nav-toggle, html.rk-nav-mini .rk-nav-toggle:focus-visible { opacity: 1; }
+  html.rk-nav-mini .rk-sidebar-brand:hover .rk-brand-logo { opacity: 0; }
   .rk-sidebar-nav { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: 4px 12px; display: flex; flex-direction: column; gap: 3px; }
   .rk-nav-label { font-size: 10px; font-weight: 800; letter-spacing: 1.3px; color: rgba(255,255,255,.45); margin: 14px 12px 6px; white-space: nowrap; }
   .rk-nav-link {
@@ -76,7 +81,7 @@
 
   /* folded: icons only, labels as hover tooltips, badge becomes a red dot */
   html.rk-nav-mini .rk-sidebar-brand { padding: 20px 0 10px; justify-content: center; }
-  html.rk-nav-mini .rk-sidebar-brand span,
+  html.rk-nav-mini .rk-sidebar-brand > span:not(.rk-brand-logo),
   html.rk-nav-mini .rk-nav-text { display: none; }
   html.rk-nav-mini .rk-nav-label { font-size: 0; height: 1px; margin: 12px 14px; background: rgba(255,255,255,.14); }
   html.rk-nav-mini .rk-nav-link, html.rk-nav-mini .rk-sidebar-logout { justify-content: center; padding: 13px 0; }
@@ -148,7 +153,6 @@
 html[data-theme="dark"] .rk-nav-link { color: #cbd5dc; }
 html[data-theme="dark"] .rk-nav-avatar { color: #dee1e9; }
 html[data-theme="dark"] .rk-sidebar { background: linear-gradient(165deg, #0b1626, #0f3446 60%, #0f4a55); box-shadow: 0 16px 34px rgba(0,0,0,.5); }
-html[data-theme="dark"] .rk-nav-toggle { border-color: #10161f; }
 html[data-theme="dark"] .rk-tabbar { background: #17202d; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.41); }
 html[data-theme="dark"] .rk-tab-link { color: #ced3d9; }
 html[data-theme="dark"] .rk-tab-link.active { color: #41eedf; }
@@ -160,12 +164,12 @@ html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0
 <script>try { if (localStorage.getItem('rk_nav_mini') === '1') document.documentElement.classList.add('rk-nav-mini'); } catch (e) {}</script>
 <nav class="rk-sidebar" aria-label="{{ __('Main menu') }}">
   <div class="rk-sidebar-brand">
-    <x-brand-logo size="32" />
+    <span class="rk-brand-logo"><x-brand-logo size="32" /></span>
     <span>RakanKampus</span>
+    <button type="button" class="rk-nav-toggle" id="rkNavToggle" aria-label="{{ __('Collapse menu') }}" title="{{ __('Collapse menu') }}">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="3"/><path d="M9 4v16"/></svg>
+    </button>
   </div>
-  <button type="button" class="rk-nav-toggle" id="rkNavToggle" aria-label="{{ __('Collapse menu') }}" title="{{ __('Collapse menu') }}">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-  </button>
   <div class="rk-sidebar-nav">
     @foreach($navItems as $item)
       @if($item['key'] === 'home')<p class="rk-nav-label">{{ __('MENU') }}</p>@endif
