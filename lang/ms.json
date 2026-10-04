@@ -771,5 +771,7 @@
     "days": "hari",
     "hrs": "jam",
     "sec": "saat",
-    "Showing :day": "Tunjuk :day"
+    "Showing :day": "Tunjuk :day",
+    "Previous week": "Minggu sebelumnya",
+    "This week": "Minggu ini"
 }

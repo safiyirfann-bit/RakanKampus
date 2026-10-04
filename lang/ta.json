@@ -576,5 +576,8 @@
     "days": "நாட்கள்",
     "hrs": "மணி",
     "sec": "வினா",
-    "Showing :day": ":day காட்டுகிறது"
+    "Showing :day": ":day காட்டுகிறது",
+    "Previous week": "முந்தைய வாரம்",
+    "Next week": "அடுத்த வாரம்",
+    "This week": "இந்த வாரம்"
 }

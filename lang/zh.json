@@ -576,5 +576,8 @@
     "days": "天",
     "hrs": "小时",
     "sec": "秒",
-    "Showing :day": "显示 :day"
+    "Showing :day": "显示 :day",
+    "Previous week": "上一周",
+    "Next week": "下一周",
+    "This week": "本周"
 }

@@ -824,6 +824,16 @@ html[data-theme="dark"] .rm-cal-grid button.today { background: #41eedf; color: 
 }
 html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41eedf; }
 </style>
+<style id="rm-weeknav">
+.rm-weekhead { display: flex; align-items: center; gap: 6px; margin: 0 0 8px; }
+.rm-weekhead b { flex: 1; font-size: 13px; font-weight: 800; color: #fff; }
+.rm-weekhead button { height: 30px; min-width: 30px; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.14); color: #fff; border-radius: 10px; font: 800 15px inherit; font-family: inherit; cursor: pointer; padding: 0 8px; }
+.rm-weekhead .rm-today { font-size: 11.5px; }
+.rm-week.slide-l { animation: rmSlideL .25s ease; } .rm-week.slide-r { animation: rmSlideR .25s ease; }
+@keyframes rmSlideL { from { opacity: 0; transform: translateX(30px); } }
+@keyframes rmSlideR { from { opacity: 0; transform: translateX(-30px); } }
+@media (min-width: 861px) { .rm-weekhead { display: none; } }
+</style>
 </head>
 <body>
 
@@ -844,6 +854,12 @@ html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41ee
   <div class="rm-next rm-next-m" data-next></div>
 
   {{-- Phones: this week's 7 days, dot = has a reminder, tap to show only that day --}}
+  <div class="rm-weekhead" id="rmWeekHead">
+    <button type="button" onclick="shiftWeek(-1)" aria-label="{{ __('Previous week') }}">‹</button>
+    <b id="rmWeekRange"></b>
+    <button type="button" class="rm-today" id="rmWeekToday" onclick="shiftWeek(0)">{{ __('Today') }}</button>
+    <button type="button" onclick="shiftWeek(1)" aria-label="{{ __('Next week') }}">›</button>
+  </div>
   <div class="rm-week" id="rmWeek"></div>
 
   <div class="notify-banner" id="notifyBanner">
@@ -1172,19 +1188,42 @@ function renderNext() {
       <div class="rm-cd">${box(d, t('days'))}${box(h, t('hrs'))}${box(m, t('min'))}${box(sec, t('sec'))}</div>`;
   });
 }
+let weekOffset = 0; // 0 = the 7 days from today, 1 = the next 7, -1 = the previous 7
 function renderWeek() {
   const el = document.getElementById('rmWeek'); if (!el) return;
   const dots = dotsByDay(), start = new Date(); start.setHours(0, 0, 0, 0);
+  start.setDate(start.getDate() + weekOffset * 7);
+  const todayKey = toDateStr(Date.now());
   let html = '';
   for (let i = 0; i < 7; i++) {
     const d = new Date(start); d.setDate(start.getDate() + i);
     const k = toDateStr(d.getTime());
-    html += `<button type="button" class="${dayFilter === k ? 'on' : ''} ${i === 0 ? 'today' : ''}" onclick="setDayFilter('${k}')">
+    html += `<button type="button" class="${dayFilter === k ? 'on' : ''} ${k === todayKey ? 'today' : ''}" onclick="setDayFilter('${k}')">
       ${d.toLocaleDateString(RM_LOC, { weekday: 'narrow' })}<b>${d.getDate()}</b>
       <span class="rm-dots">${(dots[k] || []).slice(0, 3).map(c => `<i style="background:${c}"></i>`).join('')}</span></button>`;
   }
   el.innerHTML = html;
+  const end = new Date(start); end.setDate(start.getDate() + 6);
+  const fmt = d => d.toLocaleDateString(RM_LOC, { day: 'numeric', month: 'short' });
+  document.getElementById('rmWeekRange').textContent = weekOffset === 0 ? t('This week') + ' · ' + fmt(start) + ' – ' + fmt(end) : fmt(start) + ' – ' + fmt(end);
+  document.getElementById('rmWeekToday').style.visibility = weekOffset === 0 ? 'hidden' : 'visible';
 }
+function shiftWeek(n) { weekOffset = n === 0 ? 0 : weekOffset + n; renderWeek(); }
+// swipe the strip left / right to change week
+(function () {
+  const el = document.getElementById('rmWeek'); if (!el) return;
+  let x0 = null, y0 = null;
+  el.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+  el.addEventListener('touchend', e => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0; x0 = null;
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+      el.classList.remove('slide-l', 'slide-r'); void el.offsetWidth;
+      el.classList.add(dx < 0 ? 'slide-l' : 'slide-r');
+      shiftWeek(dx < 0 ? 1 : -1);
+    }
+  }, { passive: true });
+})();
 function renderCal() {
   const grid = document.getElementById('rmCalGrid'); if (!grid) return;
   document.getElementById('rmCalTitle').textContent = calMonth.toLocaleDateString(RM_LOC, { month: 'long', year: 'numeric' });
