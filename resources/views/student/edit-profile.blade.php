@@ -107,6 +107,73 @@
     .matric-input-err { border-color: #f87171 !important; box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.18) !important; }
     .matric-input-ok { border-color: #2dd4bf !important; }
 </style>
+<style>
+/* Edit Profile, "glass neon": see-through fields on the gradient, light-teal labels,
+   white text, and a neon glow on the field being edited. On PC the gradient becomes
+   a rounded panel (the page background there is light). */
+.ep-wrap { max-width: 42rem; margin: 0 auto; padding: 8px 20px 40px; position: relative; z-index: 1; }
+.ep-panel { position: relative; }
+.ep-av-btn { position: relative; display: block; border: 0; padding: 0; background: none; cursor: pointer; }
+.ep-av { width: 92px; height: 92px; border-radius: 50%; overflow: hidden; display: grid; place-items: center;
+  background: linear-gradient(135deg, #0d9488, #2ec4c6); color: #fff; font-size: 32px; font-weight: 800;
+  border: 3px solid rgba(255,255,255,.7); box-shadow: 0 12px 28px rgba(0,0,0,.25); transition: transform .2s; }
+.ep-av-btn:hover .ep-av { transform: scale(1.04); }
+.ep-av-edit { position: absolute; right: -2px; bottom: 0; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center;
+  background: #fff; color: #0f766e; box-shadow: 0 4px 12px rgba(0,0,0,.25); }
+.ep-av-edit svg { width: 15px; height: 15px; }
+.ep-name { text-align: center; color: #fff; margin: 12px 0 22px; }
+.ep-name b { display: block; font-size: 18px; font-weight: 800; text-transform: capitalize; min-height: 1.3em; }
+.ep-name span { display: block; font-size: 12.5px; color: #c9f3f1; margin-top: 2px; letter-spacing: .02em; }
+.ep-flash { margin-bottom: 16px; padding: 11px 14px; border-radius: 14px; font-size: 13.5px; font-weight: 600;
+  background: rgba(74,222,128,.18); border: 1px solid rgba(134,239,172,.45); color: #dcfce7; }
+.ep-form { display: flex; flex-direction: column; gap: 14px; }
+.ep-grid2 { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 768px) { .ep-grid2 { grid-template-columns: 1fr 1fr; } }
+
+.epf { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border-radius: 18px; cursor: text;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.35);
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.22); transition: background .2s, border-color .2s, box-shadow .2s; }
+.epf:hover { background: rgba(255,255,255,.18); }
+.epf:focus-within { background: rgba(255,255,255,.22); border-color: #7ff5ec;
+  box-shadow: 0 0 0 3px rgba(127,245,236,.25), 0 0 24px rgba(127,245,236,.35); }
+.epf-ic { width: 36px; height: 36px; flex: none; border-radius: 12px; display: grid; place-items: center;
+  background: rgba(255,255,255,.18); color: #fff; transition: background .2s, color .2s; }
+.epf-ic svg { width: 17px; height: 17px; }
+.epf:focus-within .epf-ic { background: #7ff5ec; color: #0f2747; }
+.epf-body { flex: 1; min-width: 0; }
+.epf-body label { display: block; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #b9fbf5; cursor: text; }
+.epf-opt { text-transform: none; letter-spacing: 0; font-weight: 600; color: rgba(255,255,255,.6); }
+html body .epf input { display: block; width: 100%; margin: 1px 0 0; padding: 0; border: 0 !important; outline: none; box-shadow: none !important;
+  background: transparent !important; color: #fff !important; font-size: 16px; font-weight: 600; font-family: inherit; caret-color: #7ff5ec; }
+html body .epf input::placeholder { color: rgba(255,255,255,.45); }
+html body .epf input:-webkit-autofill { -webkit-text-fill-color: #fff; transition: background-color 9999s ease-in-out 0s; }
+/* live validation states (set on the input by the script below) */
+.epf:has(.matric-input-err) { border-color: #fca5a5; box-shadow: 0 0 0 3px rgba(248,113,113,.28); }
+.epf:has(.matric-input-ok) { border-color: #5eead4; }
+.ep-panel .matric-hint { color: #d9f7f5; }
+.ep-panel .matric-ok { color: #a7f3d0; }
+
+.ep-save { margin-top: 6px; width: 100%; padding: 15px; border: 0; border-radius: 18px; cursor: pointer; font-family: inherit;
+  font-size: 16px; font-weight: 800; color: #0f2747; background: linear-gradient(90deg, #ffffff, #b9fbf5);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.6), 0 10px 26px rgba(127,245,236,.35); transition: transform .15s, box-shadow .2s, opacity .2s; }
+.ep-save:hover:not(:disabled) { box-shadow: 0 0 0 1px #fff, 0 12px 32px rgba(127,245,236,.55); }
+.ep-save:active:not(:disabled) { transform: scale(.98); }
+.ep-save:disabled { cursor: default; color: rgba(255,255,255,.55); background: rgba(255,255,255,.12); box-shadow: inset 0 0 0 1px rgba(255,255,255,.25); }
+
+@media (min-width: 861px) {
+  .ep-wrap { padding: 28px 24px 48px; }
+  .ep-panel { overflow: hidden; border-radius: 28px; padding: 32px 32px 28px;
+    background: linear-gradient(135deg, #14213d 0%, #1b3a5c 35%, #21768a 70%, #2ec4c6 100%);
+    box-shadow: 0 20px 50px rgba(15,39,71,.22); }
+  .ep-panel::before, .ep-panel::after { content: ""; position: absolute; border-radius: 50%; pointer-events: none; background: rgba(255,255,255,.1); filter: blur(4px); }
+  .ep-panel::before { width: 260px; height: 260px; top: -90px; left: -80px; }
+  .ep-panel::after { width: 220px; height: 220px; bottom: -80px; right: -60px; }
+  .ep-panel > * { position: relative; z-index: 1; }
+  html[data-theme="dark"] .ep-panel { background: linear-gradient(135deg, #0c1320 0%, #112031 40%, #17505a 75%, #1d6869 100%); box-shadow: 0 20px 50px rgba(0,0,0,.45); }
+}
+@media (prefers-reduced-motion: reduce) { .epf, .ep-save, .ep-av { transition: none; } }
+</style>
 <style id="rk-dark-theme">
 /* Dark theme — generated by scripts/dark-theme/generate.py, do not edit by hand.
    Hand-made fixes go in resources/views/partials/dark-fixes.blade.php */
@@ -148,112 +215,104 @@ html[data-theme="dark"] .matric-input-err { box-shadow: 0 0 0 3px rgba(0, 0, 0, 
 
 </div>
 
-<div class="max-w-2xl mx-auto px-6 py-8">
+<div class="ep-wrap">
+<div class="ep-panel">
 
     <!-- Avatar -->
-    <div class="flex justify-center mb-8">
-
-        <button type="button" onclick="openPhotoModal()" class="relative group">
-
-            <div class="w-24 h-24 rounded-full bg-indigo-600 flex items-center justify-center text-white text-4xl font-bold shadow-lg overflow-hidden" id="avatarWrapper">
+    <div class="flex justify-center">
+        <button type="button" onclick="openPhotoModal()" class="ep-av-btn group" aria-label="{{ __('Profile photo') }}">
+            <div class="ep-av" id="avatarWrapper">
                 @if($user->photo_data)
                     <img src="{{ $user->photo_data }}" class="w-full h-full object-cover" alt="{{ __('Profile photo') }}">
                 @else
                     {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
                 @endif
             </div>
-
-            <div class="absolute -bottom-1 -right-1 w-10 h-10 rounded-full bg-indigo-600 border-4 border-white flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition">
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536M9 11l6.768-6.768a2.5 2.5 0 113.536 3.536L12.536 14.536A2 2 0 0111.121 15H9v-2a2 2 0 01.586-1.414z"/>
-                </svg>
-
-            </div>
-
+            <span class="ep-av-edit">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            </span>
         </button>
-
+    </div>
+    @php
+        $epDept = \App\Support\MatricNumber::department($user->student_id);
+    @endphp
+    <div class="ep-name">
+        <b id="epNameLive">{{ trim(($user->first_name ?? '') . ' ' . ($user->last_name ?? '')) }}</b>
+        <span>{{ collect([$user->student_id, $epDept])->filter()->implode(' · ') }}</span>
     </div>
 
     @if(session('success'))
-        <div class="mb-4 rounded-xl bg-green-50 text-green-700 px-4 py-3 text-sm">
-            {{ session('success') }}
-        </div>
+        <div class="ep-flash">✓ {{ session('success') }}</div>
     @endif
 
     <!-- Form -->
-    <form action="{{ route('student.profile.update') }}" method="POST" class="space-y-6" id="editProfileForm" novalidate>
+    <form action="{{ route('student.profile.update') }}" method="POST" class="ep-form" id="editProfileForm" novalidate>
         @csrf
         @method('PUT')
 
-        <!-- First & Last Name -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-            <div>
-                <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    {{ __('First Name') }}
-                </label>
-
-                <input type="text" name="first_name" id="field_first_name" value="{{ old('first_name', $user->first_name) }}"
-                       class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
-                <p class="matric-msg" data-msg-for="first_name"></p>
-                @error('first_name')
+        <div class="ep-grid2">
+        <div>
+            <div class="epf">
+                <span class="epf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <div class="epf-body">
+                    <label>{{ __('First Name') }}</label>
+                    <input type="text" name="first_name" id="field_first_name" autocomplete="given-name" value="{{ old('first_name', $user->first_name) }}">
+                </div>
+            </div>
+            <p class="matric-msg" data-msg-for="first_name"></p>
+            @error('first_name')
                 <p class="matric-msg matric-err" data-server-error="first_name">⚠️ {{ $message }}</p>
             @enderror
+        </div>
+        <div>
+            <div class="epf">
+                <span class="epf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                <div class="epf-body">
+                    <label>{{ __('Last Name') }}</label>
+                    <input type="text" name="last_name" id="field_last_name" autocomplete="family-name" value="{{ old('last_name', $user->last_name) }}">
+                </div>
             </div>
-
-            <div>
-                <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                    {{ __('Last Name') }}
-                </label>
-
-                <input type="text" name="last_name" id="field_last_name" value="{{ old('last_name', $user->last_name) }}"
-                       class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
-                <p class="matric-msg" data-msg-for="last_name"></p>
-                @error('last_name')
+            <p class="matric-msg" data-msg-for="last_name"></p>
+            @error('last_name')
                 <p class="matric-msg matric-err" data-server-error="last_name">⚠️ {{ $message }}</p>
             @enderror
-            </div>
-
+        </div>
         </div>
 
-        <!-- Email -->
         <div>
-            <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                {{ __('Email') }}
-            </label>
-
-            <input type="email" name="email" id="field_email" value="{{ old('email', $user->email) }}"
-                   class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            <div class="epf">
+                <span class="epf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></span>
+                <div class="epf-body">
+                    <label>{{ __('Email') }}</label>
+                    <input type="email" name="email" id="field_email" autocomplete="email" value="{{ old('email', $user->email) }}">
+                </div>
+            </div>
             <p class="matric-msg" data-msg-for="email"></p>
             @error('email')
                 <p class="matric-msg matric-err" data-server-error="email">⚠️ {{ $message }}</p>
             @enderror
         </div>
-
-        <!-- Registration Number -->
         <div>
-            <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                {{ __('Registration Number') }}
-            </label>
-
-            <input type="text" name="student_id" id="matricInput" maxlength="16" autocomplete="off" placeholder="01DKA23F0456"
-                   value="{{ old('student_id', $user->student_id) }}"
-                   class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            <div class="epf">
+                <span class="epf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M15 8h2M15 12h2M6 16c.7-1.3 1.8-2 3-2s2.3.7 3 2"/></svg></span>
+                <div class="epf-body">
+                    <label>{{ __('Registration Number') }}</label>
+                    <input type="text" name="student_id" id="matricInput" maxlength="16" autocomplete="off" placeholder="01DKA23F0456" value="{{ old('student_id', $user->student_id) }}">
+                </div>
+            </div>
             <p id="matricMsg" class="matric-msg"></p>
             @error('student_id')
                 <p class="matric-msg matric-err" data-server-error="student_id">⚠️ {{ $message }}</p>
             @enderror
         </div>
-
-        <!-- Phone -->
         <div>
-            <label class="block text-sm font-bold tracking-wide uppercase text-indigo-500 mb-3">
-                {{ __('Phone Number') }} <span class="normal-case font-medium text-indigo-300">({{ __('optional') }})</span>
-            </label>
-
-            <input type="tel" name="phone" id="field_phone" placeholder="012-3456789" value="{{ old('phone', $user->phone) }}"
-                   class="w-full rounded-2xl border border-indigo-200 bg-white px-5 py-4 text-lg text-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition">
+            <div class="epf">
+                <span class="epf-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg></span>
+                <div class="epf-body">
+                    <label>{{ __('Phone Number') }} <span class="epf-opt">· {{ __('optional') }}</span></label>
+                    <input type="tel" name="phone" id="field_phone" autocomplete="tel" placeholder="012-3456789" value="{{ old('phone', $user->phone) }}">
+                </div>
+            </div>
             <p class="matric-msg" data-msg-for="phone"></p>
             @error('phone')
                 <p class="matric-msg matric-err" data-server-error="phone">⚠️ {{ $message }}</p>
@@ -262,16 +321,13 @@ html[data-theme="dark"] .matric-input-err { box-shadow: 0 0 0 3px rgba(0, 0, 0, 
 
         <!-- Save Button -->
         {{-- Only lights up (and can be pressed) once something in the form has changed. --}}
-        <button type="submit" id="saveProfileBtn" @if(! $errors->any()) disabled @endif
-                class="w-full rounded-2xl bg-indigo-600 py-4 text-lg font-bold text-white shadow-lg shadow-indigo-200 hover:bg-indigo-700 transition duration-200
-                       disabled:bg-indigo-100 disabled:text-indigo-300 disabled:shadow-none disabled:cursor-default disabled:hover:bg-indigo-100">
-
+        <button type="submit" id="saveProfileBtn" class="ep-save" @if(! $errors->any()) disabled @endif>
             {{ __('Save Changes') }}
-
         </button>
 
     </form>
 
+</div>
 </div>
 
 <!-- Profile Photo Modal -->
@@ -704,6 +760,16 @@ function uploadPhoto() {
         fields.forEach(f => { f.touched = true; if (!show(f, true) && !firstBad) firstBad = f; });
         if (firstBad) { e.preventDefault(); firstBad.input.focus(); }
     });
+})();
+
+// Name under the avatar follows what's typed.
+(function () {
+    const f = document.getElementById('field_first_name'), l = document.getElementById('field_last_name'), out = document.getElementById('epNameLive');
+    if (!f || !l || !out) return;
+    const sync = () => { out.textContent = (f.value.trim() + ' ' + l.value.trim()).trim(); };
+    f.addEventListener('input', sync); l.addEventListener('input', sync);
+    // tapping anywhere on a glass field focuses its input
+    document.querySelectorAll('.epf').forEach(el => el.addEventListener('click', e => { if (e.target.tagName !== 'INPUT') el.querySelector('input')?.focus(); }));
 })();
 </script>
 </body>
