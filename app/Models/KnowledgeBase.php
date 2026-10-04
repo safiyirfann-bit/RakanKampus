@@ -17,6 +17,9 @@ class KnowledgeBase extends Model
         'answer',
         'category',
         'keywords',
+        'location_name',
+        'latitude',
+        'longitude',
     ];
 
     /** Small-talk categories from sapaan.csv: the bot can reply to them, but they are never suggested as questions. */
@@ -48,6 +51,37 @@ class KnowledgeBase extends Model
         return implode(' | ', array_filter([
             $this->question, $this->question_ms, $this->question_en, $this->question_zh, $this->question_ta,
         ]));
+    }
+
+    /** Map pin for the chat, or null when this entry has no location. */
+    public function mapData(): ?array
+    {
+        if ($this->latitude === null || $this->longitude === null) {
+            return null;
+        }
+
+        return [
+            'name' => $this->location_name ?: $this->questionFor(),
+            'lat' => (float) $this->latitude,
+            'lng' => (float) $this->longitude,
+        ];
+    }
+
+    /**
+     * Read "4.5912, 101.1265" or a Google Maps link (…@4.5912,101.1265… / …?q=4.5912,101.1265)
+     * into [lat, lng]. Returns [null, null] when empty or not valid.
+     */
+    public static function parseCoordinates(?string $text): array
+    {
+        if (preg_match('/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/', (string) $text, $m)) {
+            $lat = (float) $m[1];
+            $lng = (float) $m[2];
+            if (abs($lat) <= 90 && abs($lng) <= 180) {
+                return [$lat, $lng];
+            }
+        }
+
+        return [null, null];
     }
 
     public function information()

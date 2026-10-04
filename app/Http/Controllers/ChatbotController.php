@@ -268,6 +268,8 @@ $reply = trim($reply);;
             // shown as "From the PUO knowledge base" + the topic chip in the chat
             'from_kb' => $entries->isNotEmpty(),
             'topic' => $entries->isNotEmpty() ? ($entries->first()->category ?: null) : null,
+            // the matched entry has a map pin → the chat shows a map card under the answer
+            'map' => $entries->isNotEmpty() ? $entries->first()->mapData() : null,
         ]);
     }
 
@@ -402,9 +404,10 @@ $reply = trim($reply);;
             ->get(['id', 'sender', 'message', 'rating', 'knowledge_base_id']);
 
         // A bot answer came from the knowledge base when the question before it matched an entry
-        $topics = KnowledgeBase::whereIn('id', $messages->pluck('knowledge_base_id')->filter()->unique())->pluck('category', 'id');
+        $kbEntries = KnowledgeBase::whereIn('id', $messages->pluck('knowledge_base_id')->filter()->unique())->get()->keyBy('id');
+        $topics = $kbEntries->map(fn ($e) => $e->category);
         $lastKb = null;
-        $messages = $messages->map(function ($m) use (&$lastKb, $topics) {
+        $messages = $messages->map(function ($m) use (&$lastKb, $topics, $kbEntries) {
             if ($m->sender === 'user') {
                 $lastKb = $m->knowledge_base_id;
             }
@@ -412,6 +415,7 @@ $reply = trim($reply);;
             if ($m->sender === 'bot') {
                 $row['from_kb'] = (bool) $lastKb;
                 $row['topic'] = $lastKb ? ($topics[$lastKb] ?? null) : null;
+                $row['map'] = $lastKb ? $kbEntries->get($lastKb)?->mapData() : null;
             }
 
             return $row;
@@ -490,7 +494,7 @@ public function destroy(Request $request, ChatConversation $conversation)
         }
 
         return KnowledgeBase::query()
-            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords'])
+            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords', 'location_name', 'latitude', 'longitude'])
             ->map(function ($entry) use ($tokens, $phrases, $exact, $probe) {
                 $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
                 $q = mb_strtolower($entry->allQuestions());
