@@ -756,6 +756,74 @@ html[data-theme="dark"] .ai-rem-row select { border: 1px solid #283b48; color: #
 html[data-theme="dark"] .ai-rem-add { background: #141b26; color: #41eedf; }
 html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #d0d4da; }
 </style>
+<style id="rm-b">
+/* Reminders "B": list + next-deadline countdown + calendar */
+.rm-layout { display: block; }
+.rm-side { display: none; }
+.rm-next { position: relative; overflow: hidden; border-radius: 20px; padding: 15px 16px; color: #fff; margin-bottom: 14px;
+  background: linear-gradient(135deg, #be123c, #f43f5e 60%, #fb923c); box-shadow: 0 12px 26px rgba(244,63,94,.28); }
+.rm-next::after { content: ""; position: absolute; right: -40px; top: -40px; width: 140px; height: 140px; border-radius: 50%; background: rgba(255,255,255,.12); }
+.rm-next.none { background: linear-gradient(135deg, #0f766e, #14b8a6); box-shadow: 0 12px 26px rgba(20,184,166,.25); }
+.rm-next-label { margin: 0; font-size: 10.5px; font-weight: 800; letter-spacing: .8px; opacity: .9; }
+.rm-next-title { display: block; font-size: 16px; font-weight: 800; margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; position: relative; z-index: 1; }
+.rm-next-when { margin: 2px 0 0; font-size: 11.5px; opacity: .85; }
+.rm-cd { display: flex; gap: 8px; margin-top: 10px; position: relative; z-index: 1; }
+.rm-cd div { flex: 1; max-width: 64px; background: rgba(255,255,255,.2); border-radius: 12px; padding: 6px 4px; text-align: center; font-size: 9.5px; font-weight: 700; }
+.rm-cd b { display: block; font-size: 19px; font-weight: 800; font-variant-numeric: tabular-nums; }
+
+.rm-week { display: flex; gap: 6px; margin-bottom: 14px; }
+.rm-week button { flex: 1; min-width: 0; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.14); color: #e6fbfb; border-radius: 14px; padding: 6px 0 9px; font: 700 10px inherit; font-family: inherit; cursor: pointer; position: relative; }
+.rm-week button b { display: block; font-size: 15px; font-weight: 800; color: #fff; }
+.rm-week button.today { border-color: #fff; }
+.rm-week button.on { background: #fff; color: #0f766e; } .rm-week button.on b { color: #0f2747; }
+.rm-dots { position: absolute; left: 0; right: 0; bottom: 3px; display: flex; justify-content: center; gap: 2px; }
+.rm-dots i { width: 5px; height: 5px; border-radius: 50%; }
+
+.rm-types { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; margin: 0 0 10px; }
+.rm-types::-webkit-scrollbar { display: none; }
+.rm-type { flex: none; border: 1px solid rgba(255,255,255,.35); background: rgba(255,255,255,.14); color: #fff; font: 700 12px inherit; font-family: inherit; padding: 7px 13px; border-radius: 999px; cursor: pointer; }
+.rm-type.on { background: #fff; color: #0f2747; border-color: #fff; }
+.rm-dayfilter { display: none; align-items: center; justify-content: space-between; gap: 8px; background: rgba(255,255,255,.9); color: #0f2747; border-radius: 12px; padding: 8px 12px; font-size: 12.5px; font-weight: 700; margin-bottom: 10px; }
+.rm-dayfilter.open { display: flex; }
+.rm-dayfilter button { border: 0; background: #f0fdfa; color: #0f766e; font: 800 11.5px inherit; font-family: inherit; padding: 5px 10px; border-radius: 999px; cursor: pointer; }
+.reminder-card { border-left: 4px solid var(--tc, transparent) !important; }
+
+.rm-cal { background: #fff; border: 1px solid #dbeeee; border-radius: 20px; padding: 14px 16px 12px; }
+.rm-cal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.rm-cal-head b { font-size: 14.5px; color: #14213d; }
+.rm-cal-head button { width: 28px; height: 28px; border: 0; border-radius: 9px; background: #f1f5f9; color: #475569; font-size: 16px; cursor: pointer; margin-left: 4px; }
+.rm-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; text-align: center; }
+.rm-cal-grid .h { font-size: 10px; font-weight: 800; color: #94a3b8; padding: 4px 0; }
+.rm-cal-grid button { position: relative; border: 0; background: none; font: 600 12px inherit; font-family: inherit; color: #334155; padding: 8px 0 10px; border-radius: 10px; cursor: default; }
+.rm-cal-grid button.has { cursor: pointer; font-weight: 800; color: #0f2747; }
+.rm-cal-grid button.has:hover { background: #f0fdfa; }
+.rm-cal-grid button.today { background: #0f2747; color: #fff; }
+.rm-cal-grid button.on { background: #14b8a6; color: #fff; }
+.rm-cal-grid button .rm-dots { bottom: 2px; }
+.rm-cal-legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 10.5px; font-weight: 700; color: #64748b; }
+.rm-cal-legend span::before { content: "●"; color: var(--c); margin-right: 3px; }
+
+@media (min-width: 861px) {
+  .rm-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 22px; align-items: start; }
+  .rm-side { display: block; position: sticky; top: 24px; }
+  .rm-next-m, .rm-week { display: none; }
+  .rm-type { border-color: #dbeeee; background: #fff; color: #0f766e; }
+  .rm-type.on { background: #0f2747; color: #fff; border-color: #0f2747; }
+  .rm-dayfilter { background: #fff; border: 1px solid #dbeeee; }
+}
+html[data-theme="dark"] .rm-cal { background: #17202d; border-color: #284848; }
+html[data-theme="dark"] .rm-cal-head b, html[data-theme="dark"] .rm-cal-grid button.has { color: #dee1e9; }
+html[data-theme="dark"] .rm-cal-grid button { color: #b0b6be; }
+html[data-theme="dark"] .rm-cal-head button { background: #1f2a39; color: #ced3d9; }
+html[data-theme="dark"] .rm-cal-grid button.has:hover { background: #1d3d3b; }
+html[data-theme="dark"] .rm-cal-grid button.today { background: #41eedf; color: #0b1626; }
+@media (min-width: 861px) {
+  html[data-theme="dark"] .rm-type { background: #17202d; border-color: #284848; color: #41eedf; }
+  html[data-theme="dark"] .rm-type.on { background: #41eedf; color: #0b1626; }
+  html[data-theme="dark"] .rm-dayfilter { background: #17202d; border-color: #284848; color: #dee1e9; }
+}
+html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41eedf; }
+</style>
 </head>
 <body>
 
@@ -768,6 +836,15 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #d0d4da; }
       <p class="header-sub">{{ __('For exams, assignments & deadlines') }}</p>
     </div>
   </div>
+
+  <div class="rm-layout">
+  <div class="rm-main">
+
+  {{-- Next deadline countdown (phones show it here; PC shows it in the side column) --}}
+  <div class="rm-next rm-next-m" data-next></div>
+
+  {{-- Phones: this week's 7 days, dot = has a reminder, tap to show only that day --}}
+  <div class="rm-week" id="rmWeek"></div>
 
   <div class="notify-banner" id="notifyBanner">
     <span>{{ __('Turn on notifications to get alerted before your deadlines.') }}</span>
@@ -804,6 +881,15 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #d0d4da; }
   </div>
   </div>
 
+  <div class="rm-types" id="rmTypes">
+    <button type="button" class="rm-type on" data-type="">{{ __('All') }}</button>
+    <button type="button" class="rm-type" data-type="Exam">🎓 {{ __('Exam') }}</button>
+    <button type="button" class="rm-type" data-type="Assignment">📦 {{ __('Assignment') }}</button>
+    <button type="button" class="rm-type" data-type="Quiz">📝 {{ __('Quiz') }}</button>
+    <button type="button" class="rm-type" data-type="Other">📌 {{ __('Other') }}</button>
+  </div>
+  <div class="rm-dayfilter" id="rmDayFilter"><span id="rmDayText"></span><button type="button" onclick="setDayFilter(null)">{{ __('Show all') }} ×</button></div>
+
   <div class="section-row">
     <p class="section-label" id="countLabel">{{ __('UPCOMING (:count)', ['count' => 0]) }}</p>
     <a href="{{ route('student.reminders.history') }}" class="history-link">
@@ -825,6 +911,24 @@ html[data-theme="dark"] .ai-rem-cancel { background: #10161f; color: #d0d4da; }
 
   <div class="reminder-list" id="reminderList"></div>
   <div class="empty-state" id="emptyState" style="display:none;">{{ __('No reminders yet — tap "Add Reminder" to add your first exam, assignment or deadline.') }}</div>
+  </div>{{-- /rm-main --}}
+
+  {{-- PC side column: next deadline countdown + month calendar --}}
+  <aside class="rm-side">
+    <div class="rm-next" data-next></div>
+    <div class="rm-cal">
+      <div class="rm-cal-head">
+        <b id="rmCalTitle"></b>
+        <span>
+          <button type="button" onclick="shiftCal(-1)" aria-label="{{ __('Previous month') }}">‹</button>
+          <button type="button" onclick="shiftCal(1)" aria-label="{{ __('Next month') }}">›</button>
+        </span>
+      </div>
+      <div class="rm-cal-grid" id="rmCalGrid"></div>
+      <div class="rm-cal-legend"><span style="--c:#6366f1">{{ __('Exam') }}</span><span style="--c:#0d9488">{{ __('Assignment') }}</span><span style="--c:#7c3aed">{{ __('Quiz') }}</span><span style="--c:#64748b">{{ __('Other') }}</span></div>
+    </div>
+  </aside>
+  </div>{{-- /rm-layout --}}
 </div>
 
 
@@ -929,6 +1033,9 @@ let dragStartX = null;
 let dragOffset = 0;
 let pageDragStartX = null;
 let selectedRepeatHours = [];
+let typeFilter = '';
+let dayFilter = null; // 'YYYY-MM-DD'
+let calMonth = (() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); })();
 
 function typeStyle(type) {
   if (type === 'Assignment') return { color: '#0d9488', bg: '#f0fdfa' };
@@ -977,7 +1084,8 @@ function render() {
   const visible = reminders
     .filter(r => !q || r.subject.toLowerCase().includes(q))
     .filter(r => new Date(r.due_at).getTime() > Date.now())
-    .filter(r => new Date(r.due_at).getTime() <= cutoff)
+    .filter(r => dayFilter ? toDateStr(new Date(r.due_at).getTime()) === dayFilter : new Date(r.due_at).getTime() <= cutoff)
+    .filter(r => !typeFilter || r.type === typeFilter)
     .sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
 
   document.getElementById('countLabel').textContent = t('UPCOMING (:count)', {count: visible.length});
@@ -997,7 +1105,7 @@ function render() {
           <span>${t('Delete')}</span>
         </button>
         <div class="reminder-card ${isSelected ? 'selected' : ''}" data-id="${r.id}"
-             style="transform: translateX(${offset}px);"
+             style="transform: translateX(${offset}px); --tc: ${ts.color};"
              onpointerdown="startRowDrag(event, ${r.id})" onpointermove="moveRowDrag(event)" onpointerup="endRowDrag(event)" onpointerleave="endRowDrag(event)">
           <input type="checkbox" class="reminder-select ${selectMode ? 'open' : ''}" ${isSelected ? 'checked' : ''} onchange="toggleSelect(${r.id})" onclick="event.stopPropagation()">
           <div class="reminder-dot" style="background: ${status.dotBg};">
@@ -1030,7 +1138,89 @@ function render() {
   document.getElementById('selectedCount').textContent = selectedIds.length;
 
   window._visibleIds = visible.map(r => r.id);
+  renderSide();
 }
+
+// ---------- next deadline, week strip, month calendar ----------
+const RM_LOC = ({ ms: 'ms-MY', zh: 'zh-CN', ta: 'ta-IN' })[window.APP_LOCALE] || 'en-GB';
+const RM_TYPE_C = { Exam: '#6366f1', Assignment: '#0d9488', Quiz: '#7c3aed', Other: '#64748b' };
+function upcomingAll() {
+  return reminders.filter(r => new Date(r.due_at).getTime() > Date.now()).sort((a, b) => new Date(a.due_at) - new Date(b.due_at));
+}
+function dotsByDay() {
+  const m = {};
+  upcomingAll().forEach(r => { const k = toDateStr(new Date(r.due_at).getTime()); (m[k] = m[k] || []).push(RM_TYPE_C[r.type] || '#64748b'); });
+  return m;
+}
+function renderNext() {
+  const n = upcomingAll()[0];
+  document.querySelectorAll('[data-next]').forEach(el => {
+    if (!n) {
+      el.classList.add('none');
+      el.innerHTML = `<p class="rm-next-label">⏰ ${t('NEXT DEADLINE')}</p><b class="rm-next-title">${t('Nothing due — enjoy! 🎉')}</b>`;
+      return;
+    }
+    el.classList.remove('none');
+    let left = Math.max(0, new Date(n.due_at).getTime() - Date.now()) / 1000;
+    const d = Math.floor(left / 86400); left -= d * 86400;
+    const h = Math.floor(left / 3600); left -= h * 3600;
+    const m = Math.floor(left / 60); const sec = Math.floor(left - m * 60);
+    const box = (v, l) => `<div><b>${pad(v)}</b>${l}</div>`;
+    el.innerHTML = `<p class="rm-next-label">⏰ ${t('NEXT DEADLINE')}</p>
+      <b class="rm-next-title">${escapeHtml(n.subject)}</b>
+      <p class="rm-next-when">${escapeHtml(t(n.type))} · ${formatWhen(new Date(n.due_at).getTime())}</p>
+      <div class="rm-cd">${box(d, t('days'))}${box(h, t('hrs'))}${box(m, t('min'))}${box(sec, t('sec'))}</div>`;
+  });
+}
+function renderWeek() {
+  const el = document.getElementById('rmWeek'); if (!el) return;
+  const dots = dotsByDay(), start = new Date(); start.setHours(0, 0, 0, 0);
+  let html = '';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start); d.setDate(start.getDate() + i);
+    const k = toDateStr(d.getTime());
+    html += `<button type="button" class="${dayFilter === k ? 'on' : ''} ${i === 0 ? 'today' : ''}" onclick="setDayFilter('${k}')">
+      ${d.toLocaleDateString(RM_LOC, { weekday: 'narrow' })}<b>${d.getDate()}</b>
+      <span class="rm-dots">${(dots[k] || []).slice(0, 3).map(c => `<i style="background:${c}"></i>`).join('')}</span></button>`;
+  }
+  el.innerHTML = html;
+}
+function renderCal() {
+  const grid = document.getElementById('rmCalGrid'); if (!grid) return;
+  document.getElementById('rmCalTitle').textContent = calMonth.toLocaleDateString(RM_LOC, { month: 'long', year: 'numeric' });
+  const dots = dotsByDay(), first = new Date(calMonth), today = toDateStr(Date.now());
+  const lead = (first.getDay() + 6) % 7, days = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  let html = '';
+  const ref = new Date(2024, 0, 1); // a Monday
+  for (let i = 0; i < 7; i++) { const d = new Date(ref); d.setDate(1 + i); html += `<span class="h">${d.toLocaleDateString(RM_LOC, { weekday: 'narrow' })}</span>`; }
+  for (let i = 0; i < lead; i++) html += '<span></span>';
+  for (let n = 1; n <= days; n++) {
+    const k = first.getFullYear() + '-' + pad(first.getMonth() + 1) + '-' + pad(n);
+    const has = dots[k];
+    html += `<button type="button" class="${k === today ? 'today' : ''} ${dayFilter === k ? 'on' : ''} ${has ? 'has' : ''}" ${has ? `onclick="setDayFilter('${k}')"` : 'disabled'}>${n}
+      <span class="rm-dots">${(has || []).slice(0, 3).map(c => `<i style="background:${c}"></i>`).join('')}</span></button>`;
+  }
+  grid.innerHTML = html;
+}
+function renderSide() { renderNext(); renderWeek(); renderCal(); }
+function shiftCal(n) { calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth() + n, 1); renderCal(); }
+function setDayFilter(k) {
+  dayFilter = (k && dayFilter !== k) ? k : null;
+  const bar = document.getElementById('rmDayFilter');
+  bar.classList.toggle('open', !!dayFilter);
+  if (dayFilter) {
+    const [y, mo, d] = dayFilter.split('-').map(Number);
+    document.getElementById('rmDayText').textContent = t('Showing :day', { day: new Date(y, mo - 1, d).toLocaleDateString(RM_LOC, { weekday: 'short', day: 'numeric', month: 'short' }) });
+  }
+  render();
+}
+document.getElementById('rmTypes').addEventListener('click', e => {
+  const b = e.target.closest('.rm-type'); if (!b) return;
+  typeFilter = b.dataset.type;
+  document.querySelectorAll('.rm-type').forEach(x => x.classList.toggle('on', x === b));
+  render();
+});
+setInterval(renderNext, 1000);
 
 function onSearchChange() {
   searchQuery = document.getElementById('searchInput').value;
