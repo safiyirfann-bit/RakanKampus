@@ -1,79 +1,76 @@
 {{--
-  Floating "RakanKampus AI" button (Reminders / Timetable → opens the AI capture modal).
-  - A round robot button with a rainbow border. Every few seconds it stretches
-    open to show "RakanKampus AI · Upload & I'll fill it in", then folds back.
-  - The robot is alive: it bobs, waves, blinks and hops when the button opens.
-  - Hover / keyboard focus keeps it open.
+  Floating "RakanKampus" button (Reminders / Timetable → opens the AI capture modal).
+  - The robot strolls from one end of the button to the other, passing
+    behind the word "RakanKampus", turning round at each end.
+  - A beam of light runs round the border like a loading ring, with a soft
+    pulsing glow outside it.
   Positioning (fixed, bottom-right) still comes from the page's own .ai-fab rules.
 --}}
 @once
 <style>
   html body button.ai-fab.rkfab {
-    background: transparent !important; border: 0; padding: 0; overflow: visible; cursor: pointer;
-    border-radius: 999px; box-shadow: none; isolation: isolate;
+    background: transparent !important; border: none; padding: 0; overflow: visible;
+    border-radius: 999px; cursor: pointer; isolation: isolate;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.22);
+    animation: rkfabGlow 2.4s ease-in-out infinite;
   }
-  .rkfab .rkfab-pill {
-    position: relative; display: flex; align-items: center; height: 62px; width: 62px; padding: 4px;
-    border-radius: 999px; border: 2.5px solid transparent; overflow: hidden;
-    background-image: linear-gradient(#fff, #fff), linear-gradient(120deg, #22d3ee, #a78bfa, #f472b6, #22d3ee);
-    background-origin: border-box; background-clip: padding-box, border-box; background-size: 100% 100%, 300% 300%;
-    box-shadow: 0 12px 26px rgba(15, 39, 71, .2), 0 0 0 0 rgba(45, 212, 191, .4);
-    animation: rkfabOpen 7s ease-in-out infinite, rkfabHue 6s linear infinite, rkfabPulse 2.4s ease-out infinite;
+  /* the spinning light, clipped to a thin ring */
+  .rkfab .rkfab-ring {
+    position: relative; display: block; border-radius: 999px; padding: 2.5px; overflow: hidden;
+    background: rgba(46, 196, 198, 0.25);
   }
-  html body button.ai-fab.rkfab:hover .rkfab-pill,
-  html body button.ai-fab.rkfab:focus-visible .rkfab-pill { animation: rkfabHue 6s linear infinite; width: 252px; }
-  .rkfab .rkfab-bubble {
-    position: relative; flex: none; width: 50px; height: 50px; border-radius: 50%; display: grid; place-items: center;
-    background: radial-gradient(circle at 35% 30%, #ffffff, #ccfbf1 60%, #a5f3fc);
+  .rkfab .rkfab-ring::before {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 170%; aspect-ratio: 1;
+    transform: translate(-50%, -50%) rotate(0deg);
+    background: conic-gradient(from 0deg, transparent 0 58%, #22d3ee 70%, #34d399 80%, #facc15 90%, #ffffff 95%, transparent 100%);
+    animation: rkfabSpin 2.4s linear infinite;
   }
-  .rkfab .rkfab-bot { width: 40px !important; height: 40px !important; animation: rkfabHop 7s ease-in-out infinite; transform-origin: 50% 100%; }
-  .rkfab .rkfab-bot .rb-walk { animation: none !important; }   /* stay in the circle… */
-  .rkfab .rkfab-bot .rb-face { animation: rkfabLook 7s steps(1, end) infinite !important; }   /* …but look left / right */
-  .rkfab .rkfab-ai {
-    position: absolute; top: -2px; right: -4px; z-index: 2; font-size: 9px; font-weight: 800; color: #fff; letter-spacing: .02em;
-    background: linear-gradient(90deg, #8b5cf6, #ec4899); padding: 2px 6px; border-radius: 999px; border: 2px solid #fff;
-    animation: rkfabBadge 7s ease-in-out infinite;
+  .rkfab .rkfab-body {
+    position: relative; z-index: 1; display: block; overflow: hidden;
+    border-radius: 999px; background: #ffffff;
+    width: 176px; height: 42px;
   }
-  .rkfab .rkfab-text { padding: 0 14px 0 10px; white-space: nowrap; text-align: left; line-height: 1.25; opacity: 0; animation: rkfabText 7s ease-in-out infinite; }
-  .rkfab .rkfab-text b { display: block; font-size: 13.5px; font-weight: 800; color: #14213d; }
-  .rkfab .rkfab-text b i { font-style: normal; display: inline-block; font-size: 9px; font-weight: 800; color: #fff; background: linear-gradient(90deg, #8b5cf6, #ec4899); padding: 1px 6px; border-radius: 999px; margin-left: 4px; vertical-align: 2px; }
-  .rkfab .rkfab-text small { display: block; font-size: 10.5px; font-weight: 600; color: #64748b; }
-  html body button.ai-fab.rkfab:hover .rkfab-text, html body button.ai-fab.rkfab:focus-visible .rkfab-text { animation: none; opacity: 1; }
+  .rkfab .rkfab-label {
+    position: absolute; inset: 0; z-index: 2; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 800; letter-spacing: 0.01em; color: #14213d; pointer-events: none;
+    text-shadow: 0 0 4px #fff, 0 0 8px #fff, 0 0 2px #fff;
+  }
+  /* the robot's lane — it walks the full width, underneath the label */
+  html body .rkfab .rkfab-bot {
+    position: absolute; z-index: 1; bottom: 3px; left: 4px;
+    width: 46px; height: 32px; opacity: .95;
+    animation: rkfabWalk 7s ease-in-out infinite;
+  }
+  .rkfab .rkfab-bot .rb-walk { animation: none; }            /* the lane does the walking */
+  .rkfab .rkfab-bot .rb-face { animation-duration: 7s; }       /* turn round at each end */
 
-  @keyframes rkfabOpen { 0%, 18% { width: 62px; } 30%, 72% { width: 252px; } 84%, 100% { width: 62px; } }
-  @keyframes rkfabText { 0%, 24% { opacity: 0; } 32%, 68% { opacity: 1; } 76%, 100% { opacity: 0; } }
-  @keyframes rkfabBadge { 0%, 18%, 84%, 100% { opacity: 1; transform: scale(1); } 26%, 76% { opacity: 0; transform: scale(.4); } }
-  @keyframes rkfabHop { 0%, 22%, 40%, 100% { transform: translateY(0) scale(1); } 27% { transform: translateY(-9px) scale(.95, 1.06); } 32% { transform: translateY(0) scale(1.08, .92); } 36% { transform: translateY(-3px); } }
-  @keyframes rkfabLook { 0% { transform: scaleX(1); } 50% { transform: scaleX(-1); } 60% { transform: scaleX(1); } }
-  @keyframes rkfabHue { to { background-position: 0 0, 300% 0; } }
-  @keyframes rkfabPulse {
-    0% { box-shadow: 0 12px 26px rgba(15, 39, 71, .2), 0 0 0 0 rgba(45, 212, 191, .45); }
-    100% { box-shadow: 0 12px 26px rgba(15, 39, 71, .2), 0 0 0 14px rgba(45, 212, 191, 0); }
+  @keyframes rkfabWalk { 0%, 100% { left: 2px; } 46%, 54% { left: calc(100% - 48px); } }
+  @keyframes rkfabSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+  @keyframes rkfabGlow {
+    0%, 100% { box-shadow: 0 8px 18px rgba(0,0,0,.22), 0 0 10px rgba(34, 211, 238, .45); }
+    50%      { box-shadow: 0 8px 18px rgba(0,0,0,.22), 0 0 18px rgba(250, 204, 21, .45); }
   }
-  html body button.ai-fab.rkfab:active .rkfab-pill { transform: scale(.96); }
-  html body button.ai-fab.rkfab:focus-visible { outline: none; }
-  html body button.ai-fab.rkfab:focus-visible .rkfab-pill { box-shadow: 0 0 0 3px #2ec4c6, 0 12px 26px rgba(15, 39, 71, .2); }
 
-  html[data-theme="dark"] .rkfab .rkfab-pill { background-image: linear-gradient(#172233, #172233), linear-gradient(120deg, #22d3ee, #a78bfa, #f472b6, #22d3ee); box-shadow: 0 12px 26px rgba(0,0,0,.5); }
-  html[data-theme="dark"] .rkfab .rkfab-text b { color: #e2e8f0; }
-  html[data-theme="dark"] .rkfab .rkfab-text small { color: #a5b4c3; }
-  html[data-theme="dark"] .rkfab .rkfab-ai { border-color: #172233; }
+  html body button.ai-fab.rkfab:hover .rkfab-ring::before { animation-duration: 1s; }
+  html body button.ai-fab.rkfab:active { transform: scale(.97); }
+  html body button.ai-fab.rkfab:focus-visible { outline: 3px solid #2ec4c6; outline-offset: 3px; }
+
+  html[data-theme="dark"] .rkfab .rkfab-body { background: #172233; }
+  html[data-theme="dark"] .rkfab .rkfab-label { color: #e2e8f0; text-shadow: 0 0 4px #172233, 0 0 8px #172233, 0 0 2px #172233; }
+  /* navy robot on a dark button: give it a light outline + teal glow so it still reads */
+  html[data-theme="dark"] .rkfab .rkfab-bot { background: none !important; padding: 0 !important; filter: drop-shadow(0 0 0.6px #e2e8f0) drop-shadow(0 0 0.6px #e2e8f0) drop-shadow(0 0 4px rgba(46,196,198,.55)); }
+  html[data-theme="dark"] .rkfab .rkfab-bot .rb-shadow { fill: #000; }
 
   @media (prefers-reduced-motion: reduce) {
-    .rkfab .rkfab-pill, .rkfab .rkfab-bot, .rkfab .rkfab-text, .rkfab .rkfab-ai { animation: none !important; }
-    .rkfab .rkfab-text { opacity: 0; }
+    html body button.ai-fab.rkfab, .rkfab .rkfab-ring::before, html body .rkfab .rkfab-bot { animation: none !important; }
   }
 </style>
 @endonce
-<button type="button" {{ $attributes->merge(['class' => 'ai-fab rkfab', 'aria-label' => __('RakanKampus AI — upload a file and I will fill it in')]) }}>
-  <span class="rkfab-pill">
-    <span class="rkfab-bubble">
-      <x-brand-bot-animated :size="40" class="rkfab-bot" />
-      <span class="rkfab-ai">AI</span>
-    </span>
-    <span class="rkfab-text">
-      <b>RakanKampus<i>AI</i></b>
-      <small>{{ __('Upload & I\'ll fill it in') }}</small>
+<button type="button" {{ $attributes->merge(['class' => 'ai-fab rkfab', 'aria-label' => 'RakanKampus']) }}>
+  <span class="rkfab-ring">
+    <span class="rkfab-body">
+      <x-brand-bot-animated :size="32" class="rkfab-bot" />
+      <span class="rkfab-label">RakanKampus</span>
     </span>
   </span>
 </button>
