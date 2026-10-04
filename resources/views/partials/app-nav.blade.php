@@ -137,6 +137,35 @@
   .rk-tab-link.elevated span { display: none; }
   .rk-tab-link.elevated.active { color: #fff; }
 
+  /* Phone tab bar, "dark glass + glowing dot": see-through dark bar; only the active tab
+     shows its label, its icon glows neon and a glowing dot sits under it. Tapping a tab
+     slides the dot over while the next page loads. */
+  .rk-tabbar {
+    background: rgba(15, 25, 45, .84);
+    -webkit-backdrop-filter: blur(16px) saturate(140%); backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(255,255,255,.16);
+    box-shadow: 0 14px 30px rgba(8, 15, 30, .35), inset 0 1px 0 rgba(255,255,255,.1);
+  }
+  .rk-tab-link { position: relative; z-index: 1; color: rgba(255,255,255,.55); transition: color .3s; }
+  .rk-tab-link svg { width: 22px; height: 22px; transition: transform .3s, filter .3s; }
+  .rk-tabbar .rk-tab-lbl { font-size: 10.5px; }
+  .rk-tab-lbl { max-height: 0; opacity: 0; overflow: hidden; transition: max-height .3s, opacity .3s; }
+  .rk-tab-link.active { color: #7ff5ec; }
+  .rk-tab-link.active .rk-tab-lbl { max-height: 14px; opacity: 1; }
+  .rk-tab-link.active svg { filter: drop-shadow(0 0 6px rgba(127,245,236,.85)); }
+  .rk-tab-link:not(.elevated):active svg { transform: scale(.88); }
+  .rk-tab-avatar { width: 24px; height: 24px; color: #0f2747; transition: box-shadow .3s; }
+  .rk-tab-link.active .rk-tab-avatar { box-shadow: 0 0 0 2px #7ff5ec, 0 0 12px rgba(127,245,236,.7); }
+  .rk-tab-link.elevated { border: 3px solid rgba(255,255,255,.22); box-shadow: 0 8px 20px rgba(8,15,30,.45), 0 0 18px rgba(46,196,198,.35); }
+  .rk-tab-link.elevated.active { box-shadow: 0 8px 20px rgba(8,15,30,.45), 0 0 0 3px rgba(127,245,236,.55), 0 0 22px rgba(127,245,236,.55); }
+  .rk-tab-dot {
+    position: absolute; bottom: 7px; left: 0; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%;
+    background: #7ff5ec; box-shadow: 0 0 10px #7ff5ec, 0 0 4px #7ff5ec; opacity: 0;
+    transition: transform .45s cubic-bezier(.5,1.6,.4,1), opacity .2s; pointer-events: none;
+  }
+  .rk-tab-dot.on { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .rk-tab-dot, .rk-tab-lbl, .rk-tab-link svg { transition: none; } }
+
   @media (min-width: 861px) {
     .rk-sidebar { display: flex; }
     body { margin-left: 248px; transition: margin-left .25s ease; }
@@ -153,11 +182,7 @@
 html[data-theme="dark"] .rk-nav-link { color: #cbd5dc; }
 html[data-theme="dark"] .rk-nav-avatar { color: #dee1e9; }
 html[data-theme="dark"] .rk-sidebar { background: linear-gradient(165deg, #0b1626, #0f3446 60%, #0f4a55); box-shadow: 0 16px 34px rgba(0,0,0,.5); }
-html[data-theme="dark"] .rk-tabbar { background: #17202d; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.41); }
-html[data-theme="dark"] .rk-tab-link { color: #ced3d9; }
-html[data-theme="dark"] .rk-tab-link.active { color: #41eedf; }
-html[data-theme="dark"] .rk-tab-avatar { color: #dee1e9; }
-html[data-theme="dark"] .rk-tab-link.active .rk-tab-avatar { box-shadow: 0 0 0 2px #000000; }
+html[data-theme="dark"] .rk-tabbar { background: rgba(10, 16, 28, .86); box-shadow: 0 14px 30px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,.08); }
 html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0, 0, 0.81); }
 </style>
 
@@ -236,7 +261,41 @@ html[data-theme="dark"] .rk-tab-link.elevated { box-shadow: 0 8px 18px rgba(0, 0
       @else
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">{!! $item['icon'] !!}</svg>
       @endif
-      <span>{{ $item['label'] }}</span>
+      <span class="rk-tab-lbl">{{ $item['label'] }}</span>
     </a>
   @endforeach
+  <span class="rk-tab-dot" aria-hidden="true"></span>
 </nav>
+<script>
+(function () {
+  var bar = document.querySelector('.rk-tabbar');
+  if (!bar) return;
+  var dot = bar.querySelector('.rk-tab-dot');
+  function moveTo(link, animate) {
+    if (!link || link.classList.contains('elevated')) { dot.classList.remove('on'); return; }
+    var b = bar.getBoundingClientRect(), r = link.getBoundingClientRect();
+    if (!animate) dot.style.transition = 'none';
+    dot.style.transform = 'translateX(' + (r.left - b.left + r.width / 2) + 'px)';
+    dot.classList.add('on');
+    if (!animate) { dot.offsetWidth; dot.style.transition = ''; }
+  }
+  var home = bar.querySelector('.rk-tab-link.active');
+  function place() { moveTo(bar.querySelector('.rk-tab-link.active'), false); }
+  place();
+  window.addEventListener('resize', place);
+  bar.querySelectorAll('.rk-tab-link').forEach(function (a) {
+    a.addEventListener('click', function () {
+      if (a.classList.contains('active')) return;
+      bar.querySelectorAll('.rk-tab-link.active').forEach(function (x) { x.classList.remove('active'); });
+      a.classList.add('active');
+      moveTo(a, true);
+    });
+  });
+  // coming back with the browser's back button: restore the real active tab
+  window.addEventListener('pageshow', function (e) {
+    if (!e.persisted) return;
+    bar.querySelectorAll('.rk-tab-link').forEach(function (x) { x.classList.toggle('active', x === home); });
+    place();
+  });
+})();
+</script>
