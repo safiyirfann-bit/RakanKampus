@@ -580,6 +580,78 @@ html[data-theme="dark"] .prog-day { background: #10161f; border-color: #343c4c; 
   html[data-theme="dark"] .up-left { background: #10161f; color: #e5e7eb; }
 }
 </style>
+<style id="tt-ac">
+/* ---------- Timetable: "happening now" hero + timeline + week side card ---------- */
+.tt-hero { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; border-radius: 22px; padding: 18px 20px; margin: 0 0 18px; color: #fff;
+  background: linear-gradient(120deg, #0f2747, #155e75 60%, #14b8a6); box-shadow: 0 14px 30px rgba(15,39,71,.22); }
+.tt-hero::after { content: ""; position: absolute; right: -60px; top: -70px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,.07); }
+.tt-ring { --p: 0; position: relative; z-index: 1; width: 84px; height: 84px; flex: none; border-radius: 50%; display: grid; place-items: center;
+  background: conic-gradient(#5eead4 calc(var(--p) * 1%), rgba(255,255,255,.18) 0); transition: background .6s; }
+.tt-ring i { width: 68px; height: 68px; border-radius: 50%; background: #134a63; display: grid; place-content: center; text-align: center; font-style: normal; font-weight: 800; font-size: 15px; line-height: 1.05; }
+.tt-ring i small { display: block; font-size: 9px; font-weight: 700; opacity: .8; margin-top: 2px; }
+.tt-hero-body { position: relative; z-index: 1; flex: 1; min-width: 0; padding-right: 110px; }
+.tt-hero-label { margin: 0; font-size: 11px; font-weight: 800; letter-spacing: .6px; opacity: .88; }
+.tt-hero-title { display: block; font-size: 19px; font-weight: 800; margin: 3px 0 2px; line-height: 1.25; }
+.tt-hero-sub { margin: 0; font-size: 12px; opacity: .88; }
+.tt-hero-next { display: inline-block; margin: 10px 0 0; font-size: 11.5px; font-weight: 600; background: rgba(255,255,255,.15); border-radius: 10px; padding: 6px 10px; }
+.tt-hero-bot { position: absolute; right: 22px; bottom: -8px; width: 96px; height: auto; z-index: 1; filter: drop-shadow(0 10px 14px rgba(0,0,0,.3)); animation: ttBob 3.4s ease-in-out infinite; }
+@keyframes ttBob { 50% { transform: translateY(-6px); } }
+
+.dp-count { display: block; font-size: 9.5px; font-weight: 700; color: #0d9488; margin-top: 1px; white-space: nowrap; }
+.day-picker-item.active .dp-count { color: #5eead4; }
+
+.tl-type { display: inline-block; font-size: 10px; font-weight: 800; color: #fff; padding: 2px 8px; border-radius: 999px; margin-bottom: 4px; background: var(--tyc, #64748b); }
+.timeline-card.ty-l { --tyc: #f59e0b; background: #fffbeb; border-left-color: #f59e0b; }
+.timeline-card.ty-p { --tyc: #6366f1; background: #eef2ff; border-left-color: #6366f1; }
+.timeline-card.ty-t { --tyc: #ec4899; background: #fdf2f8; border-left-color: #ec4899; }
+.timeline-card.ty-o { --tyc: #14b8a6; background: #f0fdfa; border-left-color: #14b8a6; }
+.timeline-card { align-items: center; }
+.timeline-card-main { flex: 1; min-width: 0; }
+.tl-pill { flex: none; font-size: 10.5px; font-weight: 800; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
+.tl-pill.done { background: #f1f5f9; color: #64748b; } .tl-pill.now { background: #fee2e2; color: #b91c1c; } .tl-pill.soon { background: #e0f2fe; color: #0369a1; }
+.timeline-row.is-done .timeline-card { opacity: .6; }
+.timeline-row.is-now .timeline-card { box-shadow: 0 8px 20px rgba(99,102,241,.18); }
+.timeline-row.is-now .timeline-dot { background: #ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,.25); }
+.tl-prog { height: 5px; border-radius: 5px; background: rgba(15,39,71,.08); margin-top: 8px; overflow: hidden; }
+.tl-prog i { display: block; height: 100%; border-radius: 5px; background: var(--tyc, #14b8a6); }
+.tl-nowline { position: relative; margin: -6px 0 8px 62px; border-top: 2px dashed #ef4444; }
+.tl-nowline::before { content: ""; position: absolute; left: -9px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 4px rgba(239,68,68,.2); }
+.tl-nowline span { position: absolute; left: -62px; top: -8px; width: 46px; text-align: center; font-size: 10px; font-weight: 800; color: #fca5a5; }
+
+.tt-layout { display: block; }
+.tt-week { display: none; }
+.tt-week-title { margin: 0; font-size: 13.5px; font-weight: 800; color: #14213d; }
+.tt-week-sub { margin: 2px 0 10px; font-size: 11.5px; color: #64748b; }
+.tt-week-bars { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; align-items: end; height: 82px; }
+.tt-week-bars button { border: 0; background: none; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 5px; height: 100%; cursor: pointer; font-family: inherit; }
+.tt-week-bars i { width: 100%; border-radius: 7px; background: linear-gradient(180deg, #99f6e4, #14b8a6); transition: filter .15s; }
+.tt-week-bars button.on i { background: linear-gradient(180deg, #2dd4bf, #0f2747); }
+.tt-week-bars button:hover i { filter: brightness(1.08); }
+.tt-week-bars span { font-size: 10px; font-weight: 800; color: #94a3b8; }
+.tt-week-bars button.today span { color: #0d9488; }
+
+@media (min-width: 861px) {
+  .tt-layout { display: grid; grid-template-columns: minmax(0, 1fr) clamp(260px, 22vw, 340px); gap: 24px; align-items: start; }
+  .tt-side { position: sticky; top: 24px; }
+  .tt-week { display: block; background: #fff; border: 1px solid #dbeeee; border-radius: 20px; padding: 16px 18px; margin-bottom: 14px; }
+  .tt-side .upcoming { margin-top: 0; background: #fff; border: 1px solid #dbeeee; border-radius: 20px; padding: 14px 16px; }
+  .tt-side .upcoming:empty { display: none; }
+  .tl-nowline span { color: #ef4444; }
+}
+@media (max-width: 860px) {
+  .tt-hero { padding: 14px; gap: 12px; border-radius: 20px; }
+  .tt-ring { width: 64px; height: 64px; } .tt-ring i { width: 52px; height: 52px; font-size: 12px; }
+  .tt-hero-body { padding-right: 52px; }
+  .tt-hero-title { font-size: 15px; } .tt-hero-sub { font-size: 11px; } .tt-hero-next { font-size: 10.5px; margin-top: 7px; }
+  .tt-hero-bot { width: 60px; right: 8px; bottom: -6px; }
+  .dp-count { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tt-hero-bot { animation: none; } }
+html[data-theme="dark"] .tt-week, html[data-theme="dark"] .tt-side .upcoming { background: #17202d; border-color: #284848; }
+html[data-theme="dark"] .tt-week-title { color: #dee1e9; }
+html[data-theme="dark"] .timeline-card.ty-l { background: #2a2414; } html[data-theme="dark"] .timeline-card.ty-p { background: #1d1f3a; }
+html[data-theme="dark"] .timeline-card.ty-t { background: #2c1a26; } html[data-theme="dark"] .timeline-card.ty-o { background: #13302e; }
+</style>
 </head>
 <body>
 
@@ -598,6 +670,15 @@ html[data-theme="dark"] .prog-day { background: #10161f; border-color: #343c4c; 
     {{ __('Add class / programme') }}
   </button>
 
+  {{-- "Happening now" hero: the class going on right now (time-left ring), or the next one --}}
+  <div class="tt-hero" id="ttHeroWrap">
+    <div class="tt-ring" id="ttRing"><i id="ttRingText"></i></div>
+    <div class="tt-hero-body" id="ttHero" aria-live="polite"></div>
+    <x-brand-logo size="96" class="tt-hero-bot" />
+  </div>
+
+  <div class="tt-layout">
+  <div class="tt-main">
   <div class="heading-row">
     <div class="today-heading" id="todayHeading">
       <p class="today-date" id="todayDateLine"></p>
@@ -626,7 +707,12 @@ html[data-theme="dark"] .prog-day { background: #10161f; border-color: #343c4c; 
   </div>
 
   <div id="scheduleList"></div>
-  <div class="upcoming" id="upcomingPrograms"></div>
+  </div>{{-- /tt-main --}}
+  <aside class="tt-side">
+    <div class="tt-week" id="ttWeek"></div>
+    <div class="upcoming" id="upcomingPrograms"></div>
+  </aside>
+  </div>{{-- /tt-layout --}}
 
   <div class="grid-wrap" id="scheduleGridWrap">
     <div class="grid-header" id="gridHeaderRow"></div>
@@ -840,6 +926,7 @@ function renderDayPicker() {
     return `<button type="button" class="day-picker-item ${day === selectedDay ? 'active' : ''}" onclick="selectDay('${day}')" ${progs.length ? `title="${escapeHtml(progs.map(p => p.title).join(', '))}"` : ''}>
         <span class="dp-label">${t(day.slice(0, 3))}</span>
         <span class="dp-date">${d.getDate()}</span>
+        <span class="dp-count">${(n => n ? (n === 1 ? t('1 class') : t(':n classes', {n})) : '—')(classesOn(day).length)}</span>
         ${marks}
       </button>`;
   }).join('');
@@ -853,6 +940,8 @@ function selectDay(day) {
   renderDayPicker();
   renderTodayHeading();
   renderMobileTimeline();
+  renderHero();
+  renderWeekChart();
   updateSelectToggleVisibility();
   updateSelectBar();
 }
@@ -873,6 +962,71 @@ function closeTimelineMenus() {
 document.addEventListener('click', closeTimelineMenus);
 
 const TIMELINE_TINTS = ['t1', 't2', 't3', 't4'];
+
+// Class type from the "(L)" / "(P)" / "(T)" / "(O)" at the end of the subject (PUO timetable style)
+const CLASS_TYPES = { L: ['Lecture', 'ty-l'], P: ['Practical', 'ty-p'], T: ['Tutorial', 'ty-t'], A: ['Amali', 'ty-p'], O: ['Other', 'ty-o'] };
+function classType(subject) {
+  const m = String(subject).match(/\(([LPTAO])\)\s*$/i);
+  return m ? CLASS_TYPES[m[1].toUpperCase()] : null;
+}
+function nowMinutes() { const d = new Date(); return d.getHours() * 60 + d.getMinutes(); }
+function inLabel(mins) { return mins < 60 ? t('in :n min', {n: mins}) : (mins % 60 && mins < 180 ? t('in :h h :m min', {h: Math.floor(mins / 60), m: mins % 60}) : t('in :nh', {n: Math.round(mins / 60)})); }
+function leftLabel(mins) { return mins < 60 ? t(':n min', {n: mins}) : (Math.floor(mins / 60) + 'h ' + (mins % 60 ? (mins % 60) + 'm' : '')).trim(); }
+function classesOn(day) { return schedules.filter(s => s.day_of_week === day).sort((a, b) => a.start_time.localeCompare(b.start_time)); }
+
+// Hero: today → the class happening now (ring = time gone), else the next one, else "done for today".
+// Another day → that day's first class and how many.
+function renderHero() {
+  const box = document.getElementById('ttHero'), ring = document.getElementById('ttRing'), rt = document.getElementById('ttRingText');
+  if (!box) return;
+  const items = classesOn(selectedDay), isToday = selectedDay === todayName, now = nowMinutes();
+  const meta = s => [s.room ? '📍 ' + escapeHtml(s.room) : '', s.lecturer ? '👤 ' + escapeHtml(s.lecturer) : '', formatTime12(s.start_time) + ' – ' + formatTime12(s.end_time)].filter(Boolean).join(' · ');
+  const tag = s => { const ty = classType(s.subject); return ty ? ' · ' + t(ty[0]) : ''; };
+  let label = '', title = '', sub = '', next = '', pct = 0, ringTxt = '';
+  if (isToday) {
+    const cur = items.find(s => toMinutes(s.start_time) <= now && now < toMinutes(s.end_time));
+    const upcoming = items.filter(s => toMinutes(s.start_time) > now);
+    if (cur) {
+      const st = toMinutes(cur.start_time), en = toMinutes(cur.end_time);
+      pct = Math.round((now - st) / Math.max(en - st, 1) * 100);
+      ringTxt = `${leftLabel(en - now)}<small>${t('left')}</small>`;
+      label = '● ' + t('HAPPENING NOW') + tag(cur); title = cur.subject; sub = meta(cur);
+      if (upcoming[0]) next = `⏭ ${t('Next')}: ${escapeHtml(upcoming[0].subject)} · ${formatTime12(upcoming[0].start_time)}${upcoming[0].room ? ' · ' + escapeHtml(upcoming[0].room) : ''}`;
+    } else if (upcoming[0]) {
+      const n = upcoming[0], mins = toMinutes(n.start_time) - now;
+      pct = Math.max(4, 100 - Math.min(100, Math.round(mins / 120 * 100)));
+      ringTxt = `${leftLabel(mins)}<small>${t('to go')}</small>`;
+      label = '⏰ ' + t('NEXT CLASS') + ' · ' + inLabel(mins) + tag(n); title = n.subject; sub = meta(n);
+      if (upcoming[1]) next = `⏭ ${t('Then')}: ${escapeHtml(upcoming[1].subject)} · ${formatTime12(upcoming[1].start_time)}`;
+    } else {
+      pct = 100; ringTxt = '🎉';
+      label = t('TODAY'); title = items.length ? t('No more classes today 🎉') : t('No classes today 🎉');
+      sub = items.length ? t(':n classes done today', {n: items.length}) : t('Enjoy your free day!');
+    }
+  } else {
+    const d = weekDates[DAYS.indexOf(selectedDay)];
+    label = '📅 ' + t(selectedDay).toUpperCase() + ', ' + d.getDate() + ' ' + t(MONTH_NAMES[d.getMonth()]);
+    if (items.length) {
+      title = items.length === 1 ? t('1 class') : t(':n classes', {n: items.length});
+      sub = t('First: :subject at :time', {subject: escapeHtml(items[0].subject), time: formatTime12(items[0].start_time)});
+      const last = items[items.length - 1]; next = `🏁 ${t('Last class ends at :time', {time: formatTime12(last.end_time)})}`;
+      ringTxt = items.length + `<small>${items.length === 1 ? t('class') : t('classes')}</small>`; pct = 100;
+    } else { title = t('No classes'); sub = t('Enjoy your free day!'); ringTxt = '🎉'; pct = 100; }
+  }
+  ring.style.setProperty('--p', pct);
+  rt.innerHTML = ringTxt;
+  box.innerHTML = `<p class="tt-hero-label">${label}</p><b class="tt-hero-title">${escapeHtml(title).replace(/&lt;|&gt;/g, '')}</b><p class="tt-hero-sub">${sub}</p>${next ? `<p class="tt-hero-next">${next}</p>` : ''}`;
+}
+
+// Side card: hours of class per day this week
+function renderWeekChart() {
+  const box = document.getElementById('ttWeek'); if (!box) return;
+  const mins = DAYS.map(d => classesOn(d).reduce((a, s) => a + Math.max(0, toMinutes(s.end_time) - toMinutes(s.start_time)), 0));
+  const max = Math.max(60, ...mins), total = mins.reduce((a, b) => a + b, 0);
+  box.innerHTML = `<p class="tt-week-title">${t('This week')}</p><p class="tt-week-sub">${t(':n classes · :h hours', {n: schedules.length, h: Math.round(total / 6) / 10})}</p>
+    <div class="tt-week-bars">${DAYS.map((d, i) => `<button type="button" class="${d === selectedDay ? 'on' : ''} ${d === todayName ? 'today' : ''}" onclick="selectDay('${d}')" title="${t(d)} · ${formatDuration(mins[i]) || '0'}">
+      <i style="height:${Math.max(4, Math.round(mins[i] / max * 56))}px"></i><span>${t(d.slice(0, 3)).slice(0, 1)}</span></button>`).join('')}</div>`;
+}
 
 function renderMobileTimeline() {
   const list = document.getElementById('scheduleList');
@@ -900,22 +1054,37 @@ function renderMobileTimeline() {
     }
 
     const tint = TIMELINE_TINTS[idx % TIMELINE_TINTS.length];
+    const ty = classType(s.subject), st = toMinutes(s.start_time), en = toMinutes(s.end_time);
+    const isToday = selectedDay === todayName, now = nowMinutes();
+    let status = '', pill = '', prog = '';
+    if (isToday) {
+      if (now >= en) { status = 'is-done'; pill = `<span class="tl-pill done">${t('Done')}</span>`; }
+      else if (now >= st) { status = 'is-now'; pill = `<span class="tl-pill now">● ${t('Now')}</span>`; prog = `<div class="tl-prog"><i style="width:${Math.round((now - st) / Math.max(en - st, 1) * 100)}%"></i></div>`; }
+      else pill = `<span class="tl-pill soon">${inLabel(st - now)}</span>`;
+      // red "now" line before the first class that hasn't started yet (if none is running)
+      if (!html.includes('tl-nowline') && now < st && !items.some(x => toMinutes(x.start_time) <= now && now < toMinutes(x.end_time))) {
+        html += `<div class="tl-nowline"><span>${formatTime12(pad(Math.floor(now / 60)) + ':' + pad(now % 60))}</span></div>`;
+      }
+    }
     html += `
-      <div class="timeline-row">
+      <div class="timeline-row ${status}">
         <div class="timeline-time">
           <span>${formatTime12(s.start_time)}</span>
           <span class="timeline-dot"></span>
         </div>
-        <div class="timeline-card ${tint}" data-id="${s.id}">
+        <div class="timeline-card ${tint} ${ty ? ty[1] : ''}" data-id="${s.id}">
           ${selectMode ? `
           <label class="timeline-checkbox">
             <input type="checkbox" data-id="${s.id}" ${selectedIds.has(s.id) ? 'checked' : ''} onchange="toggleScheduleSelected(${s.id}, this.checked)">
           </label>` : ''}
           <div class="timeline-card-main">
+            ${ty ? `<span class="tl-type">${t(ty[0])}</span>` : ''}
             <p class="timeline-subject">${escapeHtml(s.subject)}</p>
-            <p class="timeline-meta">${formatTime12(s.start_time)} - ${formatTime12(s.end_time)}${s.room ? ' · ' + escapeHtml(s.room) : ''}</p>
-            ${s.lecturer ? `<p class="timeline-lecturer">${escapeHtml(s.lecturer)}</p>` : ''}
+            <p class="timeline-meta">${formatTime12(s.start_time)} - ${formatTime12(s.end_time)}${s.room ? ' · 📍 ' + escapeHtml(s.room) : ''}</p>
+            ${s.lecturer ? `<p class="timeline-lecturer">👤 ${escapeHtml(s.lecturer)}</p>` : ''}
+            ${prog}
           </div>
+          ${pill}
           ${!selectMode ? `
           <div class="timeline-menu-wrap">
             <button type="button" class="timeline-menu-btn" aria-label="${t('More options')}" onclick="toggleTimelineMenu(event, ${s.id})">⋮</button>
@@ -998,6 +1167,8 @@ function render() {
   renderMobileTimeline();
   renderUpcomingPrograms();
   renderDesktopGrid();
+  renderHero();
+  renderWeekChart();
   document.getElementById('deleteAllBtn').classList.toggle('hidden', schedules.length === 0);
   updateSelectToggleVisibility();
   updateSelectBar();
@@ -1104,6 +1275,8 @@ function programCardHtml(p, iso) {
 }
 
 // Programmes after this week (this week's ones already show on their days)
+setInterval(() => { renderHero(); if (selectedDay === todayName && !selectMode) renderMobileTimeline(); }, 30000);
+
 function renderUpcomingPrograms() {
   const box = document.getElementById('upcomingPrograms');
   if (!box) return;
