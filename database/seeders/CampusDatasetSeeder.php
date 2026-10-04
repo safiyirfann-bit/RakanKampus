@@ -13,8 +13,7 @@ use Illuminate\Support\Str;
  * (one row per question/answer).
  *
  * CSV columns: id, main_topic, intent, question, answer, category, keywords,
- *              question_ms, question_en, question_zh, question_ta (optional translations),
- *              location_name, latitude, longitude (optional map pin shown in the chat)
+ *              question_ms, question_en, question_zh, question_ta (optional translations)
  *
  * Safe to run again and again (it runs on every deploy): a topic is matched by
  * its main_topic and an entry by topic + intent, so re-running updates the
@@ -63,20 +62,9 @@ class CampusDatasetSeeder extends Seeder
                     }
                 }
 
-                // Optional map pin (location_name, latitude, longitude columns). Only set when the CSV
-                // has a value, so a pin added by the admin is never wiped by a re-run.
-                $location = [];
-                if (trim($row['latitude'] ?? '') !== '' && trim($row['longitude'] ?? '') !== '') {
-                    $location = [
-                        'location_name' => trim($row['location_name'] ?? '') ?: null,
-                        'latitude' => (float) $row['latitude'],
-                        'longitude' => (float) $row['longitude'],
-                    ];
-                }
-
                 $entry = KnowledgeBase::updateOrCreate(
                     ['information_id' => $topics[$mainTopic]->id, 'intent' => $intent],
-                    $location + $translations + [
+                    $translations + [
                         'question' => Str::limit($question, 255, ''),
                         'answer' => $answer,
                         'category' => trim($row['category'] ?? '') ?: null,

@@ -53,10 +53,7 @@ class KnowledgeBaseController extends Controller
             'answer' => 'required|string',
             'category' => 'nullable|string|max:255',
             'keywords' => 'nullable|string|max:255',
-            'location_name' => 'nullable|string|max:255',
-            'coordinates' => 'nullable|string|max:2000',
         ]);
-        $data = $this->withCoordinates($data);
 
         $information->knowledgeEntries()->create($data);
 
@@ -73,10 +70,7 @@ class KnowledgeBaseController extends Controller
             'answer' => 'required|string',
             'category' => 'nullable|string|max:255',
             'keywords' => 'nullable|string|max:255',
-            'location_name' => 'nullable|string|max:255',
-            'coordinates' => 'nullable|string|max:2000',
         ]);
-        $data = $this->withCoordinates($data);
 
         $entry->update($data);
 
@@ -92,17 +86,5 @@ class KnowledgeBaseController extends Controller
         return redirect()
             ->route('admin.information.show', $information->id)
             ->with('status', 'Entry deleted successfully.');
-    }
-
-    /** "coordinates" box (numbers or a Google Maps link) → latitude / longitude columns. */
-    private function withCoordinates(array $data): array
-    {
-        [$data['latitude'], $data['longitude']] = KnowledgeBase::parseCoordinates($data['coordinates'] ?? null);
-        unset($data['coordinates']);
-        if ($data['latitude'] === null) {
-            $data['location_name'] = null;
-        }
-
-        return $data;
     }
 }

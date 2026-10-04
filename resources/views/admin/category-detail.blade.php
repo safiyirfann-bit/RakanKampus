@@ -250,7 +250,7 @@ tbody tr:last-child td{ border-bottom:none; }
                     <td>
                         <div class="actions">
                             <button type="button" class="edit-btn"
-                                onclick="openEditModal({{ $entry->id }}, {{ json_encode($entry->intent) }}, {{ json_encode($entry->question) }}, {{ json_encode($entry->answer) }}, {{ json_encode($entry->category) }}, {{ json_encode($entry->keywords) }}, {{ json_encode($entry->location_name) }}, {{ json_encode($entry->latitude !== null ? $entry->latitude . ', ' . $entry->longitude : '') }})">
+                                onclick="openEditModal({{ $entry->id }}, {{ json_encode($entry->intent) }}, {{ json_encode($entry->question) }}, {{ json_encode($entry->answer) }}, {{ json_encode($entry->category) }}, {{ json_encode($entry->keywords) }})">
                                 Edit
                             </button>
 
@@ -312,17 +312,6 @@ tbody tr:last-child td{ border-bottom:none; }
                 <input type="text" name="keywords" placeholder="e.g. registration, semester, course">
             </div>
 
-            <div class="form-group">
-                <label>Location name <small style="color:#8b96b8">(optional, for "where is…" questions)</small></label>
-                <input type="text" name="location_name" placeholder="e.g. Perpustakaan PUO">
-            </div>
-
-            <div class="form-group">
-                <label>Map coordinates <small style="color:#8b96b8">(optional)</small></label>
-                <input type="text" name="coordinates" placeholder="e.g. 4.5891, 101.1265 or a Google Maps link">
-                <small style="color:#8b96b8">Google Maps → right-click the building → click the numbers to copy.</small>
-            </div>
-
             <div class="modal-actions">
                 <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
                 <button type="submit" class="submit-btn">Submit</button>
@@ -366,16 +355,6 @@ tbody tr:last-child td{ border-bottom:none; }
             <div class="form-group">
                 <label>Key Words</label>
                 <input type="text" name="keywords" id="edit_keywords">
-            </div>
-
-            <div class="form-group">
-                <label>Location name <small style="color:#8b96b8">(optional)</small></label>
-                <input type="text" name="location_name" id="edit_location_name">
-            </div>
-
-            <div class="form-group">
-                <label>Map coordinates <small style="color:#8b96b8">(optional — leave empty for no map)</small></label>
-                <input type="text" name="coordinates" id="edit_coordinates" placeholder="e.g. 4.5891, 101.1265 or a Google Maps link">
             </div>
 
             <div class="modal-actions">
@@ -436,14 +415,12 @@ function closeModal() {
     document.getElementById('addModal').style.display = 'none';
 }
 
-function openEditModal(id, intent, question, answer, category, keywords, locationName, coordinates) {
+function openEditModal(id, intent, question, answer, category, keywords) {
     document.getElementById('edit_intent').value = intent;
     document.getElementById('edit_question').value = question;
     document.getElementById('edit_answer').value = answer;
     document.getElementById('edit_category').value = category;
     document.getElementById('edit_keywords').value = keywords;
-    document.getElementById('edit_location_name').value = locationName || '';
-    document.getElementById('edit_coordinates').value = coordinates || '';
 
     document.getElementById('editForm').action =
         "{{ route('admin.information.entries.update', [$information->id, '__ID__']) }}".replace('__ID__', id);

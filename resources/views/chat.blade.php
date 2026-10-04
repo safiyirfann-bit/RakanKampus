@@ -756,20 +756,7 @@ html[data-theme="dark"] .suggestion.wl-chip:hover { background: #1f2a37; border-
 @media (max-width: 860px) {
   html[data-theme="dark"] .sidebar { box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); }
 }
-/* Map card under a "where is…" answer (Leaflet + OpenStreetMap, no API key) */
-.map-card { margin-top: 10px; max-width: 420px; border: 1px solid #e2e8f0; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
-.map-card .map-box { height: 190px; width: 100%; z-index: 0; }
-.map-card .map-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; }
-.map-card .map-name { font-size: 13.5px; font-weight: 600; color: #0f172a; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.map-card .map-name small { display: block; font-weight: 400; font-size: 11.5px; color: #64748b; }
-.map-card .map-go { flex-shrink: 0; display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; background: #0d9488; color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; }
-.map-card .map-go:hover { background: #0f766e; }
-html[data-theme="dark"] .map-card { background: #17202d; border-color: #2a3341; }
-html[data-theme="dark"] .map-card .map-name { color: #e5e7eb; }
-html[data-theme="dark"] .map-card .map-name small { color: #94a3b8; }
 </style>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 </head>
 <body>
 
@@ -1495,32 +1482,6 @@ function buildActions(row, text, meta) {
   return actions;
 }
 
-// Map card under the answer when the matched knowledge-base entry has a location pin
-function addMapCard(row, map) {
-  if (!row || !map || typeof map.lat !== 'number' || typeof map.lng !== 'number') return;
-  const body = row.querySelector('.bot-body');
-  if (!body || body.querySelector('.map-card')) return;
-  const dirUrl = `https://www.google.com/maps/dir/?api=1&destination=${map.lat},${map.lng}`;
-  const card = document.createElement('div');
-  card.className = 'map-card';
-  card.innerHTML = `<div class="map-box"></div>
-    <div class="map-foot">
-      <div class="map-name">📍 ${escapeHtml(map.name || '')}<small>${t('Location')}</small></div>
-      <a class="map-go" href="${dirUrl}" target="_blank" rel="noopener">🧭 ${t('Get directions')}</a>
-    </div>`;
-  const msg = body.querySelector('.message');
-  msg.after(card);
-  if (!window.L) { card.querySelector('.map-box').remove(); return; } // Leaflet didn't load: keep the button
-  const m = L.map(card.querySelector('.map-box'), { scrollWheelZoom: false, attributionControl: true })
-    .setView([map.lat, map.lng], 18);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19, attribution: '&copy; OpenStreetMap',
-  }).addTo(m);
-  L.marker([map.lat, map.lng]).addTo(m).bindPopup(escapeHtml(map.name || '')).openPopup();
-  setTimeout(() => m.invalidateSize(), 150); // the card was just added, so let Leaflet re-measure
-  scrollToBottom();
-}
-
 function addMessage(text, sender, meta = {}) {
   leaveEmptyState();
   const col = ensureCol();
@@ -1567,7 +1528,6 @@ function regenerate(row, btn) {
       const meta = { id: data.message_id, fromKb: !!data.from_kb, topic: data.topic || null };
       const fresh = addMessage(data.reply, 'bot', meta);
       row.replaceWith(fresh);
-      addMapCard(fresh, data.map);
       showSuggestions(fresh, data.suggestions);
       showAnswerExtras(fresh, data.reply, meta, data.suggestions);
       fresh.querySelector('.message').animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 260, easing: 'ease-out' });
@@ -1742,7 +1702,6 @@ function sendMessage(textArg, kbId) {
       if (data.reply) {
         const meta = { id: data.message_id, fromKb: !!data.from_kb, topic: data.topic || null };
         const botRow = addMessage(data.reply, 'bot', meta);
-        addMapCard(botRow, data.map);
         showSuggestions(botRow, data.suggestions);
         showAnswerExtras(botRow, data.reply, meta, data.suggestions);
         currentConversationId = data.conversation_id;
@@ -2007,7 +1966,6 @@ function openConversation(id) {
       messages.forEach(m => {
         const meta = { id: m.id, rating: m.rating, fromKb: !!m.from_kb, topic: m.topic || null };
         const r = addMessage(m.message, m.sender, meta);
-        if (m.sender === 'bot') addMapCard(r, m.map);
         if (m.sender === 'bot') lastBot = { r, m, meta };
       });
       const conv = conversationsCache.find(c => c.id === id);
