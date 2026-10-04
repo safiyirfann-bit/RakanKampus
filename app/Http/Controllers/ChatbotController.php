@@ -184,9 +184,24 @@ class ChatbotController extends Controller
     }
 }
 
+// "Where is …?" → the knowledge-base entry with a map pin for that place (shown as a map card)
+$mapEntry = $this->findLocation($message, $entries);
+if ($mapEntry) {
+    $userMessage->forceFill(['knowledge_base_id' => $mapEntry->id])->saveQuietly();
+    if (! $entries->contains('id', $mapEntry->id)) {
+        $entries = collect([$mapEntry])->merge($entries)->take(5)->values();
+    }
+}
+
 $context = $entries->isEmpty() ? null : $entries->map(function ($entry) {
     return "Soalan: {$entry->question}\nJawapan: {$entry->answer}";
 })->implode("\n\n");
+if ($mapEntry) {
+    $place = $mapEntry->location_name ?: $mapEntry->question;
+    $context .= "\n\nLOKASI: Peta '{$place}' dan butang 'Tunjuk Arah' (Google Maps) AKAN dipaparkan terus di bawah jawapan anda. "
+        . "Jawab ringkas di mana tempat itu berdasarkan maklumat rujukan, dan beritahu pelajar boleh lihat peta di bawah / tekan 'Tunjuk Arah'. "
+        . "JANGAN suruh pelajar semak dengan pihak kampus untuk lokasi ini.";
+}
 
 $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus (politeknik). "
     . "Anda faham Bahasa Melayu formal, santai, dan slanga (contoh: 'hai', 'wsup', 'apa cerita', 'ko', 'awak') — balas dengan mesra dan natural macam kawan, bukan robot kaku. "
@@ -269,7 +284,7 @@ $reply = trim($reply);;
             'from_kb' => $entries->isNotEmpty(),
             'topic' => $entries->isNotEmpty() ? ($entries->first()->category ?: null) : null,
             // the matched entry has a map pin → the chat shows a map card under the answer
-            'map' => $entries->isNotEmpty() ? $entries->first()->mapData() : null,
+            'map' => $mapEntry?->mapData(),
         ]);
     }
 
@@ -352,6 +367,64 @@ $reply = trim($reply);;
         $message->update(['rating' => $data['rating'] ?: null]);
 
         return response()->json(['success' => true, 'rating' => $message->rating]);
+    }
+
+    /**
+     * The knowledge-base entry with a map pin that the student is asking about, or null.
+     * 1) the best match already has a pin → use it;
+     * 2) a "where / kat mana" question → a pinned entry among the matches, else the pinned
+     *    entry whose location name / key words appear in the question (e.g. "perpustakaan").
+     */
+    private function findLocation(string $message, $entries): ?KnowledgeBase
+    {
+        $first = $entries->first();
+        if ($first && $first->latitude !== null) {
+            return $first;
+        }
+
+        $text = mb_strtolower($message);
+        $asksWhere = preg_match('/\b(mana|manakah|where|lokasi|location|letak|terletak|arah|direction|directions|map|peta|pergi|jalan)\b|哪里|哪儿|在哪|位置|எங்கே|எங்கு|இடம்/u', $text);
+        if (! $asksWhere) {
+            return null;
+        }
+
+        $pinned = $entries->first(fn ($e) => $e->latitude !== null);
+        if ($pinned) {
+            return $pinned;
+        }
+
+        // Words too common to tell places apart
+        $skip = ['puo', 'politeknik', 'ungku', 'omar', 'kampus', 'campus', 'blok', 'block', 'bangunan', 'building', 'unit', 'jabatan', 'department', 'mana', 'where', 'lokasi'];
+        $words = preg_split('/[^\p{L}\p{N}]+/u', $text, -1, PREG_SPLIT_NO_EMPTY);
+
+        $best = null;
+        $bestScore = 0;
+        foreach (KnowledgeBase::whereNotNull('latitude')->whereNotNull('longitude')->get() as $entry) {
+            $names = mb_strtolower(implode(' ', array_filter([$entry->location_name, $entry->keywords])));
+            $terms = array_diff(preg_split('/[^\p{L}\p{N}]+/u', $names, -1, PREG_SPLIT_NO_EMPTY), $skip);
+            $score = 0;
+            foreach (array_unique($terms) as $term) {
+                if (mb_strlen($term) < 3) {
+                    continue;
+                }
+                foreach ($words as $w) {
+                    if ($w === $term || (mb_strlen($w) >= 4 && (str_starts_with($term, $w) || str_starts_with($w, $term)))) {
+                        $score++;
+                        break;
+                    }
+                }
+            }
+            // a whole multi-word location name in the question counts extra (e.g. "dewan besar")
+            if ($entry->location_name && str_contains($text, mb_strtolower($entry->location_name))) {
+                $score += 3;
+            }
+            if ($score > $bestScore) {
+                $best = $entry;
+                $bestScore = $score;
+            }
+        }
+
+        return $best;
     }
 
     private function containsUnsafeContent(string $message): bool

@@ -73,7 +73,9 @@ class KnowledgeBase extends Model
      */
     public static function parseCoordinates(?string $text): array
     {
-        if (preg_match('/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/', (string) $text, $m)) {
+        // A Google Maps place link: the pin is in "!3d<lat>!4d<lng>" (the "@lat,lng" part is only the map centre)
+        if (preg_match('/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/', (string) $text, $m)
+            || preg_match('/(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)/', (string) $text, $m)) {
             $lat = (float) $m[1];
             $lng = (float) $m[2];
             if (abs($lat) <= 90 && abs($lng) <= 180) {
