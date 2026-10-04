@@ -102,7 +102,30 @@ Route::middleware('auth')->group(function () {
             'lecturer' => $schedule->lecturer,
         ]);
 
+    // Next 3 reminders for the Home card, with a simple day countdown
+    $today = now()->startOfDay();
+    $upcomingReminders = $user->reminders()
+        ->where('due_at', '>=', now())
+        ->orderBy('due_at')
+        ->take(3)
+        ->get()
+        ->map(function ($r) use ($today) {
+            $days = (int) $today->diffInDays($r->due_at->copy()->startOfDay());
+
+            return [
+                'subject' => $r->subject,
+                'type' => $r->type ?: 'Other',
+                'emoji' => ['Exam' => '🎓', 'Quiz' => '📝', 'Assignment' => '📦'][$r->type] ?? '📌',
+                'when' => $r->due_at->translatedFormat('D, j M · g:i A'),
+                'left' => $days === 0 ? __('Today') : ($days === 1 ? __('Tomorrow') : __(':n days', ['n' => $days])),
+                'level' => $days <= 2 ? 'hot' : ($days <= 7 ? 'warm' : 'cool'),
+            ];
+        });
+    $dueThisWeek = $user->reminders()->whereBetween('due_at', [now(), now()->addDays(7)])->count();
+
     return view('homepage', [
+        'upcomingReminders' => $upcomingReminders,
+        'dueThisWeek' => $dueThisWeek,
         'user' => $user,
         'conversations' => $conversations,
         'classSchedules' => $classSchedules,

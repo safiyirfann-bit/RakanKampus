@@ -638,6 +638,110 @@ html[data-theme="dark"] .conv-meta svg { stroke: #ced3d9; }
 html[data-theme="dark"] .conv-action-btn { color: #ced3d9; }
 html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c3b39; }
 </style>
+<style id="bento-home">
+/* ---------- Home "Bento Dashboard": hero with ask box, then a grid of cards ---------- */
+.container.bento { display: block; max-width: 1180px; }
+.hero { position: relative; overflow: hidden; border-radius: 26px; padding: 26px 26px 22px; color: #fff; margin-bottom: 16px;
+  background: linear-gradient(120deg, #0f2747, #155e75 60%, #14b8a6); box-shadow: 0 18px 40px rgba(15, 39, 71, .22); animation: fadeInUp .5s ease both; }
+.hero::before { content: ""; position: absolute; right: -70px; top: -80px; width: 260px; height: 260px; border-radius: 50%; background: rgba(255,255,255,.08); }
+.hero::after { content: ""; position: absolute; right: 22%; bottom: -120px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,.06); }
+.hero-bot { position: absolute; right: 34px; bottom: -8px; width: 128px; height: auto; z-index: 1; filter: drop-shadow(0 12px 18px rgba(0,0,0,.28)); animation: heroFloat 3.4s ease-in-out infinite; }
+@keyframes heroFloat { 50% { transform: translateY(-7px); } }
+.hero-hello { position: relative; z-index: 2; margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -.6px; line-height: 1.2; }
+.hero-meta { position: relative; z-index: 2; margin: 4px 0 16px; font-size: 13.5px; opacity: .85; }
+.hero-ask { position: relative; z-index: 2; display: flex; align-items: center; gap: 8px; max-width: 580px; height: 52px; border-radius: 26px; background: #fff; padding: 0 6px 0 20px; box-shadow: 0 10px 24px rgba(0,0,0,.18); }
+.hero-ask input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; font-size: 15px; color: #0f2747; font-family: inherit; }
+.hero-ask input::placeholder { color: #94a3b8; }
+.hero-ask button { width: 40px; height: 40px; flex: none; border: 0; border-radius: 50%; cursor: pointer; display: grid; place-items: center; color: #fff;
+  background: linear-gradient(135deg, #0f2747, #14b8a6); transition: transform .15s; }
+.hero-ask button:hover { transform: scale(1.06); }
+.hero-ask button svg { width: 18px; height: 18px; }
+.hero-chips { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; max-width: 640px; }
+.hero-chip { font-size: 12.5px; font-weight: 600; color: #fff; text-decoration: none; padding: 7px 13px; border-radius: 999px;
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.28); transition: background .15s; }
+.hero-chip:hover { background: rgba(255,255,255,.26); }
+
+.bento-grid { display: grid; grid-template-columns: 1.25fr 1fr 1fr; grid-auto-rows: auto; gap: 14px; }
+.bento-grid > * { order: 0 !important; }
+.bento-grid .today-classes-card { grid-column: 1; grid-row: 1 / span 2; margin: 0; border-radius: 22px; padding: 18px 20px; animation-delay: .05s; }
+.b-card { background: #fff; border: 1px solid var(--border-light); border-radius: 22px; padding: 16px 18px; box-shadow: 0 1px 2px rgba(15,39,71,.04); animation: fadeInUp .5s ease both; min-width: 0; }
+.b-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.b-title { display: flex; align-items: center; gap: 9px; margin: 0; font-size: 14px; font-weight: 800; color: #14213d; }
+.b-title svg { width: 17px; height: 17px; stroke: var(--blue-primary); }
+.b-link { font-size: 11.5px; font-weight: 700; color: var(--blue-primary); text-decoration: none; white-space: nowrap; }
+.b-empty { text-align: center; padding: 18px 0 8px; }
+.b-empty p { margin: 0 0 6px; font-size: 12.5px; color: var(--text-muted); }
+
+.rem-row { display: flex; align-items: center; gap: 11px; padding: 9px 0; border-top: 1px dashed var(--border-light); text-decoration: none; color: inherit; }
+.rem-row:first-of-type { border-top: 0; }
+.rem-ic { width: 34px; height: 34px; flex: none; border-radius: 11px; display: grid; place-items: center; font-size: 16px; background: #f1f5f9; }
+.rem-exam { background: #eef2ff; } .rem-quiz { background: #f5f3ff; } .rem-assignment { background: #f0fdfa; } .rem-other { background: #f1f5f9; }
+.rem-body { flex: 1; min-width: 0; }
+.rem-body b { display: block; font-size: 13px; color: #14213d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.rem-body small { font-size: 11px; color: var(--text-muted); }
+.rem-cd { flex: none; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 999px; }
+.rem-cd-hot { background: #fee2e2; color: #b91c1c; } .rem-cd-warm { background: #fef3c7; color: #b45309; } .rem-cd-cool { background: #e0f2fe; color: #0369a1; }
+
+.chats-card .conversation-list { display: flex; flex-direction: column; gap: 0; }
+.chats-card .conv-swipe-wrap { margin: 0; border-radius: 12px; }
+.chats-card .conv-card { background: transparent; border: 0; box-shadow: none; padding: 8px 4px; border-radius: 12px; gap: 10px; animation: none; }
+.chats-card .conv-card:hover { background: #f0fdfa; transform: none; box-shadow: none; }
+.chats-card .conv-icon { width: 32px; height: 32px; border-radius: 10px; }
+.chats-card .conv-title { font-size: 12.5px; }
+.chats-card .conv-preview { font-size: 11px; color: var(--text-muted); }
+.chats-card .conv-swipe-wrap:nth-child(n+4) { display: none; }
+.chats-card .conv-actions { display: none; }
+@media (hover: hover) { .chats-card .conv-card:hover .conv-actions { display: flex; } .chats-card .conv-card:hover .conv-meta { display: none; } }
+.chats-card .conv-time { font-size: 10.5px; white-space: nowrap; }
+
+.stat { display: block; border-radius: 22px; padding: 16px 18px; color: #fff; text-decoration: none; animation: fadeInUp .5s ease both; transition: transform .15s; }
+.stat:hover { transform: translateY(-2px); }
+.stat b { display: block; font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1.1; }
+.stat small { font-size: 12.5px; opacity: .9; }
+.rem-card { grid-column: 2; grid-row: 1; } .chats-card { grid-column: 3; grid-row: 1; }
+.stat-a { grid-column: 2; grid-row: 2; } .stat-b { grid-column: 3; grid-row: 2; }
+.stat-a { background: linear-gradient(135deg, #0f2747, #155e75); }
+.stat-b { background: linear-gradient(135deg, #0d9488, #2dd4bf); }
+
+@media (max-width: 1100px) {
+  .bento-grid { grid-template-columns: 1fr 1fr; }
+  .bento-grid .today-classes-card { grid-row: 1; grid-column: 1 / -1; }
+  .rem-card { grid-column: 1; grid-row: 2; } .chats-card { grid-column: 2; grid-row: 2; }
+  .stat-a { grid-column: 1; grid-row: 3; } .stat-b { grid-column: 2; grid-row: 3; }
+}
+@media (max-width: 860px) {
+  .container.bento { padding-top: 18px; }
+  .hero { padding: 20px 18px 18px; border-radius: 22px; }
+  .hero-hello { font-size: 22px; padding-right: 70px; }
+  .hero-meta { padding-right: 70px; font-size: 12.5px; }
+  .hero-bot { width: 82px; right: 12px; top: 14px; bottom: auto; }
+  .hero-ask { height: 48px; }
+  .hero-chip { font-size: 12px; }
+  .bento-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .bento-grid .today-classes-card { grid-column: 1 / -1; grid-row: 1; }
+  .stat-a { grid-column: 1; grid-row: 2; } .stat-b { grid-column: 2; grid-row: 2; }
+  .stat { padding: 14px 16px; } .stat b { font-size: 26px; }
+  .rem-card { grid-column: 1 / -1; grid-row: 3; } .chats-card { grid-column: 1 / -1; grid-row: 4; }
+  .chats-card .conv-actions { display: flex; }
+}
+@media (prefers-reduced-motion: reduce) { .hero-bot { animation: none; } }
+
+/* dark theme */
+html[data-theme="dark"] .hero { background: linear-gradient(120deg, #0b1626, #0f3f52 60%, #0f8a7e); box-shadow: 0 18px 40px rgba(0,0,0,.5); }
+html[data-theme="dark"] .hero-ask { background: #17202d; }
+html[data-theme="dark"] .hero-ask input { color: #dee1e9; }
+html[data-theme="dark"] .b-card { background: #17202d; border-color: #284848; }
+html[data-theme="dark"] .b-title, html[data-theme="dark"] .rem-body b { color: #dee1e9; }
+html[data-theme="dark"] .b-title svg { stroke: #41eedf; }
+html[data-theme="dark"] .b-link { color: #41eedf; }
+html[data-theme="dark"] .rem-row { border-color: #284848; }
+html[data-theme="dark"] .rem-ic { background: #1f2a39; }
+html[data-theme="dark"] .rem-body small, html[data-theme="dark"] .b-empty p { color: #b0b6be; }
+html[data-theme="dark"] .chats-card .conv-card { background: transparent; border: 0; }
+html[data-theme="dark"] .chats-card .conv-card:hover { background: #1d3d3b; }
+html[data-theme="dark"] .chats-card .conv-preview { color: #b0b6be; }
+html[data-theme="dark"] .bento-grid .today-classes-card { background: #17202d; border-color: #284848; }
+</style>
 </head>
 <body>
 
@@ -662,28 +766,6 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
 
 </div>
 
-  <div class="container">
-
-    <!-- Greeting card -->
-    <div class="greeting-card">
-      <div class="greeting-top">
-        <div class="greeting-avatar">
-            @if($user->photo_data)
-                <img src="{{ $user->photo_data }}" alt="{{ __('Profile photo') }}">
-            @else
-                {{ strtoupper(substr($user->first_name ?? 'A', 0, 1) . substr($user->last_name ?? '', 0, 1)) }}
-            @endif
-        </div>
-        <div>
-          <p class="greeting-name">{{ $user->first_name }} {{ $user->last_name }}</p>
-          @if($user->programme)
-            <p class="greeting-programme">{{ $user->programme }}</p>
-          @endif
-          @if($user->student_id)
-            <p class="greeting-meta">{{ $user->student_id }}</p>
-          @endif
-        </div>
-      </div>
       @php
           // Server-rendered fallback for first paint (before the client-side
           // clock in the script below takes over and keeps this live).
@@ -698,21 +780,26 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
               $greeting = 'Good evening';
           }
       @endphp
-      <p class="greeting-hello"><span id="greetingHello">{{ __($greeting) }}</span>!</p>
-      <p class="greeting-question">{{ __('How can I help you today?') }}</p>
-    </div>
+  <div class="container bento">
 
-    <a href="{{ route('student.reminders') }}" class="reminders-banner">
-      <div class="reminders-banner-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+    {{-- Hero: greeting + ask box (sends straight to the chat) + popular questions --}}
+    <section class="hero">
+      <x-brand-logo size="128" class="hero-bot" />
+      <p class="hero-hello"><span id="greetingHello">{{ __($greeting) }}</span>@php($hiName = $user->first_name ?: $user->name){{ $hiName ? ', ' . $hiName : '' }} 👋</p>
+      @if($user->programme || $user->student_id)<p class="hero-meta">{{ collect([$user->programme, $user->student_id])->filter()->implode(' · ') }}</p>@else<div style="height:14px"></div>@endif
+      <form class="hero-ask" action="{{ route('student.chat') }}" method="GET" id="heroAsk">
+        <input type="text" name="q" placeholder="{{ __('Ask RakanKampus anything…') }}" autocomplete="off" aria-label="{{ __('Ask RakanKampus anything…') }}">
+        <button type="submit" aria-label="{{ __('Send') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      </form>
+      <div class="hero-chips">
+        @foreach(collect($quickQuestions)->take(3) as $q)
+          @php($label = $q['popular'] ? $q['text'] : __($q['text']))
+          <a href="{{ route('student.chat') }}?q={{ urlencode($label) }}" class="hero-chip">@if($q['popular'])🔥 @endif{{ $label }}</a>
+        @endforeach
       </div>
-      <div class="reminders-banner-body">
-        <p class="reminders-banner-title">{{ __('Reminders') }}</p>
-        <p class="reminders-banner-sub">{{ __('For exams, assignments & deadlines') }}</p>
-      </div>
-      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
-    </a>
+    </section>
 
+    <div class="bento-grid">
     <div class="today-classes-card">
       <div class="today-classes-head">
         <div class="today-classes-title-row">
@@ -727,33 +814,33 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
            onpointerup="endClassesDrag(event)" onpointerleave="endClassesDrag(event)"></div>
     </div>
 
-    {{-- Quick questions: the most asked questions from students (see App\Services\PopularQuestions),
-         topped up with default ones. Popular chips show a small "Popular" tag. --}}
-    <div class="quick-grid">
-      <p class="faq-label">{{ __('FREQUENTLY ASKED QUESTIONS') }}</p>
-      @foreach($quickQuestions as $q)
-        @php($label = $q['popular'] ? $q['text'] : __($q['text']))
-        <a href="{{ route('student.chat') }}?q={{ urlencode($label) }}" class="quick-chip">
-          @if($q['popular'])<span class="quick-chip-tag">🔥 {{ __('Popular') }}</span>@endif
-          {{ $label }}
-        </a>
-      @endforeach
-    </div>
+      {{-- Next 3 reminders with a day countdown --}}
+      <section class="b-card rem-card">
+        <div class="b-head">
+          <p class="b-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>{{ __('Reminders') }}</p>
+          <a href="{{ route('student.reminders') }}" class="b-link">{{ __('All →') }}</a>
+        </div>
+        @forelse($upcomingReminders as $r)
+          <a href="{{ route('student.reminders') }}" class="rem-row">
+            <span class="rem-ic rem-{{ strtolower($r['type']) }}">{{ $r['emoji'] }}</span>
+            <span class="rem-body"><b>{{ $r['subject'] }}</b><small>{{ $r['when'] }}</small></span>
+            <span class="rem-cd rem-cd-{{ $r['level'] }}">{{ $r['left'] }}</span>
+          </a>
+        @empty
+          <div class="b-empty">
+            <p>{{ __('No upcoming reminders') }}</p>
+            <a href="{{ route('student.reminders') }}?add=1" class="b-link">+ {{ __('Add reminder') }}</a>
+          </div>
+        @endforelse
+      </section>
 
-    <a href="{{ route('student.chat') }}" class="start-chat-btn">
-
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="12" y1="5" x2="12" y2="19"></line>
-        <line x1="5" y1="12" x2="19" y2="12"></line>
-    </svg>
-
-    {{ __('Start New Chat') }}
-
-</a>
-
-    <p class="section-label">{{ __('RECENT CONVERSATIONS') }}</p>
-
-    <div class="conversation-list">
+      {{-- Recent chats (same swipe / rename / delete as before) --}}
+      <section class="b-card chats-card">
+        <div class="b-head">
+          <p class="b-title"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.2a8.4 8.4 0 1 1 16.1-4.3z"/></svg>{{ __('Recent chats') }}</p>
+          <a href="{{ route('student.chat') }}" class="b-link">+ {{ __('New chat') }}</a>
+        </div>
+        <div class="conversation-list">
 
     @forelse($conversations as $conv)
 
@@ -796,7 +883,11 @@ html[data-theme="dark"] .conv-action-btn:hover { color: #41eedf; background: #1c
     @endforelse
 
 </div>
+      </section>
 
+      <a href="{{ route('student.timetable') }}" class="stat stat-a"><b id="statClasses">0</b><small id="statClassesLbl">{{ __('Classes today') }}</small></a>
+      <a href="{{ route('student.reminders') }}" class="stat stat-b"><b>{{ $dueThisWeek }}</b><small>{{ __('Due this week') }}</small></a>
+    </div>
   </div>
 
 <script>
@@ -953,6 +1044,21 @@ function updateGreeting() {
 }
 updateGreeting();
 setInterval(updateGreeting, 60000);
+
+// "Classes today" tile + empty ask box just opens a new chat
+(function () {
+    const dayName = CLASS_DAYS[(new Date().getDay() + 6) % 7];
+    const n = classSchedules.filter(s => s.day_of_week === dayName).length;
+    const el = document.getElementById('statClasses');
+    if (el) el.textContent = n;
+    const lbl = document.getElementById('statClassesLbl');
+    if (lbl && n === 1) lbl.textContent = t('Class today');
+    const form = document.getElementById('heroAsk');
+    if (form) form.addEventListener('submit', e => {
+        const v = form.q.value.trim();
+        if (!v) { e.preventDefault(); window.location.href = form.action; }
+    });
+})();
 
 // Conversation cards: swipe right to reveal "Delete", tap Delete to remove it,
 // tap the card (or swipe back) to close. A mostly-vertical drag is left to the
