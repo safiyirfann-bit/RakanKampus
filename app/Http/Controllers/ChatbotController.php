@@ -191,6 +191,7 @@ $context = $entries->isEmpty() ? null : $entries->map(function ($entry) {
 $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus (politeknik). "
     . "Anda faham Bahasa Melayu formal, santai, dan slanga (contoh: 'hai', 'wsup', 'apa cerita', 'ko', 'awak') — balas dengan mesra dan natural macam kawan, bukan robot kaku. "
     . "Untuk sapaan/borak ringan (hai, hello, apa khabar), balas mesra dan tanya macam mana boleh bantu — TAK PERLU rujuk pangkalan data untuk ni. "
+    . "GAYA BAHASA MELAYU: Guna Bahasa Melayu Malaysia yang biasa dan mudah difahami pelajar (contoh: 'tanya saja', 'boleh', 'macam mana'). JANGAN guna perkataan Indonesia, perkataan pelik, atau perkataan yang anda tak pasti maknanya. Kalau ragu, pilih perkataan paling biasa. "
     . "JANGAN mulakan SETIAP jawapan dengan 'Hai!' atau sapaan lain — guna sapaan tu HANYA pada mesej PERTAMA dalam conversation, atau bila user memang menyapa (cth 'hai', 'hello', 'apa khabar'). Untuk soalan susulan (follow-up) dalam conversation yang sama, terus jawab soalan tu tanpa ulang sapaan setiap kali. "
     . "Untuk soalan berkaitan kampus (kursus, yuran, perpustakaan, exam, dll), jawab HANYA berdasarkan 'Maklumat rujukan' di bawah jika ada. "
     . "Jika soalan berkaitan kampus tapi TIADA dalam maklumat rujukan, beritahu dengan jujur & mesra yang tiada maklumat tu buat masa ini, cadangkan hubungi pihak berkaitan — jangan reka jawapan. "
@@ -224,7 +225,8 @@ $history = $conversation->messages()
 
 $response = Http::withToken(config('services.groq.key'))
     ->post('https://api.groq.com/openai/v1/chat/completions', [
-        'model' => 'openai/gpt-oss-20b',
+        // 120b: much better Malay than 20b (20b made up words like "jejak saja")
+        'model' => 'openai/gpt-oss-120b',
         'messages' => array_merge(
             [['role' => 'system', 'content' => $systemPrompt]],
             $history
