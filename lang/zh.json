@@ -592,5 +592,7 @@
     "Maximum 9 reminders": "最多 9 个提醒",
     "Already added": "已添加",
     "Add “:label”": "添加“:label”",
-    "No reminder yet — add at least one below.": "还没有提醒 — 请在下方至少添加一个。"
+    "No reminder yet — add at least one below.": "还没有提醒 — 请在下方至少添加一个。",
+    "Upload & I'll fill it in": "上传，我来帮你填写",
+    "RakanKampus AI — upload a file and I will fill it in": "RakanKampus AI — 上传文件，我来帮你填写"
 }
