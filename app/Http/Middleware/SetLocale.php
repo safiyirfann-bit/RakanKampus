@@ -23,6 +23,10 @@ class SetLocale
             App::setLocale($user->language);
             // Relative times like "2 hours ago" (diffForHumans) follow the same language.
             \Carbon\Carbon::setLocale($user->language);
+        } elseif (! $user && in_array($request->session()->get('guest_locale'), self::SUPPORTED, true)) {
+            // Language picked on the login page (before signing in)
+            App::setLocale($request->session()->get('guest_locale'));
+            \Carbon\Carbon::setLocale($request->session()->get('guest_locale'));
         }
 
         return $next($request);

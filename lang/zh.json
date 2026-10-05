@@ -640,5 +640,6 @@
     "Send report": "发送报告",
     "Sent! The admin team will look into it.": "已发送！管理团队会处理。",
     "Error message attached": "已附上错误信息",
-    "Could not send the report. Please try again.": "无法发送报告，请重试。"
+    "Could not send the report. Please try again.": "无法发送报告，请重试。",
+    "Dark mode": "深色模式"
 }

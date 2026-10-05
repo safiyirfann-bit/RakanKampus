@@ -152,6 +152,52 @@
     .lg-hero{background:linear-gradient(160deg,#14213d 0%,#1b3a5c 45%,#21768a 75%,#2ec4c6 100%) !important}
     .lg-sheet{background:#fff !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
   }
+
+  /* ---- language + dark mode buttons (top-right of the form on PC, top-left of the page on phones) ---- */
+  .lg-ctl{position:absolute;top:18px;right:20px;z-index:5;display:flex;gap:8px}
+  .lg-cb{height:36px;min-width:36px;padding:0 12px;border-radius:12px;border:1.5px solid #dbeeee;background:#f4fbfb;color:var(--lg-ink);
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;font:700 12.5px 'Plus Jakarta Sans',sans-serif;cursor:pointer;transition:background .15s,border-color .15s}
+  .lg-cb:hover{border-color:#2ec4c6}
+  .lg-cb svg{width:16px;height:16px;flex:none}
+  .lg-cb.ic{padding:0;width:36px}
+  .lg-cb svg[hidden]{display:none}
+  .lg-lang{position:relative}
+  .lg-menu{display:none;position:absolute;top:42px;right:0;width:168px;padding:6px;border-radius:14px;background:#fff;box-shadow:0 16px 34px rgba(15,39,71,.2);z-index:6}
+  .lg-menu.open{display:block;animation:lgMenu .15s ease}
+  @keyframes lgMenu{from{opacity:0;transform:translateY(-4px)}}
+  .lg-menu a{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;border-radius:9px;font-size:13px;font-weight:600;color:#14213d;text-decoration:none}
+  .lg-menu a:hover{background:#f1f5f9}
+  .lg-menu a.on{background:#ecfdf9;color:#0f766e}
+  .lg-sheet{position:relative}
+  @media (max-width:860px){
+    .lg-sheet{-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+    .lg-ctl{position:fixed;top:max(12px,env(safe-area-inset-top));left:14px;right:auto}
+    .lg-cb{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.35);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+    .lg-menu{left:0;right:auto}
+  }
+
+  /* ---- dark mode (picked with the moon button; remembered in this browser) ---- */
+  html[data-theme="dark"]{--lg-ink:#e2e8f0;--lg-muted:#94a3b8;--lg-soft:#64748b;--lg-field:#0f1724;--lg-field-focus:#0b1220;--lg-link:#41eedf;--lg-link2:#41eedf}
+  html[data-theme="dark"] body{background:linear-gradient(160deg,#0b1424,#112031 55%,#1d6869) fixed !important}
+  html[data-theme="dark"] .lg-sheet{background:#131c2b !important;box-shadow:0 -12px 34px rgba(0,0,0,.4)}
+  html[data-theme="dark"] .lg-field{border-color:#24324a}
+  html[data-theme="dark"] .lg-field:focus-within{border-color:#2ec4c6}
+  html[data-theme="dark"] .lg-alert.err{background:rgba(239,68,68,.12);color:#fca5a5}
+  html[data-theme="dark"] .lg-alert.ok{color:#86efac}
+  html[data-theme="dark"] .lg-cb{background:#0f1724;border-color:#24324a;color:#e2e8f0}
+  html[data-theme="dark"] .lg-menu{background:#17202d;box-shadow:0 16px 34px rgba(0,0,0,.5)}
+  html[data-theme="dark"] .lg-menu a{color:#dee1e9}
+  html[data-theme="dark"] .lg-menu a:hover{background:#1f2a3a}
+  html[data-theme="dark"] .lg-menu a.on{background:#1d3d3b;color:#41eedf}
+  html[data-theme="dark"] input:-webkit-autofill{-webkit-text-fill-color:#e2e8f0;-webkit-box-shadow:0 0 0 40px #0f1724 inset}
+  @media (min-width:861px){
+    html[data-theme="dark"] body{background:#0b1424 !important}
+    html[data-theme="dark"] .lg-b1{opacity:.18 !important}
+    html[data-theme="dark"] .lg-b2{background:#2ec4c6 !important;opacity:.08 !important}
+    html[data-theme="dark"] .lg-card{background:#131c2b !important;box-shadow:0 30px 70px rgba(0,0,0,.5) !important}
+    html[data-theme="dark"] .lg-hero{background:linear-gradient(160deg,#0b1424 0%,#112031 45%,#17505a 80%,#1d6869 100%) !important}
+  }
+  @media (max-width:860px){ html[data-theme="dark"] .lg-cb{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.25);color:#fff} }
 </style>
 
 <div class="lg-blob lg-b1"></div>
@@ -170,6 +216,28 @@
   </div>
 
   <div class="lg-sheet">
+@php
+  $lgLocale = app()->getLocale();
+@endphp
+  <div class="lg-ctl">
+    <div class="lg-lang">
+      <button type="button" class="lg-cb" id="lgLangBtn" aria-haspopup="true" aria-expanded="false" aria-label="{{ __('Language') }}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18"/></svg>
+        {{ ['en' => 'EN', 'ms' => 'BM', 'zh' => '中文', 'ta' => 'தமிழ்'][$lgLocale] ?? 'EN' }}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="lg-menu" id="lgLangMenu" role="menu">
+        <a href="{{ route('guest.lang', 'en') }}" class="{{ $lgLocale === 'en' ? 'on' : '' }}" lang="en"><span>English</span> @if($lgLocale === 'en')<span>✓</span>@endif</a>
+        <a href="{{ route('guest.lang', 'ms') }}" class="{{ $lgLocale === 'ms' ? 'on' : '' }}" lang="ms"><span>Bahasa Melayu</span> @if($lgLocale === 'ms')<span>✓</span>@endif</a>
+        <a href="{{ route('guest.lang', 'zh') }}" class="{{ $lgLocale === 'zh' ? 'on' : '' }}" lang="zh"><span>中文</span> @if($lgLocale === 'zh')<span>✓</span>@endif</a>
+        <a href="{{ route('guest.lang', 'ta') }}" class="{{ $lgLocale === 'ta' ? 'on' : '' }}" lang="ta"><span>தமிழ்</span> @if($lgLocale === 'ta')<span>✓</span>@endif</a>
+      </div>
+    </div>
+    <button type="button" class="lg-cb ic" id="lgTheme" aria-label="{{ __('Dark mode') }}">
+      <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
+  </div>
     <h1>{{ __('Welcome Back') }}</h1>
     <p class="lg-sub">{{ __('Log in to chat with your campus assistant.') }}</p>
 
@@ -185,6 +253,7 @@
 
     <form method="POST" action="/login">
       @csrf
+      <input type="hidden" name="theme_pick" id="lgThemePick" value="">
       <label class="lg-field">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></svg>
         <input type="email" name="email" placeholder="{{ __('Email') }}" value="{{ old('email') }}" autocomplete="email" required>
@@ -215,6 +284,31 @@
  </div>
 </div>
 
+<script>
+(function () {
+  // dark mode: set before paint isn't possible from here, so apply right away; remembered in this browser
+  var root = document.documentElement, btn = document.getElementById('lgTheme'), pick = document.getElementById('lgThemePick');
+  function apply(t) {
+    root.setAttribute('data-theme', t);
+    btn.querySelector('.moon').toggleAttribute('hidden', t === 'dark');
+    btn.querySelector('.sun').toggleAttribute('hidden', t !== 'dark');
+  }
+  var saved = null; try { saved = localStorage.getItem('rk_guest_theme'); } catch (e) {}
+  apply(saved === 'dark' ? 'dark' : 'light');
+  if (saved) pick.value = saved;
+  btn.addEventListener('click', function () {
+    var t = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    apply(t); pick.value = t;
+    try { localStorage.setItem('rk_guest_theme', t); } catch (e) {}
+  });
+  // language menu
+  var lb = document.getElementById('lgLangBtn'), menu = document.getElementById('lgLangMenu');
+  function setOpen(o) { menu.classList.toggle('open', o); lb.setAttribute('aria-expanded', o ? 'true' : 'false'); }
+  lb.addEventListener('click', function (e) { e.stopPropagation(); setOpen(!menu.classList.contains('open')); });
+  document.addEventListener('click', function (e) { if (!menu.contains(e.target)) setOpen(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+})();
+</script>
 @php
   $lgDemo = [
     [__('When is my DFP50463 class tomorrow?'), __('Tomorrow at 10:00 am in Lab 3, JTMK 📍')],

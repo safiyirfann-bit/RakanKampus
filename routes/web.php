@@ -22,6 +22,12 @@ use App\Http\Controllers\FeedbackController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::get('/login', [AuthController::class, 'showLogin']);
 Route::post('/login', [AuthController::class, 'login']);
+// Login page language switcher (guests): remembered in the session, saved to the account on login
+Route::get('/lang/{locale}', function (Illuminate\Http\Request $request, string $locale) {
+    abort_unless(in_array($locale, \App\Http\Middleware\SetLocale::SUPPORTED, true), 404);
+    $request->session()->put('guest_locale', $locale);
+    return redirect()->back(fallback: '/');
+})->middleware('throttle:30,1')->name('guest.lang');
 
 // Student Register
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');

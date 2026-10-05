@@ -48,6 +48,15 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
+        // Language / theme picked on the login page carry on into the app
+        $picked = array_filter([
+            'language' => in_array($request->session()->pull('guest_locale'), \App\Http\Middleware\SetLocale::SUPPORTED, true) ? app()->getLocale() : null,
+            'theme' => in_array($request->input('theme_pick'), ['light', 'dark'], true) ? $request->input('theme_pick') : null,
+        ]);
+        if ($picked) {
+            Auth::user()->forceFill($picked)->saveQuietly();
+        }
+
         Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
         $this->recordLogin($request);
 
@@ -242,7 +251,16 @@ class AuthController extends Controller
 
             $request->session()->regenerate();
 
-            Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
+            // Language / theme picked on the login page carry on into the app
+        $picked = array_filter([
+            'language' => in_array($request->session()->pull('guest_locale'), \App\Http\Middleware\SetLocale::SUPPORTED, true) ? app()->getLocale() : null,
+            'theme' => in_array($request->input('theme_pick'), ['light', 'dark'], true) ? $request->input('theme_pick') : null,
+        ]);
+        if ($picked) {
+            Auth::user()->forceFill($picked)->saveQuietly();
+        }
+
+        Auth::user()->forceFill(['last_login_at' => now()])->saveQuietly();
             $this->recordLogin($request);
 
             return redirect()->route('admin.dashboard');
