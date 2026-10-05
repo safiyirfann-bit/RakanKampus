@@ -948,6 +948,7 @@ html[data-theme="dark"] .rm-dayfilter button { background: #1d3d3b; color: #41ee
       <button type="button" class="ai-rem-save" id="aiRemSaveBtn" onclick="saveAiReminderPreview()">{{ __('Save') }}</button>
     </div>
   </div>
+  @include('partials.ai-report', ['context' => 'Reminders'])
 </div>
 
 <div class="modal" id="modal">

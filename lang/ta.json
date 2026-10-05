@@ -630,5 +630,15 @@
     "Keep your account safe": "உங்கள் கணக்கைப் பாதுகாப்பாக வைத்திருங்கள்",
     "Classes, reminders and do not disturb": "வகுப்புகள், நினைவூட்டல்கள், தொந்தரவு செய்யாதே",
     "English, Melayu, 中文, தமிழ்": "English, Melayu, 中文, தமிழ்",
-    "Light, dark or device setting": "ஒளி, இருள் அல்லது சாதன அமைப்பு"
+    "Light, dark or device setting": "ஒளி, இருள் அல்லது சாதன அமைப்பு",
+    "Something not working?": "ஏதாவது வேலை செய்யவில்லையா?",
+    "REPORT A PROBLEM": "சிக்கலைப் புகாரளி",
+    "AI read it wrong": "AI தவறாகப் படித்தது",
+    "Upload failed": "பதிவேற்றம் தோல்வி",
+    "Missing dates": "தேதிகள் விடுபட்டுள்ளன",
+    "Explain what happened…": "என்ன நடந்தது என்பதை விளக்கவும்…",
+    "Send report": "புகாரை அனுப்பு",
+    "Sent! The admin team will look into it.": "அனுப்பப்பட்டது! நிர்வாகக் குழு பார்க்கும்.",
+    "Error message attached": "பிழைச் செய்தி இணைக்கப்பட்டது",
+    "Could not send the report. Please try again.": "புகாரை அனுப்ப முடியவில்லை. மீண்டும் முயலவும்."
 }

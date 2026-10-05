@@ -630,5 +630,15 @@
     "Keep your account safe": "保护您的账户安全",
     "Classes, reminders and do not disturb": "课程、提醒和勿扰",
     "English, Melayu, 中文, தமிழ்": "English, Melayu, 中文, தமிழ்",
-    "Light, dark or device setting": "浅色、深色或跟随设备"
+    "Light, dark or device setting": "浅色、深色或跟随设备",
+    "Something not working?": "遇到问题？",
+    "REPORT A PROBLEM": "报告问题",
+    "AI read it wrong": "AI 识别错误",
+    "Upload failed": "上传失败",
+    "Missing dates": "缺少日期",
+    "Explain what happened…": "说明发生了什么…",
+    "Send report": "发送报告",
+    "Sent! The admin team will look into it.": "已发送！管理团队会处理。",
+    "Error message attached": "已附上错误信息",
+    "Could not send the report. Please try again.": "无法发送报告，请重试。"
 }

@@ -42,6 +42,10 @@ class FeedbackController extends Controller
             'issue_report' => $data['issue_report'],
         ]);
 
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
         return back()->with('report_sent', __('Thanks! Your report has been sent to the admin team.'));
     }
 

@@ -765,6 +765,7 @@ html[data-theme="dark"] .timeline-card.ty-t { background: #2c1a26; } html[data-t
       <button type="button" class="ai-pv-save" id="aiPreviewSaveBtn" onclick="saveAiPreview()">{{ __('Save') }}</button>
     </div>
   </div>
+  @include('partials.ai-report', ['context' => 'Timetable'])
 </div>
 
 <div class="modal" id="modal">
