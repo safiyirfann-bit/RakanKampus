@@ -226,10 +226,11 @@ $history = $conversation->messages()
     ->values()
     ->toArray();
 
-$response = Http::withToken(config('services.groq.key'))
-    ->post('https://api.groq.com/openai/v1/chat/completions', [
-        // 120b: much better Malay than 20b (20b made up words like "jejak saja")
-        'model' => 'openai/gpt-oss-120b',
+$response = Http::withToken(\App\Support\Llm::key())
+    ->timeout(60)
+    ->post(\App\Support\Llm::url(), [
+        // Groq: gpt-oss-120b (much better Malay than 20b). OpenAI: OPENAI_MODEL.
+        'model' => \App\Support\Llm::model('chat'),
         'messages' => array_merge(
             [['role' => 'system', 'content' => $systemPrompt]],
             $history
@@ -238,13 +239,13 @@ $response = Http::withToken(config('services.groq.key'))
     ]);
 
 if ($response->failed()) {
-    Log::error('Groq API error', [
+    Log::error(\App\Support\Llm::name() . ' API error', [
         'status' => $response->status(),
         'body' => $response->body(),
     ]);
 
     return response()->json([
-        'error' => 'Groq API error',
+        'error' => 'AI API error',
         'details' => $response->json(),
     ], $response->status());
 }
@@ -756,15 +757,15 @@ public function destroy(Request $request, ChatConversation $conversation)
     /** The question rewritten by the AI as a short Malay search query (cached for a day), or null. */
     private function aiSearchQuery(string $message): ?string
     {
-        $key = (string) config('services.groq.key');
+        $key = \App\Support\Llm::key();
         if ($key === '') {
             return null;
         }
 
         return \Illuminate\Support\Facades\Cache::remember('kb.aiquery.' . md5(mb_strtolower(trim($message))), now()->addDay(), function () use ($key, $message) {
             try {
-                $res = Http::withToken($key)->timeout(6)->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'openai/gpt-oss-20b',
+                $res = Http::withToken($key)->timeout(6)->post(\App\Support\Llm::url(), [
+                    'model' => \App\Support\Llm::model('small'),
                     'temperature' => 0,
                     'messages' => [
                         ['role' => 'system', 'content' => 'Tukar soalan pelajar Politeknik Ungku Omar (PUO) kepada SATU soalan Bahasa Melayu formal yang ringkas, guna istilah rasmi (cth: daftar kursus, yuran pengajian, asrama/kamsis, peperiksaan, SPMP, iPayment). Kekalkan nama dan singkatan (PUO, JTMK, MPP). Balas dengan soalan itu SAHAJA. Jika ia bukan soalan berkaitan kampus, balas: TIADA'],

@@ -140,9 +140,9 @@ class ClassScheduleController extends Controller
         } else {
             $dataUri = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
 
-            $response = Http::withToken(config('services.groq.key'))
+            $response = Http::withToken(\App\Support\Llm::key())
                 ->timeout(110)
-                ->post('https://api.groq.com/openai/v1/chat/completions', $this->visionPayload($dataUri));
+                ->post(\App\Support\Llm::url(), \App\Support\Llm::payload($this->visionPayload($dataUri)));
 
             if (! $response || $response->failed()) {
                 Log::error('Groq vision API error (timetable)', [
@@ -438,7 +438,7 @@ class ClassScheduleController extends Controller
         $systemPrompt = $this->visionPrompt();
 
         return [
-            'model' => 'qwen/qwen3.8-27b',
+            'model' => \App\Support\Llm::model('vision'),
             'messages' => [
                 ['role' => 'system', 'content' => $systemPrompt],
                 ['role' => 'user', 'content' => [

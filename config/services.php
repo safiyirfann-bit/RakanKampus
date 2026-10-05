@@ -18,6 +18,15 @@ return [
     'key' => env('GROQ_API_KEY'),
 ],
 
+    // AI answers: when OPENAI_API_KEY is set the app uses OpenAI instead of Groq
+    // (see App\Support\Llm). Models can be changed without touching code.
+    'openai' => [
+        'key' => env('OPENAI_API_KEY', ''),
+        'model' => env('OPENAI_MODEL', 'gpt-4.1-mini'),
+        'small_model' => env('OPENAI_SMALL_MODEL', 'gpt-4.1-mini'),
+        'vision_model' => env('OPENAI_VISION_MODEL', 'gpt-4.1-mini'),
+    ],
+
     // "Read aloud" in the chat, option 1: ElevenLabs (free plan, no card needed).
     // Used first when ELEVENLABS_API_KEY is set. Flash v2.5 speaks Malay and English.
     'elevenlabs' => [

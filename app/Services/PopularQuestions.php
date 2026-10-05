@@ -227,7 +227,7 @@ class PopularQuestions
     /** @return array<int, string>|null */
     private static function translate(array $texts, string $locale): ?array
     {
-        $key = (string) config('services.groq.key');
+        $key = \App\Support\Llm::key();
         if ($key === '' || ! $texts) {
             return null;
         }
@@ -235,8 +235,8 @@ class PopularQuestions
 
         try {
             $res = \Illuminate\Support\Facades\Http::withToken($key)->timeout(8)
-                ->post('https://api.groq.com/openai/v1/chat/completions', [
-                    'model' => 'openai/gpt-oss-20b',
+                ->post(\App\Support\Llm::url(), [
+                    'model' => \App\Support\Llm::model('small'),
                     'temperature' => 0.2,
                     'messages' => [
                         ['role' => 'system', 'content' => "Translate each student question about Politeknik Ungku Omar (PUO) into natural, short {$language}. Keep names, acronyms and codes (PUO, SPMP, JTMK, JKM, iPayment) unchanged. Reply with ONLY a JSON array of strings, same order and same count as the input."],

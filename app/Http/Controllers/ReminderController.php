@@ -297,10 +297,10 @@ class ReminderController extends Controller
      */
     private function groqRead(string $prompt, string $path, string $mime): array
     {
-        $response = Http::withToken(config('services.groq.key'))
+        $response = Http::withToken(\App\Support\Llm::key())
             ->timeout(60)
-            ->post('https://api.groq.com/openai/v1/chat/completions', [
-                'model' => 'qwen/qwen3.8-27b',
+            ->post(\App\Support\Llm::url(), [
+                'model' => \App\Support\Llm::model('vision'),
                 'messages' => [
                     ['role' => 'system', 'content' => $prompt],
                     ['role' => 'user', 'content' => [
@@ -313,7 +313,7 @@ class ReminderController extends Controller
             ]);
 
         if ($response->failed()) {
-            Log::error('Groq vision API error', ['status' => $response->status(), 'body' => $response->body()]);
+            Log::error(\App\Support\Llm::name() . ' vision API error', ['status' => $response->status(), 'body' => $response->body()]);
 
             return [null, __('AI could not process that image right now. Please try again shortly.')];
         }
