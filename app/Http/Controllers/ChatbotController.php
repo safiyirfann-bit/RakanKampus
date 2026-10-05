@@ -238,17 +238,49 @@ $history = $conversation->messages()
     ->values()
     ->toArray();
 
+$payload = [
+    // Groq: gpt-oss-120b (much better Malay than 20b). OpenAI: OPENAI_MODEL.
+    'model' => \App\Support\Llm::model('chat'),
+    'messages' => array_merge(
+        [['role' => 'system', 'content' => $systemPrompt]],
+        $history
+    ),
+    'temperature' => 0.5,
+];
+
+// Saves the finished answer and builds the extras shown under it.
+$finish = function (string $reply) use ($conversation, $entries, $message) {
+    // Buang sebarang format Markdown yang AI masih guna (jaring keselamatan tambahan)
+    // **tebal** dan *italic* dikekalkan — chat app paparkan sebagai bold / italic.
+    $reply = preg_replace('/^#{1,6}\s*(.+)$/m', '$1', $reply);  // # heading → baris biasa
+    $reply = trim(str_replace('|', '', $reply));                // buang simbol table |
+
+    $botMessage = $conversation->messages()->create([
+        'sender' => 'bot',
+        'message' => $reply,
+    ]);
+    $conversation->touch();
+
+    return [
+        'reply' => $reply,
+        'conversation_id' => $conversation->id,
+        'message_id' => $botMessage->id,
+        'suggestions' => $this->suggestQuestions($entries, $conversation, $message),
+        // shown as "From the PUO knowledge base" + the topic chip in the chat
+        'from_kb' => $entries->isNotEmpty(),
+        'topic' => $entries->isNotEmpty() ? ($entries->first()->category ?: null) : null,
+    ];
+};
+
+// Live answer: the words appear as the AI writes them instead of after a long wait.
+// The page reads one JSON object per line: {"d":"text"} pieces, then {"done":true,...}.
+if ($request->boolean('stream')) {
+    return $this->streamAnswer($payload, $finish, $conversation->id);
+}
+
 $response = Http::withToken(\App\Support\Llm::key())
     ->timeout(60)
-    ->post(\App\Support\Llm::url(), [
-        // Groq: gpt-oss-120b (much better Malay than 20b). OpenAI: OPENAI_MODEL.
-        'model' => \App\Support\Llm::model('chat'),
-        'messages' => array_merge(
-            [['role' => 'system', 'content' => $systemPrompt]],
-            $history
-        ),
-        'temperature' => 0.5,
-    ]);
+    ->post(\App\Support\Llm::url(), $payload);
 
 if ($response->failed()) {
     Log::error(\App\Support\Llm::name() . ' API error', [
@@ -262,30 +294,74 @@ if ($response->failed()) {
     ], $response->status());
 }
 
-$reply = $response->json('choices.0.message.content');
+        return response()->json($finish((string) $response->json('choices.0.message.content')));
+    }
 
-// Buang sebarang format Markdown yang AI masih guna (jaring keselamatan tambahan)
-// **tebal** dan *italic* dikekalkan — chat app paparkan sebagai bold / italic.
-$reply = preg_replace('/^#{1,6}\s*(.+)$/m', '$1', $reply);  // # heading → baris biasa
-$reply = str_replace('|', '', $reply);                      // buang simbol table |
-$reply = trim($reply);;
+    /**
+     * Sends the AI's answer to the page piece by piece while it is being written
+     * (OpenAI / Groq "stream": true), then saves it like a normal answer.
+     */
+    private function streamAnswer(array $payload, \Closure $finish, int $conversationId)
+    {
+        return response()->stream(function () use ($payload, $finish, $conversationId) {
+            while (ob_get_level() > 0) {
+                ob_end_flush();
+            }
+            $send = function (array $data) {
+                echo json_encode($data, JSON_UNESCAPED_UNICODE) . "\n";
+                flush();
+            };
 
+            $reply = '';
+            try {
+                $response = Http::withToken(\App\Support\Llm::key())
+                    ->withOptions(['stream' => true])
+                    ->timeout(60)
+                    ->post(\App\Support\Llm::url(), $payload + ['stream' => true]);
 
-        $botMessage = $conversation->messages()->create([
-            'sender' => 'bot',
-            'message' => $reply,
-        ]);
+                if ($response->failed()) {
+                    Log::error(\App\Support\Llm::name() . ' API error (stream)', ['status' => $response->status(), 'body' => $response->body()]);
+                    $send(['error' => true, 'conversation_id' => $conversationId]);
 
-        $conversation->touch();
+                    return;
+                }
 
-        return response()->json([
-            'reply' => $reply,
-            'conversation_id' => $conversation->id,
-            'message_id' => $botMessage->id,
-            'suggestions' => $this->suggestQuestions($entries, $conversation, $message),
-            // shown as "From the PUO knowledge base" + the topic chip in the chat
-            'from_kb' => $entries->isNotEmpty(),
-            'topic' => $entries->isNotEmpty() ? ($entries->first()->category ?: null) : null,
+                $body = $response->toPsrResponse()->getBody();
+                $buffer = '';
+                while (! $body->eof()) {
+                    $buffer .= $body->read(1024);
+                    while (($nl = strpos($buffer, "\n")) !== false) {
+                        $line = trim(substr($buffer, 0, $nl));
+                        $buffer = substr($buffer, $nl + 1);
+                        if (! str_starts_with($line, 'data:')) {
+                            continue;
+                        }
+                        $data = trim(substr($line, 5));
+                        if ($data === '[DONE]') {
+                            break 2;
+                        }
+                        $piece = json_decode($data, true)['choices'][0]['delta']['content'] ?? '';
+                        if ($piece !== '') {
+                            $reply .= $piece;
+                            $send(['d' => $piece]);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                report($e);
+            }
+
+            if (trim($reply) === '') {
+                $send(['error' => true, 'conversation_id' => $conversationId]);
+
+                return;
+            }
+
+            $send(['done' => true] + $finish($reply));
+        }, 200, [
+            'Content-Type' => 'application/x-ndjson; charset=utf-8',
+            'Cache-Control' => 'no-cache, no-transform',
+            'X-Accel-Buffering' => 'no', // nginx: pass each piece on straight away
         ]);
     }
 

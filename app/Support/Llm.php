@@ -32,7 +32,7 @@ class Llm
     public static function url(): string
     {
         return self::usingOpenAi()
-            ? 'https://api.openai.com/v1/chat/completions'
+            ? rtrim((string) config('services.openai.base_url'), '/') . '/chat/completions'
             : 'https://api.groq.com/openai/v1/chat/completions';
     }
 

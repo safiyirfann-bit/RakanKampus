@@ -1696,6 +1696,47 @@ function showAnswerExtras(row, text, meta, suggestions) {
   });
 })();
 
+// Live answer: the server sends the answer in small pieces while the AI is still
+// writing ({"d":"..."} per line, then {"done":true, reply, ...}). The words show up
+// straight away in a bubble; when it's finished that bubble is swapped for the normal
+// answer with its buttons and suggestions.
+async function readStream(res) {
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '', text = '', row = null, queued = false, result = null;
+  const paint = () => {
+    queued = false;
+    if (!row) {
+      removeSearching();
+      row = addMessage('', 'bot', { actions: false });
+      row.id = 'liveAnswer';
+    }
+    row.querySelector('.message').innerHTML = formatBotText(text);
+    scrollToBottom();
+  };
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    let nl;
+    while ((nl = buffer.indexOf('\n')) >= 0) {
+      const line = buffer.slice(0, nl).trim();
+      buffer = buffer.slice(nl + 1);
+      if (!line) continue;
+      let msg;
+      try { msg = JSON.parse(line); } catch (e) { continue; }
+      if (msg.d) {
+        text += msg.d;
+        if (!queued) { queued = true; requestAnimationFrame(paint); }
+      } else if (msg.done || msg.error) {
+        result = msg;
+      }
+    }
+  }
+  if (queued) paint(); // last piece not drawn yet: draw it now, before the bubble is swapped
+  return result || {};
+}
+
 function sendMessage(textArg, kbId) {
   const text = (typeof textArg === 'string' ? textArg : messageInput.value).trim();
   if (text === '' || busy) return;
@@ -1716,12 +1757,14 @@ function sendMessage(textArg, kbId) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'Accept': 'application/json' },
     // kb_id: the chip came from this knowledge-base entry (its text may be translated), so the server answers from it directly
-    body: JSON.stringify({ message: text, conversation_id: currentConversationId, kb_id: kbId ? Number(kbId) : null }),
+    body: JSON.stringify({ message: text, conversation_id: currentConversationId, kb_id: kbId ? Number(kbId) : null, stream: true }),
     signal: currentController.signal,
   })
-    .then(res => res.json())
+    .then(res => /ndjson/.test(res.headers.get('Content-Type') || '') ? readStream(res) : res.json())
     .then(data => {
       removeSearching();
+      const live = document.getElementById('liveAnswer');
+      if (live) live.remove();
       if (data.reply) {
         const meta = { id: data.message_id, fromKb: !!data.from_kb, topic: data.topic || null };
         const botRow = addMessage(data.reply, 'bot', meta);
@@ -1730,11 +1773,15 @@ function sendMessage(textArg, kbId) {
         currentConversationId = data.conversation_id;
         loadHistory();
       } else {
+        if (data.conversation_id) currentConversationId = data.conversation_id;
         addMessage(t('Sorry, there was a problem getting a response. Please try again.'), 'bot');
       }
     })
     .catch(error => {
       removeSearching();
+      const live = document.getElementById('liveAnswer');
+      if (live && error.name !== 'AbortError') live.remove();
+      if (live && error.name === 'AbortError') { live.removeAttribute('id'); return; }
       if (error.name === 'AbortError') {
         const row = addMessage('', 'bot', { actions: false });
         row.querySelector('.message').innerHTML = `<span class="stopped">${escapeHtml(t('Stopped'))}</span>`;

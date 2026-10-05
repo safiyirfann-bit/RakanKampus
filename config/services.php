@@ -22,6 +22,7 @@ return [
     // (see App\Support\Llm). Models can be changed without touching code.
     'openai' => [
         'key' => env('OPENAI_API_KEY', ''),
+        'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
         'model' => env('OPENAI_MODEL', 'gpt-4.1-mini'),
         'small_model' => env('OPENAI_SMALL_MODEL', 'gpt-4.1-mini'),
         'vision_model' => env('OPENAI_VISION_MODEL', 'gpt-4.1-mini'),
