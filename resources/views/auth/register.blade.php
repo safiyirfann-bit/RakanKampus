@@ -201,6 +201,28 @@ body{
     .hero{background:linear-gradient(160deg,#14213d 0%,#1b3a5c 45%,#21768a 75%,#2ec4c6 100%) !important}
     .sheet{background:#fff !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
   }
+
+  /* ---- language / dark mode buttons (partials.auth-controls) + dark theme ---- */
+  .sheet{position:relative}
+  @media (max-width:860px){ .sheet{-webkit-backdrop-filter:none !important;backdrop-filter:none !important} }
+  @media (min-width:861px){ .head{padding-right:96px} }
+  html[data-theme="dark"]{--ink:#e2e8f0;--muted:#94a3b8;--soft:#64748b;--field:#0f1724;--link:#41eedf;--link2:#41eedf}
+  html[data-theme="dark"] body{background:linear-gradient(160deg,#0b1424,#112031 55%,#1d6869) fixed !important}
+  html[data-theme="dark"] .sheet{background:#131c2b !important;box-shadow:0 -12px 34px rgba(0,0,0,.4)}
+  html[data-theme="dark"] .box{border-color:#24324a}
+  html[data-theme="dark"] .box:focus-within{background:#0b1220}
+  html[data-theme="dark"] .bar-track, html[data-theme="dark"] .steps .dot, html[data-theme="dark"] .steps .ln{background:#24324a}
+  html[data-theme="dark"] .req-list .icon{background:rgba(239,68,68,.18);color:#fca5a5}
+  html[data-theme="dark"] .req-list li.valid .icon{background:rgba(34,197,94,.18);color:#86efac}
+  html[data-theme="dark"] .matric-ok{color:#86efac}
+  html[data-theme="dark"] .matric-err, html[data-theme="dark"] .password-error, html[data-theme="dark"] .error-banner{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5}
+  @media (min-width:861px){
+    html[data-theme="dark"] body{background:#0b1424 !important}
+    html[data-theme="dark"] .blob-1{opacity:.18 !important}
+    html[data-theme="dark"] .blob-2{background:#2ec4c6 !important;opacity:.08 !important}
+    html[data-theme="dark"] .shell{background:#131c2b !important;box-shadow:0 30px 70px rgba(0,0,0,.5) !important}
+    html[data-theme="dark"] .hero{background:linear-gradient(160deg,#0b1424 0%,#112031 45%,#17505a 80%,#1d6869 100%) !important}
+  }
 </style>
 </head>
 <body>
@@ -242,6 +264,7 @@ body{
 
   <!-- Form -->
   <div class="sheet">
+    @include('partials.auth-controls')
     <div class="head">
       <h1 id="formTitle">{{ __('Create Account') }}</h1>
       <p id="formSub">{{ __('Sign up with your email & matric number') }}</p>

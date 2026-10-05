@@ -24,6 +24,7 @@
   </div>
 
   <div class="fp-sheet">
+    @include('partials.auth-controls')
     <ol class="fp-stepper" aria-label="{{ __('Step :n of 3', ['n' => $step]) }}">
       @foreach ($labels as $n => $label)
         <li class="{{ $n < $step ? 'done' : ($n === $step ? 'on' : '') }}">

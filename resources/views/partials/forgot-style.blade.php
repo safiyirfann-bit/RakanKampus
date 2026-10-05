@@ -169,4 +169,26 @@
     .fp-hero{background:linear-gradient(160deg,#14213d 0%,#1b3a5c 45%,#21768a 75%,#2ec4c6 100%) !important}
     .fp-sheet{background:#fff !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
   }
+
+  /* ---- language / dark mode buttons (partials.auth-controls) + dark theme ---- */
+  .fp-sheet{position:relative}
+  @media (max-width:860px){ .fp-sheet{-webkit-backdrop-filter:none !important;backdrop-filter:none !important} }
+  @media (min-width:861px){ .fp-sheet{padding-top:76px !important} }
+  html[data-theme="dark"]{--fp-ink:#e2e8f0;--fp-muted:#94a3b8;--fp-soft:#64748b;--fp-field:#0f1724;--fp-link:#41eedf}
+  html[data-theme="dark"] body{background:linear-gradient(160deg,#0b1424,#112031 55%,#1d6869) fixed !important}
+  html[data-theme="dark"] .fp-sheet{background:#131c2b !important;box-shadow:0 -12px 34px rgba(0,0,0,.4)}
+  html[data-theme="dark"] .fp-sheet input[type=email], html[data-theme="dark"] .fp-sheet input[type=password], html[data-theme="dark"] .pw-wrap input[type=text]{border-color:#24324a}
+  html[data-theme="dark"] .fp-sheet input:focus{background:#0b1220}
+  html[data-theme="dark"] .fp-stepper .dot, html[data-theme="dark"] .fp-stepper .bar, html[data-theme="dark"] .pw-meter i{background:#24324a}
+  html[data-theme="dark"] .otp input{background:#0f1724;border-color:#24324a}
+  html[data-theme="dark"] .otp input:focus, html[data-theme="dark"] .otp input.filled{background:#0b1220}
+  html[data-theme="dark"] .fp-msg.err{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.35);color:#fca5a5}
+  html[data-theme="dark"] .fp-msg.ok{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.35);color:#86efac}
+  @media (min-width:861px){
+    html[data-theme="dark"] body{background:#0b1424 !important}
+    html[data-theme="dark"] .fp-b1{opacity:.18 !important}
+    html[data-theme="dark"] .fp-b2{background:#2ec4c6 !important;opacity:.08 !important}
+    html[data-theme="dark"] .fp-shell{background:#131c2b !important;box-shadow:0 30px 70px rgba(0,0,0,.5) !important}
+    html[data-theme="dark"] .fp-hero{background:linear-gradient(160deg,#0b1424 0%,#112031 45%,#17505a 80%,#1d6869 100%) !important}
+  }
 </style>
