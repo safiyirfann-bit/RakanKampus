@@ -757,6 +757,28 @@ html[data-theme="dark"] .suggestion.wl-chip:hover { background: #1f2a37; border-
   html[data-theme="dark"] .sidebar { box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5); }
 }
 </style>
+<style id="chat-dark-welcome">
+/* Dark mode, new-chat welcome: the pale pastel glows turned into muddy grey/pink smudges and
+   the grey glass blobs looked dull. Use deep teal/navy glows and dark glass blobs with a teal rim. */
+html[data-theme="dark"] .aurora i { opacity: .35; }
+html[data-theme="dark"] .aurora i:nth-child(1) { background: #0f766e; }
+html[data-theme="dark"] .aurora i:nth-child(2) { background: #1e3a8a; }
+html[data-theme="dark"] .aurora i:nth-child(3) { background: #134e4a; }
+html[data-theme="dark"] .aurora i:nth-child(4) { background: #164e63; opacity: .3; }
+html[data-theme="dark"] .wl-g {
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.5) 0 5%, rgba(255,255,255,0) 15%),
+    radial-gradient(circle at 72% 78%, rgba(45,212,191,.55), rgba(45,212,191,0) 48%),
+    radial-gradient(circle at 22% 82%, rgba(56,189,248,.35), rgba(56,189,248,0) 46%),
+    radial-gradient(circle at 50% 50%, rgba(19,40,56,.55), rgba(15,30,44,.4) 70%, rgba(15,118,110,.25));
+  box-shadow: inset 0 0 0 1.5px rgba(94,234,212,.28), inset -12px -16px 34px rgba(0,0,0,.35), inset 10px 12px 26px rgba(255,255,255,.08), 0 0 40px rgba(45,212,191,.18);
+  -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+}
+html[data-theme="dark"] .wl-g::after { background: rgba(255,255,255,.35); }
+html[data-theme="dark"] .wl-pill { background: rgba(23,32,45,.85); border: 1px solid #23484a; color: #99f6e4; }
+/* keep the composer hint on one line on phones */
+#messageInput::placeholder, .hero-input::placeholder { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+</style>
 </head>
 <body>
 
@@ -930,6 +952,7 @@ html[data-theme="dark"] .suggestion.wl-chip:hover { background: #1f2a37; border-
 
     <div class="composer-box wl-composer">
       <textarea class="hero-input" id="heroInput" rows="1" placeholder="{{ __('Ask me anything about Politeknik...') }}"></textarea>
+      <script>if (window.innerWidth <= 600) { ['heroInput','messageInput'].forEach(function (id) { var el = document.getElementById(id); if (el) el.placeholder = @js(__('Ask me about Politeknik…')); }); }</script>
       <button type="button" class="round-btn mic-btn hidden" id="heroMicBtn" aria-label="{{ __('Voice input') }}">
         <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"></path><path d="M19 11a7 7 0 0 1-14 0"></path><line x1="12" y1="18" x2="12" y2="22"></line></svg>
       </button>
