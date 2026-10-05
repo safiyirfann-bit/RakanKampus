@@ -942,7 +942,9 @@ html[data-theme="dark"] .qc-ic { filter: saturate(.8) brightness(.9); }
             <rect class="c-canopy" x="430" y="80" width="40" height="5" rx="2"/><rect class="c-canopy" x="530" y="80" width="40" height="5" rx="2"/>
             {{-- the words run along the arch band, following its curve --}}
             <path id="gateArc" d="M381 72Q417 38 453 72" fill="none"/>
-            <text class="c-gtext" style="font-size:6.6px;letter-spacing:.4px"><textPath href="#gateArc" startOffset="50%" text-anchor="middle">SELAMAT DATANG</textPath></text>
+            <text class="c-gtext" style="font-size:6.6px;letter-spacing:.4px;text-rendering:geometricPrecision"><textPath href="#gateArc" startOffset="50%" text-anchor="middle">SELAMAT DATANG</textPath></text>
+            <path id="gateArcR" d="M544 75Q583 35 622 75" fill="none"/>
+            <text class="c-gtext" style="font-size:5.4px;letter-spacing:.3px;text-rendering:geometricPrecision"><textPath href="#gateArcR" startOffset="50%" text-anchor="middle">POLITEKNIK UNGKU OMAR</textPath></text>
           </g>
           {{-- Kampus Bercham: tower + yellow-panelled block --}}
           <g class="bercham" transform="translate(-60 0)">
