@@ -642,5 +642,6 @@
     "Error message attached": "பிழைச் செய்தி இணைக்கப்பட்டது",
     "Could not send the report. Please try again.": "புகாரை அனுப்ப முடியவில்லை. மீண்டும் முயலவும்.",
     "Dark mode": "இருண்ட பயன்முறை",
-    "Ask me about Politeknik…": "பாலிடெக்னிக் பற்றி கேளுங்கள்…"
+    "Ask me about Politeknik…": "பாலிடெக்னிக் பற்றி கேளுங்கள்…",
+    "Your session expired, so nothing was sent. Please try again.": "உங்கள் அமர்வு காலாவதியானது, எதுவும் அனுப்பப்படவில்லை. மீண்டும் முயலவும்."
 }

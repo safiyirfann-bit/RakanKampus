@@ -642,5 +642,6 @@
     "Error message attached": "已附上错误信息",
     "Could not send the report. Please try again.": "无法发送报告，请重试。",
     "Dark mode": "深色模式",
-    "Ask me about Politeknik…": "问我关于理工学院…"
+    "Ask me about Politeknik…": "问我关于理工学院…",
+    "Your session expired, so nothing was sent. Please try again.": "会话已过期，内容未发送。请重试。"
 }

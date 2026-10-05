@@ -39,13 +39,31 @@ return Application::configure(
 
     ->withExceptions(function (Exceptions $exceptions): void {
 
-        // Session/CSRF token expired (419) — instead of showing the
-        // "Page Expired" error page, just send the user to login.
-        // This covers logout (and any other form) being submitted
-        // long after the page was first loaded.
-        $exceptions->render(function (\Illuminate\Session\TokenMismatchException $e, \Illuminate\Http\Request $request) {
-            return redirect()->route('login')
-                ->with('status', 'Sesi anda telah tamat. Sila log masuk semula.');
+        // Session/CSRF token expired (419), e.g. the app or a tab was left open for hours and
+        // then a form was sent. Laravel turns TokenMismatchException into an HttpException(419)
+        // before render callbacks run, so match on that. Instead of the bare "419 Page Expired"
+        // page: logging out just finishes the logout; any other form goes back to the page it
+        // came from (or the login page) with a fresh token and a short note to try again.
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpException $e, \Illuminate\Http\Request $request) {
+            if ($e->getStatusCode() !== 419) {
+                return null;
+            }
+            if ($request->expectsJson()) {
+                return response()->json(['message' => __('Your session has expired. Please refresh the page and try again.')], 419);
+            }
+            if ($request->is('logout')) {
+                \Illuminate\Support\Facades\Auth::guard('web')->logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return redirect()->route('login');
+            }
+
+            $back = url()->previous();
+            $target = ($back && $back !== $request->fullUrl()) ? redirect()->to($back) : redirect()->route('login');
+
+            return $target->withInput($request->except('password', 'password_confirmation', '_token'))
+                ->with('status', __('Your session expired, so nothing was sent. Please try again.'));
         });
 
     })
