@@ -2,8 +2,8 @@
      theme gradient, the robot chatting on top, the form in a white glass sheet below
      (phones), or a split card (wider screens). Used with partials.forgot-head. --}}
 <style>
-  :root{ --fp-purple:#a78bfa; --fp-pink:#f472b6; --fp-blue:#60a5fa; --fp-amber:#f59e0b;
-    --fp-ink:#2e1065; --fp-muted:#7c6aa8; --fp-soft:#a596c9; --fp-field:#f5f0ff; --fp-link:#7c3aed; }
+  :root{ --fp-purple:#0d9488; --fp-pink:#2ec4c6; --fp-blue:#2ec4c6; --fp-amber:#14213d;
+    --fp-ink:#14213d; --fp-muted:#64748b; --fp-soft:#94a3b8; --fp-field:#f0fafa; --fp-link:#0d9488; }
   *{box-sizing:border-box}
   html,body{min-height:100%;margin:0}
   body{font-family:'Plus Jakarta Sans', -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--fp-ink);min-height:100vh;overflow-x:hidden;
@@ -21,7 +21,7 @@
   .fp-hero{min-height:270px;display:flex;align-items:center;justify-content:center;padding:44px 22px 28px}
   .fp-chat{width:100%;max-width:330px;display:flex;flex-direction:column;gap:9px;min-height:170px}
   .fp-hdr{display:flex;align-items:center;gap:10px;margin-bottom:4px}
-  .fp-hdr .fp-av{width:48px;height:48px;display:grid;place-items:center;filter:drop-shadow(0 6px 10px rgba(46,16,101,.3));animation:fpBob 3s ease-in-out infinite}
+  .fp-hdr .fp-av{width:48px;height:48px;display:grid;place-items:center;filter:drop-shadow(0 6px 10px rgba(15,39,71,.3));animation:fpBob 3s ease-in-out infinite}
   @keyframes fpBob{50%{transform:translateY(-3px)}}
   .fp-hdr b{display:block;color:#fff;font-size:16px}
   .fp-hdr span{display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.9);font-size:12px}
@@ -37,19 +37,19 @@
 
   /* ---- sheet ---- */
   .fp-sheet{flex:1;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:30px 30px 0 0;
-    padding:24px 22px 20px;box-shadow:0 -12px 34px rgba(46,16,101,.18)}
+    padding:24px 22px 20px;box-shadow:0 -12px 34px rgba(15,39,71,.18)}
   .fp-sheet h1{margin:0 0 4px;font-weight:800;font-size:25px;letter-spacing:-.4px;color:var(--fp-ink)}
   .fp-lead{color:var(--fp-muted);font-size:14px;line-height:1.55;margin:0 0 18px}
   .fp-lead b{color:var(--fp-ink)}
 
   .fp-stepper{list-style:none;padding:0;margin:0 0 16px;display:flex;align-items:center;gap:6px}
   .fp-stepper li:not(.bar){display:flex;align-items:center;gap:6px}
-  .fp-stepper .dot{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:800;background:#ede9fe;color:var(--fp-link);flex:none}
+  .fp-stepper .dot{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:800;background:#dbeeee;color:var(--fp-link);flex:none}
   .fp-stepper .dot svg{width:12px;height:12px}
   .fp-stepper .lbl{font-size:12px;font-weight:700;color:var(--fp-soft);white-space:nowrap}
   .fp-stepper li.on .dot,.fp-stepper li.done .dot{background:linear-gradient(135deg,var(--fp-purple),var(--fp-pink));color:#fff}
   .fp-stepper li.on .lbl{color:var(--fp-ink)}
-  .fp-stepper .bar{flex:1;height:3px;border-radius:99px;background:#ede9fe;min-width:14px}
+  .fp-stepper .bar{flex:1;height:3px;border-radius:99px;background:#dbeeee;min-width:14px}
   .fp-stepper .bar.done{background:linear-gradient(90deg,var(--fp-purple),var(--fp-pink))}
 
   .fp-msg{display:flex;gap:10px;align-items:flex-start;padding:11px 14px;border-radius:14px;margin-bottom:14px;font-size:13.5px;line-height:1.45}
@@ -65,12 +65,12 @@
     font-family:inherit;outline:none;transition:border-color .2s,box-shadow .2s,background .2s}
   .fp-input input{padding-left:48px !important}
   .fp-sheet input::placeholder{color:var(--fp-soft)}
-  .fp-sheet input:focus{background:#fff;border-color:var(--fp-purple);box-shadow:0 0 0 4px rgba(167,139,250,.2)}
+  .fp-sheet input:focus{background:#fff;border-color:var(--fp-purple);box-shadow:0 0 0 4px rgba(46,196,198,.2)}
   .fp-input:focus-within > svg{color:var(--fp-purple)}
 
   .btn-signin{position:relative;overflow:hidden;width:100%;height:52px;border:0;border-radius:26px;cursor:pointer;font-family:inherit;font-size:16px;font-weight:800;color:#fff;
     display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;
-    background:linear-gradient(90deg,var(--fp-purple),var(--fp-pink));box-shadow:0 10px 24px rgba(244,114,182,.35);transition:transform .15s}
+    background:linear-gradient(90deg,var(--fp-purple),var(--fp-pink));box-shadow:0 10px 24px rgba(13,148,136,.35);transition:transform .15s}
   .btn-signin:hover:not(:disabled){transform:translateY(-1px)}
   .btn-signin svg{width:18px;height:18px}
   .btn-signin:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
@@ -86,9 +86,9 @@
 
   /* 6 code boxes */
   .otp{display:flex;gap:8px;justify-content:center;margin-bottom:16px}
-  .otp input{width:48px;height:58px;padding:0;text-align:center;font-size:24px;font-weight:800;border-radius:16px;border:1.5px solid #ddd6fe;
-    background:#f3edff;color:var(--fp-ink);outline:none;font-family:'SFMono-Regular',Menlo,Consolas,monospace;transition:all .15s}
-  .otp input:focus{background:#fff;border-color:var(--fp-purple);box-shadow:0 0 0 4px rgba(167,139,250,.2)}
+  .otp input{width:48px;height:58px;padding:0;text-align:center;font-size:24px;font-weight:800;border-radius:16px;border:1.5px solid #b8e6e6;
+    background:#f0fafa;color:var(--fp-ink);outline:none;font-family:'SFMono-Regular',Menlo,Consolas,monospace;transition:all .15s}
+  .otp input:focus{background:#fff;border-color:var(--fp-purple);box-shadow:0 0 0 4px rgba(46,196,198,.2)}
   .otp input.filled{background:#fff;border-color:var(--fp-purple)}
   .otp .gap{width:6px}
   .otp.shake{animation:fpShake .4s}
@@ -102,13 +102,13 @@
   .pw-eye:hover{color:var(--fp-purple)}
   .pw-eye svg{width:20px;height:20px}
   .pw-meter{display:flex;gap:6px;margin:10px 6px 0}
-  .pw-meter i{flex:1;height:5px;border-radius:99px;background:#ede9fe;transition:background .2s}
+  .pw-meter i{flex:1;height:5px;border-radius:99px;background:#dbeeee;transition:background .2s}
   .pw-hint,.pw-match{font-size:12.5px;color:var(--fp-muted);margin:6px 6px 0;min-height:16px}
 
   @media (min-width:861px){
     .fp{align-items:center;justify-content:center;padding:32px}
     .fp-shell{flex:none;flex-direction:row;width:100%;max-width:960px;min-height:560px;border-radius:32px;overflow:hidden;
-      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(46,16,101,.3)}
+      background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(15,39,71,.3)}
     .fp-hero{flex:1;padding:48px}
     .fp-sheet{flex:1;border-radius:0;padding:44px 48px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
   }
@@ -155,4 +155,18 @@
   @media (max-width:400px){ .otp{gap:6px} .otp .gap{width:2px} .otp input{width:40px;height:52px;font-size:21px} .fp-stepper .lbl{font-size:11px} }
   @media (prefers-reduced-motion:reduce){ body,.fp-blob,.fp-av{animation:none !important} }
   @keyframes fpShake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+  /* ---- student theme (navy-teal), layout "B": phone = still navy→teal gradient like Reminders;
+     PC = light mint page, white card, navy-teal left panel ---- */
+  body{background:linear-gradient(160deg,#14213d,#1b3a5c 55%,#2ec4c6) fixed !important;animation:none !important}
+  .fp-b1{background:rgba(127,245,236,.45) !important;opacity:.35 !important}
+  .fp-b2{background:rgba(255,255,255,.5) !important;opacity:.25 !important}
+  @media (min-width:861px){
+    body{background:#eefafa !important}
+    .fp-b1{background:#2ec4c6 !important;opacity:.28 !important;filter:blur(80px) !important}
+    .fp-b2{background:#14213d !important;opacity:.14 !important;filter:blur(80px) !important}
+    .fp-shell{background:#fff !important;border:0 !important;box-shadow:0 30px 70px rgba(15,39,71,.16) !important}
+    .fp-hero{background:linear-gradient(160deg,#14213d 0%,#1b3a5c 45%,#21768a 75%,#2ec4c6 100%) !important}
+    .fp-sheet{background:#fff !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+  }
 </style>

@@ -14,8 +14,8 @@
 --}}
 <style>
 :root{
-  --purple:#a78bfa; --pink:#f472b6; --blue:#60a5fa; --amber:#f59e0b;
-  --ink:#2e1065; --muted:#7c6aa8; --soft:#a596c9; --field:#f5f0ff; --link:#7c3aed; --link2:#db2777;
+  --purple:#0d9488; --pink:#2ec4c6; --blue:#2ec4c6; --amber:#14213d;
+  --ink:#14213d; --muted:#64748b; --soft:#94a3b8; --field:#f0fafa; --link:#0d9488; --link2:#0f766e;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{min-height:100%}
@@ -38,14 +38,14 @@ body{
 .hero{display:flex;align-items:center;justify-content:center;padding:46px 22px 30px;min-height:250px}
 .idcard{position:relative;width:min(330px,100%);aspect-ratio:1.62;border-radius:22px;padding:0;container-type:inline-size;color:#fff;overflow:hidden;
   background:linear-gradient(135deg,rgba(255,255,255,.38),rgba(255,255,255,.12));border:1px solid rgba(255,255,255,.55);
-  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 20px 40px rgba(46,16,101,.25);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 20px 40px rgba(15,39,71,.25);
   transform:rotate(-3deg);animation:cardFloat 4.5s ease-in-out infinite}
 @keyframes cardFloat{50%{transform:rotate(-1deg) translateY(-6px)}}
 .idcard:after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(110deg,transparent 30%,rgba(255,255,255,.45) 45%,transparent 60%);transform:translateX(-100%);animation:shine 4s ease-in-out infinite}
 @keyframes shine{55%,100%{transform:translateX(100%)}}
 .idc-top{margin:4.8cqw 5.4cqw 0;display:flex;justify-content:space-between;align-items:center;font-size:3.2cqw;font-weight:800;letter-spacing:.35cqw}
-.idc-top svg{width:10.3cqw;height:10.3cqw;filter:drop-shadow(0 3px 6px rgba(46,16,101,.3))}
+.idc-top svg{width:10.3cqw;height:10.3cqw;filter:drop-shadow(0 3px 6px rgba(15,39,71,.3))}
 .idc-body{display:flex;gap:4.2cqw;margin:3.6cqw 5.4cqw 0;align-items:center}
 .idc-ph{width:20cqw;height:24cqw;border-radius:4.2cqw;background:rgba(255,255,255,.3);border:1px solid rgba(255,255,255,.45);
   display:grid;place-items:center;font-size:7.8cqw;font-weight:800;flex:none;transition:transform .25s}
@@ -63,7 +63,7 @@ body{
 
 /* ---------- form sheet ---------- */
 .sheet{flex:1;background:rgba(255,255,255,.9);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
-  border-radius:30px 30px 0 0;padding:26px 22px 22px;box-shadow:0 -12px 34px rgba(46,16,101,.18)}
+  border-radius:30px 30px 0 0;padding:26px 22px 22px;box-shadow:0 -12px 34px rgba(15,39,71,.18)}
 .head h1{font-size:25px;font-weight:800;letter-spacing:-.4px}
 .head p{font-size:13.5px;color:var(--muted);margin:3px 0 16px}
 
@@ -72,7 +72,7 @@ body{
 .field{margin-bottom:11px;min-width:0}
 .box{position:relative;display:flex;align-items:center;height:50px;border-radius:25px;background:var(--field);border:1.5px solid transparent;
   padding:0 16px;gap:10px;transition:border-color .2s,box-shadow .2s,background .2s}
-.box:focus-within{background:#fff;border-color:var(--purple);box-shadow:0 0 0 4px rgba(167,139,250,.2)}
+.box:focus-within{background:#fff;border-color:var(--purple);box-shadow:0 0 0 4px rgba(46,196,198,.2)}
 .box > svg{width:18px;height:18px;flex:none;color:var(--soft)}
 .box:focus-within > svg{color:var(--purple)}
 .input{flex:1;min-width:0;height:100%;border:0;outline:0;background:transparent;font-size:15px;color:var(--ink);font-family:inherit}
@@ -86,7 +86,7 @@ body{
 .pw-box{background:var(--field);border-radius:18px;padding:12px 16px;margin:2px 0 12px}
 .pw-head{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
 .strength{font-size:11.5px;font-weight:800;text-transform:uppercase;transition:color .2s}
-.bar-track{height:6px;border-radius:9px;background:#e9e1fb;margin:9px 0 10px;overflow:hidden}
+.bar-track{height:6px;border-radius:9px;background:#dbeeee;margin:9px 0 10px;overflow:hidden}
 .bar-fill{height:100%;width:0;border-radius:9px;transition:width .25s ease,background .25s ease}
 .req-list{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px}
 .req-list li{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--muted)}
@@ -108,7 +108,7 @@ body{
 .error-banner ul{list-style:none;display:grid;gap:3px}
 
 .btn{width:100%;height:50px;border:0;border-radius:25px;cursor:pointer;font-family:inherit;font-size:15.5px;font-weight:800;color:#fff;
-  background:linear-gradient(90deg,var(--purple),var(--pink));box-shadow:0 10px 24px rgba(244,114,182,.35);transition:transform .15s,box-shadow .15s}
+  background:linear-gradient(90deg,var(--purple),var(--pink));box-shadow:0 10px 24px rgba(13,148,136,.35);transition:transform .15s,box-shadow .15s}
 .btn:hover{transform:translateY(-1px)}.btn:active{transform:translateY(1px)}
 .btn.ghost{background:var(--field);color:var(--link);box-shadow:none}
 .actions{margin-top:6px}
@@ -119,18 +119,18 @@ body{
 
 /* stepper (phones) */
 .steps{display:none;align-items:center;gap:8px;margin:0 0 16px;font-size:12px;font-weight:700;color:var(--soft)}
-.steps .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;background:#ede9fe;color:var(--link);flex-shrink:0;transition:all .2s}
+.steps .dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:12px;background:#dbeeee;color:var(--link);flex-shrink:0;transition:all .2s}
 .steps .dot.on{background:linear-gradient(135deg,var(--purple),var(--pink));color:#fff}
 .steps small{font-size:12px;white-space:nowrap}
 .steps small.on{color:var(--ink)}
-.steps .ln{flex:1;height:3px;border-radius:9px;background:#ede9fe;overflow:hidden}
+.steps .ln{flex:1;height:3px;border-radius:9px;background:#dbeeee;overflow:hidden}
 .steps .ln i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--pink));transition:width .35s}
 
 /* ================= wider screens: split card ================= */
 @media (min-width:861px){
   .wrap{align-items:center;justify-content:center;padding:32px}
   .shell{flex:none;flex-direction:row;width:100%;max-width:1000px;min-height:600px;border-radius:32px;overflow:hidden;
-    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(46,16,101,.3)}
+    background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);box-shadow:0 30px 70px rgba(15,39,71,.3)}
   .hero{flex:.9;padding:48px 40px}
   .sheet{flex:1.1;border-radius:0;padding:40px 44px 28px;box-shadow:none;display:flex;flex-direction:column;justify-content:center}
 }
@@ -187,6 +187,20 @@ body{
   .head h1{margin-bottom:10px}
 }
 @media (prefers-reduced-motion:reduce){body,.blob,.idcard,.idcard:after{animation:none !important}}
+
+  /* ---- student theme (navy-teal), layout "B": phone = still navy→teal gradient like Reminders;
+     PC = light mint page, white card, navy-teal left panel ---- */
+  body{background:linear-gradient(160deg,#14213d,#1b3a5c 55%,#2ec4c6) fixed !important;animation:none !important}
+  .blob-1{background:rgba(127,245,236,.45) !important;opacity:.35 !important}
+  .blob-2{background:rgba(255,255,255,.5) !important;opacity:.25 !important}
+  @media (min-width:861px){
+    body{background:#eefafa !important}
+    .blob-1{background:#2ec4c6 !important;opacity:.28 !important;filter:blur(80px) !important}
+    .blob-2{background:#14213d !important;opacity:.14 !important;filter:blur(80px) !important}
+    .shell{background:#fff !important;border:0 !important;box-shadow:0 30px 70px rgba(15,39,71,.16) !important}
+    .hero{background:linear-gradient(160deg,#14213d 0%,#1b3a5c 45%,#21768a 75%,#2ec4c6 100%) !important}
+    .sheet{background:#fff !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
+  }
 </style>
 </head>
 <body>
