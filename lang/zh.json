@@ -643,5 +643,9 @@
     "Could not send the report. Please try again.": "无法发送报告，请重试。",
     "Dark mode": "深色模式",
     "Ask me about Politeknik…": "问我关于理工学院…",
-    "Your session expired, so nothing was sent. Please try again.": "会话已过期，内容未发送。请重试。"
+    "Your session expired, so nothing was sent. Please try again.": "会话已过期，内容未发送。请重试。",
+    ":subject starts in :time": ":subject 将在 :time 后开始",
+    "Turn on notifications": "开启通知",
+    "Allow RakanKampus to send reminder and class alerts to this phone.": "允许 RakanKampus 向此手机发送提醒和课程通知。",
+    "Allow": "允许"
 }

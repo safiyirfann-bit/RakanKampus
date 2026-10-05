@@ -6,6 +6,7 @@
 @if (! $errors->any() && ! session('success') && ! session('status'))
     @include('partials.intro-splash')
 @endif
+@include('partials.app-notify')
 
 {{--
   Student login. Top: the theme gradient with a small live chat demo (a question is

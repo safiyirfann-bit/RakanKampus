@@ -643,5 +643,9 @@
     "Could not send the report. Please try again.": "புகாரை அனுப்ப முடியவில்லை. மீண்டும் முயலவும்.",
     "Dark mode": "இருண்ட பயன்முறை",
     "Ask me about Politeknik…": "பாலிடெக்னிக் பற்றி கேளுங்கள்…",
-    "Your session expired, so nothing was sent. Please try again.": "உங்கள் அமர்வு காலாவதியானது, எதுவும் அனுப்பப்படவில்லை. மீண்டும் முயலவும்."
+    "Your session expired, so nothing was sent. Please try again.": "உங்கள் அமர்வு காலாவதியானது, எதுவும் அனுப்பப்படவில்லை. மீண்டும் முயலவும்.",
+    ":subject starts in :time": ":subject :time இல் தொடங்கும்",
+    "Turn on notifications": "அறிவிப்புகளை இயக்கு",
+    "Allow RakanKampus to send reminder and class alerts to this phone.": "இந்த தொலைபேசிக்கு நினைவூட்டல் மற்றும் வகுப்பு அறிவிப்புகளை அனுப்ப RakanKampus-ஐ அனுமதிக்கவும்.",
+    "Allow": "அனுமதி"
 }

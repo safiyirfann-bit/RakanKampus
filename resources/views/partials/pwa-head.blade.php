@@ -42,3 +42,4 @@ function t(key, params) {
 @include('partials.dark-fixes')
 @include('partials.rk-dialog')
 @include('partials.fast-nav')
+@include('partials.app-notify')

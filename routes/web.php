@@ -186,6 +186,8 @@ Route::delete('/chatbot/{conversation}', [ChatbotController::class, 'destroy'])-
     // Web push subscriptions
     Route::post('/push/subscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'store'])->name('push.subscribe');
     Route::post('/push/unsubscribe', [\App\Http\Controllers\PushSubscriptionController::class, 'destroy'])->name('push.unsubscribe');
+    // RakanKampus Android app: upcoming alerts it schedules on the phone itself
+    Route::get('/app/notifications', [\App\Http\Controllers\AppNotificationController::class, 'index'])->name('app.notifications');
 
     // Profile
     Route::get('/student/profile', [ProfileController::class, 'studentProfile'])
