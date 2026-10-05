@@ -299,6 +299,12 @@ Route::middleware(['auth', 'admin'])
         Route::delete('/information/{information}/entries/{entry}', [KnowledgeBaseController::class, 'destroy'])
             ->name('information.entries.destroy');
 
+        // Users (registered students: list + delete)
+        Route::get('/users', [\App\Http\Controllers\AdminUserController::class, 'index'])
+            ->name('users');
+        Route::delete('/users/{user}', [\App\Http\Controllers\AdminUserController::class, 'destroy'])
+            ->name('users.destroy');
+
         // Inbox
         Route::get('/inbox', [FeedbackController::class, 'inbox'])
             ->name('inbox');

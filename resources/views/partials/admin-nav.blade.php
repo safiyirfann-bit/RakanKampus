@@ -12,7 +12,7 @@
   $adminUnreadFeedback = $unreadFeedbackCount ?? \App\Models\Feedback::where('is_read', false)->count();
   $adminTopics = \App\Models\Information::count();
   $adminUser = auth()->user();
-  $adminCrumb = ['dashboard' => 'Dashboard', 'analytics' => 'Analytics', 'knowledge' => 'Knowledge base', 'unanswered' => 'Unanswered', 'inbox' => 'Inbox', ][$adminNavActive] ?? 'Dashboard';
+  $adminCrumb = ['dashboard' => 'Dashboard', 'analytics' => 'Analytics', 'knowledge' => 'Knowledge base', 'unanswered' => 'Unanswered', 'inbox' => 'Inbox', 'users' => 'Users', ][$adminNavActive] ?? 'Dashboard';
   $adminCrumbSub = $crumb ?? null;
   $adminJump = \App\Models\Information::orderBy('main_topic')->get(['id', 'main_topic']);
   // Bell: what happened lately that needs the admin (new student questions the bot couldn't answer + unread messages)
@@ -27,6 +27,7 @@
     'Overview' => [
       ['key' => 'dashboard', 'route' => 'admin.dashboard', 'label' => 'Dashboard', 'icon' => '<rect x="3" y="3" width="7" height="9" rx="1.5"></rect><rect x="14" y="3" width="7" height="5" rx="1.5"></rect><rect x="14" y="12" width="7" height="9" rx="1.5"></rect><rect x="3" y="16" width="7" height="5" rx="1.5"></rect>', 'badge' => 0],
       ['key' => 'analytics', 'route' => 'admin.analytics', 'label' => 'Analytics', 'icon' => '<path d="M3 3v18h18"></path><path d="M7 16v-4"></path><path d="M12 16V8"></path><path d="M17 16v-7"></path>', 'badge' => 0],
+      ['key' => 'users', 'route' => 'admin.users', 'label' => 'Users', 'icon' => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>', 'badge' => 0],
     ],
     'Chatbot' => [
       ['key' => 'knowledge', 'route' => 'admin.knowledge', 'label' => 'Knowledge base', 'icon' => '<path d="M4 19.5V5a2 2 0 0 1 2-2h13v16H6.5A2.5 2.5 0 0 0 4 21.5"></path><path d="M8 7h7M8 11h5"></path>', 'badge' => $adminTopics, 'tone' => 'soft'],
