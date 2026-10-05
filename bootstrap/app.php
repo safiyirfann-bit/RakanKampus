@@ -32,6 +32,7 @@ return Application::configure(
         $middleware->appendToGroup('web', [
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\LogUserActivity::class,
+            \App\Http\Middleware\AllowPrefetch::class,
         ]);
 
     })

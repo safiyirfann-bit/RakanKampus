@@ -37,6 +37,7 @@
   ];
 @endphp
 @include('partials.admin-theme')
+@include('partials.fast-nav')
 <style>
   /* Left menu: the same floating rounded panel as the student sidebar (labels, groups, active
      neon bar, fold to an icon rail — remembered), in the admin green. */

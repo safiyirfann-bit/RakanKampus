@@ -41,3 +41,4 @@ function t(key, params) {
 @include('partials.dark-tailwind')
 @include('partials.dark-fixes')
 @include('partials.rk-dialog')
+@include('partials.fast-nav')
