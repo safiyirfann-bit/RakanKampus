@@ -19,9 +19,12 @@
   :root{--rk-font:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,"Noto Sans SC","Noto Sans Tamil",sans-serif}
   html body{font-family:var(--rk-font) !important;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
   html body button,html body input,html body select,html body textarea,html body .font-sans{font-family:var(--rk-font)}
-  /* Chrome autofill paints fields light blue — keep the soft field colour on the sign-in pages */
+  /* Chrome autofill paints fields light blue/purple — keep the field colour on the sign-in pages (light + dark) */
   .lg-field input:-webkit-autofill,.box input:-webkit-autofill,.fp-sheet input:-webkit-autofill{
-    -webkit-box-shadow:0 0 0 1000px #f5f0ff inset !important;-webkit-text-fill-color:#2e1065 !important;caret-color:#2e1065;transition:background-color 99999s}
+    -webkit-box-shadow:0 0 0 1000px #f0fafa inset !important;-webkit-text-fill-color:#14213d !important;caret-color:#14213d;transition:background-color 99999s}
   .lg-field:focus-within input:-webkit-autofill,.box:focus-within input:-webkit-autofill,.fp-sheet input:focus:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #fff inset !important}
+  html[data-theme="dark"] .lg-field input:-webkit-autofill,html[data-theme="dark"] .box input:-webkit-autofill,html[data-theme="dark"] .fp-sheet input:-webkit-autofill{
+    -webkit-box-shadow:0 0 0 1000px #0f1724 inset !important;-webkit-text-fill-color:#e2e8f0 !important;caret-color:#e2e8f0}
+  html[data-theme="dark"] .lg-field:focus-within input:-webkit-autofill,html[data-theme="dark"] .box:focus-within input:-webkit-autofill,html[data-theme="dark"] .fp-sheet input:focus:-webkit-autofill{-webkit-box-shadow:0 0 0 1000px #0b1220 inset !important}
 </style>
 @endonce
