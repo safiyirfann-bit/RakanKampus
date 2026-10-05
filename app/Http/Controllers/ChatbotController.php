@@ -207,13 +207,16 @@ $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus 
     . ($context ? "\n\nPENTING: Soalan pelajar ini BERKAITAN KAMPUS kerana ada 'Maklumat rujukan' di bawah — JANGAN tolak soalan ini. Jawab berdasarkan maklumat rujukan, dalam bahasa yang pelajar guna (terjemahkan maklumat rujukan jika perlu)."
         . "\n\nMaklumat rujukan:\n{$context}" : '');
 
-// Ambil sejarah mesej dalam conversation ni (supaya AI ingat konteks & bahasa)
+// Ambil sejarah mesej dalam conversation ni (supaya AI ingat konteks & bahasa).
+// The LATEST 20 messages, oldest first, ending with the question just asked.
+// (Before, "orderBy asc + latest" picked the FIRST 20 messages, so after 10 questions
+// the AI never saw the new question and answered an old one instead.)
 $history = $conversation->messages()
-    ->orderBy('created_at')
-    ->latest('created_at')
+    ->reorder()
+    ->orderByDesc('id')
     ->take(20)
-    ->get(['sender', 'message'])
-    ->sortBy('created_at')
+    ->get(['id', 'sender', 'message'])
+    ->sortBy('id')
     ->map(function ($m) {
         return [
             'role' => $m->sender === 'user' ? 'user' : 'assistant',
