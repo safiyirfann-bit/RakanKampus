@@ -232,5 +232,13 @@
   .modal .cancel-btn, .modal .submit-btn { border-radius: 99px; }
   .modal .submit-btn { background: var(--a-dark); } .modal .submit-btn:hover { background: #24322a; }
   .modal .form-group input, .modal .form-group textarea, .modal .form-group select { border-radius: 14px; }
+
+  /* RakanKampus dialogs in the admin colours (the shared dialog is styled for students) */
+  .rkd { color: var(--a-ink); }
+  .rkd-title { color: var(--a-ink); }
+  .rkd-ok.primary { background: var(--a-dark, #111c15); color: #fff; box-shadow: 0 8px 18px rgba(17,28,21,.22); }
+  .rkd-ok.primary:hover { background: #1f3a2b; }
+  .rkd-ok.danger { background: #d64545; box-shadow: 0 8px 18px rgba(214,69,69,.28); }
+  .rkd-input:focus { border-color: #3fb070; box-shadow: 0 0 0 3px rgba(63,176,112,.18); }
 </style>
 @endonce

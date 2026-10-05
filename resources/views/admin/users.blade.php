@@ -144,6 +144,7 @@ async function deleteUser(btn) {
         message: btn.dataset.email + ' — the account is removed for good, together with ' + btn.dataset.lose + '. This cannot be undone. Type DELETE to confirm.',
         placeholder: 'Type DELETE',
         confirmText: 'Delete student',
+        tone: 'danger',
     });
     if (typed === null) return;
     if (typed.trim() !== 'DELETE') {
