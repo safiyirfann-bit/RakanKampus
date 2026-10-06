@@ -373,6 +373,9 @@ class ClassScheduleController extends Controller
                 'temperature' => 0,
                 'responseMimeType' => 'application/json',
                 'maxOutputTokens' => 8192,
+                // Speed: transcription only, so skip Gemini 3's default "medium"
+                // thinking, which was the main reason a scan took so long.
+                'thinkingConfig' => ['thinkingLevel' => 'low'],
             ],
         ];
 
@@ -385,6 +388,15 @@ class ClassScheduleController extends Controller
                 $response = Http::timeout(60)
                     ->withHeaders(['x-goog-api-key' => config('services.gemini.key')])
                     ->post("https://generativelanguage.googleapis.com/v1beta/models/{$model}:generateContent", $body);
+
+                // A model that doesn't support thinkingLevel (e.g. gemini-2.5 set via
+                // GEMINI_MODEL) answers 400 -> drop it and retry immediately.
+                if ($response->status() === 400 && isset($body['generationConfig']['thinkingConfig'])
+                    && str_contains(strtolower($response->body()), 'thinking')) {
+                    unset($body['generationConfig']['thinkingConfig']);
+                    $attempt--;
+                    continue;
+                }
 
                 if (! in_array($response->status(), [500, 503], true)) {
                     break;

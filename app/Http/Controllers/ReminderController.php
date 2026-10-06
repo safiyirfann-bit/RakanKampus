@@ -247,6 +247,9 @@ class ReminderController extends Controller
     {
         $model = config('services.gemini.model') ?: 'gemini-flash-latest';
         $response = null;
+        // Speed: Gemini 3 Flash "thinks" at medium level by default, which adds many
+        // seconds before it answers. Reading dates off a notice doesn't need that.
+        $thinking = ['thinkingConfig' => ['thinkingLevel' => 'low']];
 
         for ($attempt = 1; $attempt <= 3; $attempt++) {
             $response = Http::timeout(90)
@@ -264,13 +267,21 @@ class ReminderController extends Controller
                         'temperature' => 0,
                         'responseMimeType' => 'application/json',
                         'maxOutputTokens' => 8192,
-                    ],
+                    ] + $thinking,
                 ]);
+
+            // Older/other models (e.g. gemini-2.5 via GEMINI_MODEL) reject thinkingLevel
+            // with a 400 -> drop it and retry straight away.
+            if ($thinking && $response->status() === 400 && str_contains(strtolower($response->body()), 'thinking')) {
+                $thinking = [];
+                $attempt--;
+                continue;
+            }
 
             if (! in_array($response->status(), [500, 503], true)) {
                 break;
             }
-            sleep(2 * $attempt);
+            sleep($attempt);
         }
 
         if ($response->failed()) {

@@ -1518,7 +1518,32 @@ function dismissAiError() {
   document.getElementById('aiError').classList.remove('open');
 }
 
-function handlePhotoSelected(e) {
+// Speed: phone photos are often 3–6MB. Shrink them in the browser before upload so
+// the request (and Gemini's read of it) is much faster. Falls back to the original
+// file on anything unexpected (PDF, HEIC the browser can't decode, old browser...).
+async function shrinkImage(file, maxSide, quality) {
+  if (!file.type || !file.type.startsWith('image/') || file.type === 'image/gif') return file;
+  try {
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
+    const scale = Math.min(1, maxSide / Math.max(bmp.width, bmp.height));
+    if (scale === 1 && file.size < 1500000) { if (bmp.close) bmp.close(); return file; }
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#fff'; // transparent PNG screenshots would otherwise turn black as JPEG
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    if (bmp.close) bmp.close();
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+    if (!blob || blob.size >= file.size) return file;
+    return new File([blob], file.name.replace(/\.[^.]+$/, '') + '.jpg', { type: 'image/jpeg' });
+  } catch (err) {
+    return file;
+  }
+}
+
+async function handlePhotoSelected(e) {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
 
@@ -1526,8 +1551,9 @@ function handlePhotoSelected(e) {
   document.getElementById('aiSuccess').classList.remove('open');
   document.getElementById('aiError').classList.remove('open');
 
+  const upload = await shrinkImage(file, 1600, 0.85);
   const formData = new FormData();
-  formData.append('photo', file);
+  formData.append('photo', upload);
 
   fetch('{{ route('reminders.aiCapture') }}', {
     method: 'POST',
