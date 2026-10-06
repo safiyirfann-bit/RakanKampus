@@ -1,4 +1,4 @@
-id,main_topic,intent,question,answer,category,keywords,question_ms,question_en,question_zh,question_ta
+﻿id,main_topic,intent,question,answer,category,keywords,question_ms,question_en,question_zh,question_ta
 1,Sapaan & Perbualan Ringkas,greeting_ms_01,hai,Hai! 👋 Saya RakanKampus. Saya sedia membantu anda dengan maklumat berkaitan Politeknik Ungku Omar. Apa yang anda ingin tahu?,Greeting,"hai, hai!",,,,
 2,Sapaan & Perbualan Ringkas,greeting_ms_02,hello,Hai! 👋 Saya RakanKampus. Saya sedia membantu anda dengan maklumat berkaitan Politeknik Ungku Omar. Apa yang anda ingin tahu?,Greeting,hello,,,,
 3,Sapaan & Perbualan Ringkas,greeting_ms_03,hi,Hai! 👋 Saya RakanKampus. Saya sedia membantu anda dengan maklumat berkaitan Politeknik Ungku Omar. Apa yang anda ingin tahu?,Greeting,hi,,,,
