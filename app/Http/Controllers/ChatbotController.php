@@ -557,8 +557,79 @@ public function destroy(Request $request, ChatConversation $conversation)
      * - Follow-up questions with no topic words of their own ("kat mana tu?")
      *   borrow the words from the student's previous message.
      */
-    /** @var \Illuminate\Support\Collection<int, KnowledgeBase>|null */
-    private $kbRows = null;
+    /** @var array<int, array<string, mixed>>|null the search index, loaded once per request */
+    private ?array $kbIndexRows = null;
+
+    /**
+     * Every knowledge-base entry already lower-cased and split into words, so a search only compares
+     * strings instead of re-processing ~3,000 entries for every question. Kept in the file cache and
+     * rebuilt automatically when entries are added, edited or deleted (row count / last update change).
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    private function kbIndex(): array
+    {
+        if ($this->kbIndexRows !== null) {
+            return $this->kbIndexRows;
+        }
+
+        $state = KnowledgeBase::query()->selectRaw('count(*) as total, max(updated_at) as changed, max(id) as last')->first();
+        $signature = implode('|', [$state->total ?? 0, $state->changed ?? '', $state->last ?? 0, 2]);
+
+        $cache = \Illuminate\Support\Facades\Cache::store('file');
+        try {
+            $stored = $cache->get('kb.search-index');
+        } catch (\Throwable $e) {
+            $stored = null;
+        }
+        if (is_array($stored) && ($stored['signature'] ?? null) === $signature) {
+            return $this->kbIndexRows = $stored['rows'];
+        }
+
+        $rows = [];
+        foreach (KnowledgeBase::query()->orderBy('id')->get(['id', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords']) as $entry) {
+            $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
+            $q = mb_strtolower($entry->allQuestions());
+
+            $exact = [];
+            foreach ([$entry->question, $entry->question_ms, $entry->question_en, $entry->question_zh, $entry->question_ta] as $variant) {
+                if ($variant) {
+                    $exact[$this->normaliseQuestion($variant)] = true;
+                }
+            }
+
+            $latin = [];
+            foreach (array_filter([$entry->question_en, $entry->question, $entry->question_ms]) as $text) {
+                $words = $this->contentWords((string) $text);
+                if ($words) {
+                    $latin[] = $words;
+                }
+            }
+            $ta = $entry->question_ta ? $this->contentWords((string) $entry->question_ta) : [];
+            $zhText = mb_strtolower((string) $entry->question_zh);
+            $zh = array_merge($this->hanBigrams($zhText), $this->contentWords(preg_replace('/\p{Han}+/u', ' ', $zhText)));
+
+            $rows[] = [
+                'id' => $entry->id,
+                'kw' => $kw,
+                'q' => $q,
+                'ans' => mb_strtolower((string) $entry->answer),
+                'kwq' => str_replace('/', ' ', $kw . ' ' . $q),
+                'exact' => $exact,
+                'latin' => $latin,
+                'ta' => $ta ? [$ta] : [],
+                'zh' => $zh,
+            ];
+        }
+
+        try {
+            $cache->forever('kb.search-index', ['signature' => $signature, 'rows' => $rows]);
+        } catch (\Throwable $e) {
+            report($e); // still answer the question; the index is just rebuilt next time
+        }
+
+        return $this->kbIndexRows = $rows;
+    }
 
     public function searchKnowledgeBase(string $message, int $limit = 5, ?ChatConversation $conversation = null)
     {
@@ -596,62 +667,75 @@ public function destroy(Request $request, ChatConversation $conversation)
         // what tells them apart, so a match on the whole name counts a lot.
         $named = $this->letterNames($message);
 
-        // Loaded once per request: a weak match searches a second time with the AI's rewrite.
-        $this->kbRows ??= KnowledgeBase::query()
-            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords']);
+        $tokens = array_values(array_filter($tokens, fn ($w) => mb_strlen($w) >= 2)); // a lone "a"/"b" only counts as part of a name (below)
+        $named = array_map(
+            fn ($variants) => array_map(fn ($name) => '/(?<![\p{L}\p{N}])' . preg_quote($name, '/') . '(?![\p{L}\p{N}])/u', $variants),
+            $named
+        );
 
-        return $this->kbRows
-            ->map(fn ($entry) => clone $entry)
-            ->map(function ($entry) use ($tokens, $phrases, $exact, $probe, $named) {
-                $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
-                $q = mb_strtolower($entry->allQuestions());
-                $ans = mb_strtolower((string) $entry->answer);
-
-                $score = 0;
-                $hits = 0;
-                foreach ($tokens as $w) {
-                    if (mb_strlen($w) < 2) {
-                        continue; // a lone "a"/"b" is in almost every text; it only counts as part of a name (below)
-                    }
-                    $hit = false;
-                    if (str_contains($kw, $w)) { $score += 3; $hit = true; }
-                    if (str_contains($q, $w)) { $score += 2; $hit = true; }
-                    if (str_contains($ans, $w)) { $score += 1; $hit = true; }
-                    $hits += $hit ? 1 : 0;
+        $scored = [];
+        foreach ($this->kbIndex() as $row) {
+            $score = 0;
+            $hits = 0;
+            foreach ($tokens as $w) {
+                $hit = false;
+                if (str_contains($row['kw'], $w)) { $score += 3; $hit = true; }
+                if (str_contains($row['q'], $w)) { $score += 2; $hit = true; }
+                if (str_contains($row['ans'], $w)) { $score += 1; $hit = true; }
+                $hits += $hit ? 1 : 0;
+            }
+            foreach ($phrases as $ph) {
+                if (str_contains($row['kw'], $ph) || str_contains($row['q'], $ph)) {
+                    $score += 4;
                 }
-                foreach ($phrases as $ph) {
-                    if (str_contains($kw, $ph) || str_contains($q, $ph)) {
-                        $score += 4;
-                    }
-                }
-                foreach ([$entry->question, $entry->question_ms, $entry->question_en, $entry->question_zh, $entry->question_ta] as $variant) {
-                    if ($exact !== '' && $variant && $this->normaliseQuestion($variant) === $exact) {
-                        $score += 100; // same question, word for word
+            }
+            if ($exact !== '' && isset($row['exact'][$exact])) {
+                $score += 100; // same question, word for word
+            }
+            // How close the message is to the entry's question in the student's own language.
+            [$points, $coverage] = $this->translationScore($probe, $row);
+            $score += $points;
+            // "kafe b" → the entry about Kantin/Cafe B (keywords "kafe b" or question "… Cafe B")
+            foreach ($named as $patterns) {
+                foreach ($patterns as $pattern) {
+                    if (preg_match($pattern, $row['kwq'])) {
+                        $score += 45;
+                        $hits++;
+                        $coverage = max($coverage, 0.67);
                         break;
                     }
                 }
-                // How close the message is to the entry's question in the student's own language.
-                $score += $this->translationScore($probe, $entry);
-                // "kafe b" → the entry about Kantin/Cafe B (keywords "kafe b" or question "… Cafe B")
-                $kwQ = str_replace('/', ' ', $kw . ' ' . $q);
-                foreach ($named as $variants) {
-                    foreach ($variants as $name) {
-                        if (preg_match('/(?<![\p{L}\p{N}])' . preg_quote($name, '/') . '(?![\p{L}\p{N}])/u', $kwQ)) {
-                            $score += 45;
-                            $hits++;
-                            $entry->coverage = max($entry->coverage ?? 0, 0.67);
-                            break;
-                        }
-                    }
+            }
+            // Reward entries that cover more of the student's words.
+            $relevance = $score + $hits * 2;
+            if ($relevance >= 5) {
+                $scored[$row['id']] = [$relevance, $coverage];
+            }
+        }
+
+        // Highest first; equal scores keep the knowledge-base order (same as before).
+        $order = array_keys($scored);
+        $pos = array_flip($order);
+        usort($order, fn ($a, $b) => ($scored[$b][0] <=> $scored[$a][0]) ?: ($pos[$a] <=> $pos[$b]));
+        $top = array_slice($order, 0, $limit);
+        if (! $top) {
+            return collect();
+        }
+
+        $models = KnowledgeBase::query()->whereIn('id', $top)
+            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords'])
+            ->keyBy('id');
+
+        return collect($top)
+            ->map(function ($id) use ($models, $scored) {
+                $entry = $models->get($id);
+                if ($entry) {
+                    [$entry->relevance, $entry->coverage] = $scored[$id];
                 }
-                // Reward entries that cover more of the student's words.
-                $entry->relevance = $score + $hits * 2;
 
                 return $entry;
             })
-            ->filter(fn ($entry) => $entry->relevance >= 5)
-            ->sortByDesc('relevance')
-            ->take($limit)
+            ->filter()
             ->values();
     }
 
@@ -709,6 +793,9 @@ public function destroy(Request $request, ChatConversation $conversation)
         if ($a === $b) {
             return true;
         }
+        if ($a[0] !== $b[0]) {
+            return false; // different first letter → no shared start (needs at least 3 letters in common)
+        }
         $la = mb_strlen($a);
         $lb = mb_strlen($b);
         $min = min($la, $lb);
@@ -732,36 +819,26 @@ public function destroy(Request $request, ChatConversation $conversation)
      * (Chinese → question_zh, Tamil → question_ta, English/Malay → question_en + question + question_ms).
      * Works for every entry automatically, because it uses the stored translations.
      */
-    private function translationScore(array $probe, KnowledgeBase $entry): int
+    private function translationScore(array $probe, array $row): array
     {
         $items = $probe['items'];
-        $entry->coverage = $items ? 0.0 : 1.0; // share of the student's words found in this entry's question
         if (! $items) {
-            return 0;
+            return [0, 1.0];
         }
+        $coverage = 0.0; // share of the student's words found in this entry's question
 
         if ($probe['lang'] === 'zh') {
-            $zh = mb_strtolower((string) $entry->question_zh);
-            $target = array_merge($this->hanBigrams($zh), $this->contentWords(preg_replace('/\p{Han}+/u', ' ', $zh)));
+            $target = $row['zh'];
             if (! $target) {
-                return 0;
+                return [0, $coverage];
             }
             $shared = count(array_intersect($items, $target));
-            $entry->coverage = $shared / count($items);
 
-            return (int) round(60 * (2 * $shared) / (count($items) + count($target)));
+            return [(int) round(60 * (2 * $shared) / (count($items) + count($target))), $shared / count($items)];
         }
 
-        $versions = $probe['lang'] === 'ta'
-            ? [$entry->question_ta]
-            : [$entry->question_en, $entry->question, $entry->question_ms];
-
         $best = 0;
-        foreach (array_filter($versions) as $text) {
-            $target = $this->contentWords((string) $text);
-            if (! $target) {
-                continue;
-            }
+        foreach ($probe['lang'] === 'ta' ? $row['ta'] : $row['latin'] as $target) {
             $matched = 0;
             foreach ($items as $w) {
                 foreach ($target as $t) {
@@ -771,11 +848,11 @@ public function destroy(Request $request, ChatConversation $conversation)
                     }
                 }
             }
-            $entry->coverage = max($entry->coverage, $matched / count($items));
+            $coverage = max($coverage, $matched / count($items));
             $best = max($best, (int) round(60 * (2 * $matched) / (count($items) + count($target))));
         }
 
-        return $best;
+        return [$best, $coverage];
     }
 
     /**
