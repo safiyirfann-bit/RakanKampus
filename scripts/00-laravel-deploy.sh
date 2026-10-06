@@ -29,3 +29,11 @@ php artisan config:cache
 
 echo "Caching routes..."
 php artisan route:cache
+
+echo "Starting background scheduler (reminder & class push notifications)..."
+# Render free plan takde cron. Sebelum ni reminder hanya dihantar bila cron-job.org
+# hit /cron/reminders dengan CRON_TOKEN yang betul - kalau token tu tak sama dengan
+# nilai dalam Render (render.yaml guna generateValue), endpoint bagi 404 dan
+# notifikasi langsung tak keluar. Loop ni jalankan scheduler setiap minit selagi
+# server hidup. Cron luar masih berguna untuk kejutkan server dari sleep (ping apa-apa URL).
+nohup setsid bash -c 'while true; do php /var/www/html/artisan schedule:run --no-interaction >> /proc/1/fd/2 2>&1; sleep 60; done' > /dev/null 2>&1 &
