@@ -1,0 +1,5 @@
+id,main_topic,intent,question,answer,category,keywords,question_ms,question_en,question_zh,question_ta
+1,Campus Facilities & Services Module,waktu_operasi_printer_sebelah_dobi_kamsis,Pukul berapa kedai printer sebelah dobi Kamsis buka?,"Waktu operasi kedai printer / fotostat di sebelah dobi Kamsis:
+1. Ahad – Jumaat: 8.00 pagi – 5.00 petang, dan 8.00 malam – 10.00 malam
+2. Sabtu: TUTUP",Kemudahan,"waktu operasi printer, printer kamsis, kedai printer, fotostat, photostat, print, cetak, sebelah dobi, dobi kamsis, buka pukul berapa, tutup bila, ratna bestari, kamsis pfi",,What are the opening hours of the printing shop next to the Kamsis laundry?,,
+2,Campus Facilities & Services Module,printer_kamsis_buka_sabtu,Adakah kedai printer sebelah dobi Kamsis buka pada hari Sabtu?,"Tidak. Kedai printer / fotostat di sebelah dobi Kamsis tutup pada hari Sabtu. Ia buka Ahad – Jumaat, 8.00 pagi – 5.00 petang dan 8.00 malam – 10.00 malam.",Kemudahan,"printer sabtu, printer buka sabtu, fotostat sabtu, kedai printer tutup, printer kamsis, cuti",,Is the printing shop next to the Kamsis laundry open on Saturday?,,
