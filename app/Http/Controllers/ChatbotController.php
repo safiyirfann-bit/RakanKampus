@@ -248,7 +248,11 @@ $payload = [
         $history
     ),
     'temperature' => 0.5,
+    // gpt-oss "thinks" before writing; nothing shows on screen until it is done.
+    // Low = it starts writing in about a second instead of several. (Ignored for OpenAI.)
+    'reasoning_effort' => 'low',
 ];
+$payload = \App\Support\Llm::payload($payload);
 
 // Saves the finished answer and builds the extras shown under it.
 $finish = function (string $reply) use ($conversation, $entries, $message) {
@@ -553,6 +557,9 @@ public function destroy(Request $request, ChatConversation $conversation)
      * - Follow-up questions with no topic words of their own ("kat mana tu?")
      *   borrow the words from the student's previous message.
      */
+    /** @var \Illuminate\Support\Collection<int, KnowledgeBase>|null */
+    private $kbRows = null;
+
     public function searchKnowledgeBase(string $message, int $limit = 5, ?ChatConversation $conversation = null)
     {
         $words = $this->topicWords($message);
@@ -589,8 +596,12 @@ public function destroy(Request $request, ChatConversation $conversation)
         // what tells them apart, so a match on the whole name counts a lot.
         $named = $this->letterNames($message);
 
-        return KnowledgeBase::query()
-            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords'])
+        // Loaded once per request: a weak match searches a second time with the AI's rewrite.
+        $this->kbRows ??= KnowledgeBase::query()
+            ->get(['id', 'information_id', 'intent', 'question', 'question_ms', 'question_en', 'question_zh', 'question_ta', 'answer', 'category', 'keywords']);
+
+        return $this->kbRows
+            ->map(fn ($entry) => clone $entry)
             ->map(function ($entry) use ($tokens, $phrases, $exact, $probe, $named) {
                 $kw = mb_strtolower((string) $entry->keywords . ' ' . (string) $entry->category);
                 $q = mb_strtolower($entry->allQuestions());
@@ -854,14 +865,15 @@ public function destroy(Request $request, ChatConversation $conversation)
 
         return \Illuminate\Support\Facades\Cache::remember('kb.aiquery.' . md5(mb_strtolower(trim($message))), now()->addDay(), function () use ($key, $message) {
             try {
-                $res = Http::withToken($key)->timeout(6)->post(\App\Support\Llm::url(), [
+                $res = Http::withToken($key)->timeout(4)->post(\App\Support\Llm::url(), \App\Support\Llm::payload([
                     'model' => \App\Support\Llm::model('small'),
                     'temperature' => 0,
+                    'reasoning_effort' => 'low', // a one-line rewrite needs no long thinking
                     'messages' => [
                         ['role' => 'system', 'content' => 'Tukar soalan pelajar Politeknik Ungku Omar (PUO) kepada SATU soalan Bahasa Melayu formal yang ringkas, guna istilah rasmi (cth: daftar kursus, yuran pengajian, asrama/kamsis, peperiksaan, SPMP, iPayment). Kekalkan nama dan singkatan (PUO, JTMK, MPP). Balas dengan soalan itu SAHAJA. Jika ia bukan soalan berkaitan kampus, balas: TIADA'],
                         ['role' => 'user', 'content' => Str::limit($message, 300, '')],
                     ],
-                ]);
+                ]));
                 $out = trim((string) $res->json('choices.0.message.content'));
 
                 return ($res->successful() && $out !== '' && stripos($out, 'TIADA') === false) ? Str::limit($out, 200, '') : null;
