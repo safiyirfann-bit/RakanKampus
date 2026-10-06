@@ -77,6 +77,39 @@ class CampusDatasetSeeder extends Seeder
 
             $this->command?->info(sprintf('%s: %d new, %d updated.', basename($file), $created, $updated));
         }
+
+        $this->removeDeleted();
+    }
+
+    /**
+     * Entries taken out of the data. Re-running never deletes on its own, so an entry that
+     * should disappear is listed (by intent, one per line) in data/campus_dibuang.txt.
+     * Lines starting with # are notes.
+     */
+    private function removeDeleted(): void
+    {
+        $file = database_path('seeders/data/campus_dibuang.txt');
+        if (! is_file($file)) {
+            return;
+        }
+
+        $intents = collect(file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES))
+            ->map(fn ($line) => trim($line))
+            ->reject(fn ($line) => $line === '' || str_starts_with($line, '#'))
+            ->unique()
+            ->values();
+
+        if ($intents->isEmpty()) {
+            return;
+        }
+
+        $removed = 0;
+        KnowledgeBase::whereIn('intent', $intents)->get()->each(function ($entry) use (&$removed) {
+            $entry->delete();
+            $removed++;
+        });
+
+        $this->command?->info("campus_dibuang.txt: {$removed} removed.");
     }
 
     /** @return array<int, array<string, string>> */

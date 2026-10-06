@@ -1,0 +1,4 @@
+# Entri yang dibuang dari database (satu intent setiap baris). Dipadam setiap kali deploy.
+# Nama pensyarah yang ejaannya tidak dapat disahkan (dibuang atas permintaan pemilik projek).
+pensyarah_agliza_binti_yacob
+pensyarah_puteri_roshidah_binti_megat_ibnu_rashad
