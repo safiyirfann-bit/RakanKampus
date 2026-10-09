@@ -137,6 +137,7 @@ class AuthController extends Controller
             'email' => $user->email,
             'phone' => $user->phone,
             'programme' => $user->programme,
+            'department' => \App\Support\MatricNumber::department($user->student_id), // JTMK, JKA, … (Home sky picture)
             'photo' => $user->photo_data,      // data: URI or null
             'cover' => $user->cover_data,      // data: URI or null
             'language' => $user->language ?? 'en',

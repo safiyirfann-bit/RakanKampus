@@ -63,7 +63,8 @@ class HomeController extends Controller
             'classes' => $classes,
             'reminders' => $reminders,
             'conversations' => $conversations,
-            'quick_questions' => PopularQuestions::top(4),
+            // Popular ones are students' own words; the defaults are translated (same as the website).
+            'quick_questions' => array_map(fn ($q) => $q + ['label' => $q['popular'] ? $q['text'] : __($q['text'])], PopularQuestions::top(4)),
         ]);
     }
 }
