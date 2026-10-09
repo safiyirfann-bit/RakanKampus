@@ -30,6 +30,10 @@ class ClassScheduleController extends Controller
             ->map(fn ($p) => $p->toRaw())
             ->values();
 
+        if ($request->expectsJson()) { // mobile app
+            return response()->json(['schedules' => $schedules, 'programs' => $programs, 'days' => ClassSchedule::DAYS]);
+        }
+
         return view('timetable', [
             'user' => $request->user(),
             'schedules' => $schedules,

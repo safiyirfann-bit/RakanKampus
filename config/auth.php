@@ -42,6 +42,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Mobile app: "Authorization: Bearer rk_..." (see App\Models\ApiToken)
+        'api' => [
+            'driver' => 'rk-token',
+            'provider' => 'users',
+        ],
     ],
 
     /*

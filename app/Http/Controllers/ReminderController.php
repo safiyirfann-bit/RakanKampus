@@ -23,6 +23,10 @@ class ReminderController extends Controller
         $historyCount = $user->reminders()->onlyTrashed()->count()
             + $user->reminders()->where('due_at', '<', now())->count();
 
+        if ($request->expectsJson()) { // mobile app
+            return response()->json(['reminders' => $reminders->values(), 'history_count' => $historyCount]);
+        }
+
         return view('reminders', [
             'user' => $user,
             'reminders' => $reminders,
@@ -41,6 +45,10 @@ class ReminderController extends Controller
             ->map(fn (Reminder $r) => $this->toHistoryItem($r, false));
 
         $items = $deleted->concat($completed)->sortByDesc('due_at')->values();
+
+        if ($request->expectsJson()) { // mobile app
+            return response()->json(['items' => $items]);
+        }
 
         return view('reminders-history', [
             'user' => $user,

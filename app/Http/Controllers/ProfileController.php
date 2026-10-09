@@ -135,6 +135,14 @@ class ProfileController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $this->saveProfile($request);
+
+        return redirect()->route('student.profile.edit')->with('success', __('Profile updated successfully!'));
+    }
+
+    /** Validates and saves the Edit Profile fields (web form and mobile app). */
+    public function saveProfile(Request $request): \App\Models\User
+    {
         if ($request->filled('student_id')) {
             $request->merge(['student_id' => \App\Support\MatricNumber::normalise($request->student_id)]);
         }
@@ -175,7 +183,7 @@ class ProfileController extends Controller
         $user->phone       = $request->phone;
         $user->save();
 
-        return redirect()->route('student.profile.edit')->with('success', __('Profile updated successfully!'));
+        return $user;
     }
 
     public function updatePassword(Request $request): RedirectResponse

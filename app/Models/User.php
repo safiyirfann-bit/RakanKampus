@@ -11,6 +11,9 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasPushSubscriptions;
 
+    /** Set when the request came from the mobile app (auth:api); used to log out that phone. */
+    public ?ApiToken $currentApiToken = null;
+
     protected $fillable = [
         'name',
         'theme',
@@ -76,6 +79,11 @@ class User extends Authenticatable
     public function classSchedules()
     {
         return $this->hasMany(ClassSchedule::class);
+    }
+
+    public function apiTokens()
+    {
+        return $this->hasMany(ApiToken::class);
     }
 
     public function programs()
