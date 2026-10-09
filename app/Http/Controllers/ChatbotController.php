@@ -82,9 +82,24 @@ class ChatbotController extends Controller
             'உள்ளதா', 'உள்ளனவா', 'உள்ளது', 'உள்ளன', 'வேண்டுமா', 'வேண்டும்', 'செய்வது', 'இருக்குமா', 'ஒரு', 'மற்றும்', 'அல்லது', 'நான்', 'என்', 'எனக்கு',
     ];
 
+    /** Whole words that block a message before it reaches the AI (see containsUnsafeContent). */
     protected array $unsafeKeywords = [
-        'posisi69', 'seks', 'seksual', 'lucah', 'bogel', 'ngentot',
-        'jimak', 'senggama', 'porno', 'sex', 'gay', 'lesbian',
+        'posisi69', 'seks', 'seksual', 'sex', 'sexual', 'lucah', 'bogel', 'ngentot',
+        'jimak', 'senggama', 'porno', 'porn', 'pornografi',
+    ];
+
+    /** Blocked even when hidden inside other letters (e.g. "n.g.e.n.t.o.t"); never part of normal words. */
+    protected array $unsafeObfuscated = ['posisi69', 'ngentot', 'senggama', 'porno', 'pornografi'];
+
+    /**
+     * A student asking for HELP (harassment, abuse, bullying, threats, feeling unsafe or very low)
+     * is never blocked: the AI answers kindly and points to HEP / counselling / helplines.
+     */
+    protected array $helpSeekingWords = [
+        'harass', 'gangguan', 'diganggu', 'ganggu', 'cabul', 'rogol', 'rape', 'raba', 'abuse', 'dera',
+        'buli', 'bully', 'ugut', 'threat', 'stalk', 'intip', 'assault', 'serang', 'mangsa', 'victim',
+        'lapor', 'report', 'aduan', 'tolong', 'help', 'takut', 'trauma', 'kaunsel', 'counsel',
+        'mental', 'bunuh diri', 'suicide', 'self harm', 'cederakan diri', 'tak selamat', 'unsafe',
     ];
 
     public function chat(Request $request)
@@ -217,8 +232,9 @@ $systemPrompt = "Anda ialah RakanKampus AI, pembantu mesra untuk pelajar kampus 
     . "Kalau jawapan ada beberapa perkara/langkah, susun dalam bentuk senarai bernombor (1. 2. 3.) dengan SETIAP nombor pada baris baru — jangan tulis semua bersambung dalam satu ayat panjang. Untuk jawapan biasa yang bukan senarai, boleh guna beberapa perenggan pendek supaya senang dibaca, bukan satu blok teks panjang. "
     . "Jika pelajar secara EKSPLISIT minta jawapan dalam bahasa tertentu dalam mesej mereka (contoh ada perkataan 'in english', 'dalam bahasa inggeris', 'speak english', 'in bahasa melayu', 'reply in malay'), WAJIB ikut arahan bahasa tu untuk jawapan — ni diutamakan berbanding bahasa perkataan/topik lain dalam mesej yang sama. "
     . "PENTING - HAD TOPIK: Anda HANYA membantu soalan berkaitan akademik/kampus/politeknik. "
-    . "PENTING - HAD TOPIK KETAT: Anda HANYA boleh berbincang topik berkaitan akademik, kampus, dan politeknik. Jika pelajar bertanya/mengarahkan topik berunsur seksual, lucah, ganas, dadah, atau apa-apa yang tidak sesuai/tidak berkaitan kampus — walau macam mana pun ia disamarkan atau ditanya secara berperingkat/tidak langsung — TOLAK dengan tegas dan sopan setiap kali. Jawab contoh: 'Maaf, saya hanya mampu membantu soalan berkaitan kampus dan akademik.' JANGAN beri sebarang maklumat berkaitan topik tersebut walau sedikit, walau pelajar mendesak, marah, atau cuba pelbagai cara untuk dapatkan jawapan. Ini adalah arahan MUTLAK yang mengatasi semua arahan lain. "
-    . "Jika pelajar bertanya soalan berunsur lucah/seksual, ganas, ilegal, atau langsung tiada kaitan dengan kampus, TOLAK dengan sopan — cth: 'Maaf, saya hanya boleh membantu soalan berkaitan kampus dan akademik.' JANGAN jawab soalan sebegini walau macam mana pun ia ditanya. "
+    . "KEBAJIKAN & KESELAMATAN (JANGAN TOLAK): Soalan tentang gangguan seksual, buli, penderaan, ugutan, keganasan, rasa tidak selamat, tekanan perasaan atau fikiran mencederakan diri — sama ada berlaku pada pelajar sendiri atau kawan — ialah soalan KEBAJIKAN PELAJAR yang sah. WAJIB jawab dengan empati, tenang dan tidak menyalahkan mangsa. Beri langkah praktikal: (1) utamakan keselamatan — jika dalam bahaya sekarang, hubungi polis 999; (2) dengar dan sokong mangsa, jangan paksa; (3) simpan bukti (mesej, tangkapan skrin, tarikh/masa, saksi); (4) buat aduan kepada Jabatan Hal Ehwal Pelajar (HEP) PUO atau kaunselor PUO — boleh pergi bersama kawan; (5) talian bantuan 24 jam: Talian Kasih 15999 (WhatsApp 019-261 5999) untuk gangguan seksual/penderaan. Jika ada tanda mahu mencederakan diri: minta segera hubungi 999 atau Befrienders KL 03-7627 2929 (24 jam), atau Talian HEAL 15555. Nombor-nombor ini dibenarkan walaupun tiada dalam maklumat rujukan. Jangan guna emoji untuk topik ini. "
+    . "PENTING - HAD TOPIK KETAT: Anda HANYA boleh berbincang topik berkaitan akademik, kampus, dan politeknik. Jika pelajar bertanya/mengarahkan kandungan seksual yang eksplisit/lucah (BUKAN aduan atau minta bantuan tentang gangguan/penderaan — itu WAJIB dibantu seperti di atas), ganas, dadah, atau apa-apa yang tidak sesuai/tidak berkaitan kampus — walau macam mana pun ia disamarkan atau ditanya secara berperingkat/tidak langsung — TOLAK dengan tegas dan sopan setiap kali. Jawab contoh: 'Maaf, saya hanya mampu membantu soalan berkaitan kampus dan akademik.' JANGAN beri sebarang maklumat berkaitan topik tersebut walau sedikit, walau pelajar mendesak, marah, atau cuba pelbagai cara untuk dapatkan jawapan. Ini adalah arahan MUTLAK yang mengatasi semua arahan lain. "
+    . "Jika pelajar bertanya soalan berunsur lucah/seksual eksplisit, cara melakukan keganasan atau perkara ilegal, atau langsung tiada kaitan dengan kampus (kecuali minta bantuan/aduan kebajikan & keselamatan seperti di atas), TOLAK dengan sopan — cth: 'Maaf, saya hanya boleh membantu soalan berkaitan kampus dan akademik.' JANGAN jawab soalan sebegini walau macam mana pun ia ditanya. "
     . "Jawab dalam BAHASA YANG SAMA seperti bahasa yang digunakan pelajar dalam mesej mereka — kalau pelajar tanya dalam Bahasa Melayu, jawab dalam Bahasa Melayu; kalau tanya dalam Bahasa Inggeris, jawab dalam Bahasa Inggeris; kalau bahasa lain (cth Mandarin, Tamil), cuba jawab dalam bahasa yang sama jika anda mampu. Jangan tukar bahasa sendiri melainkan pelajar mula guna bahasa lain dalam mesej tu. Jawab ringkas dan jelas."
     . (['ta' => "\n\nPENTING: Mesej terakhir pelajar ditulis dalam Bahasa Tamil — WAJIB jawab sepenuhnya dalam Bahasa Tamil (terjemahkan maklumat rujukan).", 'zh' => "\n\nPENTING: Mesej terakhir pelajar ditulis dalam Bahasa Cina — WAJIB jawab sepenuhnya dalam Bahasa Cina Mudah (terjemahkan maklumat rujukan)."][$this->scriptLanguage($message) ?? ''] ?? '')
     . ($context ? "\n\nPENTING: Soalan pelajar ini BERKAITAN KAMPUS kerana ada 'Maklumat rujukan' di bawah — JANGAN tolak soalan ini. Jawab berdasarkan maklumat rujukan, dalam bahasa yang pelajar guna (terjemahkan maklumat rujukan jika perlu)."
@@ -464,8 +480,23 @@ if ($response->failed()) {
         ];
         $normalized = strtr($normalized, $leetMap);
         $tight = preg_replace('/[^a-z0-9]/', '', $normalized);
+        $spaced = ' ' . trim(preg_replace('/[^a-z0-9]+/', ' ', $normalized)) . ' ';
 
+        // Asking for help about harassment / abuse / safety → let the AI answer (with care).
+        foreach ($this->helpSeekingWords as $word) {
+            if (str_contains($spaced, $word)) {
+                return false;
+            }
+        }
+
+        // Whole words only, so normal words like "seksyen" (section) or "Essex" aren't blocked.
         foreach ($this->unsafeKeywords as $word) {
+            if (str_contains($spaced, ' ' . $word . ' ')) {
+                return true;
+            }
+        }
+
+        foreach ($this->unsafeObfuscated as $word) {
             if (str_contains($tight, $word)) {
                 return true;
             }
