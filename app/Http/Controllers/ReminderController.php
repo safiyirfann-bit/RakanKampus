@@ -94,9 +94,19 @@ class ReminderController extends Controller
             . 'If nothing dated is visible, reply {"items":[]}. '
             . 'If the image is a WEEKLY class timetable (days of the week like Isnin/Monday with time slots, but no calendar dates), reply {"items":[],"kind":"weekly_timetable"}.';
 
-        [$raw, $error] = $useGemini
-            ? $this->geminiRead($prompt, $file->getRealPath(), $isPdf ? 'application/pdf' : $mime)
-            : $this->groqRead($prompt, $file->getRealPath(), $mime);
+        // Photos go to OpenAI when its key is set: it answers in a few seconds, while
+        // Gemini's free tier often queues or returns "busy" (each retry adds a long wait).
+        // PDFs still go to Gemini (it reads PDFs directly). If OpenAI fails, try Gemini.
+        if (! $isPdf && \App\Support\Llm::usingOpenAi()) {
+            [$raw, $error] = $this->groqRead($prompt, $file->getRealPath(), $mime);
+            if ($raw === null && $useGemini) {
+                [$raw, $error] = $this->geminiRead($prompt, $file->getRealPath(), $mime);
+            }
+        } else {
+            [$raw, $error] = $useGemini
+                ? $this->geminiRead($prompt, $file->getRealPath(), $isPdf ? 'application/pdf' : $mime)
+                : $this->groqRead($prompt, $file->getRealPath(), $mime);
+        }
 
         if ($raw === null) {
             return response()->json(['success' => false, 'error' => $error], 422);
@@ -321,6 +331,7 @@ class ReminderController extends Controller
                 ],
                 'temperature' => 0.2,
                 'response_format' => ['type' => 'json_object'],
+                'max_tokens' => 3000,
             ]);
 
         if ($response->failed()) {
